@@ -1,3 +1,11 @@
+# Team Members
+· Víctor Llana Pérez - uo294629@uniovi.es
+· Lara Haya Santiago - uo289684@uniovi.es
+· Alba González Arango - uo289041@uniovi.es
+· Marco Lorenzo Martínez - uo294324@uniovi.es
+· Javier Menéndez Osendi - uo294866@uniovi.es
+· Daniel Rodríguez Fernández - uo293655@uniovi.es 
+
 # wichat_en3b
 
 [![Actions Status](https://github.com/arquisoft/wichat_en3b/workflows/CI%20for%20wichat_en3b/badge.svg)](https://github.com/arquisoft/wichat_en3b/actions)
