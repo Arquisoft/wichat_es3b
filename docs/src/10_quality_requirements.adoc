@@ -2,30 +2,20 @@ ifndef::imagesdir[:imagesdir: ../images]
 
 [[section-quality-scenarios]]
 == Quality Requirements
+In order to make Wichat a satisfactory final product, we find it crucial to set some quality requirements to live up with. These aspects are to influence architectural decisions and hence include some measurable features:
+
+- **Usability:** Intuitive and easy interfaces, reducing the volume of help needed in order to use the application.
+- **Mantainability:** Long-term enhancement support requiring minimal effort.
+- **Accesibility:** Make the application usable to people with diverse disabilities.
+- **Reliability:** Contistency and easy recovering.
+- **Availability:** Handling increased traffic without compromising performance.
 
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
+Moreover, some other non-functional requirements, while less prioritary, are still relevant:
 
-.Content
-This section contains all quality requirements as quality tree with scenarios. The most important ones have already been described in section 1.2. (quality goals)
-
-Here you can also capture quality requirements with lesser priority,
-which will not create high risks when they are not fully achieved.
-
-.Motivation
-Since quality requirements will have a lot of influence on architectural
-decisions you should know for every stakeholder what is really important to them,
-concrete and measurable.
-
-
-.Further Information
-
-See https://docs.arc42.org/section-10/[Quality Requirements] in the arc42 documentation.
-
-****
-endif::arc42help[]
+- **Performance:** A smooth user experience, ensuring responsiveness and minimal delays.
+- **Security:** Basic measures, even if sensitive data is not handled.
+- **Compatibility:** Accesibility across diferent devices and screen sizes. 
 
 === Quality Tree
 
