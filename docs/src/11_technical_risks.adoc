@@ -16,9 +16,18 @@ A list of identified technical risks or technical debts, ordered by priority
 == Form
 List of risks and/or technical debts, probably including suggested measures to minimize, mitigate or avoid risks or reduce technical debts.
 
+[cols="1,1,3", options="header"]
+|===
+| Risk | Relevance | Considerations
+| Limited expertise in specific tools or programming languages | 2 | The team may encounter difficulties due to varying levels of familiarity with required tools and languages. To address this, we will prioritize the use of well-known technologies within the team while encouraging knowledge-sharing and individual learning efforts.
+| Lack of prior collaboration within the team | 1 | Since the team has not worked together before, there is a risk of inefficiencies in coordination. Establishing clear communication channels and regularly updating each other on progress will mitigate this issue.
+| Large team size | 1 | A higher number of contributors can complicate communication and workflow synchronization. Implementing structured meetings and documentation processes should help maintain efficiency.
+| Potential delays in integrating external APIs | 2 | Depending on external data sources, such as Wikidata, might introduce latency or downtime risks. Developing fallback mechanisms and caching strategies can help mitigate disruptions.
+| Knowledge disparity among team members | 2 | Some team members have prior experience, either from retaking the course or external knowledge, while others are learning these concepts for the first time. This can lead to uneven task distribution and communication gaps. Encouraging mentoring and pairing experienced members with those less familiar can help balance the workload and improve overall team efficiency.
+|===
+
 
 == Further Information
-
 See https://docs.arc42.org/section-11/[Risks and Technical Debt] in the arc42 documentation.
 
 
