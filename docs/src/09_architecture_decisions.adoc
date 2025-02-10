@@ -3,6 +3,55 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-design-decisions]]
 == Architecture Decisions
 
+[cols="3,5,3", options="header"]
+|===
+| Decision | Description | Status
+
+| *JavaScript*
+|*Decision:* We will use the JavaScript language to build both the front-end and the back-end of the application.
+
+
+*Justification:*
+We have chosen this technology because it comes from the initial project, and the whole team felt it was the right decision to continue using it.
+
+*Consequences:*
+Information about how the language works should be researched.
+
+| *Approved*
+
+| *React*
+|*Decision:* We have decided to use ReactJS for the front-end of our project.
+
+
+*Justification:*
+The decision was made because the base project provided to us already used ReactJS, and we considered this a great advantage to get started, as well as an opportunity to familiarize ourselves with a framework that is unfamiliar to many of us.
+
+*Consequences:*
+As a consequence, at the beginning, we will have to familiarize ourselves with this new technology for most of us, but we will be able to use the base project as an example.
+
+| *Approved*
+
+|*NodeJs*
+|*Decision:*
+
+
+*Justification:*
+
+
+
+*Consequences:*
+|*Approved*
+
+| *MongoDB*
+|*Decision:*
+
+
+*Justification:*
+
+
+*Consequences:*
+| *Approved*
+|===
 
 ifdef::arc42help[]
 [role="arc42help"]
