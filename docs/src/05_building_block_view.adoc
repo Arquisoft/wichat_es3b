@@ -67,7 +67,8 @@ In the best case you will get away with examples or simple signatures.
 ****
 endif::arc42help[]
 
-_**<Overview Diagram>**_
+image:5_Overview_diagram.png[]
+
 
 Motivation::
 
@@ -88,6 +89,8 @@ Important Interfaces::
 - **Question API**: Provides access to questions and answers.
 - **Hint API**: Offers hints for the questions.
 
+Both Question and Hint API will make use of external services (SONAR and Wikidata), and therefore will use their APIs.
+
 ifdef::arc42help[]
 [role="arc42help"]
 ****
@@ -98,66 +101,26 @@ responsibility according to the following schema:
 
 [cols="1,2" options="header"]
 |===
-| **Name** | **Responsibility**
-| _<black box 1>_ | _<Text>_
-| _<black box 2>_ | _<Text>_
+| **Name** | **Responsibility** 
+|  | 
+|| |
 |===
-
-
 
 If you use a list of black box descriptions then you fill in a separate black box template for every important building block .
 Its headline is the name of the black box.
 ****
 endif::arc42help[]
 
-==== <Name black box 1>
-
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Here you describe <black box 1>
-according the the following black box template:
-
-* Purpose/Responsibility
-* Interface(s), when they are not extracted as separate paragraphs. This interfaces may include qualities and performance characteristics.
-* (Optional) Quality-/Performance characteristics of the black box, e.g.availability, run time behavior, ....
-* (Optional) directory/file location
-* (Optional) Fulfilled requirements (if you need traceability to requirements).
-* (Optional) Open issues/problems/risks
-
-****
-endif::arc42help[]
-
-_<Purpose/Responsibility>_
-
-_<Interface(s)>_
-
-_<(Optional) Quality/Performance Characteristics>_
-
-_<(Optional) Directory/File Location>_
-
-_<(Optional) Fulfilled Requirements>_
-
-_<(optional) Open Issues/Problems/Risks>_
-
-
-
-
-==== <Name black box 2>
-
-_<black box template>_
-
-==== <Name black box n>
-
-_<black box template>_
-
-
-==== <Name interface 1>
-
-...
-
-==== <Name interface m>
-
+[cols="1,2" options="header"]
+|===
+| **Name** | **Responsibility** 
+| Webapp | Main entry point for users. It renders the graphical interface and executes game logic in client.
+| API Gateway | Central request router between the Webapp and backend services.
+| Question Service | Generates and retrieves system questions, based on catrgory and difficulty level.
+| User Authentication Service | Manages user registration, authentication and administration.
+| Hint Generation Service | Generates hints for questions based on difficulty level, by means of a LLM.
+| Database | Stores user information and questions. Recieves requests to store questions and manages credentials.
+|===
 
 
 === Level 2
