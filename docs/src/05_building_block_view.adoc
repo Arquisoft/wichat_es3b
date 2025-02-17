@@ -71,14 +71,22 @@ _**<Overview Diagram>**_
 
 Motivation::
 
-_<text explanation>_
-
+This view describes the decomposition of the WIChat system into several building blocks, focusing on the web application, external API interactions, and data handling, in order to provide an interactive and efficient user experience.
 
 Contained Building Blocks::
-_<Description of contained building block (black boxes)>_
+
+- **Webapp**: Manages the user interface and game logic.
+- **User Authentication Service**: Handles user registration and login.
+- **Question Service**: Generates and retrieves questions.
+- **Hint Generation Service**: Provides hints for users during the quiz.
+- **API Gateway**: Routes requests between the frontend and backend.
+- **Database**: Stores user data and question-related metadata.
 
 Important Interfaces::
-_<Description of important interfaces>_
+
+- **User API**: Allows interaction with user data.
+- **Question API**: Provides access to questions and answers.
+- **Hint API**: Offers hints for the questions.
 
 ifdef::arc42help[]
 [role="arc42help"]
