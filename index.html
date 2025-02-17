@@ -452,14 +452,25 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_stakeholders">1.3. Stakeholders</a></li>
 </ul>
 </li>
-<li><a href="#section-architecture-constraints">2. Architecture Constraints</a></li>
+<li><a href="#section-architecture-constraints">2. Architecture Constraints</a>
+<ul class="sectlevel2">
+<li><a href="#_technical_constraints">2.1. Technical Constraints</a></li>
+<li><a href="#_convention_constraints">2.2. Convention Constraints</a></li>
+<li><a href="#_organizational_constraints">2.3. Organizational Constraints</a></li>
+</ul>
+</li>
 <li><a href="#section-context-and-scope">3. Context and Scope</a>
 <ul class="sectlevel2">
 <li><a href="#_business_context">3.1. Business Context</a></li>
 <li><a href="#_technical_context">3.2. Technical Context</a></li>
 </ul>
 </li>
-<li><a href="#section-solution-strategy">4. Solution Strategy</a></li>
+<li><a href="#section-solution-strategy">4. Solution Strategy</a>
+<ul class="sectlevel2">
+<li><a href="#_decissions_made_to_achieve_quality_goals">4.1. Decissions made to achieve quality goals</a></li>
+<li><a href="#_relevant_organizational_decisions">4.2. Relevant organizational decisions</a></li>
+</ul>
+</li>
 <li><a href="#section-building-block-view">5. Building Block View</a>
 <ul class="sectlevel2">
 <li><a href="#_whitebox_overall_system">5.1. Whitebox Overall System</a></li>
@@ -496,7 +507,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </ul>
 </li>
 <li><a href="#section-technical-risks">11. Risks and Technical Debts</a></li>
-<li><a href="#section-glossary">12. Glossary</a></li>
+<li><a href="#_contents">12. Contents</a></li>
+<li><a href="#_motivation">13. Motivation</a></li>
+<li><a href="#_form">14. Form</a>
+<ul class="sectlevel2">
+<li><a href="#_technical_debts">14.1. Technical Debts</a></li>
+</ul>
+</li>
+<li><a href="#_further_information">15. Further Information</a></li>
+<li><a href="#section-glossary">16. Glossary</a></li>
 </ul>
 </div>
 </div>
@@ -552,35 +571,87 @@ For documentation of your own system you use better the <em>plain</em> version.<
 <div class="sect1">
 <h2 id="section-introduction-and-goals">1. Introduction and Goals</h2>
 <div class="sectionbody">
-<div class="sidebarblock arc42help">
-<div class="content">
 <div class="paragraph">
-<p>Describes the relevant requirements and the driving forces that software architects and development team must consider.
-These include</p>
+<p>This project was created and developed by a development team composed of students from the Software Architecture course
+at the School of Computer Engineering of the University of Oviedo.</p>
+</div>
+<div class="paragraph">
+<p>Last year, the company HappySw launched a project aimed at updating an experimental online version of a quiz
+competition similar to "Saber y Ganar" for the RTVE network.</p>
+</div>
+<div class="paragraph">
+<p>This year, the company ChattySw wants to expand its functionality so that contestants can interact with the application by
+receiving hints about the answers.</p>
+</div>
+<div class="paragraph">
+<p>This is the development team:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>underlying business goals,</p>
+<p><strong>Enol Rodríguez Hevia</strong>: <em>UO287935</em></p>
 </li>
 <li>
-<p>essential features,</p>
+<p><strong>Alberto Fernández Azcoaga</strong>: <em>UO179637</em></p>
 </li>
 <li>
-<p>essential functional requirements,</p>
+<p><strong>David González González</strong>: <em>UO291047</em></p>
 </li>
 <li>
-<p>quality goals for the architecture and</p>
+<p><strong>Zinedine Álvarez Sais</strong>: <em>UO294258</em></p>
 </li>
 <li>
-<p>relevant stakeholders and their expectations</p>
+<p><strong>Alejandro Vega García</strong>: <em>UO294615</em></p>
+</li>
+<li>
+<p><strong>Ignacio Llaneza Aller</strong>: <em>UO294914</em></p>
+</li>
+<li>
+<p><strong>Daniel Uría Edroso</strong>: <em>UO282813</em></p>
 </li>
 </ul>
 </div>
-</div>
-</div>
 <div class="sect2">
 <h3 id="_requirements_overview">1.1. Requirements Overview</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>The system will include at least a web frontend that will display images and answers, as well as a hint system
+that will allow users to receive clues about the images.</p>
+</li>
+<li>
+<p>Users will be able to register in the system and consult the history of their participation in the system: number
+of games, number of correct/failed questions, times, etc.</p>
+</li>
+<li>
+<p>The website must be deployed and accessible via the web.</p>
+</li>
+<li>
+<p>The question data will be automatically generated from Wikidata API.</p>
+</li>
+<li>
+<p>Users will be able to interact with the application for each question to obtain hints. This will be achieved through
+a language model (LLM) accessed via a provided API.</p>
+</li>
+<li>
+<p>There will be a time limit to answer each question.</p>
+</li>
+<li>
+<p>The system will provide API access to user information, which must be properly documented.</p>
+</li>
+<li>
+<p>The system will also provide API access to the generated questions.</p>
+</li>
+<li>
+<p>Each question will have one correct answer and several incorrect (distracting) answers. All answers will be genereated
+automatically.</p>
+</li>
+<li>
+<p>A technique must be implemented to generate hints from Wikidata data while mitigating incorrect
+answers and hallucinations during interactions.</p>
+</li>
+</ul>
+</div>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -611,6 +682,51 @@ If requirements documents exist this overview should refer to these documents.</
 </div>
 <div class="sect2">
 <h3 id="_quality_goals">1.2. Quality Goals</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 40%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Priority</th>
+<th class="tableblock halign-left valign-top">Quality Goal</th>
+<th class="tableblock halign-left valign-top">Expectations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>1</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Usability</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>All people should be able to enjoy and finish with success the application within a reasonable
+limit of time</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>2</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Maintainability</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The application should be easy to maintain, with clear, well-documented code and modular
+design that allows for future updates.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>3</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Accessibility</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The application should be usable by people with various disabilities, meeting common
+accessibility standards</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>4</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Availability</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The application should be available with minimal downtime, aiming for 99.9% uptime or better,
+and should be scalable to handle user demand</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>5</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Reliability</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The application should operate consistently and recover quickly from failures</em></p></td>
+</tr>
+</tbody>
+</table>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -694,14 +810,29 @@ These stakeholders determine the extent and the level of detail of your work and
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Role-1&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Contact-1&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Expectation-1&gt;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Teachers</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Jose Emilio Labra, Pablo González, Irene Cid, Diego Martín</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The teachers are the supervisors of the
+team and will help the team and should be accessible if the team needs them.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Role-2&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Contact-2&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Expectation-2&gt;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Students</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Enol Rodríguez, Alberto Fernández, David González, Zinedine Álvarez, Alejandro Vega
+Ignacio Llaneza, Daniel Uría</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>They are the development team. They should develop the application with success and
+learn through the process of the subject</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Users</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Anyone who interacts with the application</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">They should be able to use the application without any
+problems and enjoy the experience.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>RTVE</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>RTVE</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">They are the primary stakeholders in the application, as they commissioned it to allow their
+viewers to use it.</p></td>
 </tr>
 </tbody>
 </table>
@@ -712,6 +843,84 @@ These stakeholders determine the extent and the level of detail of your work and
 <div class="sect1">
 <h2 id="section-architecture-constraints">2. Architecture Constraints</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_technical_constraints">2.1. Technical Constraints</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Constraint</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wikidata</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The application must interact with Wikidata to generate the questions and answers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Git and GitHub</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The project will have version control through Git. The repository will be in GitHub, where issues, "project" and wiki will be useful for project tracking.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">LLM</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The application must have a bot chat to interact with it. The chat have to be made by an LLM.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_convention_constraints">2.2. Convention Constraints</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Constraint</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Arc42</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The project documentation will be done following the Arc42 template. Arc42 is a framework for documenting software architecture that provides a clear and structured approach to communicate architectural decisions, components, and requirements.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The project deadline is May 5th, but there will be sprints during the process. Important dates are February 24th for the first verion of de documentation, March 17th for a prototype of the application, and April 7th for an almost finished application.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_organizational_constraints">2.3. Organizational Constraints</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Constraint</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Team</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The team is made up of seven members who never worked together. The members will reunite at least one time per week to catch up on work and establish next objectives.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The project deadline is May 5th, but there will be sprints during the process. Important dates are February 24th for the first verion of de documentation, March 17th for a prototype of the application, and April 7th for an almost finished application.</p></td>
+</tr>
+</tbody>
+</table>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -737,6 +946,7 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </div>
 </div>
 <div style="page-break-after: always;"></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -841,48 +1051,59 @@ together with a mapping table showing the relationships between channels and inp
 <div class="sect1">
 <h2 id="section-solution-strategy">4. Solution Strategy</h2>
 <div class="sectionbody">
-<div class="sidebarblock arc42help">
-<div class="content">
 <div class="paragraph">
-<div class="title">Contents</div>
-<p>A short summary and explanation of the fundamental decisions and solution strategies, that shape system architecture. It includes</p>
+<p>We develop an application of questions, like 'Saber y Ganar', in which the main objetive is to comunicate with a chatbot to obtain some hints for answer correctly each question.</p>
+</div>
+<div class="paragraph">
+<p>We start from a ready-make application, which condition us when making some of the technical decisions.</p>
 </div>
 <div class="ulist">
+<div class="title">Technologies used:</div>
 <ul>
 <li>
-<p>technology decisions</p>
+<p>JavaScript: JavaScript is a very flexible programming language widely used in software development. Besides, we decided to continue with this language due to the base application.</p>
 </li>
 <li>
-<p>decisions about the top-level decomposition of the system, e.g. usage of an architectural pattern or design pattern</p>
+<p>Node.js: Node.js is used to create server-side applications with JavaScript, so we decided to use it to make the back-end of our web app.</p>
 </li>
 <li>
-<p>decisions on how to achieve key quality goals</p>
+<p>MongoDB: MongoDB is an open-source NoSQL database that uses a document-based data model for information storage and retrieval. Again its use is mainly due to the legacy project.</p>
 </li>
 <li>
-<p>relevant organizational decisions, e.g. selecting a development process or delegating certain tasks to third parties.</p>
+<p>React JS: It&#8217;s a framework widely used to create user interface components. Chosen for the large volume of documentation and the fact that it is the framework used during the previous app.</p>
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>These decisions form the cornerstones for your architecture. They are the foundation for many other detailed decisions or implementation rules.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>Keep the explanations of such key decisions short.</p>
-</div>
-<div class="paragraph">
-<p>Motivate what was decided and why it was decided that way,
-based upon problem statement, quality goals and key constraints.
-Refer to details in the following sections.</p>
-</div>
-<div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-4/">Solution Strategy</a> in the arc42 documentation.</p>
+<div class="sect2">
+<h3 id="_decissions_made_to_achieve_quality_goals">4.1. Decissions made to achieve quality goals</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Usability</strong>: Although usability is already guaranteed by the developers of the base application, we will try to make interaction with the chatbot simple so that it remains that way.</p>
+</li>
+<li>
+<p><strong>Maintainability</strong>: The entire team is committed to making clean and well-structured code, along with adequate documentation to enable good maintainability of the project.</p>
+</li>
+<li>
+<p><strong>Accessibility</strong>: In the event of making any changes that affect the accessibility of the application, we will ensure that it complies with the appropriate accessibility standards.</p>
+</li>
+</ul>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_relevant_organizational_decisions">4.2. Relevant organizational decisions</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Communication between team members is mostly made through Github, using issues to create and assign tasks, Whatsapp, to ask the rest of the team for help if needed for quick advice, and meetings.</p>
+</li>
+<li>
+<p>For the tasks to be performed, we have decided to implement an author-reviewer mechanic to avoid a single person being in charge of a part of the application and minimize large avoidable errors.</p>
+</li>
+</ul>
 </div>
 <div style="page-break-after: always;"></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1560,6 +1781,55 @@ on this list.</p>
 <div class="sect1">
 <h2 id="section-design-decisions">9. Architecture Decisions</h2>
 <div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 27.2727%;">
+<col style="width: 45.4545%;">
+<col style="width: 27.2728%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Decision</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>JavaScript</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Decision:</strong> We will use the JavaScript language to build both the front-end and the back-end of the application.</p>
+<p class="tableblock"><strong>Justification:</strong>
+We have chosen this technology because it comes from the initial project, and the whole team felt it was the right decision to continue using it.</p>
+<p class="tableblock"><strong>Consequences:</strong>
+Information about how the language works should be researched.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Approved</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>React</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Decision:</strong> We have decided to use ReactJS for the front-end of our project.</p>
+<p class="tableblock"><strong>Justification:</strong>
+The decision was made because the base project provided to us already used ReactJS, and we considered this a great advantage to get started, as well as an opportunity to familiarize ourselves with a framework that is unfamiliar to many of us.</p>
+<p class="tableblock"><strong>Consequences:</strong>
+As a consequence, at the beginning, we will have to familiarize ourselves with this new technology for most of us, but we will be able to use the base project as an example.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Approved</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>NodeJs</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Decision:</strong> We will use the Node.js framework to develop the application&#8217;s backend.</p>
+<p class="tableblock"><strong>Justification:</strong> This technology was chosen because it is the default in the initial project and the ones we will use
+as a reference. The entire team agreed that it was appropriate to continue using it.</p>
+<p class="tableblock"><strong>Consequences:</strong> The team members will need to gain more knowledge about how this library works.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Approved</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>MongoDB</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Decision:</strong> We have decided to use MongoDB for the development of our project&#8217;s backend.</p>
+<p class="tableblock"><strong>Justification:</strong> The decision was made because the base project and other projects from the previous year used MongoDB. We see this as a great advantage to start with, as well as an opportunity to deepen our knowledge of a database management system that is less common for us compared to MySQL.</p>
+<p class="tableblock"><strong>Consequences:</strong> As a result, the learning curve will be steeper at first, but we will be able to take advantage of its benefits as we progress.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Approved</strong></p></td>
+</tr>
+</tbody>
+</table>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -1610,100 +1880,154 @@ There you will find links and examples about ADR.</p>
 <div class="sect1">
 <h2 id="section-quality-scenarios">10. Quality Requirements</h2>
 <div class="sectionbody">
-<div class="sidebarblock arc42help">
-<div class="content">
 <div class="paragraph">
-<div class="title">Content</div>
-<p>This section contains all quality requirements as quality tree with scenarios. The most important ones have already been described in section 1.2. (quality goals)</p>
-</div>
-<div class="paragraph">
-<p>Here you can also capture quality requirements with lesser priority,
-which will not create high risks when they are not fully achieved.</p>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>Since quality requirements will have a lot of influence on architectural
-decisions you should know for every stakeholder what is really important to them,
-concrete and measurable.</p>
-</div>
-<div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-10/">Quality Requirements</a> in the arc42 documentation.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_quality_tree">10.1. Quality Tree</h3>
-<div class="sidebarblock arc42help">
-<div class="content">
-<div class="paragraph">
-<div class="title">Content</div>
-<p>The quality tree (as defined in ATAM – Architecture Tradeoff Analysis Method) with quality/evaluation scenarios as leafs.</p>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>The tree structure with priorities provides an overview for a sometimes large number of quality requirements.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>The quality tree is a high-level overview of the quality goals and requirements:</p>
+<p>In order to make Wichat a satisfactory final product, we find it crucial to set some quality requirements to live up with. These aspects are to influence architectural decisions and hence include some measurable features:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>tree-like refinement of the term "quality". Use "quality" or "usefulness" as a root</p>
+<p><strong>Usability:</strong> Intuitive and easy interfaces, reducing the volume of help needed in order to use the application.</p>
 </li>
 <li>
-<p>a mind map with quality categories as main branches</p>
+<p><strong>Mantainability:</strong> Long-term enhancement support requiring minimal effort.</p>
+</li>
+<li>
+<p><strong>Accesibility:</strong> Make the application usable to people with diverse disabilities.</p>
+</li>
+<li>
+<p><strong>Reliability:</strong> Contistency and easy recovering.</p>
+</li>
+<li>
+<p><strong>Availability:</strong> Handling increased traffic without compromising performance.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>In any case the tree should include links to the scenarios of the following section.</p>
+<p>Moreover, some other non-functional requirements, while less prioritary, are still relevant:</p>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Performance:</strong> A smooth user experience, ensuring responsiveness and minimal delays.</p>
+</li>
+<li>
+<p><strong>Security:</strong> Basic measures, even if sensitive data is not handled.</p>
+</li>
+<li>
+<p><strong>Compatibility:</strong> Accesibility across diferent devices and screen sizes.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_quality_tree">10.1. Quality Tree</h3>
+<div class="imageblock">
+<div class="content">
+<img src="./images/diagrama_escenarios_calidad.jpg" alt="Diagrama de escenarios de calidad" width="primera versión">
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_quality_scenarios">10.2. Quality Scenarios</h3>
-<div class="sidebarblock arc42help">
-<div class="content">
-<div class="paragraph">
-<div class="title">Contents</div>
-<p>Concretization of (sometimes vague or implicit) quality requirements using (quality) scenarios.</p>
-</div>
-<div class="paragraph">
-<p>These scenarios describe what should happen when a stimulus arrives at the system.</p>
-</div>
-<div class="paragraph">
-<p>For architects, two kinds of scenarios are important:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Usage scenarios (also called application scenarios or use case scenarios) describe the system’s runtime reaction to a certain stimulus. This also includes scenarios that describe the system’s efficiency or performance. Example: The system reacts to a user’s request within one second.</p>
-</li>
-<li>
-<p>Change scenarios describe a modification of the system or of its immediate environment. Example: Additional functionality is implemented or requirements for a quality attribute change.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>Scenarios make quality requirements concrete and allow to
-more easily measure or decide whether they are fulfilled.</p>
-</div>
-<div class="paragraph">
-<p>Especially when you want to assess your architecture using methods like
-ATAM you need to describe your quality goals (from section 1.2)
-more precisely down to a level of scenarios that can be discussed and evaluated.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>Tabular or free form text.</p>
-</div>
-</div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 23.0769%;">
+<col style="width: 23.0769%;">
+<col style="width: 38.4615%;">
+<col style="width: 15.3847%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>ID</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>QA</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Scenario</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Priority</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q1.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Usability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must allow a player to start and quit a game without external help, within 3 minutes of opening the app, thanks to clear and simple interfaces.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q1.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Usability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Users must be able to navigate between different game sections (settings, chat, etc.) in no more than 2 taps. It should take under 10 seconds for an average user.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q2.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mantainability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The addition of new questions must be quick and simple without interrupting the application flow. It should take approximately 5 minutes, this entailing no downtime for the application.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q2.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mantainability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must allow the implementation of new game models with minimal changes to the existing codebase, which should not take more than 1 hour. There should not be any regression in existing game functionality.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q3.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Accessibility</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The application must support screen readers for users with visual impairments, guaranteeing as well buttons and answers that are simple to read. All interactive elements must have alternative text, and the screen reader should process the entire game in under 30 seconds for each screen.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q3.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Accessibility</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An option for high-contrast mode for users with daltonism or another visual disability must be provided. The color contrast between text and background must have a contrast radio of at least 4.5:1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q4.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reliability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If the system fails during a game, it should allow the user to resume the game from the last saved state. No more than 1 minute of progess should be lost.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q5.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Availability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must mantain 99.9% uptime over a month, including the peak usage period. Downtime must not overcome 45 minutes/month.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">P1.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Performance</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The product must respond to a player&#8217;s request in less than 0.5s.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">P1.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Performance</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The application should give support to approximately 100 simultaneous request without significant downgrade in performance</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S1.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Security</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">It must be ensured that player personal data (especially credentials) is encrypted, even if no sensitive data is handled. 0 data breaches must be admitted</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S1.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Security</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must log all user actions related to account creation and gameplay. Unauthorized attempts to read private account information should trigger an alarm within 5 minutes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C1.1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compatibility</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The game should work correctly on both mobile and desktop devices, adjusting the dessign for different screen sizes, at least between 4"-27".</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C1.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compatibility</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must support the latest versions of popular browsers (Chrome, Safari, Firefox, etc.). It should be completely functional, with 0 visual/functional issues.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+</tr>
+</tbody>
+</table>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -1711,34 +2035,100 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 <div class="sect1">
 <h2 id="section-technical-risks">11. Risks and Technical Debts</h2>
 <div class="sectionbody">
-<div class="sidebarblock arc42help">
-<div class="content">
+
+</div>
+</div>
+<div class="sect1 arc42help">
+<h2 id="_contents">12. Contents</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<div class="title">Contents</div>
 <p>A list of identified technical risks or technical debts, ordered by priority</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_motivation">13. Motivation</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<div class="title">Motivation</div>
 <p>“Risk management is project management for grown-ups” (Tim Lister, Atlantic Systems Guild.)</p>
 </div>
-<div class="paragraph">
-<p>This should be your motto for systematic detection and evaluation of risks and technical debts in the architecture, which will be needed by management stakeholders (e.g. project managers, product owners) as part of the overall risk analysis and measurement planning.</p>
 </div>
+</div>
+<div class="sect1">
+<h2 id="_form">14. Form</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<div class="title">Form</div>
 <p>List of risks and/or technical debts, probably including suggested measures to minimize, mitigate or avoid risks or reduce technical debts.</p>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Risk</th>
+<th class="tableblock halign-left valign-top">Relevance</th>
+<th class="tableblock halign-left valign-top">Considerations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Limited expertise in specific tools or programming languages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The team may encounter difficulties due to varying levels of familiarity with required tools and languages. To address this, we will prioritize the use of well-known technologies within the team while encouraging knowledge-sharing and individual learning efforts.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lack of prior collaboration within the team</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Since the team has not worked together before, there is a risk of inefficiencies in coordination. Establishing clear communication channels and regularly updating each other on progress will mitigate this issue.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Large team size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A higher number of contributors can complicate communication and workflow synchronization. Implementing structured meetings and documentation processes should help maintain efficiency.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Potential delays in integrating external APIs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Depending on external data sources, such as Wikidata, might introduce latency or downtime risks. Developing fallback mechanisms and caching strategies can help mitigate disruptions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Knowledge disparity among team members</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Some team members have prior experience, either from retaking the course or external knowledge, while others are learning these concepts for the first time. This can lead to uneven task distribution and communication gaps. Encouraging mentoring and pairing experienced members with those less familiar can help balance the workload and improve overall team efficiency.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_technical_debts">14.1. Technical Debts</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Technical Debt</th>
+<th class="tableblock halign-left valign-top">Considerations</th>
+</tr>
+</thead>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_further_information">15. Further Information</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<div class="title">Further Information</div>
 <p>See <a href="https://docs.arc42.org/section-11/">Risks and Technical Debt</a> in the arc42 documentation.</p>
-</div>
-</div>
 </div>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-glossary">12. Glossary</h2>
+<h2 id="section-glossary">16. Glossary</h2>
 <div class="sectionbody">
 <div class="sidebarblock arc42help">
 <div class="content">
@@ -1789,12 +2179,28 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Term-1&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;definition-1&gt;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>LLM</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Large Language Model, a type of AI model that can generate human-like text.</em></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Term-2&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;definition-2&gt;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Chatbot</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>It&#8217;s a computer programme that simulates human conversation with an end-user.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Framework</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A framework is an outline that provides a basic structure for developing a project with specific objectives, a kind of template that serves as a starting point for the organisation and development of software.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Front-end</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Front-end includes drop-down menus, images, icons, colours, graphic elements, animations and everything related to improving the user&#8217;s browsing experience.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Back-end</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Back-end is responsible for the server, database and application logic.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>API</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>APIs are mechanisms that allow two software components to communicate with each other through a set of definitions and protocols.</em></p></td>
 </tr>
 </tbody>
 </table>
