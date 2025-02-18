@@ -39,29 +39,143 @@ See https://docs.arc42.org/section-6/[Runtime View] in the arc42 documentation.
 ****
 endif::arc42help[]
 
-=== <Runtime Scenario 1>
+=== Sign up
 
+The user wants to create a new account and register it for the future.
+Data must be valid and not collide with some account that already exists.
 
-* _<insert runtime diagram or textual description of the scenario>_
-* _<insert description of the notable aspects of the interactions between the
-building block instances depicted in this diagram.>_
-
-It is possible to use a sequence diagram:
-
-[plantuml,"Sequence diagram",png]
+[plantuml,"SignUp",png]
 ----
-actor Alice
-actor Bob
-database Pod as "Bob's Pod"
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
-Alice  --> Pod: Store route
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+actor User
+participant Web
+database MongoDB
+
+User --> Web: Select to sign up
+
+loop Until user has no errors and does not exist
+    Web --> User: Show sign up fields
+    User --> Web: Fill sign up fields
+    Web --> Web: Validate sign up fields
+    Web --> MongoDB: Check that user does not exist
+    MongoDB --> Web: Inform if user exists
+
+    alt Validations are incorrect or user already exists
+        Web --> User: Show errors
+    end
+end
+
+Web --> MongoDB: Save new user
+MongoDB --> Web: Inform that the user has been saved
+Web --> User: Session started with new user
 ----
 
-=== <Runtime Scenario 2>
 
-=== ...
+=== Log in
 
-=== <Runtime Scenario n>
+The user wants to log in with an account that has already been created.
+
+[plantuml,"LogIn",png]
+----
+actor User
+participant Web
+database MongoDB
+
+User --> Web: Select to log in
+
+loop Until user enters valid credentials and exists
+    Web --> User: Show login fields
+    User --> Web: Fill login fields
+    Web --> Web: Validate credentials
+    
+    
+    Web --> MongoDB: Check if user exists
+    MongoDB --> Web: Inform if user exists
+
+    alt Credentials are incorrect or user does not exist
+        Web --> User: Show errors
+    end
+end
+
+Web --> User: Session started successfully
+----
+
+
+=== Playing the game
+
+Selecting the game mode and playing it.
+
+[plantuml,"Playing",png]
+----
+actor User
+participant Web
+participant LLM
+participant Wikidata
+participant QuestionAPI
+database Database
+
+User --> Web: Choose Category
+Web--> Wikidata: Get a question
+Wikidata-->QuestionAPI: Store question&answer
+QuestionAPI --> Wikidata: Send question
+Wikidata --> LLM: Give information
+Wikidata --> Web: Send question
+User --> Web: Answer the question
+Web--> Wikidata: Pass the answer
+Wikidata-->QuestionAPI: Pass the answer
+QuestionAPI-->QuestionAPI: Check
+QuestionAPI-->Database: Update Points
+QuestionAPI --> Wikidata: Send result
+Wikidata --> Web: Send result
+User-->Web: Other category || Other round
+----
+
+
+=== Hints
+
+The application has several types of hints, but we can define a general structure 
+that matches with all of them, just by varying few details for each type.
+
+[plantuml,"Hints",png]
+----
+actor User
+participant Web
+participant Wikidata
+participant LLM
+
+User --> Web: Ask for a Hint
+Web --> Wikidata: Ask for information
+Wikidata --> Web: Return information
+Web --> LLM: Send current information and query
+LLM --> Web: Return the hint
+Web --> User: Show the hint
+----
+
+
+
+=== Rankings
+
+Seeing the ranking of best scores. It can be the general one or the one for each category.
+
+[plantuml,"Rankings",png]
+----
+actor User
+participant Web
+database Database
+
+User --> Web: Login
+Web --> Web: See general ranking
+Web --> Database: Get results
+Database --> Database: Getting all results
+Database --> Web: Retriving to User
+Web --> User: Presenting rankings
+
+User --> Web: Choose a category 
+Web --> Database: Get results
+Database --> Database: Getting results
+Database --> Web: Retriving to User
+Web --> User: Presenting rankings
+----
+
+
+
+
