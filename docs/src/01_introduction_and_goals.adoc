@@ -80,8 +80,8 @@ endif::arc42help[]
 
 |===
 |Goal|Description
-| Testability | Tests are going to be developed in order to test the different actions that our application will    provide. 
-| Usability | We will do some user tests for different people of all ages in order to make our application usable by everyone. 
+| Testability | Our application is going to be proven with different tests checking its funcionality. 
+| Usability | Our application is going to be very intuitive, allowing new users to navigate through it quickly.
 | Portability | Our application will allow its deployment of different devices at different times. 
 | Security & Privacy | Our application will only allow the users themselves to see its own results, without considering some rankings that will involve all users. 
 | Performance | Our application will be loading tests to confirm that runs correctly under “heavy conditions” in which there is much traffic of users.  
