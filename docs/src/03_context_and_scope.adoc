@@ -58,24 +58,24 @@ endif::arc42help[]
 ----
 @startuml
 
+left to right direction
+
 actor User
 
 rectangle "Web Application" {
-    rectangle "Frontend" as Frontend
+    rectangle Frontend
     rectangle "Backend Service" as Backend
-    database Database
 }
 
 rectangle "External Services" {
-    rectangle "Wikidata" as Wikidata
-    rectangle "LLM" as LLM
+    rectangle Wikidata
+    rectangle LLM
 }
 
-User <-> Frontend
+User <..> Frontend : Interacts
 Frontend <-> Backend
-Backend <-> Wikidata
-Backend <-> LLM
-Backend <-> Database
+Backend ..> Wikidata : Requests data
+Backend ..> LLM : Asks for hints
 
 @enduml
 ----
