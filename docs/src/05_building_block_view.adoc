@@ -101,9 +101,7 @@ responsibility according to the following schema:
 
 [cols="1,2" options="header"]
 |===
-| **Name** | **Responsibility** 
-|  |
-|||
+| **Name** | **Responsibility**
 |===
 
 If you use a list of black box descriptions then you fill in a separate black box template for every important building block .
