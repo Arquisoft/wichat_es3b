@@ -44,7 +44,6 @@ Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%8
 
  - React's declarative nature facilitates the construction of interactive user interfaces.
  - The integration of React with Wikidata is straightforward and user-friendly, simplifying data management and display.
- - It aligns with our existing JavaScript stack used in the backend.
 
 As a consequence, most part of the team will require React training because it is a new technology for many of us.
 
