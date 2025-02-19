@@ -67,15 +67,43 @@ In the best case you will get away with examples or simple signatures.
 ****
 endif::arc42help[]
 
-_**<Overview Diagram>**_
+[plantuml,width=400px,height=300px]
+----
+@startuml
+
+storage {
+  actor user
+  rectangle Wikidata
+  rectangle LLM
+  node WIChat
+}
+
+skinparam node{
+  BackgroundColor #78a1c4
+  FontSize 18
+}
+
+user -right-> WIChat
+Wikidata --> WIChat
+LLM --> WIChat
+
+@enduml
+----
 
 Motivation::
 
-_<text explanation>_
+The purpose of this diagram is to represent the system in the most general way possible, outlining the main application from the external components that are also in use.
 
 
 Contained Building Blocks::
-_<Description of contained building block (black boxes)>_
+
+[cols="1,2" options="header"]
+|===
+| **Name** | **Responsibility**
+| **WIChat** | Central web Application, acts as the primary interface for the user and acts as mediator between external data sources and services. 
+| **Wikidata** | Repository of factual, well-organized, and machine-readable data that can be queried and leveraged to support the system’s functionality.
+| **LLM** | Will generate appropiate hints in response to user queries, will also process data from Wikidata to generate said hints. 
+|===
 
 Important Interfaces::
 _<Description of important interfaces>_
@@ -91,8 +119,8 @@ responsibility according to the following schema:
 [cols="1,2" options="header"]
 |===
 | **Name** | **Responsibility**
-| _<black box 1>_ | _<Text>_
-| _<black box 2>_ | _<Text>_
+| _<black box 1>_ | _<Text>_
+| _<black box 2>_ | _<Text>_
 |===
 
 
@@ -165,7 +193,29 @@ Leave out normal, simple, boring or standardized parts of your system
 ****
 endif::arc42help[]
 
-==== White Box _<building block 1>_
+[plantuml]
+----
+@startuml
+
+actor User
+
+rectangle WiChat {
+    rectangle "Web Application" as Web
+    rectangle "Backend Service" as Backend
+    database Database
+}
+
+rectangle Wikidata
+rectangle LLM
+
+User <-> Web
+Web <-> Backend
+Backend <-> Database
+Backend ..> Wikidata
+Backend ..> LLM
+
+@enduml
+----
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -174,19 +224,6 @@ ifdef::arc42help[]
 ****
 endif::arc42help[]
 
-_<white box template>_
-
-==== White Box _<building block 2>_
-
-
-_<white box template>_
-
-...
-
-==== White Box _<building block m>_
-
-
-_<white box template>_
 
 
 
@@ -202,24 +239,56 @@ part of arc42 for additional levels.
 ****
 endif::arc42help[]
 
-==== White Box <_building block x.1_>
+[plantuml]
+----
+@startuml
+' 1) Force layout from top to bottom
+top to bottom direction
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Specifies the internal structure of _building block x.1_.
-****
-endif::arc42help[]
+skinparam nodeStyle rectangle
+skinparam artifactStyle rectangle
+skinparam databaseStyle cylinder
 
-_<white box template>_
+actor "User" as user
+
+' 2) Browser node at the top, containing the Web Application artifact
+node "Browser" as browser {
+  artifact "Web Application" as Web
+}
+
+' 3) Server node in the middle, containing the Backend Service and Database
+node "Server" as server {
+  node "Backend Service" as backend {
+    artifact "Authentication Service" as Auth
+    artifact "Game Service" as Game
+    artifact "Chat Service" as ChatSvc
+    artifact "Questions Service" as QnA
+  }
+  database "Database" as DB
+}
+
+' 4) External Services node at the bottom
+node "External Services" as ext {
+  artifact "LLM" as LLM
+  artifact "Wikidata" as Wikidata
+}
+
+' 5) Create relationships; use arrow directions to hint at top->bottom flow
+user -right-> Web
+Web --> Auth
+Web --> Game
+Auth --> DB
+Game --> ChatSvc
+Game --> QnA
+ChatSvc --> LLM
+QnA --> Wikidata
+
+' 6) (Optional) Add a hidden link to force vertical ordering
+'    This is sometimes useful if PlantUML tries to shuffle the diagram.
+
+@enduml
+----
 
 
-==== White Box <_building block x.2_>
-
-_<white box template>_
 
 
-
-==== White Box <_building block y.1_>
-
-_<white box template>_
