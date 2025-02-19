@@ -67,18 +67,48 @@ In the best case you will get away with examples or simple signatures.
 ****
 endif::arc42help[]
 
-_**<Overview Diagram>**_
+[plantuml,width=400px,height=300px]
+----
+@startuml
+
+storage {
+  actor user
+  rectangle Wikidata
+  rectangle LLM
+  node WIChat
+}
+
+skinparam node{
+  BackgroundColor #78a1c4
+  FontSize 18
+}
+
+user -right-> WIChat
+Wikidata --> WIChat
+LLM --> WIChat
+
+@enduml
+----
 
 Motivation::
 
-_<text explanation>_
+The purpose of this diagram is to represent the system in the most general way possible, outlining the main application from the external components that are also in use.
 
 
 Contained Building Blocks::
-_<Description of contained building block (black boxes)>_
 
-Important Interfaces::
-_<Description of important interfaces>_
+[cols="1,2" options="header"]
+|===
+| **Name** | **Responsibility**
+| **WIChat** | Central web Application, acts as the primary interface for the user and acts as mediator between external data sources and services. 
+| **Wikidata** | Repository of factual, well-organized, and machine-readable data that can be queried and leveraged to support the system’s functionality.
+| **LLM** | Will generate appropiate hints in response to user queries, will also process data from Wikidata to generate said hints. 
+|===
+
+Important interfaces::
+ * User ↔ WIChat: Direct interaction through UI.
+ * WIChat ↔ Wikidata: Structured data retrieval for factual information and images.
+ * WIChat ↔ LLM: Natural language understanding and response generation.
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -91,66 +121,15 @@ responsibility according to the following schema:
 [cols="1,2" options="header"]
 |===
 | **Name** | **Responsibility**
-| _<black box 1>_ | _<Text>_
-| _<black box 2>_ | _<Text>_
+| _<black box 1>_ | _<Text>_
+| _<black box 2>_ | _<Text>_
 |===
-
 
 
 If you use a list of black box descriptions then you fill in a separate black box template for every important building block .
 Its headline is the name of the black box.
 ****
 endif::arc42help[]
-
-==== <Name black box 1>
-
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Here you describe <black box 1>
-according the the following black box template:
-
-* Purpose/Responsibility
-* Interface(s), when they are not extracted as separate paragraphs. This interfaces may include qualities and performance characteristics.
-* (Optional) Quality-/Performance characteristics of the black box, e.g.availability, run time behavior, ....
-* (Optional) directory/file location
-* (Optional) Fulfilled requirements (if you need traceability to requirements).
-* (Optional) Open issues/problems/risks
-
-****
-endif::arc42help[]
-
-_<Purpose/Responsibility>_
-
-_<Interface(s)>_
-
-_<(Optional) Quality/Performance Characteristics>_
-
-_<(Optional) Directory/File Location>_
-
-_<(Optional) Fulfilled Requirements>_
-
-_<(optional) Open Issues/Problems/Risks>_
-
-
-
-
-==== <Name black box 2>
-
-_<black box template>_
-
-==== <Name black box n>
-
-_<black box template>_
-
-
-==== <Name interface 1>
-
-...
-
-==== <Name interface m>
-
-
 
 === Level 2
 
@@ -165,30 +144,37 @@ Leave out normal, simple, boring or standardized parts of your system
 ****
 endif::arc42help[]
 
-==== White Box _<building block 1>_
+[plantuml]
+----
+@startuml
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-...describes the internal structure of _building block 1_.
-****
-endif::arc42help[]
+actor User
 
-_<white box template>_
+rectangle WiChat {
+    rectangle "Frontend Service" as Web
+    rectangle "Backend Service" as Backend
+    database Database
+}
 
-==== White Box _<building block 2>_
+rectangle Wikidata
+rectangle LLM
 
+User <-> Web
+Web <-> Backend
+Backend <-> Database
+Backend ..> Wikidata
+Backend ..> LLM
 
-_<white box template>_
+@enduml
+----
 
-...
-
-==== White Box _<building block m>_
-
-
-_<white box template>_
-
-
+[cols="1,2" options="header"]
+|===
+| **Name** | **Responsibility**
+| **Frontend Service** | Manages user interaction and presentation.
+| **Backend Service** | Handles logic, coordination, and communication between the frontend, database, and external services.
+| **Database Layer** | Provides secure and efficient storage and retrieval of data for the application.
+|===
 
 === Level 3
 
@@ -202,24 +188,53 @@ part of arc42 for additional levels.
 ****
 endif::arc42help[]
 
-==== White Box <_building block x.1_>
+[plantuml]
+----
+@startuml
+top to bottom direction
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Specifies the internal structure of _building block x.1_.
-****
-endif::arc42help[]
+skinparam nodeStyle rectangle
+skinparam artifactStyle rectangle
+skinparam databaseStyle cylinder
 
-_<white box template>_
+actor "User" as user
 
+node "Browser" as browser {
+  artifact "Frontend Service" as Web
+}
 
-==== White Box <_building block x.2_>
+node "Server" as server {
+  node "Backend Service" as backend {
+    artifact "Authentication Service" as Auth
+    artifact "Game Service" as Game
+    artifact "Chat Service" as ChatSvc
+    artifact "Questions Service" as QnA
+  }
+  database "Database" as DB
+}
 
-_<white box template>_
+node "External Services" as ext {
+  artifact "LLM" as LLM
+  artifact "Wikidata" as Wikidata
+}
 
+user -right-> Web
+Web --> Auth
+Web --> Game
+Auth --> DB
+Game --> ChatSvc
+Game --> QnA
+ChatSvc --> LLM
+QnA --> Wikidata
 
+@enduml
+----
 
-==== White Box <_building block y.1_>
-
-_<white box template>_
+[options="header", cols="1,2"]
+|===
+| **Name** | Responsibility
+| **Authentication Service** | Handles user authentication, login and signup.
+| **Game Service** | Manages game state and logic. Uses more concrete services like Chat and Questions to divide responsibilities.
+| **Chat Service** | Provides chat functionality, sending requests to an LLM, receiving and processing responses to show hints to the user.
+| **Questions Service** | Creates and provides questions using data from Wikidata.
+|===
