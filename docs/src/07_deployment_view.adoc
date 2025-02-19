@@ -44,7 +44,7 @@ See https://docs.arc42.org/section-7/[Deployment View] in the arc42 documentatio
 ****
 endif::arc42help[]
 
-=== Infrastructure Level 1
+=== Infrastructure
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -60,7 +60,45 @@ For multiple environments or alternative deployments please copy and adapt this 
 ****
 endif::arc42help[]
 
-_**<Overview Diagram>**_
+[plantuml,"Deployment-View",png]
+----
+title Deployment Diagram
+
+cloud "User" as user #lightgreen
+
+node Device as device #lightgreen {
+    node "Web Browser" as browser
+  }
+
+cloud "Azure Ubuntu Server" as server #lightyellow {
+    node "Docker" as docker #lightblue {
+        node "WebApp" as webapp
+        node "Gateway" as gateway
+        database "MongoDB" as db
+
+        folder "Microservices" as microservices #pink {
+            component "AuthService" as authservice
+            component "UserService" as userservice
+            component "LLMservice" as llmservice
+        }
+    }
+    
+}
+
+cloud "External Service" #orange {
+    node "WikiData" as wikidata
+}
+
+user --> device : Interacts With
+browser --> webapp : HTTPS Request
+webapp --> gateway : Uses
+gateway --> authservice : Handles Authentication
+gateway --> userservice : Handles User Data
+gateway --> llmservice : Handles Hints
+microservices --> wikidata : Retrieves Questions & Answers
+userservice <--> db : Stores/Retrieves User Data
+authservice <--> db : Authenticates User Data
+----
 
 Motivation::
 
@@ -88,8 +126,6 @@ The web app, gateway, and services run within Docker containers, all hosted on a
 | WikiData         | External API used to retrieve information from WikiData.  
 |===
 
-=== Infrastructure Level 2
-
 ifdef::arc42help[]
 [role="arc42help"]
 ****
@@ -98,17 +134,3 @@ Here you can include the internal structure of (some) infrastructure elements fr
 Please copy the structure from level 1 for each selected element.
 ****
 endif::arc42help[]
-
-==== _<Infrastructure Element 1>_
-
-_<diagram + explanation>_
-
-==== _<Infrastructure Element 2>_
-
-_<diagram + explanation>_
-
-...
-
-==== _<Infrastructure Element n>_
-
-_<diagram + explanation>_
