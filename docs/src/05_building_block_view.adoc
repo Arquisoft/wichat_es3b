@@ -105,8 +105,10 @@ Contained Building Blocks::
 | **LLM** | Will generate appropiate hints in response to user queries, will also process data from Wikidata to generate said hints. 
 |===
 
-Important Interfaces::
-_<Description of important interfaces>_
+Important interfaces::
+ * User ↔ WIChat: Direct interaction through UI.
+ * WIChat ↔ Wikidata: Structured data retrieval for factual information and images.
+ * WIChat ↔ LLM: Natural language understanding and response generation.
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -124,61 +126,10 @@ responsibility according to the following schema:
 |===
 
 
-
 If you use a list of black box descriptions then you fill in a separate black box template for every important building block .
 Its headline is the name of the black box.
 ****
 endif::arc42help[]
-
-==== <Name black box 1>
-
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Here you describe <black box 1>
-according the the following black box template:
-
-* Purpose/Responsibility
-* Interface(s), when they are not extracted as separate paragraphs. This interfaces may include qualities and performance characteristics.
-* (Optional) Quality-/Performance characteristics of the black box, e.g.availability, run time behavior, ....
-* (Optional) directory/file location
-* (Optional) Fulfilled requirements (if you need traceability to requirements).
-* (Optional) Open issues/problems/risks
-
-****
-endif::arc42help[]
-
-_<Purpose/Responsibility>_
-
-_<Interface(s)>_
-
-_<(Optional) Quality/Performance Characteristics>_
-
-_<(Optional) Directory/File Location>_
-
-_<(Optional) Fulfilled Requirements>_
-
-_<(optional) Open Issues/Problems/Risks>_
-
-
-
-
-==== <Name black box 2>
-
-_<black box template>_
-
-==== <Name black box n>
-
-_<black box template>_
-
-
-==== <Name interface 1>
-
-...
-
-==== <Name interface m>
-
-
 
 === Level 2
 
@@ -200,7 +151,7 @@ endif::arc42help[]
 actor User
 
 rectangle WiChat {
-    rectangle "Web Application" as Web
+    rectangle "Frontend Service" as Web
     rectangle "Backend Service" as Backend
     database Database
 }
@@ -217,15 +168,13 @@ Backend ..> LLM
 @enduml
 ----
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-...describes the internal structure of _building block 1_.
-****
-endif::arc42help[]
-
-
-
+[cols="1,2" options="header"]
+|===
+| **Name** | **Responsibility**
+| **Frontend Service** | Manages user interaction and presentation.
+| **Backend Service** | Handles logic, coordination, and communication between the frontend, database, and external services.
+| **Database Layer** | Provides secure and efficient storage and retrieval of data for the application.
+|===
 
 === Level 3
 
@@ -242,7 +191,6 @@ endif::arc42help[]
 [plantuml]
 ----
 @startuml
-' 1) Force layout from top to bottom
 top to bottom direction
 
 skinparam nodeStyle rectangle
@@ -251,12 +199,10 @@ skinparam databaseStyle cylinder
 
 actor "User" as user
 
-' 2) Browser node at the top, containing the Web Application artifact
 node "Browser" as browser {
-  artifact "Web Application" as Web
+  artifact "Frontend Service" as Web
 }
 
-' 3) Server node in the middle, containing the Backend Service and Database
 node "Server" as server {
   node "Backend Service" as backend {
     artifact "Authentication Service" as Auth
@@ -267,13 +213,11 @@ node "Server" as server {
   database "Database" as DB
 }
 
-' 4) External Services node at the bottom
 node "External Services" as ext {
   artifact "LLM" as LLM
   artifact "Wikidata" as Wikidata
 }
 
-' 5) Create relationships; use arrow directions to hint at top->bottom flow
 user -right-> Web
 Web --> Auth
 Web --> Game
@@ -283,12 +227,14 @@ Game --> QnA
 ChatSvc --> LLM
 QnA --> Wikidata
 
-' 6) (Optional) Add a hidden link to force vertical ordering
-'    This is sometimes useful if PlantUML tries to shuffle the diagram.
-
 @enduml
 ----
 
-
-
-
+[options="header", cols="1,2"]
+|===
+| **Name** | Responsibility
+| **Authentication Service** | Handles user authentication, login and signup.
+| **Game Service** | Manages game state and logic. Uses more concrete services like Chat and Questions to divide responsibilities.
+| **Chat Service** | Provides chat functionality, sending requests to an LLM, receiving and processing responses to show hints to the user.
+| **Questions Service** | Creates and provides questions using data from Wikidata.
+|===
