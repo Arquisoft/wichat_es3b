@@ -3,7 +3,6 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-solution-strategy]]
 == Solution Strategy
 
-
 ifdef::arc42help[]
 [role="arc42help"]
 ****
@@ -32,3 +31,65 @@ See https://docs.arc42.org/section-4/[Solution Strategy] in the arc42 documentat
 
 ****
 endif::arc42help[]
+
+The application is built on the MERN stack, a full-stack combination of source-available technologies used for building web-based applications on a simpler and more agile manner. It consists of:
+
+|===
+| **Name** |**Explanation**
+
+| **MongoDB** | NoSQL database which uses JSON-like documents with optional schemas. We choose it over relational databases to make use of its scalability and flexibility to store large amounts of data.
+
+| **Express.js** | Backend framework for __Node.js__. It will simplify the process of building APIs.
+
+| **React.js** | Front-end JavaScript library. Despite the loading overhead, it will help us build a modern and fast UIs for the application. 
+
+| **Node.js** | Open-source cross-platform JavaScript Runtime environment which will be used to build the backend of the application. It is widely used and has an enormous amount of available libraries, wich makes it one of the best approach for most web applications.
+|===
+
+=== Decompositon of the system
+The main architectural pattern to be used in the application is to divide different responsibilities in their own respective microservice, creating a logical separation between modules. This will help to coordinate the team and reduce conflicts while working on different microservices of the application, easing development.
+For the authentication microservice, we will be combining statelessess, a token-based model and API Gateway orchestration for a robust and scalable authentication system.
+Other microservices, such as the game microservice, or LLM microservice and WikiData querying microservice, will be based on either a MVC pattern or a Client-server or Controller-Responder model. 
+As for design patterns, we will use template method to manage the behavior of the questions in different gamemodes and possibly the factory pattern to create the different questions.
+
+=== Achieving quality goals
+
+|===
+| **Goal** | **Steps to achieve it**
+
+| **Testability** | We will aim for a high test coverage of the code for the application, using tools like Selenium to achieve this.
+
+| **Usability** | We will perform usability tests, like using dummy users and testers, and we will extend the application to be accesible. 
+
+| **Portability** | We will test the application in different environments, and use up-to-date frameworks and tools to ensure maximum compability.
+
+| **Security** | We will follow best security practices, and use checklists to ensure there aren't major security flaws in our application. 
+|===
+
+=== Other organizational decisions. 
+Since we will be building a microserviced application, we will be using a microservice-oriented gitflow for version control. It will be a single repository (monorepo) where there is a folder for each service. We will also follow GitHub Flow for a straightforward development strategy.
+
+We will also follow SCRUM with 1-week sprints for the development cycle. Since we are heavily constricted by time, this will be our best alternative.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
