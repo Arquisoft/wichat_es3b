@@ -106,4 +106,8 @@ image::doc3-technical_context-diagram.png["Technical Context diagram", align="ce
 | User inputs
 | Browser outputs
 
+| *_LLM service_*
+| User text inputs
+| Hints about the question
+
 |===
