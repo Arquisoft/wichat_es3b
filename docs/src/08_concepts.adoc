@@ -57,17 +57,21 @@ See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
 ****
 endif::arc42help[]
 
-=== _<Concept 1>_
+=== _Microservices architecture_
 
-_<explanation>_
+_We have decided that our architecture will be based on microservices, which means that every part of the aplication will be divided in a service that performs a specific function. The services can communicate witch eachother using their repective APIs or via the shared database_
 
 
 
-=== _<Concept 2>_
+=== _Build, Test, Deploy_
 
-_<explanation>_
+_The project follows a CI/CD pipeline that automates the build, test, and deployment processes. This ensures that the application is always up-to-date and working correctly._
 
 ...
+
+=== _Usability_
+
+_Usability is crucial for any application, as it directly impacts user interaction efficiency. To ensure our app’s usability, we conducted extensive user research, leading to an intuitive interface design. Employing a user-centric approach throughout development, we prioritized user experience, facilitating easy navigation_
 
 === _<Concept n>_
 
