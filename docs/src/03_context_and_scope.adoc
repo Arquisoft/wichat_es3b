@@ -73,8 +73,41 @@ together with a mapping table showing the relationships between channels and inp
 ****
 endif::arc42help[]
 
-**<Diagram or Table>**
+image::doc3-technical_context-diagram.png["Technical Context diagram", align="center"]
 
-**<optionally: Explanation of technical interfaces>**
+|===
+| Communication partners | Inputs | Outputs
 
-**<Mapping Input/Output to Channels>**
+| *_Question service_*
+| Question data-index
+| Questions and answers
+
+| *_User service_*
+| Login info
+| User info (account page)
+
+| *_History service_*
+| Session user info
+| User's history
+
+| *_Users_*
+| Questions and possible answers
+| Interaction to log in and answer to questions
+
+| *_Wikidata_*
+| Request for question data with category
+| Question sources
+
+| *_Persistence_*
+| RAW data for questions and answers
+| Structured data of questions and answers
+
+| *_Webapp_*
+| User inputs
+| Browser outputs
+
+| *_LLM service_*
+| User text inputs
+| Hints about the question
+
+|===
