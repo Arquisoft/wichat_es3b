@@ -1,54 +1,83 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
-[[section-design-decisions]]
-== Architecture Decisions
+= Architectural decisions
 
-[cols="3,5,3", options="header"]
-|===
-| Decision | Description | Status
+== 9.1 Use of Large Language Models (LLMs) in the System
+We will use LLM in our question-and-answer application to generate hints during
+the user's turn.
 
-| *JavaScript*
-|*Decision:* We will use the JavaScript language to build both the front-end and the back-end of the application.
+*_Decision:_* +
+It was decided to integrate Large Language Models (LLMs) through external APIs to generate real-time responses and hints. +
+The selected models are Gemini-1.5-Flash (Google) and Qwen2.5-Coder-7B-Instruct (Empathy AI)
+because they are the ones integrated into the base project software.
 
+*Consequences* +
+Consequently, we need a structured knowledge source, in our case Wikidata,
+from which we will extract and process the information to provide it to the user and also we must learn to create effective prompts.
 
-*Justification:*
-We have chosen this technology because it comes from the initial project, and the whole team felt it was the right decision to continue using it.
+To know more about Prompt Engineering link:https://github.com/Arquisoft/wichat_es3b/issues/4[Issue #4].
 
-*Consequences:*
-Information about how the language works should be researched.
+== 9.2 Using Wikidata as the main knowledge base
+We require a structured and up-to-date knowledge base, so we decided to utilize Wikidata
+as the primary information source. +
+Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
 
-| *Approved*
+*Justification*
 
-| *React*
-|*Decision:* We have decided to use ReactJS for the front-end of our project.
+ - Wikidata is an open, structured database offering information in RDF and SPARQL formats.
+ - It enables flexible integrations with our backend systems.
 
-*Justification:*
-The decision was made because the base project provided to us already used ReactJS, and we considered this a great advantage to get started, as well as an opportunity to familiarize ourselves with a framework that is unfamiliar to many of us.
+*Consequences*
 
-*Consequences:*
-As a consequence, at the beginning, we will have to familiarize ourselves with this new technology for most of us, but we will be able to use the base project as an example.
+ - Optimal performance requires expertise in SPARQL query optimization.
+ - Data updates are dependent on the Wikidata community.
 
-| *Approved*
-
-|*NodeJs*
-|*Decision:* We will use the Node.js framework to develop the application's backend.
-
-*Justification:* This technology was chosen because it is the default in the initial project and the ones we will use
-as a reference. The entire team agreed that it was appropriate to continue using it.
-
-*Consequences:* The team members will need to gain more knowledge about how this library works.
-|*Approved*
-
-| *MongoDB*
-|*Decision:* We have decided to use MongoDB for the development of our project's backend.
+To learn basic concepts about Wikidata and SPARQL link:https://github.com/Arquisoft/wichat_es3b/issues/6[Issue #6].
 
 
-*Justification:* The decision was made because the base project and other projects from the previous year used MongoDB. We see this as a great advantage to start with, as well as an opportunity to deepen our knowledge of a database management system that is less common for us compared to MySQL.
+== 9.3 Choosing React for the Frontend
+We require an efficient framework for frontend development so we decided to utilize
+React for the user interface. +
+Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
+
+*Justification*
+
+ - React's declarative nature facilitates the construction of interactive user interfaces.
+ - The integration of React with Wikidata is straightforward and user-friendly, simplifying data management and display.
+
+As a consequence, most part of the team will require React training because it is a new technology for many of us.
+
+To learn basic concepts about React link:https://github.com/Arquisoft/wichat_es3b/issues/7[Issue #7].
+
+== 9.4  Using Node.js for Backend Development
+We require an efficient and scalable technology for the backend so we will
+utilize Node.js to solve this problem. +
+Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
 
 
-*Consequences:* As a result, the learning curve will be steeper at first, but we will be able to take advantage of its benefits as we progress.
-| *Approved*
-|===
+*Justification* +
+Node.js is highly efficient for asynchronous and high-traffic applications.
+Furthermore, it is a great opportunity for many of us to learn how to use this important technology in the software development world.
+
+New knowledge about Node.js link:https://github.com/Arquisoft/wichat_es3b/issues/3[Issue #3]
+
+== 9.5 Selecting MongoDB for the Database
+Due to the requirement for flexible storage of structured and unstructured data,
+we have chosen a NoSQL database over SQL.  +
+Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
+
+
+*Justification*
+
+ - It facilitates the storage of semi-structured data in JSON format.
+ - It works very well with Node.js and is highly scalable.
+
+*Consequences* +
+Query optimization may be required for handling large data volumes. Although we
+have had some exposure to NoSQL databases, further training and development in this area will be necessary to optimize their usage.
+
+To learn basic concepts about MongoDb and practice examples link:https://github.com/Arquisoft/wichat_es3b/issues/9[Issue #9].
+
 
 ifdef::arc42help[]
 [role="arc42help"]
