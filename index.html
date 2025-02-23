@@ -501,24 +501,27 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_usability">8.4. <em>Usability</em></a></li>
 </ul>
 </li>
-<li><a href="#_architectural_decisions">9. Architectural decisions</a></li>
-<li><a href="#_use_of_large_language_models_llms_in_the_system">10. Use of Large Language Models (LLMs) in the System</a></li>
-<li><a href="#_using_wikidata_as_the_main_knowledge_base">11. Using Wikidata as the main knowledge base</a></li>
-<li><a href="#_choosing_react_for_the_frontend">12. Choosing React for the Frontend</a></li>
-<li><a href="#_using_node_js_for_backend_development">13. Using Node.js for Backend Development</a></li>
-<li><a href="#_selecting_mongodb_for_the_database">14. Selecting MongoDB for the Database</a></li>
-<li><a href="#section-quality-scenarios">15. Quality Requirements</a>
+<li><a href="#_architectural_decisions">9. Architectural decisions</a>
 <ul class="sectlevel2">
-<li><a href="#_quality_tree">15.1. Quality Tree</a></li>
-<li><a href="#_quality_scenarios">15.2. Quality Scenarios</a></li>
+<li><a href="#_use_of_large_language_models_llms_in_the_system">9.1. Use of Large Language Models (LLMs) in the System</a></li>
+<li><a href="#_using_wikidata_as_the_main_knowledge_base">9.2. Using Wikidata as the main knowledge base</a></li>
+<li><a href="#_choosing_react_for_the_frontend">9.3. Choosing React for the Frontend</a></li>
+<li><a href="#_using_node_js_for_backend_development">9.4. Using Node.js for Backend Development</a></li>
+<li><a href="#_selecting_mongodb_for_the_database">9.5. Selecting MongoDB for the Database</a></li>
 </ul>
 </li>
-<li><a href="#section-technical-risks">16. Risks and Technical Debts</a>
+<li><a href="#section-quality-scenarios">10. Quality Requirements</a>
 <ul class="sectlevel2">
-<li><a href="#_technical_debts">16.1. Technical Debts</a></li>
+<li><a href="#_quality_tree">10.1. Quality Tree</a></li>
+<li><a href="#_quality_scenarios">10.2. Quality Scenarios</a></li>
 </ul>
 </li>
-<li><a href="#section-glossary">17. Glossary</a></li>
+<li><a href="#section-technical-risks">11. Risks and Technical Debts</a>
+<ul class="sectlevel2">
+<li><a href="#_technical_debts">11.1. Technical Debts</a></li>
+</ul>
+</li>
+<li><a href="#section-glossary">12. Glossary</a></li>
 </ul>
 </div>
 </div>
@@ -2101,12 +2104,8 @@ on this list.</p>
 <div class="sect1">
 <h2 id="_architectural_decisions">9. Architectural decisions</h2>
 <div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
-<h2 id="_use_of_large_language_models_llms_in_the_system">10. Use of Large Language Models (LLMs) in the System</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_use_of_large_language_models_llms_in_the_system">9.1. Use of Large Language Models (LLMs) in the System</h3>
 <div class="paragraph">
 <p>We will use LLM in our question-and-answer application to generate hints during
 the user&#8217;s turn.</p>
@@ -2126,10 +2125,8 @@ from which we will extract and process the information to provide it to the user
 <p>To know more about Prompt Engineering <a href="https://github.com/Arquisoft/wichat_es3b/issues/4">Issue #4</a>.</p>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_using_wikidata_as_the_main_knowledge_base">11. Using Wikidata as the main knowledge base</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_using_wikidata_as_the_main_knowledge_base">9.2. Using Wikidata as the main knowledge base</h3>
 <div class="paragraph">
 <p>We require a structured and up-to-date knowledge base, so we decided to utilize Wikidata
 as the primary information source.<br>
@@ -2165,10 +2162,8 @@ Decision made in <a href="https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%
 <p>To learn basic concepts about Wikidata and SPARQL <a href="https://github.com/Arquisoft/wichat_es3b/issues/6">Issue #6</a>.</p>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_choosing_react_for_the_frontend">12. Choosing React for the Frontend</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_choosing_react_for_the_frontend">9.3. Choosing React for the Frontend</h3>
 <div class="paragraph">
 <p>We require an efficient framework for frontend development so we decided to utilize
 React for the user interface.<br>
@@ -2194,10 +2189,8 @@ Decision made in <a href="https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%
 <p>To learn basic concepts about React <a href="https://github.com/Arquisoft/wichat_es3b/issues/7">Issue #7</a>.</p>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_using_node_js_for_backend_development">13. Using Node.js for Backend Development</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_using_node_js_for_backend_development">9.4. Using Node.js for Backend Development</h3>
 <div class="paragraph">
 <p>We require an efficient and scalable technology for the backend so we will
 utilize Node.js to solve this problem.<br>
@@ -2212,10 +2205,8 @@ Furthermore, it is a great opportunity for many of us to learn how to use this i
 <p>New knowledge about Node.js <a href="https://github.com/Arquisoft/wichat_es3b/issues/3">Issue #3</a></p>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_selecting_mongodb_for_the_database">14. Selecting MongoDB for the Database</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_selecting_mongodb_for_the_database">9.5. Selecting MongoDB for the Database</h3>
 <div class="paragraph">
 <p>Due to the requirement for flexible storage of structured and unstructured data,
 we have chosen a NoSQL database over SQL. <br>
@@ -2289,8 +2280,9 @@ There you will find links and examples about ADR.</p>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
+</div>
 <div class="sect1">
-<h2 id="section-quality-scenarios">15. Quality Requirements</h2>
+<h2 id="section-quality-scenarios">10. Quality Requirements</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>In order to make Wichat a satisfactory final product, we find it crucial to set some quality requirements to live up with. These aspects are to influence architectural decisions and hence include some measurable features:</p>
@@ -2331,7 +2323,7 @@ There you will find links and examples about ADR.</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_quality_tree">15.1. Quality Tree</h3>
+<h3 id="_quality_tree">10.1. Quality Tree</h3>
 <div class="imageblock">
 <div class="content">
 <img src="./images/diagrama_escenarios_calidad.jpg" alt="Diagrama de escenarios de calidad" width="primera versión">
@@ -2339,7 +2331,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_quality_scenarios">15.2. Quality Scenarios</h3>
+<h3 id="_quality_scenarios">10.2. Quality Scenarios</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 23.0769%;">
@@ -2445,7 +2437,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-technical-risks">16. Risks and Technical Debts</h2>
+<h2 id="section-technical-risks">11. Risks and Technical Debts</h2>
 <div class="sectionbody">
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -2489,7 +2481,7 @@ There you will find links and examples about ADR.</p>
 </tbody>
 </table>
 <div class="sect2">
-<h3 id="_technical_debts">16.1. Technical Debts</h3>
+<h3 id="_technical_debts">11.1. Technical Debts</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2507,7 +2499,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-glossary">17. Glossary</h2>
+<h2 id="section-glossary">12. Glossary</h2>
 <div class="sectionbody">
 <div class="sidebarblock arc42help">
 <div class="content">
