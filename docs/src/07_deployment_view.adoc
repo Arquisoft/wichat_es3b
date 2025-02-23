@@ -60,19 +60,47 @@ For multiple environments or alternative deployments please copy and adapt this 
 ****
 endif::arc42help[]
 
-_**<Overview Diagram>**_
-
 Motivation::
-
-_<explanation in text form>_
+The system is deployed on a virtual machine hosted on Microsoft Azure. This choice ensures high availability, simplified scaling, and seamless integration with Azure services, meeting the performance, maintainability, and security requirements of the application.
 
 Quality and/or Performance Features::
-
-_<explanation in text form>_
+* **Scalability:** The containerized microservices architecture allows for scaling individual components based on demand.
+* **Portability:** Docker containers ensure consistent execution across various environments.
+* **Maintainability:** Isolation of services enables independent updates and minimizes downtime.
+* **Security:** Azure provides robust security features and network isolation, protecting both data and services.
 
 Mapping of Building Blocks to Infrastructure::
-_<description of the mapping>_
+The deployment maps the following building blocks:
+* **User Interface:** Delivered via a web application hosted on an Azure virtual machine.
+* **Microservices:** Packaged as Docker containers within the Azure VM, each responsible for distinct functionalities (e.g., user management or question generation).
+* **Persistence Layer:** A dedicated container hosting the database, accessible only to internal services.
+* **External Services:** Secure connections are established to external APIs (e.g., Wikidata) to fetch dynamic content.
 
+Below is a diagram summarizing the infrastructure distribution:
+
+[plantuml, diagram, svg]
+----
+@startuml
+node "User Agent" as UA {
+  component "Web Browser" as Browser
+}
+
+node "Azure VM" as AzureVM {
+  node "Docker Engine" as Docker {
+    component "Microservices" as Micro
+    component "Database" as DB
+  }
+}
+
+node "Wikidata API" as Wikidata
+
+UA --> Browser : HTTP/HTTPS
+Browser --> AzureVM : Requests
+Micro --> DB : Data Access
+Micro --> Wikidata : External API Calls
+
+@enduml
+----
 
 === Infrastructure Level 2
 
@@ -85,16 +113,63 @@ Please copy the structure from level 1 for each selected element.
 ****
 endif::arc42help[]
 
-==== _<Infrastructure Element 1>_
+This section provides a detailed view of selected infrastructure elements from Level 1.
 
-_<diagram + explanation>_
+==== Azure Virtual Machine Hosting the Web Application
 
-==== _<Infrastructure Element 2>_
+This element represents the Azure virtual machine that hosts the web application. The VM runs a supported operating system (e.g., Ubuntu) and includes the Docker engine to manage containerized services.
 
-_<diagram + explanation>_
+[plantuml, diagram2, svg]
+----
+@startuml
+node "Azure VM" as AzureVM {
+  package "Operating System" {
+    node "Docker Engine" as Docker {
+      component "Web Application Container" as WebApp
+    }
+  }
+}
+AzureVM --> "Azure Networking" : Internet Connectivity
+@enduml
+----
 
-...
+_Explanation_:
+The Azure VM was selected for its reliability and integrated security features. Hosting the web application in a Docker container on Azure facilitates quick scaling and streamlined management while leveraging Azure’s global network infrastructure.
 
-==== _<Infrastructure Element n>_
+==== Docker Container Environment
 
-_<diagram + explanation>_
+Within the Azure VM, the Docker engine orchestrates several containers, each encapsulating a microservice. This environment supports modular development and independent scalability.
+
+[plantuml, diagram3, svg]
+----
+@startuml
+node "Docker Engine" {
+component "User Service" as UserService
+component "Question Service" as QuestionService
+component "LLM Service" as LLMService
+component "Persistence DB" as Persistence
+}
+UserService --> Persistence : User data management
+QuestionService --> Persistence : Save/Get questions
+@enduml
+----
+
+_Explanation_:
+The Docker container environment isolates each microservice, enabling independent updates and robust fault tolerance. Internal communication is handled through the Docker network, ensuring efficient and secure interactions between services.
+
+[cols="1,3"]
+|===
+| **Building Block** | **Infrastructure Mapping**
+
+| Web Application (UI)
+| Runs in the Web Application Container on the Azure VM, accessible to users via HTTP/HTTPS.
+
+| Microservices (User Service, Question Service, LLM Service)
+| Each microservice is packaged in its own Docker container within the Docker Engine on the Azure VM, communicating over an isolated internal network.
+
+| Persistence (Database)
+| Deployed as a dedicated container, ensuring secure data storage and access limited to internal services.
+
+| External API (Wikidata)
+| Accessed securely over the public internet by relevant microservices.
+|===
