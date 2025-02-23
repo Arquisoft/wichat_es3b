@@ -499,7 +499,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_microservices_architecture">8.2. <em>Microservices architecture</em></a></li>
 <li><a href="#_build_test_deploy">8.3. <em>Build, Test, Deploy</em></a></li>
 <li><a href="#_usability">8.4. <em>Usability</em></a></li>
-<li><a href="#_concept_n">8.5. <em>&lt;Concept n&gt;</em></a></li>
 </ul>
 </li>
 <li><a href="#_9_architectural_decisions">9. 9 Architectural decisions</a>
@@ -517,16 +516,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_quality_scenarios">10.2. Quality Scenarios</a></li>
 </ul>
 </li>
-<li><a href="#section-technical-risks">11. Risks and Technical Debts</a></li>
-<li><a href="#_contents">12. Contents</a></li>
-<li><a href="#_motivation">13. Motivation</a></li>
-<li><a href="#_form">14. Form</a>
+<li><a href="#section-technical-risks">11. Risks and Technical Debts</a>
 <ul class="sectlevel2">
-<li><a href="#_technical_debts">14.1. Technical Debts</a></li>
+<li><a href="#_technical_debts">11.1. Technical Debts</a></li>
 </ul>
 </li>
-<li><a href="#_further_information">15. Further Information</a></li>
-<li><a href="#section-glossary">16. Glossary</a></li>
+<li><a href="#section-glossary">12. Glossary</a></li>
 </ul>
 </div>
 </div>
@@ -1082,10 +1077,8 @@ together with a mapping table showing the relationships between channels and inp
 </div>
 </div>
 </div>
-<div class="imageblock">
-<div class="content">
-<img src="./images/technical-context-diagram.svg" alt="technical context diagram" width="1000" height="594">
-</div>
+<div class="paragraph">
+<p><span class="image"><img src="./images/technical-context-diagram.png" alt="technical context diagram"></span></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -1860,10 +1853,8 @@ when your infrastructure is more complex.</p>
 <div class="paragraph">
 <p>Below is a diagram summarizing the infrastructure distribution:</p>
 </div>
-<div class="imageblock">
-<div class="content">
-<img src="./images/diagram.svg" alt="diagram" width="1005" height="594">
-</div>
+<div class="paragraph">
+<p><span class="image"><img src="./images/diagram-7_1.png" alt="diagram 7 1"></span></p>
 </div>
 </div>
 <div class="sect2">
@@ -1886,10 +1877,8 @@ when your infrastructure is more complex.</p>
 <div class="paragraph">
 <p>This element represents the Azure virtual machine that hosts the web application. The VM runs a supported operating system (e.g., Ubuntu) and includes the Docker engine to manage containerized services.</p>
 </div>
-<div class="imageblock">
-<div class="content">
-<img src="./images/diagram2.svg" alt="diagram2" width="1005" height="594">
-</div>
+<div class="paragraph">
+<p><span class="image"><img src="./images/diagram-7_2.png" alt="diagram 7 2"></span></p>
 </div>
 <div class="paragraph">
 <p><em>Explanation</em>:
@@ -1901,10 +1890,8 @@ The Azure VM was selected for its reliability and integrated security features. 
 <div class="paragraph">
 <p>Within the Azure VM, the Docker engine orchestrates several containers, each encapsulating a microservice. This environment supports modular development and independent scalability.</p>
 </div>
-<div class="imageblock">
-<div class="content">
-<img src="./images/diagram3.svg" alt="diagram3" width="1012" height="594">
-</div>
+<div class="paragraph">
+<p><span class="image"><img src="./images/diagram-7_3.png" alt="diagram 7 3"></span></p>
 </div>
 <div class="paragraph">
 <p><em>Explanation</em>:
@@ -2051,10 +2038,8 @@ on this list.</p>
 <h3 id="_domain_concepts">8.1. <em>Domain concepts</em></h3>
 <div class="sect3">
 <h4 id="_domain_model">8.1.1. <em>Domain model</em></h4>
-<div class="imageblock">
-<div class="content">
-<img src="./images/Sequence%20diagram.svg" alt="Sequence diagram" width="990" height="609">
-</div>
+<div class="paragraph">
+<p><span class="image"><img src="./images/diagram-8_1.png" alt="diagram 8 1"></span></p>
 </div>
 </div>
 <div class="sect3">
@@ -2111,12 +2096,6 @@ on this list.</p>
 <h3 id="_usability">8.4. <em>Usability</em></h3>
 <div class="paragraph">
 <p><em>Usability is crucial for any application, as it directly impacts user interaction efficiency. To ensure our app’s usability, we conducted extensive user research, leading to an intuitive interface design. Employing a user-centric approach throughout development, we prioritized user experience, facilitating easy navigation</em></p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_concept_n">8.5. <em>&lt;Concept n&gt;</em></h3>
-<div class="paragraph">
-<p><em>&lt;explanation&gt;</em></p>
 </div>
 <div style="page-break-after: always;"></div>
 </div>
@@ -2460,31 +2439,6 @@ There you will find links and examples about ADR.</p>
 <div class="sect1">
 <h2 id="section-technical-risks">11. Risks and Technical Debts</h2>
 <div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1 arc42help">
-<h2 id="_contents">12. Contents</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>A list of identified technical risks or technical debts, ordered by priority</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_motivation">13. Motivation</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>“Risk management is project management for grown-ups” (Tim Lister, Atlantic Systems Guild.)</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_form">14. Form</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>List of risks and/or technical debts, probably including suggested measures to minimize, mitigate or avoid risks or reduce technical debts.</p>
-</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -2527,7 +2481,7 @@ There you will find links and examples about ADR.</p>
 </tbody>
 </table>
 <div class="sect2">
-<h3 id="_technical_debts">14.1. Technical Debts</h3>
+<h3 id="_technical_debts">11.1. Technical Debts</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2540,20 +2494,12 @@ There you will find links and examples about ADR.</p>
 </tr>
 </thead>
 </table>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_further_information">15. Further Information</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>See <a href="https://docs.arc42.org/section-11/">Risks and Technical Debt</a> in the arc42 documentation.</p>
-</div>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
+</div>
 <div class="sect1">
-<h2 id="section-glossary">16. Glossary</h2>
+<h2 id="section-glossary">12. Glossary</h2>
 <div class="sectionbody">
 <div class="sidebarblock arc42help">
 <div class="content">
@@ -2635,7 +2581,7 @@ There you will find links and examples about ADR.</p>
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2025-02-23 22:25:11 +0100
+Last updated 2025-02-03 23:34:41 +0100
 </div>
 </div>
 </body>
