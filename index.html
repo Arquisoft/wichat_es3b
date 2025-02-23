@@ -480,10 +480,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-runtime-view">6. Runtime View</a>
 <ul class="sectlevel2">
-<li><a href="#_runtime_scenario_1">6.1. &lt;Runtime Scenario 1&gt;</a></li>
-<li><a href="#_runtime_scenario_2">6.2. &lt;Runtime Scenario 2&gt;</a></li>
-<li><a href="#">6.3. &#8230;&#8203;</a></li>
-<li><a href="#_runtime_scenario_n">6.4. &lt;Runtime Scenario n&gt;</a></li>
+<li><a href="#_sign_in">6.1. Sign In</a></li>
+<li><a href="#_log_in">6.2. Log In</a></li>
+<li><a href="#_new_question">6.3. New Question</a></li>
+<li><a href="#_new_clue">6.4. New Clue</a></li>
+<li><a href="#_check_record">6.5. Check Record</a></li>
 </ul>
 </li>
 <li><a href="#section-deployment-view">7. Deployment View</a>
@@ -494,28 +495,38 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-concepts">8. Cross-cutting Concepts</a>
 <ul class="sectlevel2">
-<li><a href="#_concept_1">8.1. <em>&lt;Concept 1&gt;</em></a></li>
-<li><a href="#_concept_2">8.2. <em>&lt;Concept 2&gt;</em></a></li>
-<li><a href="#_concept_n">8.3. <em>&lt;Concept n&gt;</em></a></li>
+<li><a href="#_domain_concepts">8.1. <em>Domain concepts</em></a></li>
+<li><a href="#_microservices_architecture">8.2. <em>Microservices architecture</em></a></li>
+<li><a href="#_build_test_deploy">8.3. <em>Build, Test, Deploy</em></a></li>
+<li><a href="#_usability">8.4. <em>Usability</em></a></li>
+<li><a href="#_concept_n">8.5. <em>&lt;Concept n&gt;</em></a></li>
 </ul>
 </li>
-<li><a href="#section-design-decisions">9. Architecture Decisions</a></li>
-<li><a href="#section-quality-scenarios">10. Quality Requirements</a>
+<li><a href="#_architectural_decisions">Architectural decisions</a>
+<ul class="sectlevel1">
+<li><a href="#_9_1_use_of_large_language_models_llms_in_the_system">1. 9.1 Use of Large Language Models (LLMs) in the System</a></li>
+<li><a href="#_9_2_using_wikidata_as_the_main_knowledge_base">2. 9.2 Using Wikidata as the main knowledge base</a></li>
+<li><a href="#_9_3_choosing_react_for_the_frontend">3. 9.3 Choosing React for the Frontend</a></li>
+<li><a href="#_9_4_using_node_js_for_backend_development">4. 9.4  Using Node.js for Backend Development</a></li>
+<li><a href="#_9_5_selecting_mongodb_for_the_database">5. 9.5 Selecting MongoDB for the Database</a></li>
+<li><a href="#section-quality-scenarios">6. Quality Requirements</a>
 <ul class="sectlevel2">
-<li><a href="#_quality_tree">10.1. Quality Tree</a></li>
-<li><a href="#_quality_scenarios">10.2. Quality Scenarios</a></li>
+<li><a href="#_quality_tree">6.1. Quality Tree</a></li>
+<li><a href="#_quality_scenarios">6.2. Quality Scenarios</a></li>
 </ul>
 </li>
-<li><a href="#section-technical-risks">11. Risks and Technical Debts</a></li>
-<li><a href="#_contents">12. Contents</a></li>
-<li><a href="#_motivation">13. Motivation</a></li>
-<li><a href="#_form">14. Form</a>
+<li><a href="#section-technical-risks">7. Risks and Technical Debts</a></li>
+<li><a href="#_contents">8. Contents</a></li>
+<li><a href="#_motivation">9. Motivation</a></li>
+<li><a href="#_form">10. Form</a>
 <ul class="sectlevel2">
-<li><a href="#_technical_debts">14.1. Technical Debts</a></li>
+<li><a href="#_technical_debts">10.1. Technical Debts</a></li>
 </ul>
 </li>
-<li><a href="#_further_information">15. Further Information</a></li>
-<li><a href="#section-glossary">16. Glossary</a></li>
+<li><a href="#_further_information">11. Further Information</a></li>
+<li><a href="#section-glossary">12. Glossary</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -1009,12 +1020,48 @@ The title of the table is the name of your system, the three columns contain the
 </div>
 </div>
 </div>
-<div class="paragraph">
-<p><strong>&lt;Diagram or Table&gt;</strong></p>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/doc3-business-context-diagram.png" alt="Businesss Context diagram">
 </div>
-<div class="paragraph">
-<p><strong>&lt;optionally: Explanation of external domain interfaces&gt;</strong></p>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Q&amp;A System</caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Communication partners</th>
+<th class="tableblock halign-left valign-top">Inputs</th>
+<th class="tableblock halign-left valign-top">Outputs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>Q&amp;A</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Data from Wikidata, Hints from LLM&#8217;s, User Answers, User Requests</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Questions to User, Feedback to User, Queries to Wikidata, Requests to LLM&#8217;s</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>USER</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Answer questions, request hints</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Question Presentation, Answer Feedback, Hint Presentation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>WIKIDATA</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Data queries (probably in SPARQL)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Question and Answer Data (JSON format)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>LLM&#8217;S</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hint Generation Request using a text prompt</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Generated hints</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect2">
 <h3 id="_technical_context">3.2. Technical Context</h3>
@@ -1035,15 +1082,67 @@ together with a mapping table showing the relationships between channels and inp
 </div>
 </div>
 </div>
-<div class="paragraph">
-<p><strong>&lt;Diagram or Table&gt;</strong></p>
+<div class="imageblock">
+<div class="content">
+<img src="./images/technical-context-diagram.svg" alt="technical context diagram" width="280" height="208">
 </div>
-<div class="paragraph">
-<p><strong>&lt;optionally: Explanation of technical interfaces&gt;</strong></p>
 </div>
-<div class="paragraph">
-<p><strong>&lt;Mapping Input/Output to Channels&gt;</strong></p>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Communication partners</th>
+<th class="tableblock halign-left valign-top">Inputs</th>
+<th class="tableblock halign-left valign-top">Outputs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>Question service</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Question data-index</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Questions and answers</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>User service</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Login info</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User info (account page)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>History service</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Session user info</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User&#8217;s history</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>LLM service</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User text inputs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hints about the question</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>Users</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Questions and possible answers</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interaction to log in and answer to questions</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>Wikidata</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Request for question data with category</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Question sources</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>Persistence</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RAW data for questions and answers</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Structured data of questions and answers</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>Webapp</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User inputs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Browser outputs</p></td>
+</tr>
+</tbody>
+</table>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -1051,6 +1150,47 @@ together with a mapping table showing the relationships between channels and inp
 <div class="sect1">
 <h2 id="section-solution-strategy">4. Solution Strategy</h2>
 <div class="sectionbody">
+<div class="sidebarblock arc42help">
+<div class="content">
+<div class="paragraph">
+<div class="title">Contents</div>
+<p>A short summary and explanation of the fundamental decisions and solution strategies, that shape system architecture. It includes</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>technology decisions</p>
+</li>
+<li>
+<p>decisions about the top-level decomposition of the system, e.g. usage of an architectural pattern or design pattern</p>
+</li>
+<li>
+<p>decisions on how to achieve key quality goals</p>
+</li>
+<li>
+<p>relevant organizational decisions, e.g. selecting a development process or delegating certain tasks to third parties.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<div class="title">Motivation</div>
+<p>These decisions form the cornerstones for your architecture. They are the foundation for many other detailed decisions or implementation rules.</p>
+</div>
+<div class="paragraph">
+<div class="title">Form</div>
+<p>Keep the explanations of such key decisions short.</p>
+</div>
+<div class="paragraph">
+<p>Motivate what was decided and why it was decided that way,
+based upon problem statement, quality goals and key constraints.
+Refer to details in the following sections.</p>
+</div>
+<div class="paragraph">
+<div class="title">Further Information</div>
+<p>See <a href="https://docs.arc42.org/section-4/">Solution Strategy</a> in the arc42 documentation.</p>
+</div>
+</div>
+</div>
 <div class="paragraph">
 <p>We develop an application of questions, like 'Saber y Ganar', in which the main objetive is to comunicate with a chatbot to obtain some hints for answer correctly each question.</p>
 </div>
@@ -1528,37 +1668,59 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 </div>
 <div class="sect2">
-<h3 id="_runtime_scenario_1">6.1. &lt;Runtime Scenario 1&gt;</h3>
-<div class="ulist">
-<ul>
-<li>
-<p><em>&lt;insert runtime diagram or textual description of the scenario&gt;</em></p>
-</li>
-<li>
-<p><em>&lt;insert description of the notable aspects of the interactions between the
-building block instances depicted in this diagram.&gt;</em></p>
-</li>
-</ul>
-</div>
+<h3 id="_sign_in">6.1. Sign In</h3>
 <div class="paragraph">
-<p>It is possible to use a sequence diagram:</p>
+<p>A user wants to create a new account. The user introduces the required information and clicks the "Sign In" button. The system validates the information and creates a new account. If all the process runs correctly, the system logs in the user and redirects to the main page.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Sequence%20diagram.png" alt="Sequence diagram" width="353" height="328">
+<img src="./images/SignIn%20diagram.svg" alt="SignIn diagram" width="772" height="501">
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_runtime_scenario_2">6.2. &lt;Runtime Scenario 2&gt;</h3>
-
+<h3 id="_log_in">6.2. Log In</h3>
+<div class="paragraph">
+<p>A user wants to log in into the application. The user introduces the required information and clicks the "Log In" button. The system validates the information and if the user had already an account, redirects them to the main page.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/LogIn%20diagram.svg" alt="LogIn diagram" width="626" height="501">
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="">6.3. &#8230;&#8203;</h3>
-
+<h3 id="_new_question">6.3. New Question</h3>
+<div class="paragraph">
+<p>A user wants to start a new round, it can be a new question or start a new game. The system generates a new question and shows it to the user. The user answers the question and the system validates the answer. The system updates the user&#8217;s score and stats, then shows the results to the user.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/New%20question.svg" alt="New question" width="921" height="736">
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_runtime_scenario_n">6.4. &lt;Runtime Scenario n&gt;</h3>
+<h3 id="_new_clue">6.4. New Clue</h3>
+<div class="paragraph">
+<p>A user wants to get a new clue for the current question. The GameService cheks if all the conditions are met and asks the LLMService for a new clue. The LLMService validates the clue and returns it to the GameService, which sends it to the GatewayService and finally to the WebApp.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/New%20clue.svg" alt="New clue" width="965" height="488">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_check_record">6.5. Check Record</h3>
+<div class="paragraph">
+<p>A user wants to check the record of a game session. The system loads all records and the user selects one to see the details. The system loads the details of the record and shows them to the user.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/Question%20record.svg" alt="Question record" width="795" height="592">
+</div>
+</div>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -1648,24 +1810,60 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 </div>
-<div class="paragraph">
-<p><em><strong>&lt;Overview Diagram&gt;</strong></em></p>
-</div>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">Motivation</dt>
 <dd>
-<p><em>&lt;explanation in text form&gt;</em></p>
+<p>The system is deployed on a virtual machine hosted on Microsoft Azure. This choice ensures high availability, simplified scaling, and seamless integration with Azure services, meeting the performance, maintainability, and security requirements of the application.</p>
 </dd>
 <dt class="hdlist1">Quality and/or Performance Features</dt>
 <dd>
-<p><em>&lt;explanation in text form&gt;</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Scalability:</strong> The containerized microservices architecture allows for scaling individual components based on demand.</p>
+</li>
+<li>
+<p><strong>Portability:</strong> Docker containers ensure consistent execution across various environments.</p>
+</li>
+<li>
+<p><strong>Maintainability:</strong> Isolation of services enables independent updates and minimizes downtime.</p>
+</li>
+<li>
+<p><strong>Security:</strong> Azure provides robust security features and network isolation, protecting both data and services.</p>
+</li>
+</ul>
+</div>
 </dd>
 <dt class="hdlist1">Mapping of Building Blocks to Infrastructure</dt>
 <dd>
-<p><em>&lt;description of the mapping&gt;</em></p>
+<p>The deployment maps the following building blocks:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>User Interface:</strong> Delivered via a web application hosted on an Azure virtual machine.</p>
+</li>
+<li>
+<p><strong>Microservices:</strong> Packaged as Docker containers within the Azure VM, each responsible for distinct functionalities (e.g., user management or question generation).</p>
+</li>
+<li>
+<p><strong>Persistence Layer:</strong> A dedicated container hosting the database, accessible only to internal services.</p>
+</li>
+<li>
+<p><strong>External Services:</strong> Secure connections are established to external APIs (e.g., Wikidata) to fetch dynamic content.</p>
+</li>
+</ul>
+</div>
 </dd>
 </dl>
+</div>
+<div class="paragraph">
+<p>Below is a diagram summarizing the infrastructure distribution:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/diagram.svg" alt="diagram" width="280" height="208">
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -1680,26 +1878,68 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_infrastructure_element_1">7.2.1. <em>&lt;Infrastructure Element 1&gt;</em></h4>
 <div class="paragraph">
-<p><em>&lt;diagram + explanation&gt;</em></p>
-</div>
+<p>This section provides a detailed view of selected infrastructure elements from Level 1.</p>
 </div>
 <div class="sect3">
-<h4 id="_infrastructure_element_2">7.2.2. <em>&lt;Infrastructure Element 2&gt;</em></h4>
+<h4 id="_azure_virtual_machine_hosting_the_web_application">7.2.1. Azure Virtual Machine Hosting the Web Application</h4>
 <div class="paragraph">
-<p><em>&lt;diagram + explanation&gt;</em></p>
+<p>This element represents the Azure virtual machine that hosts the web application. The VM runs a supported operating system (e.g., Ubuntu) and includes the Docker engine to manage containerized services.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/diagram2.svg" alt="diagram2" width="280" height="208">
+</div>
 </div>
 <div class="paragraph">
-<p>&#8230;&#8203;</p>
+<p><em>Explanation</em>:
+The Azure VM was selected for its reliability and integrated security features. Hosting the web application in a Docker container on Azure facilitates quick scaling and streamlined management while leveraging Azure’s global network infrastructure.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_infrastructure_element_n">7.2.3. <em>&lt;Infrastructure Element n&gt;</em></h4>
+<h4 id="_docker_container_environment">7.2.2. Docker Container Environment</h4>
 <div class="paragraph">
-<p><em>&lt;diagram + explanation&gt;</em></p>
+<p>Within the Azure VM, the Docker engine orchestrates several containers, each encapsulating a microservice. This environment supports modular development and independent scalability.</p>
 </div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/diagram3.svg" alt="diagram3" width="280" height="208">
+</div>
+</div>
+<div class="paragraph">
+<p><em>Explanation</em>:
+The Docker container environment isolates each microservice, enabling independent updates and robust fault tolerance. Internal communication is handled through the Docker network, ensuring efficient and secure interactions between services.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><strong>Building Block</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Infrastructure Mapping</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Web Application (UI)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runs in the Web Application Container on the Azure VM, accessible to users via HTTP/HTTPS.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Microservices (User Service, Question Service, LLM Service)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Each microservice is packaged in its own Docker container within the Docker Engine on the Azure VM, communicating over an isolated internal network.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Persistence (Database)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Deployed as a dedicated container, ensuring secure data storage and access limited to internal services.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External API (Wikidata)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Accessed securely over the public internet by relevant microservices.</p></td>
+</tr>
+</tbody>
+</table>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -1808,22 +2048,73 @@ on this list.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_concept_1">8.1. <em>&lt;Concept 1&gt;</em></h3>
-<div class="paragraph">
-<p><em>&lt;explanation&gt;</em></p>
+<h3 id="_domain_concepts">8.1. <em>Domain concepts</em></h3>
+<div class="sect3">
+<h4 id="_domain_model">8.1.1. <em>Domain model</em></h4>
+<div class="imageblock">
+<div class="content">
+<img src="./images/Sequence%20diagram.svg" alt="Sequence diagram" width="280" height="208">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_domain_description">8.1.2. <em>Domain description</em></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Term</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a user of the application.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UserRecord</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stores all the game sessions in which a user has participated and keeps their total score.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GameSession</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a game session played by a user, storing all the questions, the choices made, and the total score.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Question</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents questions shown to the user by the application and stores the wrong choices, correct choices, and the text that is displayed.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choice</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents the choices that the user can make when answering a question. It stores the text of the choice and indicates if it was selected by the user.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_concept_2">8.2. <em>&lt;Concept 2&gt;</em></h3>
+<h3 id="_microservices_architecture">8.2. <em>Microservices architecture</em></h3>
 <div class="paragraph">
-<p><em>&lt;explanation&gt;</em></p>
-</div>
-<div class="paragraph">
-<p>&#8230;&#8203;</p>
+<p><em>We have decided that our architecture will be based on microservices, which means that every part of the aplication will be divided in a service that performs a specific function. The services can communicate witch eachother using their repective APIs or via the shared database</em></p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_concept_n">8.3. <em>&lt;Concept n&gt;</em></h3>
+<h3 id="_build_test_deploy">8.3. <em>Build, Test, Deploy</em></h3>
+<div class="paragraph">
+<p><em>The project follows a CI/CD pipeline that automates the build, test, and deployment processes. This ensures that the application is always up-to-date and working correctly.</em></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_usability">8.4. <em>Usability</em></h3>
+<div class="paragraph">
+<p><em>Usability is crucial for any application, as it directly impacts user interaction efficiency. To ensure our app’s usability, we conducted extensive user research, leading to an intuitive interface design. Employing a user-centric approach throughout development, we prioritized user experience, facilitating easy navigation</em></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_concept_n">8.5. <em>&lt;Concept n&gt;</em></h3>
 <div class="paragraph">
 <p><em>&lt;explanation&gt;</em></p>
 </div>
@@ -1831,58 +2122,145 @@ on this list.</p>
 </div>
 </div>
 </div>
+<h1 id="_architectural_decisions" class="sect0">Architectural decisions</h1>
 <div class="sect1">
-<h2 id="section-design-decisions">9. Architecture Decisions</h2>
+<h2 id="_9_1_use_of_large_language_models_llms_in_the_system">1. 9.1 Use of Large Language Models (LLMs) in the System</h2>
 <div class="sectionbody">
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 27.2727%;">
-<col style="width: 45.4545%;">
-<col style="width: 27.2728%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Decision</th>
-<th class="tableblock halign-left valign-top">Description</th>
-<th class="tableblock halign-left valign-top">Status</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>JavaScript</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Decision:</strong> We will use the JavaScript language to build both the front-end and the back-end of the application.</p>
-<p class="tableblock"><strong>Justification:</strong>
-We have chosen this technology because it comes from the initial project, and the whole team felt it was the right decision to continue using it.</p>
-<p class="tableblock"><strong>Consequences:</strong>
-Information about how the language works should be researched.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Approved</strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>React</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Decision:</strong> We have decided to use ReactJS for the front-end of our project.</p>
-<p class="tableblock"><strong>Justification:</strong>
-The decision was made because the base project provided to us already used ReactJS, and we considered this a great advantage to get started, as well as an opportunity to familiarize ourselves with a framework that is unfamiliar to many of us.</p>
-<p class="tableblock"><strong>Consequences:</strong>
-As a consequence, at the beginning, we will have to familiarize ourselves with this new technology for most of us, but we will be able to use the base project as an example.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Approved</strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>NodeJs</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Decision:</strong> We will use the Node.js framework to develop the application&#8217;s backend.</p>
-<p class="tableblock"><strong>Justification:</strong> This technology was chosen because it is the default in the initial project and the ones we will use
-as a reference. The entire team agreed that it was appropriate to continue using it.</p>
-<p class="tableblock"><strong>Consequences:</strong> The team members will need to gain more knowledge about how this library works.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Approved</strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>MongoDB</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Decision:</strong> We have decided to use MongoDB for the development of our project&#8217;s backend.</p>
-<p class="tableblock"><strong>Justification:</strong> The decision was made because the base project and other projects from the previous year used MongoDB. We see this as a great advantage to start with, as well as an opportunity to deepen our knowledge of a database management system that is less common for us compared to MySQL.</p>
-<p class="tableblock"><strong>Consequences:</strong> As a result, the learning curve will be steeper at first, but we will be able to take advantage of its benefits as we progress.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Approved</strong></p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p>We will use LLM in our question-and-answer application to generate hints during
+the user&#8217;s turn.</p>
+</div>
+<div class="paragraph">
+<p><strong><em>Decision:</em></strong><br>
+It was decided to integrate Large Language Models (LLMs) through external APIs to generate real-time responses and hints.<br>
+The selected models are Gemini-1.5-Flash (Google) and Qwen2.5-Coder-7B-Instruct (Empathy AI)
+because they are the ones integrated into the base project software.</p>
+</div>
+<div class="paragraph">
+<p><strong>Consequences</strong><br>
+Consequently, we need a structured knowledge source, in our case Wikidata,
+from which we will extract and process the information to provide it to the user and also we must learn to create effective prompts.</p>
+</div>
+<div class="paragraph">
+<p>To know more about Prompt Engineering <a href="https://github.com/Arquisoft/wichat_es3b/issues/4">Issue #4</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_9_2_using_wikidata_as_the_main_knowledge_base">2. 9.2 Using Wikidata as the main knowledge base</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We require a structured and up-to-date knowledge base, so we decided to utilize Wikidata
+as the primary information source.<br>
+Decision made in <a href="https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025">Acta 2 ‐ 10 02 2025</a>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Justification</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Wikidata is an open, structured database offering information in RDF and SPARQL formats.</p>
+</li>
+<li>
+<p>It enables flexible integrations with our backend systems.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Consequences</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Optimal performance requires expertise in SPARQL query optimization.</p>
+</li>
+<li>
+<p>Data updates are dependent on the Wikidata community.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To learn basic concepts about Wikidata and SPARQL <a href="https://github.com/Arquisoft/wichat_es3b/issues/6">Issue #6</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_9_3_choosing_react_for_the_frontend">3. 9.3 Choosing React for the Frontend</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We require an efficient framework for frontend development so we decided to utilize
+React for the user interface.<br>
+Decision made in <a href="https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025">Acta 2 ‐ 10 02 2025</a>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Justification</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>React&#8217;s declarative nature facilitates the construction of interactive user interfaces.</p>
+</li>
+<li>
+<p>The integration of React with Wikidata is straightforward and user-friendly, simplifying data management and display.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>As a consequence, most part of the team will require React training because it is a new technology for many of us.</p>
+</div>
+<div class="paragraph">
+<p>To learn basic concepts about React <a href="https://github.com/Arquisoft/wichat_es3b/issues/7">Issue #7</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_9_4_using_node_js_for_backend_development">4. 9.4  Using Node.js for Backend Development</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We require an efficient and scalable technology for the backend so we will
+utilize Node.js to solve this problem.<br>
+Decision made in <a href="https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025">Acta 2 ‐ 10 02 2025</a>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Justification</strong><br>
+Node.js is highly efficient for asynchronous and high-traffic applications.
+Furthermore, it is a great opportunity for many of us to learn how to use this important technology in the software development world.</p>
+</div>
+<div class="paragraph">
+<p>New knowledge about Node.js <a href="https://github.com/Arquisoft/wichat_es3b/issues/3">Issue #3</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_9_5_selecting_mongodb_for_the_database">5. 9.5 Selecting MongoDB for the Database</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Due to the requirement for flexible storage of structured and unstructured data,
+we have chosen a NoSQL database over SQL. <br>
+Decision made in <a href="https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025">Acta 2 ‐ 10 02 2025</a>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Justification</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It facilitates the storage of semi-structured data in JSON format.</p>
+</li>
+<li>
+<p>It works very well with Node.js and is highly scalable.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Consequences</strong><br>
+Query optimization may be required for handling large data volumes. Although we
+have had some exposure to NoSQL databases, further training and development in this area will be necessary to optimize their usage.</p>
+</div>
+<div class="paragraph">
+<p>To learn basic concepts about MongoDb and practice examples <a href="https://github.com/Arquisoft/wichat_es3b/issues/9">Issue #9</a>.</p>
+</div>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -1931,7 +2309,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-quality-scenarios">10. Quality Requirements</h2>
+<h2 id="section-quality-scenarios">6. Quality Requirements</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>In order to make Wichat a satisfactory final product, we find it crucial to set some quality requirements to live up with. These aspects are to influence architectural decisions and hence include some measurable features:</p>
@@ -1972,7 +2350,7 @@ There you will find links and examples about ADR.</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_quality_tree">10.1. Quality Tree</h3>
+<h3 id="_quality_tree">6.1. Quality Tree</h3>
 <div class="imageblock">
 <div class="content">
 <img src="./images/diagrama_escenarios_calidad.jpg" alt="Diagrama de escenarios de calidad" width="primera versión">
@@ -1980,7 +2358,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_quality_scenarios">10.2. Quality Scenarios</h3>
+<h3 id="_quality_scenarios">6.2. Quality Scenarios</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 23.0769%;">
@@ -2086,13 +2464,13 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-technical-risks">11. Risks and Technical Debts</h2>
+<h2 id="section-technical-risks">7. Risks and Technical Debts</h2>
 <div class="sectionbody">
 
 </div>
 </div>
 <div class="sect1 arc42help">
-<h2 id="_contents">12. Contents</h2>
+<h2 id="_contents">8. Contents</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>A list of identified technical risks or technical debts, ordered by priority</p>
@@ -2100,7 +2478,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_motivation">13. Motivation</h2>
+<h2 id="_motivation">9. Motivation</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>“Risk management is project management for grown-ups” (Tim Lister, Atlantic Systems Guild.)</p>
@@ -2108,7 +2486,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_form">14. Form</h2>
+<h2 id="_form">10. Form</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>List of risks and/or technical debts, probably including suggested measures to minimize, mitigate or avoid risks or reduce technical debts.</p>
@@ -2155,7 +2533,7 @@ There you will find links and examples about ADR.</p>
 </tbody>
 </table>
 <div class="sect2">
-<h3 id="_technical_debts">14.1. Technical Debts</h3>
+<h3 id="_technical_debts">10.1. Technical Debts</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2172,7 +2550,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_further_information">15. Further Information</h2>
+<h2 id="_further_information">11. Further Information</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>See <a href="https://docs.arc42.org/section-11/">Risks and Technical Debt</a> in the arc42 documentation.</p>
@@ -2181,7 +2559,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-glossary">16. Glossary</h2>
+<h2 id="section-glossary">12. Glossary</h2>
 <div class="sectionbody">
 <div class="sidebarblock arc42help">
 <div class="content">
