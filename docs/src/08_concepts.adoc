@@ -56,18 +56,81 @@ image::08-concepts-EN.drawio.png["Possible topics for crosscutting concepts"]
 See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
 ****
 endif::arc42help[]
-
-=== _<Concept 1>_
-
-_<explanation>_
+=== _Domain concepts_
+==== _Domain model_
 
 
+[plantuml,"Sequence diagram",svg]
+----
+@startuml
+class User {
+    +userName : string
+}
 
-=== _<Concept 2>_
+class UserRecord {
+    +totalScore : double
+}
 
-_<explanation>_
+class GameSession {
+    +score : double
+}
 
-...
+class Question {
+    +questionText : string
+    +imageUrl : string
+}
+
+class Choice {
+    +text : string
+    +selected : boolean
+}
+
+Question "1" *--- "3" Choice : wrongChoice
+Question "1" *--- "1" Choice : correctChoice
+GameSession "1" *-- "n" Question
+UserRecord "1" o-- "n" GameSession :  storages
+User "1" - "1" UserRecord
+
+@enduml
+----
+
+==== _Domain description_
+|===
+|Term |Description
+
+|User
+|Represents a user of the application.
+
+|UserRecord
+|Stores all the game sessions in which a user has participated and keeps their total score.
+
+|GameSession
+|Represents a game session played by a user, storing all the questions, the choices made, and the total score.
+
+|Question
+|Represents questions shown to the user by the application and stores the wrong choices, correct choices, and the text that is displayed.
+
+|Choice
+|Represents the choices that the user can make when answering a question. It stores the text of the choice and indicates if it was selected by the user.
+
+|===
+
+
+
+=== _Microservices architecture_
+
+_We have decided that our architecture will be based on microservices, which means that every part of the aplication will be divided in a service that performs a specific function. The services can communicate witch eachother using their repective APIs or via the shared database_
+
+
+
+=== _Build, Test, Deploy_
+
+_The project follows a CI/CD pipeline that automates the build, test, and deployment processes. This ensures that the application is always up-to-date and working correctly._
+
+
+=== _Usability_
+
+_Usability is crucial for any application, as it directly impacts user interaction efficiency. To ensure our app’s usability, we conducted extensive user research, leading to an intuitive interface design. Employing a user-centric approach throughout development, we prioritized user experience, facilitating easy navigation_
 
 === _<Concept n>_
 
