@@ -38,28 +38,6 @@ See https://docs.arc42.org/section-6/[Runtime View] in the arc42 documentation.
 
 ****
 endif::arc42help[]
-
-=== <Runtime Scenario 1>
-
-
-* _<insert runtime diagram or textual description of the scenario>_
-* _<insert description of the notable aspects of the interactions between the
-building block instances depicted in this diagram.>_
-
-It is possible to use a sequence diagram:
-
-[plantuml,"Sequence diagram",png]
-----
-actor Alice
-actor Bob
-database Pod as "Bob's Pod"
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
-Alice  --> Pod: Store route
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
-----
-
 === Sign In
 A user wants to create a new account. The user introduces the required information and clicks the "Sign In" button. The system validates the information and creates a new account. If all the process runs correctly, the system logs in the user and redirects to the main page.
 [plantuml,"SignIn diagram",svg]
