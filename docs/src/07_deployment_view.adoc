@@ -92,13 +92,15 @@ node "Azure VM" as AzureVM {
   }
 }
 
-node "Wikidata API" as Wikidata
+node "External Services" as ExServs {
+  component "Wikidata API" as Wikidata
+  component "LLM API" as LLM
+}
 
 UA --> Browser : HTTP/HTTPS
 Browser --> AzureVM : Requests
 Micro --> DB : Data Access
-Micro --> Wikidata : External API Calls
-
+Micro --> ExServs : External API Calls
 @enduml
 ----
 
@@ -143,12 +145,21 @@ Within the Azure VM, the Docker engine orchestrates several containers, each enc
 [plantuml, diagram3, svg]
 ----
 @startuml
-node "Docker Engine" {
-component "User Service" as UserService
-component "Question Service" as QuestionService
-component "LLM Service" as LLMService
-component "Persistence DB" as Persistence
+node "Docker" {
+  node "Container" as dc1 {
+  component "User Service" as UserService
+  }
+  node "Container" as dc2 {
+  component "Question Service" as QuestionService
+  }
+  node "Container" as dc3 {
+  component "LLM Service" as LLMService
+  }
+  node "Container" as dc4 {
+  component "Persistence DB" as Persistence
+  }
 }
+
 UserService --> Persistence : User data management
 QuestionService --> Persistence : Save/Get questions
 @enduml
