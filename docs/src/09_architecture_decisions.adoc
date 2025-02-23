@@ -1,6 +1,6 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
-= Architectural decisions
+= 9 Architectural decisions
 
 == 9.1 Use of Large Language Models (LLMs) in the System
 We will use LLM in our question-and-answer application to generate hints during
