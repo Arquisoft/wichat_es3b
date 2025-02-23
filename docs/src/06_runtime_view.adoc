@@ -60,8 +60,128 @@ Alice -> Bob: Another authentication Request
 Alice <-- Bob: another authentication Response
 ----
 
-=== <Runtime Scenario 2>
+=== Sign In
+A user wants to create a new account. The user introduces the required information and clicks the "Sign In" button. The system validates the information and creates a new account. If all the process runs correctly, the system logs in the user and redirects to the main page.
+[plantuml,"SignIn diagram",svg]
+----
+actor User
+collections WebApp
+collections GatewayService
+collections UsersService
+database DB
 
-=== ...
+User -> WebApp: Request login
+WebApp -> GatewayService: SignInRequest(UserData)
+GatewayService  -> UsersService: SignInRequest(UserData)
+UsersService -> UsersService: validateFields()
+UsersService  -> DB: validateRequiredFieldsAndInsert()
+DB -> UsersService: Confirm data
+UsersService -> UsersService: loginUser()
+UsersService -> GatewayService: Confirm sign in
+GatewayService -> WebApp: Confirm sign in
+WebApp -> User: Confirm sign in
+----
 
-=== <Runtime Scenario n>
+=== Log In
+A user wants to log in into the application. The user introduces the required information and clicks the "Log In" button. The system validates the information and if the user had already an account, redirects them to the main page.
+[plantuml,"LogIn diagram",svg]
+----
+actor User
+collections WebApp
+collections GatewayService
+collections AuthService
+database DB
+
+User -> WebApp: Request login
+WebApp -> GatewayService: LogInRequest(UserData)
+GatewayService  -> AuthService: LogInRequest(UserData)
+AuthService -> AuthService: validateFields()
+AuthService  -> DB: logInUser()
+DB -> AuthService: Confirm data
+AuthService -> AuthService: loginUser()
+AuthService -> GatewayService: Confirm login
+GatewayService -> WebApp: Confirm login
+WebApp -> User: Confirm login
+----
+
+=== New Question
+A user wants to start a new round, it can be a new question or start a new game. The system generates a new question and shows it to the user. The user answers the question and the system validates the answer. The system updates the user's score and stats, then shows the results to the user.
+[plantuml,"New question",svg]
+----
+actor User
+collections WA as "Web App"
+collections GW as "GatewayService"
+collections GMS as "GameService"
+collections QUS as "QuestionService"
+collections USERS as "UsersService"
+entity WD as "WikidataAPI"
+database DB as "MongoDB"
+
+User -> WA: Starts new round
+WA -> GW: getNewQuestion()
+GW -> GMS: getNewQuestion()
+GMS -> QUS: getNewQuestion()
+QUS -> WD: getNewQuestion()
+WD -> QUS: Question Info
+QUS -> GMS: Question Info
+GMS -> GMS: Saves question info
+GMS -> GW: Question Data
+GW -> WA: Question Data
+User -> WA: Answers question
+WA -> GW: Send answer
+GW -> GMS: Send answer
+GMS -> GMS: checkAnswer()
+GMS -> USERS: Update user score
+USERS -> DB: Update user data
+GMS -> GW: Show results
+GW -> WA: Show results
+----
+
+=== New Clue
+A user wants to get a new clue for the current question. The GameService cheks if all the conditions are met and asks the LLMService for a new clue. The LLMService validates the clue and returns it to the GameService, which sends it to the GatewayService and finally to the WebApp.
+[plantuml,"New clue",svg]
+----
+actor User
+collections WA as "Web App"
+collections GW as "GatewayService"
+collections QU as "GameService"
+collections LLMS as "LLMService"
+entity LLM as "MistralAPI"
+
+User -> WA: Asks for a question
+WA -> GW: userAsksForNewClue(userText)
+GW -> QU: userAsksForNewClue(userText)
+QU -> LLMS: getNewClue(userText)
+LLMS -> LLMS: validateClue(userText)
+LLMS -> LLM: getClue(userText)
+LLM -> LLMS: LLM Answer
+LLMS -> QU: Clue Data
+QU -> GW: Clue Data
+GW -> WA: Clue Data
+----
+
+=== Check Record
+A user wants to check the record of a game session. The system loads all records and the user selects one to see the details. The system loads the details of the record and shows them to the user.
+[plantuml,"Question record",svg]
+----
+actor User
+collections WA as "Web App"
+collections GW as "GatewayService"
+collections US as "UsersService"
+database DB as "MongoDB"
+
+User -> WA: Access record page
+WA -> GW: loadRecords()
+GW -> US: loadRecords()
+US -> DB: getActiveUserRecords()
+DB -> US: User Records
+US -> GW: User Records
+GW -> WA: User Records
+User -> WA: Record details
+WA -> GW: getRecordDetails(RecordID)
+GW -> US: getRecordDetails(RecordID)
+US -> DB: getRecordDetails(RecordID)
+DB -> US: Record Details
+US -> GW: Record Details
+GW -> WA: Record Details
+----
