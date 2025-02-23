@@ -67,7 +67,6 @@ _We have decided that our architecture will be based on microservices, which mea
 
 _The project follows a CI/CD pipeline that automates the build, test, and deployment processes. This ensures that the application is always up-to-date and working correctly._
 
-...
 
 === _Usability_
 
