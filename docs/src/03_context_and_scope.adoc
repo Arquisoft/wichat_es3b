@@ -93,37 +93,7 @@ together with a mapping table showing the relationships between channels and inp
 ****
 endif::arc42help[]
 
-[plantuml, technical-context-diagram, svg]
-----
-@startuml
-actor User
-
-node "Webapp" {
-    [Frontend]
-}
-
-node "Backend Services" {
-    [User service]
-    [History service]
-    [Question service]
-    [LLM service]
-}
-
-database "Persistence"
-[Wikidata]
-
-User --> Frontend : Interacts with
-Frontend --> "User service" : Sends and requests user info
-Frontend --> "History service" : Requests history
-Frontend --> "LLM service" : Ask for hints
-
-"User service" --> Persistence : Saves user info and checks
-"History service" --> Persistence : Saves history
-"Question service" --> Wikidata : Requests questions
-Wikidata --> "Question service" : Gets data from
-"Question service" --> Persistence : Saves questions
-@enduml
-----
+image:technical-context-diagram.png[]
 
 
 |===
