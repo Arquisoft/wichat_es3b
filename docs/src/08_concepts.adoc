@@ -60,39 +60,7 @@ endif::arc42help[]
 ==== _Domain model_
 
 
-[plantuml,"Sequence diagram",svg]
-----
-@startuml
-class User {
-    +userName : string
-}
-
-class UserRecord {
-    +totalScore : double
-}
-
-class GameSession {
-    +score : double
-}
-
-class Question {
-    +questionText : string
-    +imageUrl : string
-}
-
-class Choice {
-    +text : string
-    +selected : boolean
-}
-
-Question "1" *--- "3" Choice : wrongChoice
-Question "1" *--- "1" Choice : correctChoice
-GameSession "1" *-- "n" Question
-UserRecord "1" o-- "n" GameSession :  storages
-User "1" - "1" UserRecord
-
-@enduml
-----
+image:diagram-8_1.png[]
 
 ==== _Domain description_
 |===
@@ -132,6 +100,3 @@ _The project follows a CI/CD pipeline that automates the build, test, and deploy
 
 _Usability is crucial for any application, as it directly impacts user interaction efficiency. To ensure our app’s usability, we conducted extensive user research, leading to an intuitive interface design. Employing a user-centric approach throughout development, we prioritized user experience, facilitating easy navigation_
 
-=== _<Concept n>_
-
-_<explanation>_

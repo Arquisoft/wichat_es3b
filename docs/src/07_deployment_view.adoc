@@ -78,31 +78,7 @@ The deployment maps the following building blocks:
 
 Below is a diagram summarizing the infrastructure distribution:
 
-[plantuml, diagram, svg]
-----
-@startuml
-node "User Agent" as UA {
-  component "Web Browser" as Browser
-}
-
-node "Azure VM" as AzureVM {
-  node "Docker Engine" as Docker {
-    component "Microservices" as Micro
-    component "Database" as DB
-  }
-}
-
-node "External Services" as ExServs {
-  component "Wikidata API" as Wikidata
-  component "LLM API" as LLM
-}
-
-UA --> Browser : HTTP/HTTPS
-Browser --> AzureVM : Requests
-Micro --> DB : Data Access
-Micro --> ExServs : External API Calls
-@enduml
-----
+image:diagram-7_1.png[]
 
 === Infrastructure Level 2
 
@@ -121,19 +97,7 @@ This section provides a detailed view of selected infrastructure elements from L
 
 This element represents the Azure virtual machine that hosts the web application. The VM runs a supported operating system (e.g., Ubuntu) and includes the Docker engine to manage containerized services.
 
-[plantuml, diagram2, svg]
-----
-@startuml
-node "Azure VM" as AzureVM {
-  package "Operating System" {
-    node "Docker Engine" as Docker {
-      component "Web Application Container" as WebApp
-    }
-  }
-}
-AzureVM --> "Azure Networking" : Internet Connectivity
-@enduml
-----
+image:diagram-7_2.png[]
 
 _Explanation_:
 The Azure VM was selected for its reliability and integrated security features. Hosting the web application in a Docker container on Azure facilitates quick scaling and streamlined management while leveraging Azure’s global network infrastructure.
@@ -142,28 +106,7 @@ The Azure VM was selected for its reliability and integrated security features. 
 
 Within the Azure VM, the Docker engine orchestrates several containers, each encapsulating a microservice. This environment supports modular development and independent scalability.
 
-[plantuml, diagram3, svg]
-----
-@startuml
-node "Docker" {
-  node "Container" as dc1 {
-  component "User Service" as UserService
-  }
-  node "Container" as dc2 {
-  component "Question Service" as QuestionService
-  }
-  node "Container" as dc3 {
-  component "LLM Service" as LLMService
-  }
-  node "Container" as dc4 {
-  component "Persistence DB" as Persistence
-  }
-}
-
-UserService --> Persistence : User data management
-QuestionService --> Persistence : Save/Get questions
-@enduml
-----
+image:diagram-7_3.png[]
 
 _Explanation_:
 The Docker container environment isolates each microservice, enabling independent updates and robust fault tolerance. Internal communication is handled through the Docker network, ensuring efficient and secure interactions between services.
