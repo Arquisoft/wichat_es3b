@@ -5,8 +5,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import Nav from './components/Nav';  // Importa Nav
-import Footer from './components/Footer';  // Importa Footer
 
 function App() {
     const [showLogin, setShowLogin] = useState(true);
@@ -18,7 +16,6 @@ function App() {
     return (
         <div>
             {/* Incluye el Navbar */}
-            <Nav />
 
             <Container component="main" maxWidth="xs">
                 <CssBaseline />
@@ -40,7 +37,6 @@ function App() {
             </Container>
 
             {/* Incluye el Footer */}
-            <Footer />
         </div>
     );
 }
