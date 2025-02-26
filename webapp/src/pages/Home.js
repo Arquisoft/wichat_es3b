@@ -3,8 +3,12 @@ import Nav from "../components/Nav.js";
 import Footer from "../components/Footer.js";
 import { Box, Typography, Button, Grid, Container } from "@mui/material";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 
 const Home = () => {
+    const { t } = useTranslation();
+
     return (
         <>
             <Nav />
@@ -27,11 +31,11 @@ const Home = () => {
                        WIChat
                     </Typography>
                     <Typography variant="h6" color="textSecondary" paragraph>
-                        ¡Pon a prueba tus conocimientos con imágenes y pistas interactivas!
+                        {t('components.pages.home.presentation')}
                     </Typography>
                     <Button variant="contained" color="primary" component={Link}
                             to="/play" >
-                        Jugar
+                        {t('components.pages.home.play')}
                     </Button>
                 </Box>
 
@@ -52,13 +56,13 @@ const Home = () => {
                             }}
                         >
                             <Typography variant="h5" gutterBottom>
-                               ¿Cómo se juega?
+                                {t('components.pages.home.help')}
                             </Typography>
                             <Typography variant="body1" color="textSecondary">
-                                1. Observa la imagen.{" "}
+                                {t('components.pages.home.look')}
                                 <br />
-                                2. Responde en el menor tiempo posible <br />
-                                3. Usa pistas generales con IA si lo necesitas
+                                {t('components.pages.home.think')} <br />
+                                {t('components.pages.home.ia')}
                             </Typography>
                         </Box>
                     </Grid>
@@ -79,7 +83,7 @@ const Home = () => {
                             }}
                         >
                             <Typography variant="h5" gutterBottom>
-                               Top 3 jugadores
+                                {t('components.pages.home.top')}
                             </Typography>
                             <Typography variant="body1" color="textSecondary">
                                 1. Juan - 150 puntos <br />

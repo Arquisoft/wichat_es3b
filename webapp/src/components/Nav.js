@@ -1,8 +1,13 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 
 const Nav = () => {
+
+    const { t } = useTranslation();
+
     const navigate = useNavigate(); // Hook para manejar la navegación
 
     return (
@@ -19,20 +24,24 @@ const Nav = () => {
 
                 {/* Botones de navegación */}
                 <Box sx={{ display: "flex", gap: 2 }}>
-                    <Button color="inherit" onClick={() => navigate("/home")}>Inicio</Button>
-                    <Button color="inherit" onClick={() => navigate("/game")}>Juego</Button>
-                    <Button color="inherit" onClick={() => navigate("/rankings")}>Estadísticas</Button>
+                    <Button color="inherit" onClick={() => navigate("/home")}>
+                        {t('components.nav.home')}</Button>
+                    <Button color="inherit" onClick={() => navigate("/play")}>
+                        {t('components.nav.play')}</Button>
+                    <Button color="inherit" onClick={() => navigate("/rankings")}>
+                        {t('components.nav.ranking')}</Button>
                 </Box>
 
                 {/* Botones de sesión */}
                 <Box sx={{ display: "flex", gap: 1, marginLeft: "auto" }}>
-                    <Button color="inherit" onClick={() => navigate("/login")}>Iniciar sesión</Button>
+                    <Button color="inherit" onClick={() => navigate("/login")}>
+                        {t('components.nav.login')}</Button>
                     <Button
                         variant="contained"
                         sx={{ backgroundColor: "white", color: "purple" }}
                         onClick={() => navigate("/signup")}
                     >
-                        Crear cuenta
+                        {t('components.nav.singup')}
                     </Button>
                 </Box>
             </Toolbar>

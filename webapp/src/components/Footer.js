@@ -1,8 +1,13 @@
 import React from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 
 const Footer = () => {
+
+    const { t } = useTranslation();
+
     const navigate = useNavigate(); // Hook para manejar la navegación
 
     return (
@@ -10,21 +15,15 @@ const Footer = () => {
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
                 {/* Texto de derechos reservados */}
                 <Typography variant="body2" sx={{ color: "white", textAlign: "center", flexBasis: "100%" }}>
-                    © 2025 WIChat. Todos los derechos reservados.
+                    © 2025 WIChat.  {t('components.footer.rights')}
                 </Typography>
 
                 {/* Botones de navegación */}
                 <Box sx={{ display: "flex", gap: 2 }}>
-                    <Button color="inherit" onClick={() => navigate("/home")}>Inicio</Button>
-                    <Button color="inherit" onClick={() => navigate("/about")}>Sobre nosotros</Button>
-                    <Button color="inherit" onClick={() => navigate("/contact")}>Contacto</Button>
-                </Box>
-
-                {/* Redes sociales */}
-                <Box sx={{ display: "flex", gap: 2, marginTop: { xs: 2, sm: 0 } }}>
-                    <Button color="inherit" onClick={() => navigate("/facebook")}>Facebook</Button>
-                    <Button color="inherit" onClick={() => navigate("/twitter")}>Twitter</Button>
-                    <Button color="inherit" onClick={() => navigate("/instagram")}>Instagram</Button>
+                    <Button color="inherit" onClick={() => navigate("/about")}>
+                        {t('components.footer.about')}</Button>
+                    <Button color="inherit" onClick={() => navigate("/contact")}>
+                        {t('components.footer.contact')}</Button>
                 </Box>
             </Box>
         </Box>
