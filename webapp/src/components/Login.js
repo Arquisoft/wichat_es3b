@@ -1,8 +1,9 @@
 // src/components/Login.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Container, Typography, TextField, Button, Snackbar } from '@mui/material';
+import { Container, Typography, TextField, Snackbar, Box } from '@mui/material';
 import { Typewriter } from "react-simple-typewriter";
+import Button from "./BaseButton"
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -80,9 +81,11 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button variant="contained" color="primary" onClick={loginUser}>
-            Login
-          </Button>
+         {/* Centrar el botón */}
+         <Box sx={{display:'flex', justifyContent:'center', marginTop:2}}>
+          <Button text="Iniciar Sesión" onclick={loginUser}></Button>
+         </Box>
+          
           <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar} message="Login successful" />
           {error && (
             <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError('')} message={`Error: ${error}`} />
