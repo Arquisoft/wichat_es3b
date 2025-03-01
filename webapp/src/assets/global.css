@@ -5,7 +5,7 @@
 :root {
   /* Colores principales basados en la imagen */
   --color-primario: #38b6ff; /* Azul principal */
-  --color-secundario: #f0f8f7; /* Fondo claro */
+  --color-secundario: #ffffff; /* Fondo claro */
   --color-texto: #333333; /* Texto principal */
   --color-texto-secundario: #ffffff; /* Texto en botones o fondos oscuros */
 
@@ -33,47 +33,7 @@ body {
 
 /* Estilo de los encabezados */
 h1 {
+  color: var(--color-primario);
   font-size: var(--font-size-xl);
   font-weight: 700;
-}
-
-h2 {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-}
-
-p {
-  font-size: var(--font-size-md);
-  line-height: 1.6;
-}
-
-/* Campos de entrada */
-input {
-  width: 100%;
-  padding: var(--espaciado-sm);
-  border: 1px solid var(--color-borde);
-  border-radius: 5px;
-  font-size: var(--font-size-md);
-}
-
-input:focus {
-  border-color: var(--color-primario);
-  outline: none;
-}
-
-/* Contenedores generales */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--espaciado-md);
-}
-
-/* Links */
-a {
-  color: var(--color-primario);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
 }

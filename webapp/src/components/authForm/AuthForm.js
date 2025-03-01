@@ -1,13 +1,10 @@
-import React from "react";
+import { React } from "react";
+import Login from "../login/Login";
+//import AddUser from "../addUser/AddUser"
+import "./AuthForm.css";
 
-function AuthForm(){
-    const [showLogin, setShowLogin] = useState(true);
-    
-      const handleToggleView = () => {
-        setShowLogin(!showLogin);
-      };
-
-      
+function AuthForm() {
+  return <Login></Login>;
 }
 
 export default AuthForm;

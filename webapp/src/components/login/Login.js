@@ -1,23 +1,42 @@
 // src/components/Login.js
 import React, { useState } from "react";
 import axios from "axios";
-import { Container, Typography, Snackbar, Box } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Snackbar,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
 import { Typewriter } from "react-simple-typewriter";
-import Button from "../button/BaseButton";
+import BaseButton from "../button/BaseButton";
 import WiChatTextField from "../textField/WiChatTextField";
+import "./Login.css";
+import "../../assets/global.css";
+import logo from "../../assets/img/logo_base.png";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [createdAt, setCreatedAt] = useState("");
+
   const [openSnackbar, setOpenSnackbar] = useState(false);
+
+  const [showLogin, setShowLogin] = useState(true);
 
   const apiEndpoint =
     process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000";
   const apiKey = process.env.REACT_APP_LLM_API_KEY || "None";
+
+  const handleToggleView = () => {
+    setShowLogin(!showLogin);
+  };
 
   const loginUser = async () => {
     try {
@@ -78,58 +97,74 @@ const Login = () => {
           </Typography>
         </Container>
       ) : (
-        <Container
-          sx={{ display: "flex", flexDirection: "column", gap: "0.5em" }}
-        >
-          <Typography
-            component="h1"
-            variant="h5"
-            textAlign={"center"}
-            fontFamily={"Poppins, sans-serif"}
-            fontWeight={"bold"}
-            color={"#38B6FF"}
-          >
-            Identifícate
-          </Typography>
-          <Typography
-            component="subtitle1"
-            fontSize={"0.8em"}
-            textAlign={"center"}
-            fontFamily={"Poppins, sans-serif"}
-            fontStyle={"italic"}
-          >
-            Introduce el nombre de usuario y la contraseña de tu cuenta de
-            WiChat.
-          </Typography>
-          <WiChatTextField
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          ></WiChatTextField>
-          <WiChatTextField
-            value={password}
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-          ></WiChatTextField>
-          {/* Centrar el botón */}
-          <Box sx={{ display: "flex", justifyContent: "center", marginTop: 2 }}>
-            <Button text="Iniciar Sesión" onclick={loginUser}></Button>
-          </Box>
-
-          <Snackbar
-            open={openSnackbar}
-            autoHideDuration={6000}
-            onClose={handleCloseSnackbar}
-            message="Login successful"
-          />
-          {error && (
+        <div>
+          <img src={logo} alt="Logo de WiChat" />
+          <div className="form">
+            <h1>Identifícate</h1>
+            <h2>
+              Introduce el nombre de usuario y la contraseña de tu cuenta de
+              WiChat.
+            </h2>
+            <div>
+              <label>
+                Correo electrónico
+                <WiChatTextField
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                ></WiChatTextField>
+              </label>
+              <label>
+                Contraseña
+                <WiChatTextField
+                  value={password}
+                  type="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                ></WiChatTextField>
+              </label>
+            </div>
+            <div className="rememberMe">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={rememberMe}
+                    onChange={() => setRememberMe(!rememberMe)}
+                    sx={{
+                      color: "var(--color-primario)",
+                      "&.Mui-checked": { color: "var(--color-primario)" },
+                    }}
+                  />
+                }
+                label="Recordar mi contraseña"
+              />
+            </div>
+            <div className="buttonPanel">
+              <BaseButton
+                text="Iniciar Sesión"
+                onclick={loginUser}
+              ></BaseButton>
+              <span> o </span>
+              <BaseButton
+                text="Crear cuenta"
+                onclick={handleToggleView}
+                buttonType="buttonSecondary"
+              ></BaseButton>
+            </div>
             <Snackbar
-              open={!!error}
+              open={openSnackbar}
               autoHideDuration={6000}
-              onClose={() => setError("")}
-              message={`Error: ${error}`}
+              onClose={handleCloseSnackbar}
+              message="Login successful"
             />
-          )}
-        </Container>
+            {error && (
+              <Snackbar
+                open={!!error}
+                autoHideDuration={6000}
+                onClose={() => setError("")}
+                message={`Error: ${error}`}
+              />
+            )}
+          </div>
+        </div>
       )}
     </Container>
   );

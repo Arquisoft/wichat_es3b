@@ -1,0 +1,61 @@
+@import url("../../assets/global.css");
+
+input.textField {
+  margin: 0.5em 0;
+}
+
+h2 {
+  margin-top: 0;
+  font-weight: normal;
+  font-style: italic;
+  font-size: var(--font-size-md);
+}
+
+button {
+  width: 30%;
+}
+
+.form {
+  margin-top: 10%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+}
+
+input.textField {
+  width: 100%;
+  padding: 0.4em;
+}
+
+.buttonPanel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2em;
+  margin-top: 1.2%;
+}
+
+.rememberMe {
+  width: 100%;
+  display: flex;
+  justify-content: start;
+  margin-left: 43%;
+}
+
+.checkBox {
+  color: var(--color-primario);
+}
+
+.checkBox.Mui-checked {
+  color: var(--color-primario);
+}
+
+img {
+  width: 15%;
+  position: absolute;
+  top: 2%;
+  left: 10%;
+}

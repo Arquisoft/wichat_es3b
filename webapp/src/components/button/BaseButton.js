@@ -1,17 +1,16 @@
 import React from "react";
-import Button from "@mui/material/Button";
 import "./BaseButton.css";
 
-function BaseButton({ text, onClick }) {
+function BaseButton({ text, onClick, buttonType = "buttonPrimary" }) {
   return (
-    <Button
+    <button
       variant="contained"
       color="primary"
       onClick={onClick}
-      className="buttonPrimary"
+      className={buttonType}
     >
       {text}
-    </Button>
+    </button>
   );
 }
 
