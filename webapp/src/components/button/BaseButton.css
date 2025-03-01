@@ -1,0 +1,20 @@
+@import url("../../assets/global.css");
+
+/* Botones generales */
+button.buttonPrimary {
+  background-color: var(--color-primario);
+  color: var(--color-texto-secundario);
+  border: none;
+  padding: var(--espaciado-sm) var(--espaciado-md);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s;
+  text-transform: none;
+  font-weight: bold;
+}
+
+button.buttonPrimary:hover,
+button.buttonSecondary:hover {
+  background-color: #007acc; /* Azul más oscuro en hover */
+}

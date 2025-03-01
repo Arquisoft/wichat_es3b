@@ -1,0 +1,7 @@
+@import url("../../assets/global.css");
+input.textField {
+  border-radius: 5px;
+  border: none;
+  height: 2em;
+  background-color: aliceblue;
+}

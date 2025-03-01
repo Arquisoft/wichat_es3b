@@ -1,0 +1,79 @@
+/* Importamos la fuente Poppins desde Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap");
+
+/* Definimos las variables globales de colores y tamaños */
+:root {
+  /* Colores principales basados en la imagen */
+  --color-primario: #38b6ff; /* Azul principal */
+  --color-secundario: #f0f8f7; /* Fondo claro */
+  --color-texto: #333333; /* Texto principal */
+  --color-texto-secundario: #ffffff; /* Texto en botones o fondos oscuros */
+
+  /* Tamaños de fuente en medidas relativas */
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+
+  /* Espaciados */
+  --espaciado-sm: 0.5rem;
+  --espaciado-md: 1rem;
+  --espaciado-lg: 1.5rem;
+}
+
+/* Aplicamos la fuente a toda la página */
+body {
+  font-family: "Poppins", sans-serif;
+  font-size: var(--font-size-md);
+  background-color: var(--color-secundario);
+  color: var(--color-texto);
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilo de los encabezados */
+h1 {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+}
+
+h2 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+p {
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+}
+
+/* Campos de entrada */
+input {
+  width: 100%;
+  padding: var(--espaciado-sm);
+  border: 1px solid var(--color-borde);
+  border-radius: 5px;
+  font-size: var(--font-size-md);
+}
+
+input:focus {
+  border-color: var(--color-primario);
+  outline: none;
+}
+
+/* Contenedores generales */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--espaciado-md);
+}
+
+/* Links */
+a {
+  color: var(--color-primario);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
