@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Login from "../login/Login";
-import AddUser from "../addUser/AddUser";
+import Login from "../../components/login/Login";
+import AddUser from "../../components/addUser/AddUser";
 import { CSSTransition } from "react-transition-group";
 import "./AuthForm.css";
 
