@@ -8,25 +8,60 @@ h2 {
   margin-top: 0;
   font-weight: normal;
   font-style: italic;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
+  margin-bottom: 6%;
 }
 
 button {
   width: 30%;
 }
 
+.mainDiv {
+  display: grid;
+  grid-template-columns: 50% 50%; /* Divide en dos columnas iguales */
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+}
+
 .form {
-  margin-top: 10%;
-  width: 100%;
+  width: 70%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5em;
+  justify-content: center;
+  padding: 0 15%;
 }
 
-input.textField {
+.formField {
+  display: flex;
+  flex-direction: column;
+  width: 65%;
+}
+
+.formField input {
+  height: 1em;
+  padding: 0.8em;
   width: 100%;
-  padding: 0.4em;
+}
+
+.formField input:focus {
+  outline: none;
+}
+
+.passwordContainer {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.passwordContainer span {
+  position: absolute;
+  left: 98%;
+  top: 25%;
+  cursor: pointer;
 }
 
 .buttonPanel {
@@ -41,21 +76,38 @@ input.textField {
 .rememberMe {
   width: 100%;
   display: flex;
-  justify-content: start;
-  margin-left: 43%;
+  justify-content: center;
+  gap: 0.7em;
+  margin: 1em 0;
 }
 
-.checkBox {
-  color: var(--color-primario);
+.rememberMe input {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff;
+  border: 2px solid var(--color-primario);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
-.checkBox.Mui-checked {
-  color: var(--color-primario);
+.rememberMe input:checked {
+  background-color: var(--color-primario);
+  position: relative;
+}
+
+.rememberMe input:checked::after {
+  content: "✔";
+  font-size: var(--font-size-sm);
+  color: #ffffff;
+  font-weight: bold;
 }
 
 img {
-  width: 15%;
-  position: absolute;
-  top: 2%;
-  left: 10%;
+  position: relative;
+  height: 10%;
+  right: 39%;
 }

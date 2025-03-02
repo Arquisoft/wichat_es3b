@@ -1,5 +1,5 @@
 import React from "react";
-import "./assets/global.css";
+import "./App.css";
 import AuthForm from "./components/authForm/AuthForm";
 
 function App() {

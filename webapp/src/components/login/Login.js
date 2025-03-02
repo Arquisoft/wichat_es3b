@@ -1,16 +1,11 @@
 // src/components/Login.js
 import React, { useState } from "react";
 import axios from "axios";
-import {
-  Container,
-  Typography,
-  Snackbar,
-  Checkbox,
-  FormControlLabel,
-} from "@mui/material";
+import { Container, Typography, Snackbar } from "@mui/material";
 import { Typewriter } from "react-simple-typewriter";
 import BaseButton from "../button/BaseButton";
 import WiChatTextField from "../textField/WiChatTextField";
+import PhotoPanel from "../photoPanel/PhotoPanel";
 import "./Login.css";
 import "../../assets/global.css";
 import logo from "../../assets/img/logo_base.png";
@@ -18,7 +13,7 @@ import logo from "../../assets/img/logo_base.png";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -77,8 +72,12 @@ const Login = () => {
     setOpenSnackbar(false);
   };
 
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <Container component="main" sx={{ marginTop: 4 }}>
+    <div>
       {loginSuccess ? (
         <Container>
           <Typewriter
@@ -97,46 +96,38 @@ const Login = () => {
           </Typography>
         </Container>
       ) : (
-        <div>
-          <img src={logo} alt="Logo de WiChat" />
+        <div className="mainDiv">
           <div className="form">
+            <img src={logo} alt="Logo de WiChat" />
             <h1>Identifícate</h1>
             <h2>
               Introduce el nombre de usuario y la contraseña de tu cuenta de
               WiChat.
             </h2>
-            <div>
-              <label>
-                Correo electrónico
-                <WiChatTextField
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                ></WiChatTextField>
-              </label>
-              <label>
-                Contraseña
-                <WiChatTextField
-                  value={password}
-                  type="password"
-                  onChange={(e) => setPassword(e.target.value)}
-                ></WiChatTextField>
-              </label>
-            </div>
-            <div className="rememberMe">
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={rememberMe}
-                    onChange={() => setRememberMe(!rememberMe)}
-                    sx={{
-                      color: "var(--color-primario)",
-                      "&.Mui-checked": { color: "var(--color-primario)" },
-                    }}
-                  />
-                }
-                label="Recordar mi contraseña"
+
+            <div className="formField">
+              <label>Correo electrónico</label>
+              <WiChatTextField
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
+            <div className="formField">
+              <label>Contraseña</label>
+              <div className="passwordContainer">
+                <WiChatTextField
+                  value={password}
+                  type={showPassword ? "text" : "password"}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <span onClick={toggleShowPassword}>👁️‍🗨️</span>
+              </div>
+            </div>
+            <div className="rememberMe">
+              <input type="checkbox" id="rememberMeCbx"></input>
+              <label htmlFor="rememberMeCbx"> Recordar mi contraseña</label>
+            </div>
+
             <div className="buttonPanel">
               <BaseButton
                 text="Iniciar Sesión"
@@ -164,9 +155,15 @@ const Login = () => {
               />
             )}
           </div>
+          <PhotoPanel
+            text="“ 
+          El conocimiento es un viaje sin final, una aventura que nos enriquece cada dia.
+           Aprender, descubrir y compartir es lo que nos hace crecer, porque en cada pregunta hay una oportunidad
+           y en cada respuesta, un nuevo reto. Sigamos jugando y ganando juntos! “"
+          />
         </div>
       )}
-    </Container>
+    </div>
   );
 };
 
