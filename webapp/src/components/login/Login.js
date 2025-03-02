@@ -10,7 +10,7 @@ import "./Login.css";
 import "../../assets/global.css";
 import logo from "../../assets/img/logo_base.png";
 
-const Login = () => {
+const Login = ({ handleToggleView }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,15 +23,9 @@ const Login = () => {
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
-  const [showLogin, setShowLogin] = useState(true);
-
   const apiEndpoint =
     process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000";
   const apiKey = process.env.REACT_APP_LLM_API_KEY || "None";
-
-  const handleToggleView = () => {
-    setShowLogin(!showLogin);
-  };
 
   const loginUser = async () => {
     try {
@@ -106,7 +100,7 @@ const Login = () => {
             </h2>
 
             <div className="formField">
-              <label>Correo electrónico</label>
+              <label>Nombre de usuario</label>
               <WiChatTextField
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -131,12 +125,12 @@ const Login = () => {
             <div className="buttonPanel">
               <BaseButton
                 text="Iniciar Sesión"
-                onclick={loginUser}
+                onClick={loginUser}
               ></BaseButton>
               <span> o </span>
               <BaseButton
                 text="Crear cuenta"
-                onclick={handleToggleView}
+                onClick={handleToggleView}
                 buttonType="buttonSecondary"
               ></BaseButton>
             </div>
@@ -157,9 +151,9 @@ const Login = () => {
           </div>
           <PhotoPanel
             text="“ 
-          El conocimiento es un viaje sin final, una aventura que nos enriquece cada dia.
+          El conocimiento es un viaje sin final, una aventura que nos enriquece cada día.
            Aprender, descubrir y compartir es lo que nos hace crecer, porque en cada pregunta hay una oportunidad
-           y en cada respuesta, un nuevo reto. Sigamos jugando y ganando juntos! “"
+           y en cada respuesta, un nuevo reto. ¡Sigamos jugando y ganando juntos! “"
           />
         </div>
       )}
