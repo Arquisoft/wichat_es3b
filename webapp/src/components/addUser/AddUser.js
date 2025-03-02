@@ -97,7 +97,7 @@ const AddUser = ({ handleToggleView }) => {
           <BaseButton text="Crear Cuenta" onClick={addUser}></BaseButton>
           <span> o </span>
           <BaseButton
-            text="Identifícate"
+            text="Iniciar Sesión"
             onClick={handleToggleView}
             buttonType="buttonSecondary"
           ></BaseButton>
