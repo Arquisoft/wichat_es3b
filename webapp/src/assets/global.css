@@ -1,0 +1,39 @@
+/* Importamos la fuente Poppins desde Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap");
+
+/* Definimos las variables globales de colores y tamaños */
+:root {
+  /* Colores principales basados en la imagen */
+  --color-primario: #38b6ff; /* Azul principal */
+  --color-secundario: #ffffff; /* Fondo claro */
+  --color-texto: #333333; /* Texto principal */
+  --color-texto-secundario: #ffffff; /* Texto en botones o fondos oscuros */
+
+  /* Tamaños de fuente en medidas relativas */
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.75rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+}
+
+html,
+body {
+  font-size: var(--font-size-md);
+  background-color: var(--color-secundario);
+  color: var(--color-texto);
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilo de los encabezados */
+h1 {
+  color: var(--color-primario);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+}
