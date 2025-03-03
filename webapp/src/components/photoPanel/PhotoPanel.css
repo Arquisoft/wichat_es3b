@@ -1,0 +1,30 @@
+@import url("../../assets/global.css");
+
+/* Estilos para el panel */
+.image-panel {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+  opacity: 0.7;
+  background-image: url("../../assets/img/plató.jpg");
+}
+
+/* Panel azul transparente encima de la imagen */
+.blue-panel {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(28, 130, 239, 0.9); /* Color azul con transparencia */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilo para el texto */
+.text {
+  color: rgb(255, 255, 255);
+  font-style: italic;
+  font-size: var(--font-size-xl);
+  text-align: center;
+  width: 50%;
+}
