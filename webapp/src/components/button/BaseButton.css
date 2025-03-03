@@ -1,0 +1,32 @@
+@import url("../../assets/global.css");
+
+/* Botones generales */
+
+button {
+  padding: 1em 0;
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s;
+  text-transform: none;
+  font-weight: bold;
+}
+
+button.buttonPrimary {
+  background-color: var(--color-primario);
+  color: var(--color-texto-secundario);
+  border: none;
+}
+
+/* Botones generales */
+button.buttonSecondary {
+  background-color: var(--color-secundario);
+  color: var(--color-primario);
+  border: solid 0.1em var(--color-primario);
+}
+
+button.buttonPrimary:hover,
+button.buttonSecondary:hover {
+  background-color: #007acc; /* Azul más oscuro en hover */
+  color: var(--color-texto-secundario);
+}
