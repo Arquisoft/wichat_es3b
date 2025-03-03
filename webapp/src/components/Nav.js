@@ -35,13 +35,14 @@ const Nav = () => {
                 {/* Botones de sesión */}
                 <Box sx={{ display: "flex", gap: 1, marginLeft: "auto" }}>
                     <Button color="inherit" onClick={() => navigate("/login")}>
-                        {t('components.nav.login')}</Button>
+                        {t('components.nav.login')}
+                    </Button>
                     <Button
                         variant="contained"
                         sx={{ backgroundColor: "white", color: "purple" }}
                         onClick={() => navigate("/signup")}
                     >
-                        {t('components.nav.singup')}
+                        {t('components.nav.signup')}
                     </Button>
                 </Box>
             </Toolbar>
