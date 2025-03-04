@@ -78,6 +78,23 @@ have had some exposure to NoSQL databases, further training and development in t
 
 To learn basic concepts about MongoDb and practice examples link:https://github.com/Arquisoft/wichat_es3b/issues/9[Issue #9].
 
+== 9.6 Selecting Docker for the Deployment
+Considering the need for a dependable, scalable, and efficient deployment process, we chose Docker to containerize
+our services. Docker allows us to define and package all the components of our application in a consistent and
+repeatable manner, making it easy to deploy across various environments without issues. +
+Task made in link: https://github.com/Arquisoft/wichat_es3b/issues/24[Issue #24]
+
+*Justification*
+
+ - Docker ensures a consistent environment for all our services, making sure they run the same way in both
+development and production. This greatly reduces potential problems that might arise due to configuration differences.
+
+- By using Docker Compose, we can define all the services in a single file, making it simpler to orchestrate and scale
+the application as needed.
+
+*Consequences*
+
+- To make sure we’re deploying and troubleshooting containers effectively, we'll need a solid understanding of Docker-specific tools (like Docker Compose) and networking.
 
 ifdef::arc42help[]
 [role="arc42help"]
