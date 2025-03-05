@@ -5,10 +5,7 @@ const mongoose = require("mongoose");
 const { fetchAndStoreCities } = require("./wikidata-service");
 
 // Connect to MongoDB and execute the functionality
-mongoose.connect(process.env.MONGO_URI, { 
-    useNewUrlParser: true, 
-    useUnifiedTopology: true 
-}).then(async () => {
+mongoose.connect(process.env.MONGO_URI).then(async () => {
     console.log("Connected to MongoDB");
     await fetchAndStoreCities();
     mongoose.connection.close();
