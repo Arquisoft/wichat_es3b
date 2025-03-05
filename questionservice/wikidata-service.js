@@ -1,0 +1,78 @@
+const axios = require("axios");
+const City = require("./wikidata-model");
+
+// SPARQL endpoint for WikiData
+const SPARQL_ENDPOINT = "https://query.wikidata.org/sparql";
+
+// SPARQL query to get the 50 most populated cities that have an image
+const SPARQL_QUERY = `
+SELECT DISTINCT ?city ?cityLabel ?image WHERE {  
+  ?city wdt:P31 wd:Q515;
+        wdt:P1082 ?population;
+        wdt:P18 ?image.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+} 
+ORDER BY DESC(?population)
+LIMIT 50
+`;
+
+// Function to fetch the alternative description of an image from Wikimedia Commons
+async function getImageDescription(imageUrl) {
+    const fileName = decodeURIComponent(imageUrl.split("/").pop()); // Extract the image filename
+    const commonsApiUrl = `https://commons.wikimedia.org/w/api.php?action=query&titles=File:${fileName}&prop=imageinfo&iiprop=extmetadata&format=json`;
+
+    try {
+        const response = await axios.get(commonsApiUrl);
+        const pages = response.data.query.pages;
+        const pageId = Object.keys(pages)[0]; // Get the first (and only) page ID
+
+        if (pages[pageId].imageinfo) { 
+            const metadata = pages[pageId].imageinfo[0].extmetadata;
+            return metadata.ImageDescription?.value || "No alternative text available"; // Return image description or fallback message
+        }
+        return "No alternative text available"; // If no description is found, return a default message
+    } catch (error) {
+        console.error("Error fetching image description:", error);
+        return "No alternative text available"; // Return a fallback message in case of an error
+    }
+}
+
+// Function to fetch cities from WikiData and store them in MongoDB
+async function fetchAndStoreCities() {
+    try {
+        // Fetch city data from WikiData
+        const response = await axios.get(SPARQL_ENDPOINT, {
+            params: { query: SPARQL_QUERY, format: "json" }, // Query parameters
+            headers: { "User-Agent": "QuizGame/1.0 (student project)" } // User-Agent to avoid request blocking
+        });
+
+        // Process the retrieved data and format it
+        const cities = await Promise.all(response.data.results.bindings.map(async (city) => {
+            const imageUrl = city.image.value;
+            const imageAltText = await getImageDescription(imageUrl); // Fetch alternative text for the image
+
+            return {
+                id: city.city.value.split("/").pop(), // Extract city ID from the URL
+                name: city.cityLabel.value, // Get city name
+                imageUrl, // Store image URL
+                imageAltText // Store alternative image description
+            };
+        }));
+
+        // Insert or update city data in MongoDB
+        for (const city of cities) {
+            await City.findOneAndUpdate(
+                { id: city.id }, // Search for an existing document by city ID
+                city, // Update or insert this city data
+                { upsert: true, new: true } // If not found, insert it; return the updated document
+            );
+        }
+
+        console.log("Cities successfully stored in MongoDB");
+    } catch (error) {
+        console.error("Error fetching and storing cities:", error);
+    }
+}
+
+// Exporting the function so that it can be used in other files
+module.exports = { fetchAndStoreCities };
