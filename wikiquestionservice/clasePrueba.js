@@ -17,6 +17,20 @@ async function ejecutarEjemploClases() {
     } else {
         console.log("No se encontraron preguntas de banderas.");
     }
+
+    const preguntaPlaneta = await queryProcessor.generatePlanetQuizQuestion();
+
+    if (preguntaPlaneta.error) {
+        console.error("Error al generar pregunta:", preguntaPlaneta.error);
+    } else if (preguntaPlaneta.pregunta) {
+        console.log("Pregunta:", preguntaPlaneta.pregunta);
+        console.log("URL de la imagen:", preguntaPlaneta.planetaImagen);
+        console.log("Planeta Correcto:", preguntaPlaneta.planetaCorrecto);
+        console.log("Opciones Incorrectas:", preguntaPlaneta.opcionesIncorrectas);
+        console.log("------------------------------------");
+    } else {
+        console.log("No se encontraron preguntas de planetas.");
+    }
 }
 
 ejecutarEjemploClases();
