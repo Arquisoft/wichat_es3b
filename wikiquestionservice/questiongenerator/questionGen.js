@@ -24,10 +24,10 @@ class WikidataQueryService {
 
     countryCodesArray = [];
 
-    async  obtenerIdsDeWikidata(tipoEntidad, cantidad = 100) {
+    async  obtenerIdsDeWikidata( cantidad = 100) {
         const sparqlQuery = `
     SELECT ?entity ?entityLabel WHERE {
-        ?entity wdt:P31 ${tipoEntidad}.
+        ?entity wdt:P31 ${this.entity}.
         SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],es". }
     }
     LIMIT ${cantidad}
