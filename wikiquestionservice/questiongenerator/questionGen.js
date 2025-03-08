@@ -29,6 +29,42 @@ class WikidataQueryService {
         return this.fetchData(sparqlQuery);
     }
 
+    countryCodesArray = []; // Array para almacenar objetos con label e ID de países
+
+    async  obtenerDatosDeWikidata(tipoEntidad, cantidad = 100) {
+        const sparqlQuery = `
+    SELECT ?entity ?entityLabel WHERE {
+        ?entity wdt:P31 ${tipoEntidad}.
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],es". }
+    }
+    LIMIT ${cantidad}
+`;
+
+        try {
+            const data = await this.fetchData(sparqlQuery);
+            this.entitiesArray = data.results.bindings
+                .map(binding => {
+                    const entityEntity = binding.entity.value;
+                    const parts = entityEntity.split('/');
+                    const entityId = parts[parts.length - 1];
+                    const entityLabel = binding.entityLabel.value;
+                    return {
+                        id: entityId,
+                        label: entityLabel
+                    };
+                })
+                .filter(entidad => { // **AÑADIMOS UN FILTRO AQUÍ EN JAVASCRIPT**
+                    return entidad.label !== ""; // Filtra entidades donde el label NO sea una cadena vacía
+                });
+            console.log("Datos almacenados en entitiesArray (sin etiquetas vacías):", this.entitiesArray);
+
+        } catch (error) {
+            console.error('Error al obtener datos de Wikidata:', error);
+            this.entitiesArray = [];
+        }
+    }
+
+
     async fetchIncorrectCountryOptions(correctCountryItemId) {
         const sparqlQuery =  `
         SELECT ?countryLabel WHERE {
