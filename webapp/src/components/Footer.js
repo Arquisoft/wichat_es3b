@@ -12,10 +12,16 @@ const Footer = () => {
                 color: "white",
                 textAlign: "center",
                 padding: "20px",
-                marginTop: "auto"
+                marginTop: "auto",
+                height: "80px", // Ajusta la altura del footer para que sea igual al nav
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
             }}
         >
-            <Typography variant="body1">{t("footer_text")}</Typography>
+            <Typography variant="body1" sx={{ fontWeight: "normal" }}>
+                {t("footer_text")}
+            </Typography>
         </Box>
     );
 };

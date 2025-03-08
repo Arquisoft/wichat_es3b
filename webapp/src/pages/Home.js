@@ -18,7 +18,7 @@ const Home = () => {
                     <Typography variant="h6" sx={{ fontStyle: "italic", marginBottom: 3 }}>
                         {t("subtitle")}
                     </Typography>
-                    <Button variant="outlined" sx={{ borderColor: "#2196F3", color: "#2196F3", fontWeight: "bold" }} component={Link} to="/play">
+                    <Button variant="outlined" sx={{ borderColor: "#2196F3", color: "#2196F3", fontWeight: "bold", fontSize: "1.5rem", padding: "12px 30px" }} component={Link} to="/play">
                         {t("play")}
                     </Button>
                 </Box>
@@ -53,5 +53,3 @@ const Home = () => {
 };
 
 export default Home;
-
-
