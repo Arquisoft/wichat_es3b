@@ -12,13 +12,28 @@ const Home = () => {
         <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
             <Nav />
 
-            <Container maxWidth="lg" sx={{ textAlign: "center", paddingTop: 4, flexGrow: 1 }}>
+            <Container maxWidth="lg" sx={{ textAlign: "center", flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "center", paddingY: 4 }}>
                 <Box sx={{ backgroundColor: "#E3F2FD", padding: 4, borderRadius: 2 }}>
                     <Typography variant="h3" sx={{ fontWeight: "bold", color: "#2196F3" }}>{t("title")}</Typography>
                     <Typography variant="h6" sx={{ fontStyle: "italic", marginBottom: 3 }}>
                         {t("subtitle")}
                     </Typography>
-                    <Button variant="outlined" sx={{ borderColor: "#2196F3", color: "#2196F3", fontWeight: "bold", fontSize: "1.5rem", padding: "12px 30px" }} component={Link} to="/play">
+                    <Button
+                        variant="outlined"
+                        sx={{
+                            borderColor: "#2196F3",
+                            color: "#2196F3",
+                            fontWeight: "bold",
+                            fontSize: "1.5rem",
+                            padding: "12px 30px",
+                            transition: "0.3s",
+                            '&:hover': {
+                                backgroundColor: "#2196F3",
+                                color: "white"
+                            }
+                        }}
+                        component={Link} to="/play"
+                    >
                         {t("play")}
                     </Button>
                 </Box>
