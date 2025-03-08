@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';  // Importa el Router
 import App from './App';
 import reportWebVitals from "./reportWebVitals";
+import "./i18n";
 
 ReactDOM.render(
     <Router>  {/* Envuelve tu App con Router */}

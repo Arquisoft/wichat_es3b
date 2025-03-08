@@ -1,31 +1,27 @@
 import React from "react";
-import { Box, Typography, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Box, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-
 const Footer = () => {
-
     const { t } = useTranslation();
 
-    const navigate = useNavigate(); // Hook para manejar la navegación
-
     return (
-        <Box sx={{ backgroundColor: "purple", padding: "20px", marginTop: "auto" }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
-                {/* Texto de derechos reservados */}
-                <Typography variant="body2" sx={{ color: "white", textAlign: "center", flexBasis: "100%" }}>
-                    © 2025 WIChat.  {t('components.footer.rights')}
-                </Typography>
-
-                {/* Botones de navegación */}
-                <Box sx={{ display: "flex", gap: 2 }}>
-                    <Button color="inherit" onClick={() => navigate("/about")}>
-                        {t('components.footer.about')}</Button>
-                    <Button color="inherit" onClick={() => navigate("/contact")}>
-                        {t('components.footer.contact')}</Button>
-                </Box>
-            </Box>
+        <Box
+            sx={{
+                backgroundColor: "#2196F3",
+                color: "white",
+                textAlign: "center",
+                padding: "20px",
+                marginTop: "auto",
+                height: "80px", // Ajusta la altura del footer para que sea igual al nav
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+            }}
+        >
+            <Typography variant="body1" sx={{ fontWeight: "normal" }}>
+                {t("footer_text")}
+            </Typography>
         </Box>
     );
 };

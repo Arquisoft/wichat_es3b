@@ -5,98 +5,65 @@ import { Box, Typography, Button, Grid, Container } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-
 const Home = () => {
     const { t } = useTranslation();
 
     return (
-        <>
+        <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
             <Nav />
-            <Container maxWidth="lg">
-                {/* Sección 1: Pantalla completa con texto y botón */}
-                <Box
-                    sx={{
-                        height: "100vh",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        backgroundColor: "#f0f0f0",
-                        border: "5px solid #9b4dca", // Borde morado
-                        borderRadius: 2, // Bordes redondeados
-                        padding: 3, // Espaciado interno
-                    }}
-                >
-                    <Typography variant="h2" sx={{ color: '#9b4dca' }} gutterBottom>
-                       WIChat
+
+            <Container maxWidth="lg" sx={{ textAlign: "center", flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "center", paddingY: 4 }}>
+                <Box sx={{ backgroundColor: "#E3F2FD", padding: 4, borderRadius: 2 }}>
+                    <Typography variant="h3" sx={{ fontWeight: "bold", color: "#2196F3" }}>{t("title")}</Typography>
+                    <Typography variant="h6" sx={{ fontStyle: "italic", marginBottom: 3 }}>
+                        {t("subtitle")}
                     </Typography>
-                    <Typography variant="h6" color="textSecondary" paragraph>
-                        {t('components.pages.home.presentation')}
-                    </Typography>
-                    <Button variant="contained" color="primary" component={Link}
-                            to="/play" >
-                        {t('components.pages.home.play')}
+                    <Button
+                        variant="outlined"
+                        sx={{
+                            borderColor: "#2196F3",
+                            color: "#2196F3",
+                            fontWeight: "bold",
+                            fontSize: "1.5rem",
+                            padding: "12px 30px",
+                            transition: "0.3s",
+                            '&:hover': {
+                                backgroundColor: "#2196F3",
+                                color: "white"
+                            }
+                        }}
+                        component={Link} to="/play"
+                    >
+                        {t("play")}
                     </Button>
                 </Box>
 
-                {/* Sección 2: Instrucciones rápidas */}
-                <Grid container spacing={2}>
+                <Grid container spacing={2} sx={{ marginTop: 4 }}>
                     <Grid item xs={12} sm={6}>
-                        <Box
-                            sx={{
-                                height: "50vh",
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                backgroundColor: "#f0f0f0", // Fondo azul claro
-                                border: "5px solid #9b4dca", // Borde morado
-                                borderRadius: 2, // Bordes redondeados
-                                padding: 3, // Espaciado interno
-                            }}
-                        >
-                            <Typography variant="h5" gutterBottom>
-                                {t('components.pages.home.help')}
-                            </Typography>
-                            <Typography variant="body1" color="textSecondary">
-                                {t('components.pages.home.look')}
-                                <br />
-                                {t('components.pages.home.think')} <br />
-                                {t('components.pages.home.ia')}
+                        <Box sx={{ backgroundColor: "#E3F2FD", padding: 3, borderRadius: 2 }}>
+                            <Typography variant="h5" sx={{ fontWeight: "bold", color: "#2196F3" }}>{t("how_to_play")}</Typography>
+                            <Typography variant="body1" sx={{ textAlign: "left", marginTop: 2 }}>
+                                {t("observe")}<br />
+                                {t("answer")}<br />
+                                {t("hints")}
                             </Typography>
                         </Box>
                     </Grid>
-
-                    {/* Sección 3: Ranking de estadísticas */}
                     <Grid item xs={12} sm={6}>
-                        <Box
-                            sx={{
-                                height: "50vh",
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                backgroundColor: "#f0f0f0",
-                                borderRadius: 2,
-                                boxShadow: 3,
-                                padding: 3,
-                            }}
-                        >
-                            <Typography variant="h5" gutterBottom>
-                                {t('components.pages.home.top')}
-                            </Typography>
-                            <Typography variant="body1" color="textSecondary">
-                                1. Juan - 150 puntos <br />
-                                2. Ana - 130 puntos <br />
-                                3. Luis - 120 puntos <br />
-                                4. Marta - 100 puntos
+                        <Box sx={{ backgroundColor: "#E3F2FD", padding: 3, borderRadius: 2 }}>
+                            <Typography variant="h5" sx={{ fontWeight: "bold", color: "#2196F3" }}>{t("top_players")}</Typography>
+                            <Typography variant="body1" sx={{ textAlign: "left", marginTop: 2 }}>
+                                <b>1.</b> {t("player_score")}<br />
+                                <b>2.</b> {t("player_score")}<br />
+                                <b>3.</b> {t("player_score")}
                             </Typography>
                         </Box>
                     </Grid>
                 </Grid>
             </Container>
+
             <Footer />
-        </>
+        </Box>
     );
 };
 
