@@ -18,10 +18,10 @@ const llmConfigs = {
   },
   empathy: {
     url: () => 'https://empathyai.staging.empathy.co/v1/chat/completions',
-    transformRequest: (question) => ({
+    transformRequest: (prompt, question) => ({
       model: "qwen/Qwen2.5-Coder-7B-Instruct",
       messages: [
-        { role: "system", content: "You are a helpful assistant." },
+        { role: "system", content: prompt },
         { role: "user", content: question }
       ]
     }),
@@ -43,7 +43,7 @@ function validateRequiredFields(req, requiredFields) {
 }
 
 // Generic function to send questions to LLM
-async function sendQuestionToLLM(question, apiKey, model = 'gemini') {
+async function sendQuestionToLLM(prompt, question, apiKey, model = 'gemini') {
   try {
     const config = llmConfigs[model];
     if (!config) {
@@ -51,7 +51,7 @@ async function sendQuestionToLLM(question, apiKey, model = 'gemini') {
     }
 
     const url = config.url(apiKey);
-    const requestData = config.transformRequest(question);
+    const requestData = config.transformRequest(prompt, question);
 
     const headers = {
       'Content-Type': 'application/json',
