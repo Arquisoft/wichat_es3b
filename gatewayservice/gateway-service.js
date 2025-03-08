@@ -13,6 +13,8 @@ const port = 8000;
 const llmServiceUrl = process.env.LLM_SERVICE_URL || 'http://localhost:8003';
 const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
+const questionServiceUrl = process.env.QUESTION_SERVICE_URL || 'http://localhost:8004'; //added a new url for the new service
+
 
 app.use(cors());
 app.use(express.json());
@@ -55,6 +57,22 @@ app.post('/askllm', async (req, res) => {
     res.status(error.response.status).json({ error: error.response.data.error });
   }
 });
+
+// Add the /question endpoint
+app.get('/question', async (req, res) => {
+  try {
+    // Forward the request to the Question Service to get random cities and image URL
+    const questionResponse = await axios.get(`${questionServiceUrl}/question`);
+
+    // Respond with the data from the Question Service
+    res.json(questionResponse.data);
+  } catch (error) {
+    console.error('Error fetching data from question service:', error);
+    res.status(error.response?.status || 500).json({ error: 'Error fetching question data' });
+  }
+});
+
+
 
 // Read the OpenAPI YAML file synchronously
 openapiPath='./openapi.yaml'
