@@ -1,6 +1,5 @@
 import React from "react";
 import "./App.css";
-import AuthForm from "./pages/authForm/AuthForm";
 import Home from "./pages/Home.js"
 import {Route, Routes} from "react-router-dom";
 import Login from "./components/login/Login";
@@ -11,6 +10,7 @@ function App() {
     <Route path="/" element={<Home />} />  {/* Página principal */}
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<AddUser />} />
+    <Route path={"/home"} element={<Home />} />
     {/* Otras rutas que puedas tener */}
   </Routes>
 }
