@@ -17,7 +17,7 @@ const llmConfigs = {
     transformResponse: (response) => response.data.candidates[0]?.content?.parts[0]?.text
   },
   empathy: {
-    url: () => 'https://empathyai.staging.empathy.co/v1/chat/completions',
+    url: () => 'https://empathyai.prod.empathy.co/v1/chat/completions',
     transformRequest: (prompt, question) => ({
       model: "qwen/Qwen2.5-Coder-7B-Instruct",
       messages: [
@@ -58,7 +58,7 @@ async function sendQuestionToLLM(prompt, question, apiKey, model = 'gemini') {
       ...(config.headers ? config.headers(apiKey) : {})
     };
 
-    const response = await axios.post(url, requestData, { headers });
+    const response = await axios.post(url, requestData, { headers, timeout: 20000 }); // 15 segundos
 
     return config.transformResponse(response);
 
@@ -71,10 +71,10 @@ async function sendQuestionToLLM(prompt, question, apiKey, model = 'gemini') {
 app.post('/ask', async (req, res) => {
   try {
     // Check if required fields are present in the request body
-    validateRequiredFields(req, ['question', 'model', 'apiKey']);
+    validateRequiredFields(req, [ 'prompt', 'question', 'model', 'apiKey']);
 
-    const { question, model, apiKey } = req.body;
-    const answer = await sendQuestionToLLM(question, apiKey, model);
+    const { prompt, question, model, apiKey } = req.body;
+    const answer = await sendQuestionToLLM(prompt, question, apiKey, model);
     res.json({ answer });
 
   } catch (error) {

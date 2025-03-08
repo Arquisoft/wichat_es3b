@@ -20,6 +20,7 @@ const Login = () => {
     try {
       const response = await axios.post(`${apiEndpoint}/login`, { username, password });
 
+      const prompt = "You are a helpful assistant";
       const question = "Please, generate a greeting message for a student called " + username + " that is a student of the Software Architecture course in the University of Oviedo. Be nice and polite. Two to three sentences max.";
       const model = "empathy"
 
@@ -27,7 +28,7 @@ const Login = () => {
         setMessage("LLM API key is not set. Cannot contact the LLM.");
       }
       else{
-        const message = await axios.post(`${apiEndpoint}/askllm`, { question, model, apiKey })
+        const message = await axios.post(`${apiEndpoint}/askllm`, { prompt, question, apiKey, model })
         setMessage(message.data.answer);
       }
       // Extract data from the response

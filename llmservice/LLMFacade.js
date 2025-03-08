@@ -2,7 +2,7 @@ const { sendQuestionToLLM } = require('./llm-service');
 
 class LLMFacade {
     constructor() {
-        this.apiKey = 'sk-83q34o9wd1IB04bGhx0ZdQ';
+        this.apiKey = ''; //Aqui va la API key
         this.model = 'empathy';
         this.prompt = `Eres un asistente virtual que debe ayudar al usuario a responder correctamente una serie de preguntas.
             Tu rol es el de un orientador que, dada la pregunta del usuario, le guía hacia la respuesta correcta.
