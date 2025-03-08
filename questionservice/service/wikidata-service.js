@@ -1,5 +1,5 @@
 const axios = require("axios");
-const City = require("./wikidata-model");
+const City = require("../model/wikidata-model");
 
 // SPARQL endpoint for WikiData
 const SPARQL_ENDPOINT = "https://query.wikidata.org/sparql";
@@ -74,5 +74,43 @@ async function fetchAndStoreCities() {
     }
 }
 
+
+async function getRandomCitiesWithImage() {
+    try {
+        // 4 random rows from the data base
+        const cities = await City.aggregate([{ $sample: { size: 4 } }]);
+
+        // Pick one randomly and get its url for the picture
+        const randomCityIndex = Math.floor(Math.random() * cities.length); // Pick a random index
+        const randomCity = cities[randomCityIndex];
+        return {
+            cities: cities.map(city => ({
+                id: city.id,
+                name: city.name,
+            })),
+            imageUrl: randomCity.imageUrl
+            //cityWithImage: randomCity  another approach returning the entire row
+        };
+    } catch (error) {
+        console.error("Error fetching random cities:", error);
+        throw error;
+    }
+}
+
+async function getCityNameById(cityId) {
+    try {
+        
+        const city = await City.findOne({ id: cityId });
+
+        if (!city) {
+            throw new Error(`City with id ${cityId} not found`);
+        }
+
+        return city.name;
+    } catch (error) {
+        console.error("Error fetching city name by id:", error);
+        throw error;
+    }
+}
 // Exporting the function so that it can be used in other files
-module.exports = { fetchAndStoreCities };
+module.exports = { fetchAndStoreCities , getRandomCitiesWithImage, getCityNameById };
