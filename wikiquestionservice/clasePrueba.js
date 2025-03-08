@@ -1,36 +1,18 @@
-const QuestionGen = require('./questiongenerator/questionGen');
-const WikiQuestionService = require('./wikiquestion-service');
+const CategoryLoader = require('./questiongenerator/CategoryLoader');
 
-async function ejecutarEjemploClases() {
-    const queryProcessor = new WikiQuestionService();
+const categoryLoader = new CategoryLoader();
 
-    const preguntaBandera = await queryProcessor.generateCountryFlagQuizQuestion();
+// Obtener un servicio específico (ejemplo: "paises")
+const wikidataServicePaises = categoryLoader.getService("paises");
 
-    if (preguntaBandera.error) {
-        console.error("Error al generar pregunta:", preguntaBandera.error);
-    } else if (preguntaBandera.pregunta) {
-        console.log("Pregunta:", preguntaBandera.pregunta);
-        console.log("URL de la Bandera:", preguntaBandera.banderaUrl);
-        console.log("País Correcto:", preguntaBandera.paisCorrecto);
-        console.log("Opciones Incorrectas:", preguntaBandera.opcionesIncorrectas);
-        console.log("------------------------------------");
-    } else {
-        console.log("No se encontraron preguntas de banderas.");
-    }
+if (wikidataServicePaises) {
+    wikidataServicePaises.obtenerIdsDeWikidata("wd:Q6256").then(data => {
+        console.log("📊 Datos obtenidos de 'paises':", data);
+    });
 
-    const preguntaPlaneta = await queryProcessor.generatePlanetQuizQuestion();
-
-    if (preguntaPlaneta.error) {
-        console.error("Error al generar pregunta:", preguntaPlaneta.error);
-    } else if (preguntaPlaneta.pregunta) {
-        console.log("Pregunta:", preguntaPlaneta.pregunta);
-        console.log("URL de la imagen:", preguntaPlaneta.planetaImagen);
-        console.log("Planeta Correcto:", preguntaPlaneta.planetaCorrecto);
-        console.log("Opciones Incorrectas:", preguntaPlaneta.opcionesIncorrectas);
-        console.log("------------------------------------");
-    } else {
-        console.log("No se encontraron preguntas de planetas.");
-    }
+    console.log("❓ Preguntas para 'paises':", wikidataServicePaises.getQuestions());
 }
 
-ejecutarEjemploClases();
+// Obtener todas las categorías cargadas
+const allServices = categoryLoader.getAllServices();
+console.log("📌 Categorías cargadas:", Object.keys(allServices));
