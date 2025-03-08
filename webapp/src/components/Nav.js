@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -14,7 +14,15 @@ const Nav = () => {
 
     return (
         <AppBar position="static" sx={{ backgroundColor: "#42A5F5", padding: "15px" }}>
-            <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Toolbar
+                sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 2
+                }}
+            >
                 <Typography
                     variant="h6"
                     sx={{ fontWeight: "bold", cursor: "pointer", fontSize: "1.5rem" }}
@@ -23,7 +31,7 @@ const Nav = () => {
                     {t("title")} ⚪
                 </Typography>
 
-                <Box sx={{ display: "flex", gap: 3 }}>
+                <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2, alignItems: "center" }}>
                     <Button sx={{ color: "white", fontWeight: "bold", fontSize: "1.2rem", textTransform: "none" }} onClick={() => navigate("/home")}>
                         {t("home")}
                     </Button>
@@ -35,7 +43,7 @@ const Nav = () => {
                     </Button>
                 </Box>
 
-                <Box sx={{ display: "flex", gap: 2 }}>
+                <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2, alignItems: "center" }}>
                     <Button sx={{ color: "white", fontWeight: "bold", fontSize: "1.2rem", textTransform: "none" }} onClick={() => navigate("/login")}>
                         {t("login")}
                     </Button>
