@@ -4,9 +4,9 @@ import AddUser from "../../components/addUser/AddUser";
 import { CSSTransition } from "react-transition-group";
 import "./AuthForm.css";
 
-function AuthForm() {
+function AuthForm({ loginView }) {
   const TIMEOUT_MS = 300;
-  const [showLogin, setShowLogin] = useState(true);
+  const [showLogin, setShowLogin] = useState(loginView);
 
   const handleToggleView = () => {
     setShowLogin(!showLogin);
