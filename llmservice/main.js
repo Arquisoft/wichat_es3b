@@ -7,8 +7,7 @@ async function main() {
     const userQuestion = "¿Es la torre eiffel?";
     const fakeAnswers = ["La torre de Pisa", "La torre Eiffel", "El arco del triunfo"];
     const correctAnswer = "El Big Ben";
-    const npista = 3;
-    const apiKey = 'sk-83q34o9wd1IB04bGhx0ZdQ';
+    const apiKey = ""; //Aqui va la API key
     const model = 'empathy'; // or 'empathy'
 
     try {

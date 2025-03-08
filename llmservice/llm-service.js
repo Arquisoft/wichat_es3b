@@ -71,10 +71,10 @@ async function sendQuestionToLLM(prompt, question, apiKey, model = 'gemini') {
 app.post('/ask', async (req, res) => {
   try {
     // Check if required fields are present in the request body
-    validateRequiredFields(req, ['question', 'model', 'apiKey']);
+    validateRequiredFields(req, ['prompt', 'question', 'model', 'apiKey']);
 
-    const { question, model, apiKey } = req.body;
-    const answer = await sendQuestionToLLM(question, apiKey, model);
+    const { prompt, question, model, apiKey } = req.body;
+    const answer = await sendQuestionToLLM(prompt, question, apiKey, model);
     res.json({ answer });
 
   } catch (error) {
