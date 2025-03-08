@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
 import AuthForm from "./pages/authForm/AuthForm";
-import Home from "./pages/Home.js";
+import Home from "./pages/home/Home.js";
 import { Route, Routes } from "react-router-dom";
 
 function App() {
