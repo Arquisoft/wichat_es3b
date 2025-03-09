@@ -54,33 +54,27 @@ class WikidataQueryService {
 
     async generateQuestions() {
         await this.obtenerIdsDeWikidata();
-
         if (this.entitiesArray.length === 0) {
             console.warn("⚠️ No hay entidades disponibles para generar preguntas.");
             return [];
         }
-        let i=0;
         for (const entity of this.entitiesArray) {
-            i++;
             const entityName = entity.label;
             const indiceAleatorio = Math.floor(Math.random() * this.questions.length);
             const descripcion = [];
             for (const property of this.properties) {
                 const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, property);
                 if (valoresDePropiedad.length > 0) {
-                    // Obtener la etiqueta de la propiedad (usaremos un método similar al de valores de la propiedad)
                     const etiquetaPropiedad = await this.obtenerEtiquetaDePropiedad(property);
                     descripcion.push({
                         propiedad: etiquetaPropiedad,
-                        valor: valoresDePropiedad[0]  // Tomar el primer valor de la propiedad
+                        valor: valoresDePropiedad[0]
                     });
                 }
             }
-
             if (descripcion.length === 0) {
-                continue; // Si no tenemos ninguna propiedad válida, pasamos al siguiente ciclo
+                continue;
             }
-
             const valoresDePropiedadCorrectos = descripcion.map(desc => desc.valor);
             const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, this.properties[indiceAleatorio]);
             if (valoresDePropiedad.length === 0) {
