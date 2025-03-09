@@ -1,10 +1,13 @@
-const CATEGORIES = require('./categories');
+const fs = require('fs');
+const path = require('path');
 const WikidataQueryService = require('./questionGen');
 
 class CategoryLoader {
     constructor() {
         this.services = {};
-
+        const categoriesPath = path.join(__dirname, 'categories.json');
+        const rawData = fs.readFileSync(categoriesPath, 'utf8');
+        const CATEGORIES = JSON.parse(rawData);
         for (const categoryName in CATEGORIES) {
             const categoryData = CATEGORIES[categoryName];
 

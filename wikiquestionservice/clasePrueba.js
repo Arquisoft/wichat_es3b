@@ -6,7 +6,7 @@ const categoryLoader = new CategoryLoader();
 const wikidataServicePaises = categoryLoader.getService("paises");
 
 if (wikidataServicePaises) {
-    wikidataServicePaises.obtenerIdsDeWikidata().then(data => {
+    wikidataServicePaises.generateQuestions().then(data => {
         console.log("📊 Datos obtenidos de 'paises':", data);
     });
 
