@@ -12,7 +12,7 @@ const Footer = () => {
         color: "white",
         textAlign: "center",
         padding: "1em",
-        minHeight: "8vh",
+        minHeight: "6vh",
         marginTop: "auto",
         display: "flex",
         alignItems: "center",

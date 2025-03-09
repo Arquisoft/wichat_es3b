@@ -27,6 +27,6 @@ button.buttonSecondary {
 
 button.buttonPrimary:hover,
 button.buttonSecondary:hover {
-  background-color: #007acc; /* Azul más oscuro en hover */
+  background-color: var(--color-hover-boton); /* Azul más oscuro en hover */
   color: var(--color-texto-secundario);
 }

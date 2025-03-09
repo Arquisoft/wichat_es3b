@@ -14,8 +14,14 @@
   max-height: 40vh;
   overflow: hidden;
   opacity: 0;
+  transform: translateY(-5%);
+  transition: transform 150ms ease-in-out, opacity 100ms ease-in-out;
+  pointer-events: none;
+  z-index: 10;
 }
 
 .content-open {
   opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
 }
