@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const WikidataQueryService = require('./questionGen');
+const WikidataQueryService = require('./QuestionGen');
 
 class CategoryLoader {
     constructor() {

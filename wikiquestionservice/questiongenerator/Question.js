@@ -1,9 +1,10 @@
 class Question{
-    constructor(respuestaCorrecta, preguntas, respuestasIncorrectas, descripcion) {
+    constructor(respuestaCorrecta, preguntas, respuestasIncorrectas, descripcion,img) {
         this.respuestaCorrecta = respuestaCorrecta;
         this.preguntas = preguntas;
         this.respuestasIncorrectas = respuestasIncorrectas;
         this.descripcion = descripcion;
+        this.img=img;
     }
 
     obtenerPreguntaPorIdioma(idioma) {
@@ -12,6 +13,9 @@ class Question{
     obtenerRespuestas() {
         return [this.respuestaCorrecta, ...this.respuestasIncorrectas];
     }
+    obtenerImg(){
+        return this.img;
+    }
     toString() {
         const preguntaEs = this.preguntas.es || "Pregunta no disponible en español.";
 
@@ -19,9 +23,12 @@ class Question{
 
         let descripcionText = '';
         for (const item of this.descripcion) {
-            descripcionText += `${item.propiedad}: ${item.valor}\n`;
+            descripcionText += `${item.propiedad}: ${item.valor}, `;
         }
 
-        return `Para la pregunta: ${preguntaEs}, cuya solución es: ${this.respuestaCorrecta}, y las incorrectas son: ${respuestasIncorrectasText}. Las propiedades de la solución son:\n${descripcionText}`;
+        return `Para la pregunta: ${preguntaEs}, cuya solución es: ${this.respuestaCorrecta}, y las incorrectas son: ${respuestasIncorrectasText}. Las propiedades de la solución son:${descripcionText}, y la imgagen es: `
+            +this.img;
     }
 }
+
+module.exports =Question;

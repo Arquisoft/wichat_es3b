@@ -7,12 +7,17 @@ const wikidataServicePaises = categoryLoader.getService("paises");
 
 if (wikidataServicePaises) {
     wikidataServicePaises.generateQuestions().then(data => {
-        console.log("📊 Datos obtenidos de 'paises':", data);
+        const preguntas = wikidataServicePaises.getQuestions();
+
+        console.log("❓ Preguntas para 'paises':");
+        preguntas.forEach((pregunta, index) => {
+            console.log(`Pregunta ${index + 1}:`);
+            console.log(pregunta.toString()+'\n');
+        });
     });
 
-    console.log("❓ Preguntas para 'paises':", wikidataServicePaises.getQuestions());
+
 }
 
-// Obtener todas las categorías cargadas
 const allServices = categoryLoader.getAllServices();
 console.log("📌 Categorías cargadas:", Object.keys(allServices));
