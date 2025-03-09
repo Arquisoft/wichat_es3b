@@ -1,13 +1,14 @@
 const axios = require('axios');
 const Question = require('./Question');
 class WikidataQueryService {
-    constructor(categoryName, entity, properties, questions) {
+    constructor(categoryName, entity, properties, questions,types) {
         this.wikidataEndpoint = "https://query.wikidata.org/sparql";
         this.categoryName = categoryName;
         this.entity = entity;
         this.properties = properties;
         this.questions = questions;
         this.entitiesArray = [];
+        this.types=types;
         this.questionsArray=[];
     }
 
@@ -20,6 +21,17 @@ class WikidataQueryService {
             console.error("Error al realizar consulta SPARQL:", error);
             throw error;
         }
+    }
+    convertirValorPorTipo(valor, tipo) {
+        if (tipo === "date") {
+            const fecha = new Date(valor);
+            return fecha.toLocaleDateString("es-ES");
+        } else if (tipo === "num") {
+            return parseFloat(valor);
+        } else if (tipo === "str") {
+            return valor;
+        }
+        return valor;
     }
 
     async obtenerIdsDeWikidata(cantidad = 10) {
@@ -62,10 +74,15 @@ class WikidataQueryService {
             const entityName = entity.label;
             const indiceAleatorio = Math.floor(Math.random() * this.questions.length);
             const descripcion = [];
-            for (const property of this.properties) {
-                const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, property);
+            for (let i = 0; i < this.properties.length; i++) {
+                const property = this.properties[i];
+                const tipo = this.types[i];
+                const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, property,tipo);
                 if (valoresDePropiedad.length > 0) {
                     const etiquetaPropiedad = await this.obtenerEtiquetaDePropiedad(property);
+                    if (this.validar(valoresDePropiedad[0])) {
+                        continue;
+                    }
                     descripcion.push({
                         propiedad: etiquetaPropiedad,
                         valor: valoresDePropiedad[0]
@@ -81,7 +98,13 @@ class WikidataQueryService {
                 continue;
             }
             const respuestaCorrecta = valoresDePropiedad[0];
+            if (this.validar(respuestaCorrecta)) {
+                continue;
+            }
             const respuestasIncorrectas = await this.obtenerRespuestasIncorrectas(entity.id, this.properties[indiceAleatorio], valoresDePropiedad);
+            if (respuestasIncorrectas.some(respuesta => this.validar(respuesta))) {
+                continue;
+            }
             if (respuestasIncorrectas.length !== 3) {
                 continue;
             }
@@ -101,7 +124,7 @@ class WikidataQueryService {
         }
     }
 
-    async obtenerValoresDePropiedad(id, property) {
+    async obtenerValoresDePropiedad(id, property,tipo) {
         const sparqlQuery = `
         SELECT ?propertyValueLabel WHERE {
             wd:${id} wdt:${property} ?propertyValue.
@@ -113,7 +136,7 @@ class WikidataQueryService {
 
             // Si existen valores, los devolvemos como un arreglo
             if (data.results.bindings.length > 0) {
-                return data.results.bindings.map(binding => binding.propertyValueLabel.value);
+                return data.results.bindings.map(binding => this.convertirValorPorTipo(binding.propertyValueLabel.value, tipo));
             } else {
                 //console.warn("⚠️ No se encontraron valores de la propiedad.");
                 return [];
@@ -159,6 +182,10 @@ class WikidataQueryService {
             console.error('Error al obtener etiqueta de propiedad:', error);
             return property;
         }
+    }
+    validar(respuesta) {
+        const regex = /^[Qq].*/i;
+        return regex.test(respuesta);
     }
 
 }

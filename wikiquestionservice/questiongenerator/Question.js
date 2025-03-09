@@ -21,10 +21,9 @@ class Question{
 
         const respuestasIncorrectasText = this.respuestasIncorrectas.join(', ');
 
-        let descripcionText = '';
-        for (const item of this.descripcion) {
-            descripcionText += `${item.propiedad}: ${item.valor}, `;
-        }
+        const descripcionText = this.descripcion
+            .map(item => `${item.propiedad}: ${item.valor}`)
+            .join(', ');
 
         return `Para la pregunta: ${preguntaEs}, cuya solución es: ${this.respuestaCorrecta}, y las incorrectas son: ${respuestasIncorrectasText}. Las propiedades de la solución son:${descripcionText}, y la imgagen es: `
             +this.img;

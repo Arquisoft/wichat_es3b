@@ -2,6 +2,7 @@
   "paises": {
     "entity": "wd:Q6256",
     "properties": ["P36", "P35", "P1344", "P37", "P47"],
+    "types": ["str", "str", "str", "str", "str"],
     "preguntas": [
       {
         "es": "¿Cuál es la capital de %?",
@@ -28,6 +29,7 @@
   "cine": {
     "entity": "wd:Q11424",
     "properties": ["P577", "P57", "P2130"],
+    "types": ["date", "str", "num"],
     "preguntas": [
       {
         "es": "¿En qué fecha se estrenó el film %?",
@@ -46,6 +48,7 @@
   "clubes": {
     "entity": "wd:Q476028",
     "properties": ["P571", "P159", "P17", "P112", "P115", "P286"],
+    "types": ["date", "str", "str", "str", "str", "str"],
     "preguntas": [
       {
         "es": "¿En qué año se fundó el club de fútbol %?",
@@ -76,6 +79,7 @@
   "literatura": {
     "entity": "wd:Q7725634",
     "properties": ["P50", "P577", "P136", "P674"],
+    "types": ["str", "date", "str", "str"],
     "preguntas": [
       {
         "es": "¿Quién es el autor de la obra literaria %?",
@@ -98,6 +102,7 @@
   "arte": {
     "entity": "wd:Q3305213",
     "properties": ["P571", "P135", "P276"],
+    "types": ["date", "str", "str"],
     "preguntas": [
       {
         "es": "¿En qué año se pintó la obra %?",

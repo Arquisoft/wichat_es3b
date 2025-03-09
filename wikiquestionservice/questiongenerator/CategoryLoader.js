@@ -16,7 +16,8 @@ class CategoryLoader {
                     categoryName,
                     categoryData.entity,
                     categoryData.properties,
-                    categoryData.preguntas
+                    categoryData.preguntas,
+                    categoryData.types
                 );
             } else {
                 console.warn(`⚠️ La categoría '${categoryName}' está incompleta y no se cargará.`);
