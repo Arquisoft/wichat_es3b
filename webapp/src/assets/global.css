@@ -6,6 +6,7 @@
   /* Colores principales basados en la imagen */
   --color-primario: #38b6ff; /* Azul principal */
   --color-secundario: #ffffff; /* Fondo claro */
+  --color-hover-boton: #2a9dd8;
   --color-texto: #333333; /* Texto principal */
   --color-texto-secundario: #ffffff; /* Texto en botones o fondos oscuros */
 
