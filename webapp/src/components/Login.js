@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, Typography, TextField, Button, Snackbar } from '@mui/material';
 import { Typewriter } from "react-simple-typewriter";
+import GameModeSelection from './GameModeSelection';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -12,15 +13,19 @@ const Login = () => {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [createdAt, setCreatedAt] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [showGameModes, setShowGameModes] = useState(false);
 
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
   
+  const handleStartGame = () => {
+    setShowGameModes(true);
+  };
 
   const loginUser = async () => {
     try {
       const response = await axios.post(`${apiEndpoint}/login`, { username, password });
 
-      const question = "Please, generate a greeting message for a student called " + username + " that is a student of the Software Architecture course in the University of Oviedo. Be nice and polite. Two to three sentences max.";
+      const question = "Please, generate a greeting message for a student called " + username + " tell them how fun they are going to have using this game. Explain that they have to press the button to start playing. Really short and make it casual. REALLY SHORT";
       const model = "empathy"
       const message = await axios.post(`${apiEndpoint}/askllm`, { question, model })
       setMessage(message.data.answer);
@@ -42,17 +47,22 @@ const Login = () => {
 
   return (
     <Container component="main" maxWidth="xs" sx={{ marginTop: 4 }}>
-      {loginSuccess ? (
+      {showGameModes ? (
+        <GameModeSelection /> // Muestra el selector de modos de juego
+      ) : loginSuccess ? (
         <div>
           <Typewriter
             words={[message]} // Pass your message as an array of strings
             cursor
             cursorStyle="|"
-            typeSpeed={50} // Typing speed in ms
+            typeSpeed={2} // Typing speed in ms
           />
           <Typography component="p" variant="body1" sx={{ textAlign: 'center', marginTop: 2 }}>
             Your account was created on {new Date(createdAt).toLocaleDateString()}.
           </Typography>
+          <Button variant="contained" color="secondary" fullWidth sx={{ marginTop: 2 }} onClick={handleStartGame}>
+            Start the fun
+          </Button>
         </div>
       ) : (
         <div>

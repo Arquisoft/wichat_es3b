@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import './App.css';
 
 import AddUser from './components/AddUser';
 import Login from './components/Login';
+
 import { Container, CssBaseline, Link, Typography } from '@mui/material';
 
 function App() {
