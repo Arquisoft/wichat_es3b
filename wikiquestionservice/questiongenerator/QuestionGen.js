@@ -1,7 +1,7 @@
 const axios = require('axios');
 const Question = require('./Question');
 class WikidataQueryService {
-    constructor(categoryName, entity, properties, questions,types) {
+    constructor(categoryName, entity, properties, questions,types,img) {
         this.wikidataEndpoint = "https://query.wikidata.org/sparql";
         this.categoryName = categoryName;
         this.entity = entity;
@@ -10,6 +10,7 @@ class WikidataQueryService {
         this.entitiesArray = [];
         this.types=types;
         this.questionsArray=[];
+        this.img=img;
     }
 
     async fetchData(sparqlQuery) {
@@ -120,8 +121,8 @@ class WikidataQueryService {
                     preguntasModificadas[idioma] = preguntaEnIdioma;
                 }
             }
-
-            const nuevaPregunta = new Question(respuestaCorrecta, preguntasModificadas, respuestasIncorrectas, descripcion, "img");
+            const imgprueba = await this.obtenerValoresDePropiedad(entity.id,this.img[0]);
+            const nuevaPregunta = new Question(respuestaCorrecta, preguntasModificadas, respuestasIncorrectas, descripcion, imgprueba);
             this.questionsArray.push(nuevaPregunta);
         }
     }
@@ -189,6 +190,8 @@ class WikidataQueryService {
         const regex = /^[Qq].*/i;
         return regex.test(respuesta);
     }
+
+
 
 }
 
