@@ -1,3 +1,7 @@
 body {
   overflow-x: hidden;
 }
+
+.buttonSecondary {
+  width: 50%;
+}
