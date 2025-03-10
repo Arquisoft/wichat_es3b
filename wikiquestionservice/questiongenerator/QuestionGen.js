@@ -92,8 +92,7 @@ class WikidataQueryService {
             if (descripcion.length === 0) {
                 continue;
             }
-            const valoresDePropiedadCorrectos = descripcion.map(desc => desc.valor);
-            const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, this.properties[indiceAleatorio]);
+            const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, this.properties[indiceAleatorio],this.types[indiceAleatorio]);
             if (valoresDePropiedad.length === 0) {
                 continue;
             }
@@ -101,7 +100,7 @@ class WikidataQueryService {
             if (this.validar(respuestaCorrecta)) {
                 continue;
             }
-            const respuestasIncorrectas = await this.obtenerRespuestasIncorrectas(entity.id, this.properties[indiceAleatorio], valoresDePropiedad);
+            const respuestasIncorrectas = await this.obtenerRespuestasIncorrectas(entity.id, this.properties[indiceAleatorio], valoresDePropiedad,this.types[indiceAleatorio]);
             if (respuestasIncorrectas.some(respuesta => this.validar(respuesta))) {
                 continue;
             }
@@ -146,11 +145,11 @@ class WikidataQueryService {
             return [];
         }
     }
-    async obtenerRespuestasIncorrectas(entityId, property, valoresDePropiedadCorrectos) {
+    async obtenerRespuestasIncorrectas(entityId, property, valoresDePropiedadCorrectos,tipo) {
         let respuestasIncorrectas = [];
         for (const otherEntity of this.entitiesArray) {
             if (otherEntity.id !== entityId) {
-                const valoresDePropiedad = await this.obtenerValoresDePropiedad(otherEntity.id, property);
+                const valoresDePropiedad = await this.obtenerValoresDePropiedad(otherEntity.id, property,tipo);
                 for (const valor of valoresDePropiedad) {
                     if (!valoresDePropiedadCorrectos.includes(valor) && !respuestasIncorrectas.includes(valor)) {
                         respuestasIncorrectas.push(valor);
