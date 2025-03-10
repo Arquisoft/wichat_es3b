@@ -52,7 +52,7 @@ const AddUser = ({ handleToggleView }) => {
           Cada pregunta es un reto, cada acierto un paso más hacia el triunfo.“"
       />
       <div className="form">
-        <img src={logo} alt="Logo de WiChat" />
+        <img className="logoAuth" src={logo} alt="Logo de WiChat" />
         <h1>Crear cuenta</h1>
         <h2>Introduce tus datos y únete a WiChat ya mismo.</h2>
 

@@ -92,7 +92,7 @@ const Login = ({ handleToggleView }) => {
       ) : (
         <div className="mainDiv">
           <div className="form">
-            <img src={logo} alt="Logo de WiChat" />
+            <img className="logoAuth" src={logo} alt="Logo de WiChat" />
             <h1>Identifícate</h1>
             <h2>
               Introduce el nombre de usuario y la contraseña de tu cuenta de
