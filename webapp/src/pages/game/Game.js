@@ -9,6 +9,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 // Importa la imagen
 import coliseoImage from "../../assets/img/coliseo.jpg";
+import ChatBubble from "../../components/chatBubble/ChatBubble";
 
 const Game = () => {
   return (
