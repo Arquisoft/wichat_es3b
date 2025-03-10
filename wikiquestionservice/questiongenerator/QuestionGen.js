@@ -75,6 +75,9 @@ class WikidataQueryService {
             const indiceAleatorio = Math.floor(Math.random() * this.questions.length);
             const descripcion = [];
             for (let i = 0; i < this.properties.length; i++) {
+                if (i === indiceAleatorio) {
+                    continue;
+                }
                 const property = this.properties[i];
                 const tipo = this.types[i];
                 const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, property,tipo);
