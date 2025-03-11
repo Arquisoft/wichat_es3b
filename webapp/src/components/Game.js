@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./GameStyles.css";
+import Chat from './LLMChat/LLMChat';
 
 function Game() {
     const [round, setRound] = useState(1);
@@ -47,13 +48,9 @@ function Game() {
                 {/* Right Side (Chat) */}
                 <div className="chat-container">
                     <div className="chat-box">
-                        <div className="chat-title">CHAT</div>
-                        <div className="chat-messages">
-                            <div className="chat-bubble">...</div>
-                            <div className="chat-bubble">...</div>
-                            <div className="chat-bubble">...</div>
-                        </div>
-                        <button className="btn chat-input">WRITE HERE</button>
+                        {
+                            <Chat />
+                        }
                     </div>
                 </div>
             </div>

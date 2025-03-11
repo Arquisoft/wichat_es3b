@@ -48,7 +48,7 @@ const LLMChat = () => {
 
     return (
         <Container sx={{display: "flex", flexDirection: "column", gap: 1, padding: 1, border: "5px solid #ccc", borderRadius: 5}}>
-            <Container fullWidth sx={{padding: 1, bgcolor: "#1976d2", color: "white", borderRadius: 1 }}>
+            <Container fullWidth sx={{padding: 1, color: "black", borderRadius: 1}}>
                 <Typography variant="h3" align="center">TipBot</Typography>
             </Container>
             <Divider />
@@ -94,7 +94,7 @@ const LLMChat = () => {
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
             />
-            <Button onClick={sendMessage}>Send</Button>
+            <Button onClick={sendMessage} sx={{color: "black"}}>Send</Button>
         </Container>
     );
 }
