@@ -1,0 +1,154 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #b3e6ff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; 
+    overflow: hidden;
+    width: 50vw;
+}
+
+.app-container {
+    width: 60vw;
+    height: auto;  /* Ocupa todo el alto de la ventana */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden; 
+}
+
+.game-mode-container {
+    width: 100vw;
+    max-width: 100%;
+}
+
+/* Top Bar */
+.top-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.top-right {
+    display: flex;
+    gap: 10px;
+}
+
+/* Main Layout */
+.main-content {
+    display: flex;
+    width: 100%;
+    flex-grow: 1;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    overflow: hidden; /* Evita que el contenido se expanda más del viewport */
+}
+
+
+/* Left Side */
+.left-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.help-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Game Area */
+.game-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 20vw;
+}
+
+.round-info {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.image-container {
+    width: 50%;
+    background-color: #d9d9d9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50%;
+}
+
+.game-image {
+    font-weight: bold;
+}
+
+/* Option Buttons */
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.btn {
+    margin: 10px;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    background-color: #d9d9d9;
+    border-radius: 10px;
+}
+
+.btn.logo {
+    margin: 10px;
+    width: 10%;
+}
+
+/* Chat Section */
+.chat-container {
+    width: 20%;
+    height: 30%;
+    max-height: 100%;
+    flex-shrink: 0;
+}
+
+.chat-box {
+    background-color: #d9d9d9;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.chat-title {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.chat-messages {
+    background-color: white;
+    border-radius: 10px;
+    width: 90%;
+}
+
+.chat-bubble {
+    background-color: white;
+    padding: 5px;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+
+.chat-input {
+    width: 100%;
+}
