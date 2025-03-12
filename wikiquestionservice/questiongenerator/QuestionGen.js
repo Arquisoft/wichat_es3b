@@ -122,6 +122,7 @@ class WikidataQueryService {
                 }
             }
             const imgprueba = await this.obtenerValoresDePropiedad(entity.id,this.img[0]);
+            if (!imgprueba || imgprueba.length === 0) continue;
             const nuevaPregunta = new Question(respuestaCorrecta, preguntasModificadas, respuestasIncorrectas, descripcion, imgprueba);
             this.questionsArray.push(nuevaPregunta);
         }
