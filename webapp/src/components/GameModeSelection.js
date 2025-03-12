@@ -44,89 +44,88 @@ function GameModeSelection() {
         <Game /> //Cuando `showGame` es true, mostramos Game.js
       ) : (
         <>
-          <button className="btn new-game">NEW GAME</button>
-  
-          {/* SELECCIÓN DE TEMA */}
-          <h3 className="mode-title">SELECT THE TOPIC</h3>
-          <div className="section-container">
-            <label className="topic-option">
-              <input
-                type="radio"
-                name="topic"
-                checked={!isWild}
-                onChange={handleCustomSelection}
-              />
-              CUSTOM
-            </label>
-            <div className="topic-options">
-              <label className={`checkbox-container ${isWild ? "disabled" : ""}`}>
+          <div className="final">  
+            {/* SELECCIÓN DE TEMA */}
+            <div className="section-container">
+              <h3 className="mode-title">SELECT THE TOPIC</h3>
+              <label className="topic-option">
                 <input
-                  type="checkbox"
-                  disabled={isWild}
-                  checked={selectedTopic === "movies"}
-                  onChange={() => handleTopicChange("movies")}
+                  type="radio"
+                  name="topic"
+                  checked={!isWild}
+                  onChange={handleCustomSelection}
                 />
-                MOVIES
+                CUSTOM
               </label>
-              <label className={`checkbox-container ${isWild ? "disabled" : ""}`}>
+              <div className="topic-options">
+                <label className={`checkbox-container ${isWild ? "disabled" : ""}`}>
+                  <input
+                    type="checkbox"
+                    disabled={isWild}
+                    checked={selectedTopic === "movies"}
+                    onChange={() => handleTopicChange("movies")}
+                  />
+                  MOVIES
+                </label>
+                <label className={`checkbox-container ${isWild ? "disabled" : ""}`}>
+                  <input
+                    type="checkbox"
+                    disabled={isWild}
+                    checked={selectedTopic === "flags"}
+                    onChange={() => handleTopicChange("flags")}
+                  />
+                  FLAGS
+                </label>
+                <label className={`checkbox-container ${isWild ? "disabled" : ""}`}>
+                  <input
+                    type="checkbox"
+                    disabled={isWild}
+                    checked={selectedTopic === "music"}
+                    onChange={() => handleTopicChange("music")}
+                  />
+                  MUSIC
+                </label>
+              </div>
+              <label className="topic-option wild">
                 <input
-                  type="checkbox"
-                  disabled={isWild}
-                  checked={selectedTopic === "flags"}
-                  onChange={() => handleTopicChange("flags")}
+                  type="radio"
+                  name="topic"
+                  checked={isWild}
+                  onChange={handleWildSelection}
                 />
-                FLAGS
-              </label>
-              <label className={`checkbox-container ${isWild ? "disabled" : ""}`}>
-                <input
-                  type="checkbox"
-                  disabled={isWild}
-                  checked={selectedTopic === "music"}
-                  onChange={() => handleTopicChange("music")}
-                />
-                MUSIC
+                WILD - EVERYTHING ALL AT ONCE!
               </label>
             </div>
-            <label className="topic-option wild">
-              <input
-                type="radio"
-                name="topic"
-                checked={isWild}
-                onChange={handleWildSelection}
-              />
-              WILD - EVERYTHING ALL AT ONCE!
-            </label>
+    
+            {/* SELECCIÓN DE MODO */}
+            <div className="section-container">
+              <h3 className="mode-title">SELECT THE MODE</h3>
+              <label className="checkbox-container">
+                <input
+                  type="checkbox"
+                  checked={selectedMode === "rounds"}
+                  onChange={() => handleModeChange("rounds")}
+                />
+                ROUNDS
+              </label>
+              <label className="checkbox-container">
+                <input
+                  type="checkbox"
+                  checked={selectedMode === "time"}
+                  onChange={() => handleModeChange("time")}
+                />
+                TIME
+              </label>
+              <label className="checkbox-container">
+                <input
+                  type="checkbox"
+                  checked={selectedMode === "hide"}
+                  onChange={() => handleModeChange("hide")}
+                />
+                HIDE
+              </label>
+            </div>
           </div>
-  
-          {/* SELECCIÓN DE MODO */}
-          <h3 className="mode-title">SELECT THE MODE</h3>
-          <div className="section-container">
-            <label className="checkbox-container">
-              <input
-                type="checkbox"
-                checked={selectedMode === "rounds"}
-                onChange={() => handleModeChange("rounds")}
-              />
-              ROUNDS
-            </label>
-            <label className="checkbox-container">
-              <input
-                type="checkbox"
-                checked={selectedMode === "time"}
-                onChange={() => handleModeChange("time")}
-              />
-              TIME
-            </label>
-            <label className="checkbox-container">
-              <input
-                type="checkbox"
-                checked={selectedMode === "hide"}
-                onChange={() => handleModeChange("hide")}
-              />
-              HIDE
-            </label>
-          </div>
-  
           {/* BOTÓN PARA EMPEZAR */}
           <button
             className={`btn start-game ${isStartDisabled ? "disabled" : ""}`}

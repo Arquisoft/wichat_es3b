@@ -30,6 +30,11 @@ body {
   margin-bottom: 10px;
 }
 
+.final{
+  display: flex;
+  gap:20px;
+}
+
 /* Sección con fondo gris */
 .section-container {
   background: #d3d3d3;

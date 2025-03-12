@@ -47,16 +47,25 @@ const LLMChat = () => {
     }
 
     return (
-        <Container sx={{display: "flex", flexDirection: "column", gap: 1, padding: 1, border: "5px solid #ccc", borderRadius: 5}}>
+        <Container sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            padding: 1,
+            border: "5px solid #ccc",
+            borderRadius: 5,
+            width: "60vw", // Aumenta el ancho del chat
+            maxWidth: "800px" // Limita el tamaño máximo para pantallas grandes
+        }}>
             <Container fullWidth sx={{padding: 1, color: "black", borderRadius: 1}}>
                 <Typography variant="h3" align="center">TipBot</Typography>
             </Container>
             <Divider />
-            <Container ref={chatContainer} onScroll={handleScroll} sx={{display: "flex", flexDirection: "column", overflow: "hidden", overflowY: "auto", height: "30vh"}}>
+            <Container ref={chatContainer} onScroll={handleScroll} sx={{display: "flex", flexDirection: "column", overflow: "hidden", overflowY: "auto", height: "30vh", width: "20vh"}}>
                 {messages.map((message, index) => (
                     message.sender === "user" ? (
                         <Typography key={index} sx={{
-                            maxWidth: "80%",
+                            width: "80%",
                             alignSelf: "flex-end",
                             padding: 1,
                             margin: 1,
