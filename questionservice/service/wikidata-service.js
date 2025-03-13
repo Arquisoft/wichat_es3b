@@ -1,6 +1,26 @@
 const axios = require("axios");
 const City = require("../model/wikidata-model");
 
+
+//Import mongo
+const mongoose = require('mongoose'); 
+
+//Import express 
+const express = require('express'); 
+const app = express();
+
+//For using json
+app.use(express.json());
+
+//define the port
+const port = 8004; 
+
+
+//Define the connection to DB
+const mongoDB = process.env.mongoDB || 'mongodb://localhost:27017/mongo-db-wichat_en3b'; 
+
+
+
 // SPARQL endpoint for WikiData
 const SPARQL_ENDPOINT = "https://query.wikidata.org/sparql";
 
@@ -15,6 +35,12 @@ SELECT DISTINCT ?city ?cityLabel ?image WHERE {
 ORDER BY DESC(?population)
 LIMIT 50
 `;
+
+mongoose.connect(mongoDB)
+.then(() => console.log('Connected'))
+.catch(err => console.log('Error on the connection to the DB. ', err)); 
+
+
 
 // Function to fetch the alternative description of an image from Wikimedia Commons
 async function getImageDescription(imageUrl) {
@@ -69,10 +95,24 @@ async function fetchAndStoreCities() {
         }
 
         console.log("Cities successfully stored in MongoDB");
+
+        //if this is uncommented the cities will be returned apart from being saved in the DB
+        //return cities; 
+
     } catch (error) {
         console.error("Error fetching and storing cities:", error);
     }
 }
+
+
+app.post('/load' , async (req, res) => { //Calling the function to get the information from WikiData and store it on the DB
+    try {
+        await fetchAndStoreCities();  
+    } catch(error) {
+        console.error('Error fetching data from question service:', error);
+        res.status(error.response?.status || 500).json({ error: 'Error fetching question data' });
+    }
+})
 
 
 async function getRandomCitiesWithImage() {
@@ -83,19 +123,32 @@ async function getRandomCitiesWithImage() {
         // Pick one randomly and get its url for the picture
         const randomCityIndex = Math.floor(Math.random() * cities.length); // Pick a random index
         const randomCity = cities[randomCityIndex];
+
+    
         return {
             cities: cities.map(city => ({
-                id: city.id,
+                
                 name: city.name,
             })),
-            imageUrl: randomCity.imageUrl
-            //cityWithImage: randomCity  another approach returning the entire row
+            cityWithImage: randomCity
         };
+
+        
     } catch (error) {
         console.error("Error fetching random cities:", error);
         throw error;
     }
 }
+
+app.get('/getRound' , async (req, res) => { //Calling the function to get a question
+    try {
+        const dataFromDatabase = await getRandomCitiesWithImage(); 
+        res.json(dataFromDatabase); 
+    } catch(error) {
+        console.error('Error fetching data from question service:', error);
+        res.status(error.response?.status || 500).json({ error: 'Error fetching question data' });
+    }
+})
 
 async function getCityNameById(cityId) {
     try {
@@ -112,5 +165,10 @@ async function getCityNameById(cityId) {
         throw error;
     }
 }
+
+const server = app.listen(port, () => {
+    console.log(`Question Service listening at http://localhost:${port}`);
+  });
+
 // Exporting the function so that it can be used in other files
-module.exports = { fetchAndStoreCities , getRandomCitiesWithImage, getCityNameById };
+module.exports = server;

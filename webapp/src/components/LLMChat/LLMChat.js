@@ -12,9 +12,10 @@ const LLMChat = () => {
 
     const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
+
     const sendMessage = async () => {
         if (!question.trim()) return;
-
+        
         let newMessage = { sender: "user", text: question };
         setMessages(previous => [...previous, newMessage]);
         setQuestion("");
