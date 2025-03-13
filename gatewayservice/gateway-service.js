@@ -62,7 +62,6 @@ app.post('/askllm', async (req, res) => {
 app.post('/loadQuestion', async (req, res) => {
   try {
     // Forward the request to the Question Service to get random cities and image URL
-    //const questionResponse = await axios.post(`${questionServiceUrl}+ '/question`);
     const questionResponse = await axios.post(questionServiceUrl+'/load', req.body);
 
     // Respond with the data from the Question Service

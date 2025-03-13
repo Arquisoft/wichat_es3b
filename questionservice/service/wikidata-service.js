@@ -130,7 +130,6 @@ async function getRandomCitiesWithImage() {
                 
                 name: city.name,
             })),
-            //imageUrl: randomCity.imageUrl
             cityWithImage: randomCity
         };
 
