@@ -105,10 +105,9 @@ async function fetchAndStoreCities() {
 }
 
 
-app.post('/question' , async (req, res) => { //Calling the function to get the information from WikiData and store it on the DB
+app.post('/load' , async (req, res) => { //Calling the function to get the information from WikiData and store it on the DB
     try {
-        const method = await fetchAndStoreCities(); 
-        res.json(method); 
+        await fetchAndStoreCities();  
     } catch(error) {
         console.error('Error fetching data from question service:', error);
         res.status(error.response?.status || 500).json({ error: 'Error fetching question data' });
@@ -142,7 +141,7 @@ async function getRandomCitiesWithImage() {
     }
 }
 
-app.get('/getQuestion' , async (req, res) => { //Calling the function to get a question
+app.get('/getRound' , async (req, res) => { //Calling the function to get a question
     try {
         const dataFromDatabase = await getRandomCitiesWithImage(); 
         res.json(dataFromDatabase); 
