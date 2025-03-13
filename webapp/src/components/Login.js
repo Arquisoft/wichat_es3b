@@ -1,7 +1,7 @@
 // src/components/Login.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Container, Typography, TextField, Button, Snackbar } from '@mui/material';
+import { Container, Typography, TextField, Button, Snackbar, Link } from '@mui/material';
 import { Typewriter } from "react-simple-typewriter";
 import GameModeSelection from './GameModeSelection';
 
@@ -91,6 +91,11 @@ const Login = () => {
           {error && (
             <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError('')} message={`Error: ${error}`} />
           )}
+          <Typography component="div" align="center" sx={{ marginTop: 2 }}>
+            <Link href="/signup" name="gotoregister" variant="body2">
+              Don't have an account? Register here.
+            </Link>
+          </Typography>
         </div>
       )}
     </Container>

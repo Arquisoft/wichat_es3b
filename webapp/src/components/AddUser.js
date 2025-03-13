@@ -1,7 +1,7 @@
 // src/components/AddUser.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Container, Typography, TextField, Button, Snackbar } from '@mui/material';
+import { Container, Typography, TextField, Button, Snackbar, Link } from '@mui/material';
 
 const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
@@ -53,6 +53,12 @@ const AddUser = () => {
       {error && (
         <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError('')} message={`Error: ${error}`} />
       )}
+      
+      <Typography component="div" align="center" sx={{ marginTop: 2 }}>
+        <Link href="/login" variant="body2">
+          Already have an account? Login here.
+        </Link>
+      </Typography>
     </Container>
   );
 };
