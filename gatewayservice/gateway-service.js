@@ -59,10 +59,11 @@ app.post('/askllm', async (req, res) => {
 });
 
 // Add the /question endpoint for filling the data base
-app.get('/question', async (req, res) => {
+app.post('/question', async (req, res) => {
   try {
     // Forward the request to the Question Service to get random cities and image URL
-    const questionResponse = await axios.get(`${questionServiceUrl}/question`);
+    //const questionResponse = await axios.post(`${questionServiceUrl}+ '/question`);
+    const questionResponse = await axios.post(questionServiceUrl+'/question', req.body);
 
     // Respond with the data from the Question Service
     res.json(questionResponse.data);
@@ -72,9 +73,9 @@ app.get('/question', async (req, res) => {
   }
 });
 
-app.get('getQuestion', async (req, res) => {
+app.get('/getQuestion', async (req, res) => {
   try {
-    const roundResponse = await axios.post(questionServiceUrl + '/getQuestion', req.body);
+    const roundResponse = await axios.get(questionServiceUrl+'/getQuestion');
     res.json(roundResponse.data); 
   } catch(error){
     res.status(error.response.status).json({error:error.response.data.error}); 

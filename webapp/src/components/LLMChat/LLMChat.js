@@ -16,13 +16,6 @@ const LLMChat = () => {
     const sendMessage = async () => {
         if (!question.trim()) return;
         
-        const data = await axios.post('/')
-        
-        const responseToFillDataBase = await axios.post(`${apiEndpoint}/question`); 
-        const responseToAnswer = await axios.post(`${apiEndpoint}/getQuestion`); 
-        
-        console.log(responseToAnswer); 
-        
         let newMessage = { sender: "user", text: question };
         setMessages(previous => [...previous, newMessage]);
         setQuestion("");
