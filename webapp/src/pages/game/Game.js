@@ -13,9 +13,9 @@ const Game = () => {
   const [showRules, setShowRules] = useState(false);
 
   return (
-    <div>
+    <div className="gameContainer">
       <Nav />
-      <main>
+      <main className={showRules ? "blurred" : ""}>
         <div className="upperSection">
           <div className="hintButton">
             <HintButton
@@ -62,10 +62,18 @@ const Game = () => {
             <span>00:35</span>
           </Box>
         </div>
-        <div className="dialogGameRulesContainer">
-          {showRules && <InfoDialog message="Aquí van las reglas del juego." onClose={()=> setShowRules(false)}/>}
-        </div> 
       </main>
+      {showRules && (
+        <div className="overlay">
+          <div className="dialogGameRulesContainer">
+            <InfoDialog title={"Reglas del juego"} content={<ol>
+              <li>Observa la imagen.</li>
+              <li>Responde en el menor tiempo posible, dentro de los límites ofrecidos.</li>
+              <li>Usa las pistas generadas por nuestra IA si lo necesitas.</li>
+            </ol>} onClose={() => setShowRules(false)} />
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );

@@ -1,5 +1,12 @@
 @import url("../../assets/global.css");
 
+
+.gameContainer{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .upperSection {
   display: flex;
   align-items: center;
@@ -123,6 +130,10 @@
 
 main {
   margin: 2em 0;
+  flex: 1;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
 }
 
 .questionNumber {
@@ -152,10 +163,10 @@ main {
   transform: translate(-50%, -50%);
   width: 50%;
   height: 50%;
+  border-radius: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
 }
 
 .dialogContent {
@@ -170,6 +181,24 @@ main {
   align-items: center;
 }
 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.blurred{
+  filter: blur(0.5);
+  pointer-events: none;
+}
+
 @media (max-width: 768px) {
   .dialogGameRulesContainer {
     width: 80%;
@@ -178,23 +207,9 @@ main {
 }
 
 
-@media (max-width: 1500px) and (min-width: 1280px) {
-  main {
-    transform: scale(0.9);
-    transform-origin: top;
-  }
-}
-
-@media (max-width: 1279px) {
-  main {
-    transform: scale(0.85);
-    transform-origin: top;
-  }
-}
-
 @media (max-width: 768px) {
   main {
-    transform: scale(0.75);
+    transform: scale(0.95);
     transform-origin: top;
   }
 }
