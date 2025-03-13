@@ -1,6 +1,17 @@
 const axios = require("axios");
 const City = require("../model/wikidata-model");
 
+//Import express 
+const express = require('express'); 
+const app = express();
+
+//For using json
+app.use(express.json());
+
+//define the port
+const port = 8004; 
+
+
 // SPARQL endpoint for WikiData
 const SPARQL_ENDPOINT = "https://query.wikidata.org/sparql";
 
@@ -75,6 +86,17 @@ async function fetchAndStoreCities() {
 }
 
 
+app.get('/question' , async (req, res) => { //Calling the function to get the information from WikiData and store it on the DB
+    try {
+        const method = fetchAndStoreCities(); 
+        res.json(method); 
+    } catch(error) {
+        console.error('Error fetching data from question service:', error);
+        res.status(error.response?.status || 500).json({ error: 'Error fetching question data' });
+    }
+})
+
+
 async function getRandomCitiesWithImage() {
     try {
         // 4 random rows from the data base
@@ -83,19 +105,33 @@ async function getRandomCitiesWithImage() {
         // Pick one randomly and get its url for the picture
         const randomCityIndex = Math.floor(Math.random() * cities.length); // Pick a random index
         const randomCity = cities[randomCityIndex];
+
+    
         return {
             cities: cities.map(city => ({
-                id: city.id,
+                
                 name: city.name,
             })),
-            imageUrl: randomCity.imageUrl
-            //cityWithImage: randomCity  another approach returning the entire row
+            //imageUrl: randomCity.imageUrl
+            cityWithImage: randomCity
         };
+
+        
     } catch (error) {
         console.error("Error fetching random cities:", error);
         throw error;
     }
 }
+
+app.get('/getQuestion' , async (req, res) => { //Calling the function to get a question
+    try {
+        const dataFromDatabase = getRandomCitiesWithImage(); 
+        res.json(dataFromDatabase); 
+    } catch(error) {
+        console.error('Error fetching data from question service:', error);
+        res.status(error.response?.status || 500).json({ error: 'Error fetching question data' });
+    }
+})
 
 async function getCityNameById(cityId) {
     try {
@@ -112,5 +148,11 @@ async function getCityNameById(cityId) {
         throw error;
     }
 }
+
+const server = app.listen(port, () => {
+    console.log(`Question Service listening at http://localhost:${port}`);
+  });
+
+
 // Exporting the function so that it can be used in other files
-module.exports = { fetchAndStoreCities , getRandomCitiesWithImage, getCityNameById };
+module.exports = server;

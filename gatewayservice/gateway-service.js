@@ -58,7 +58,7 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
-// Add the /question endpoint
+// Add the /question endpoint for filling the data base
 app.get('/question', async (req, res) => {
   try {
     // Forward the request to the Question Service to get random cities and image URL
@@ -72,6 +72,14 @@ app.get('/question', async (req, res) => {
   }
 });
 
+app.get('getQuestion', async (req, res) => {
+  try {
+    const roundResponse = await axios.post(questionServiceUrl + '/getQuestion', req.body);
+    res.json(roundResponse.data); 
+  } catch(error){
+    res.status(error.response.status).json({error:error.response.data.error}); 
+  }
+}); 
 
 
 // Read the OpenAPI YAML file synchronously
