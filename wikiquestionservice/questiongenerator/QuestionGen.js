@@ -137,12 +137,9 @@ class WikidataQueryService {
 
         try {
             const data = await this.fetchData(sparqlQuery);
-
-            // Si existen valores, los devolvemos como un arreglo
             if (data.results.bindings.length > 0) {
                 return data.results.bindings.map(binding => this.convertirValorPorTipo(binding.propertyValueLabel.value, tipo));
             } else {
-                //console.warn("⚠️ No se encontraron valores de la propiedad.");
                 return [];
             }
         } catch (error) {

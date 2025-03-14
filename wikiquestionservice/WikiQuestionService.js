@@ -1,27 +1,23 @@
-const CategoryLoader = require('./questiongenerator/CategoryLoader');
+const QuestionManager = require('./questiongenerator/QuestionManager');
 
-const categoryLoader = new CategoryLoader();
+(async () => {
+    const questionManager = new QuestionManager();
 
-const allServices = categoryLoader.getAllServices();
+    // Cargar todas las preguntas antes de imprimirlas
+    await questionManager.loadAllQuestions();
 
-for (const categoryName in allServices) {
-    const wikidataService = allServices[categoryName];
+    console.log("📌 Todas las preguntas han sido generadas. Mostrando preguntas:\n");
 
-    if (wikidataService) {
-        wikidataService.generateQuestions().then(() => {
-            const preguntas = wikidataService.getQuestions();
-
-            console.log(`❓ Preguntas para la categoría '${categoryName}':`);
-            preguntas.forEach((pregunta, index) => {
-                console.log(`Pregunta ${index + 1}:`);
-                console.log(pregunta.toString() + '\n');
-            });
-        }).catch(error => {
-            console.error(`Error generando preguntas para la categoría '${categoryName}':`, error);
-        });
-    } else {
-        console.warn(`⚠️ El servicio para la categoría '${categoryName}' no existe.`);
+    let index = 1;
+    while (true) {
+        try {
+            const pregunta = questionManager.getRandomQuestion();
+            console.log(`Pregunta ${index}:`);
+            console.log(pregunta.toString() + '\n');
+            index++;
+        } catch (error) {
+            console.log("✅ No hay más preguntas disponibles.");
+            break;
+        }
     }
-}
-
-console.log("📌 Categorías cargadas:", Object.keys(allServices));
+})();
