@@ -17,11 +17,11 @@ const llmConfigs = {
     transformResponse: (response) => response.data.candidates[0]?.content?.parts[0]?.text
   },
   empathy: {
-    url: () => 'https://empathyai.staging.empathy.co/v1/chat/completions',
-    transformRequest: (question) => ({
+    url: () => 'https://empathyai.prod.empathy.co/v1/chat/completions',
+    transformRequest: (prompt, question) => ({
       model: "qwen/Qwen2.5-Coder-7B-Instruct",
       messages: [
-        { role: "system", content: "You are a helpful assistant." },
+        { role: "system", content: prompt },
         { role: "user", content: question }
       ]
     }),
@@ -43,7 +43,7 @@ function validateRequiredFields(req, requiredFields) {
 }
 
 // Generic function to send questions to LLM
-async function sendQuestionToLLM(question, apiKey, model = 'gemini') {
+async function sendQuestionToLLM(prompt, question, apiKey, model = 'gemini') {
   try {
     const config = llmConfigs[model];
     if (!config) {
@@ -51,7 +51,7 @@ async function sendQuestionToLLM(question, apiKey, model = 'gemini') {
     }
 
     const url = config.url(apiKey);
-    const requestData = config.transformRequest(question);
+    const requestData = config.transformRequest(prompt, question);
 
     const headers = {
       'Content-Type': 'application/json',
@@ -71,10 +71,10 @@ async function sendQuestionToLLM(question, apiKey, model = 'gemini') {
 app.post('/ask', async (req, res) => {
   try {
     // Check if required fields are present in the request body
-    validateRequiredFields(req, ['question', 'model', 'apiKey']);
+    validateRequiredFields(req, [ 'prompt', 'question', 'model', 'apiKey']);
 
-    const { question, model, apiKey } = req.body;
-    const answer = await sendQuestionToLLM(question, apiKey, model);
+    const { prompt, question, model, apiKey } = req.body;
+    const answer = await sendQuestionToLLM(prompt, question, apiKey, model);
     res.json({ answer });
 
   } catch (error) {
@@ -86,6 +86,5 @@ const server = app.listen(port, () => {
   console.log(`LLM Service listening at http://localhost:${port}`);
 });
 
-module.exports = server
-
+module.exports = { sendQuestionToLLM, server };
 
