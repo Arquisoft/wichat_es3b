@@ -8,6 +8,7 @@ import { LinearProgress, Box } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import coliseoImage from "../../assets/img/coliseo.jpg";
 import InfoDialog from "../../components/infoDialog/InfoDialog";
+import ChatBox from "../../components/chatBox/ChatBox";
 
 const Game = () => {
   const [showRules, setShowRules] = useState(false);
@@ -62,6 +63,7 @@ const Game = () => {
             <span>00:35</span>
           </Box>
         </div>
+        <ChatBox></ChatBox>
       </main>
       {showRules && (
         <div className="overlay">
