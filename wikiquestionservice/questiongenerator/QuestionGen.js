@@ -35,7 +35,7 @@ class WikidataQueryService {
         return valor;
     }
 
-    async obtenerIdsDeWikidata(cantidad = 10) {
+    async obtenerIdsDeWikidata(cantidad = 50) {
         const sparqlQuery = `
         SELECT ?entity ?entityLabel WHERE {
             ?entity wdt:P31 ${this.entity}.
@@ -76,6 +76,9 @@ class WikidataQueryService {
             const indiceAleatorio = Math.floor(Math.random() * this.questions.length);
             const descripcion = [];
             for (let i = 0; i < this.properties.length; i++) {
+                if(this.questionsArray.length>=5){
+                    return;
+                }
                 if (i === indiceAleatorio) {
                     continue;
                 }
@@ -114,17 +117,21 @@ class WikidataQueryService {
 
             const preguntaAleatoria = this.questions[indiceAleatorio];
             const preguntasModificadas = {};
-            for (const idioma in preguntaAleatoria) {
-                if (preguntaAleatoria.hasOwnProperty(idioma)) {
-                    let preguntaEnIdioma = preguntaAleatoria[idioma];
-                    preguntaEnIdioma = preguntaEnIdioma.replace("%", entityName);
-                    preguntasModificadas[idioma] = preguntaEnIdioma;
-                }
-            }
+            this.modifyQuestion(preguntaAleatoria, entityName, preguntasModificadas);
             const imgprueba = await this.obtenerValoresDePropiedad(entity.id,this.img[0]);
             if (!imgprueba || imgprueba.length === 0) continue;
             const nuevaPregunta = new Question(respuestaCorrecta, preguntasModificadas, respuestasIncorrectas, descripcion, imgprueba);
             this.questionsArray.push(nuevaPregunta);
+        }
+    }
+
+    modifyQuestion(preguntaAleatoria, entityName, preguntasModificadas) {
+        for (const idioma in preguntaAleatoria) {
+            if (preguntaAleatoria.hasOwnProperty(idioma)) {
+                let preguntaEnIdioma = preguntaAleatoria[idioma];
+                preguntaEnIdioma = preguntaEnIdioma.replace("%", entityName);
+                preguntasModificadas[idioma] = preguntaEnIdioma;
+            }
         }
     }
 
