@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Button } from '@mui/material';
-import { NavLink } from 'react-router';
+import { NavLink } from 'react-router-dom';
 import { Typewriter } from "react-simple-typewriter";
 
 const Welcome = () => {
