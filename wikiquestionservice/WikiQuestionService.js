@@ -3,7 +3,6 @@ const QuestionManager = require('./questiongenerator/QuestionManager');
 (async () => {
     const questionManager = new QuestionManager();
 
-    // Cargar todas las preguntas antes de imprimirlas
     await questionManager.loadAllQuestions();
 
     console.log("📌 Todas las preguntas han sido generadas. Mostrando preguntas:\n");

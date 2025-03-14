@@ -14,16 +14,21 @@ class QuestionManager {
 
             if (wikidataService) {
                 try {
+                    console.log(`🔄 Generando preguntas para la categoría '${categoryName}'...`);
                     await wikidataService.generateQuestions();
                     const preguntas = wikidataService.getQuestions();
+
+                    console.log(`✅ ${preguntas.length} preguntas generadas para '${categoryName}'`);
                     this.addQuestions(preguntas);
                 } catch (error) {
-                    console.error(`Error generando preguntas para la categoría '${categoryName}':`, error);
+                    console.error(`❌ Error generando preguntas para la categoría '${categoryName}':`, error);
                 }
             } else {
                 console.warn(`⚠️ El servicio para la categoría '${categoryName}' no existe.`);
             }
         }
+
+        console.log(`📌 Total de preguntas generadas: ${this.questions.length}`);
         this.shuffleQuestions();
     }
 
