@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8004
 
 # Define the command to run your app
-CMD ["node", "wikiquestion-service.js"]
+CMD ["node", "wikiQuestion-service.js"]
