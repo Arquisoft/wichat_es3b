@@ -38,7 +38,6 @@ const prompt = `Eres un asistente virtual que debe dar una pista al usuario a re
 
 async function getHint(userQuestion, question, idioma, apiKey) {
     try {
-        console.log("Comienza la fachada")
         const dataText = question.descripcion
             .map(item => `${item.propiedad}: ${item.valor}`)
             .join('\n');
@@ -52,8 +51,6 @@ async function getHint(userQuestion, question, idioma, apiKey) {
         try {
             // Forward the add user request to the user service
             const llmResponse = await axios.post((process.env.LLM_SERVICE_URL || 'http://localhost:8003') + '/ask', body);
-
-            console.log('llmResponse:', llmResponse.data);
 
             return llmResponse.data;
 

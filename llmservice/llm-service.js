@@ -48,7 +48,6 @@ function validateRequiredFields(req, requiredFields) {
 // Generic function to send questions to LLM
 async function sendQuestionToLLM(question, apiKey, model = 'gemini') {
   try {
-    console.log("Inicio del send question: ")
 
     const config = llmConfigs[model];
     if (!config) {
@@ -63,11 +62,9 @@ async function sendQuestionToLLM(question, apiKey, model = 'gemini') {
       ...(config.headers ? config.headers(apiKey) : {})
     };
 
-    console.log("Antes del reponse: ")
 
     const response = await axios.post(url, requestData, { headers });
 
-    console.log(response)
 
     return config.transformResponse(response);
 
@@ -83,11 +80,7 @@ app.post('/ask', async (req, res) => {
     validateRequiredFields(req, ['question', 'model']);
 
     const { question, model } = req.body;
-    console.log("Antes del send")
-    console.log("APIKEY: " + process.env.LLM_API_KEY)
-    console.log(process.env)
     const answer = await sendQuestionToLLM(question, process.env.LLM_API_KEY, model);
-    console.log("Despues del send")
     res.json({ answer });
 
   } catch (error) {
