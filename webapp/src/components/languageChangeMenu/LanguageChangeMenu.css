@@ -1,0 +1,31 @@
+@import url("../../assets/global.css");
+
+.menu {
+  height: 30%;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  color: var(--color-primario);
+  font-weight: bold;
+}
+
+.itemContent {
+  width: 50%;
+  display: flex;
+  align-items: center; /* Alinea la bandera y el texto */
+  gap: 0; /* Espacio entre la bandera y el texto */
+}
+
+.itemContent:hover {
+  text-decoration: underline;
+}
+
+.itemContent img {
+  width: 1.5em; /* Tamaño de la bandera */
+  height: auto;
+  object-fit: cover;
+}
