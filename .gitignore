@@ -4,3 +4,4 @@ docs/build
 .env
 webapp/.env
 .idea/
+llmservice/mainDePrueba.js
