@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react"; // Corregido useCallBack a useCallback
 import "./Game.css";
 import Nav from "../../components/nav/Nav";
 import Footer from "../../components/Footer";
@@ -7,11 +7,43 @@ import BaseButton from "../../components/button/BaseButton";
 import { LinearProgress, Box } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
-// Importa la imagen
-import coliseoImage from "../../assets/img/coliseo.jpg";
-import ChatBubble from "../../components/chatBubble/ChatBubble";
-
 const Game = () => {
+  const [questionNumber, setQuestionNumber] = useState(0);
+  const [questions, setQuestions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentQuestion, setCurrentQuestion] = useState("");
+
+  const URL = "http://localhost:8004/";
+
+  const fetchQuestions = useCallback(async () => {
+    // Correcto
+    try {
+      const response = await fetch(`${URL}questions?n=25&locale=es`);
+      if (!response.ok) {
+        throw new Error("No se pudieron obtener las preguntas.");
+      }
+      const data = await response.json();
+      setQuestions(data);
+      setCurrentQuestion(data[questionNumber]);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchQuestions();
+  }, [fetchQuestions]);
+
+  const handleNextQuestion = () => {
+    setQuestionNumber(questionNumber + 1);
+    setCurrentQuestion(questions[questionNumber]);
+  };
+
+  if (isLoading) {
+    return <div>Cargando...</div>;
+  }
+
   return (
     <div>
       <Nav />
@@ -25,15 +57,15 @@ const Game = () => {
           </div>
           <div className="question">
             <div className="questionNumber">
-              <h2>Pregunta 1/20</h2>
+              <h2>{`Pregunta ${questionNumber + 1}/25`}</h2>
               <ArrowForwardIcon
                 titleAccess="Siguiente pregunta"
                 fontSize="1.5em"
                 id="nextArrow"
-                onClick={() => alert("Avanzar a la siguiente pregunta.")}
+                onClick={handleNextQuestion}
               ></ArrowForwardIcon>
             </div>
-            <h1>¿Cuál es este monumento?</h1>
+            <h1>{currentQuestion.pregunta}</h1>
           </div>
           <div className="rightUpperSection">
             <div className="pointsAndRules">
@@ -45,12 +77,14 @@ const Game = () => {
           </div>
         </div>
         <div className="midSection">
-          <img src={coliseoImage} alt="imagen pregunta"></img>
+          {currentQuestion.img && (
+            <img src={currentQuestion.img[0]} alt="imagen pregunta"></img>
+          )}
           <div className="answerPanel">
-            <BaseButton text="Torre Eiffel"></BaseButton>
-            <BaseButton text="Torre de Pisa"></BaseButton>
-            <BaseButton text="La EII"></BaseButton>
-            <BaseButton text="Coliseo Romano"></BaseButton>
+            {currentQuestion.respuestas &&
+              currentQuestion.respuestas.map((respuesta, index) => (
+                <BaseButton key={index} text={respuesta}></BaseButton>
+              ))}
           </div>
         </div>
         <div className="lowerSection">
@@ -72,11 +106,9 @@ const Game = () => {
             <span>00:35</span>
           </Box>
         </div>
-        <div></div>
       </main>
       <Footer />
     </div>
   );
 };
-
 export default Game;
