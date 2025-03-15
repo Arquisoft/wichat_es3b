@@ -2,5 +2,6 @@ node_modules
 coverage
 docs/build
 .env
-.env
 .idea/
+webapp/.env
+llmservice/mainDePrueba.js
