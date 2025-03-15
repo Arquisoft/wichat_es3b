@@ -44,6 +44,18 @@ class QuestionManager {
     addQuestions(preguntas) {
         this.questions.push(...preguntas);
     }
+    getQuestionsByTopic(topics, count) {
+        let filteredQuestions = [];
+
+        if (topics.includes("all")) {
+            filteredQuestions = this.questions;
+        } else {
+            filteredQuestions = this.questions.filter(question => topics.includes(question.category));
+        }
+
+        // Limitar el número de preguntas
+        return filteredQuestions.slice(0, count);
+    }
 
     shuffleQuestions() {
         for (let i = this.questions.length - 1; i > 0; i--) {
