@@ -105,7 +105,7 @@ async function fetchAndStoreCities() {
 }
 
 
-app.post('/load' , async (req, res) => { //Calling the function to get the information from WikiData and store it on the DB
+app.get('/load' , async (req, res) => { //Calling the function to get the information from WikiData and store it on the DB
     try {
         await fetchAndStoreCities();  
     } catch(error) {

@@ -2,10 +2,48 @@ import React, { useState } from "react";
 import "./GameStyles.css";
 import Chat from './LLMChat/LLMChat';
 
+
+const axios = require('axios');
+const apiEndpoint = "http://localhost:8000";
+
+
 function Game() {
     const [round, setRound] = useState(1);
     const totalRounds = 10;
+    const [roundData, setRoundData] = useState(null);
 
+    //Function to load the data for each round.
+    const loadRound = async () => {
+        try {
+            const response = await axios.get('${apiEndpoint}/getRound');
+            console.log(response.data);
+            return response.data;
+        }catch (error) {
+            console.error('Error fetching data from question service:', error);
+        }
+    }
+
+    const gameSetup = async () => {
+        try{
+        //Loads the questions from wikidata into the database
+        await axios.get('${apiEndpoint}/loadQuestion');
+        //First round
+        setRoundData(loadRound());
+        }catch (error) {
+            console.error('Error fetching data from question service:', error);
+        }
+    }
+
+    gameSetup();
+
+    //Handles round change, score and other game logic when selecting an option.
+    /*
+    const handleOptionSelect = (index) => {
+        CorrectOption(index)? setScore(score+1): setScore(score);
+        setRound(round+1);
+        setRoundData(loadRound());
+    }
+    */
     return (
         <div className="app-container">
             {/* Top Bar */}
