@@ -1,8 +1,11 @@
 const axios = require('axios');
 const express = require('express');
 
+require("dotenv").config();
+
 const app = express();
 const port = 8003;
+
 
 // Middleware to parse JSON in request body
 app.use(express.json());
@@ -18,10 +21,10 @@ const llmConfigs = {
   },
   empathy: {
     url: () => 'https://empathyai.prod.empathy.co/v1/chat/completions',
-    transformRequest: (prompt, question) => ({
+    transformRequest: (question) => ({
       model: "qwen/Qwen2.5-Coder-7B-Instruct",
       messages: [
-        { role: "system", content: prompt },
+        { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: question }
       ]
     }),
@@ -43,22 +46,28 @@ function validateRequiredFields(req, requiredFields) {
 }
 
 // Generic function to send questions to LLM
-async function sendQuestionToLLM(prompt, question, apiKey, model = 'gemini') {
+async function sendQuestionToLLM(question, apiKey, model = 'gemini') {
   try {
+    console.log("Inicio del send question: ")
+
     const config = llmConfigs[model];
     if (!config) {
       throw new Error(`Model "${model}" is not supported.`);
     }
 
     const url = config.url(apiKey);
-    const requestData = config.transformRequest(prompt, question);
+    const requestData = config.transformRequest(question);
 
     const headers = {
       'Content-Type': 'application/json',
       ...(config.headers ? config.headers(apiKey) : {})
     };
 
+    console.log("Antes del reponse: ")
+
     const response = await axios.post(url, requestData, { headers });
+
+    console.log(response)
 
     return config.transformResponse(response);
 
@@ -71,10 +80,14 @@ async function sendQuestionToLLM(prompt, question, apiKey, model = 'gemini') {
 app.post('/ask', async (req, res) => {
   try {
     // Check if required fields are present in the request body
-    validateRequiredFields(req, [ 'prompt', 'question', 'model', 'apiKey']);
+    validateRequiredFields(req, ['question', 'model']);
 
-    const { prompt, question, model, apiKey } = req.body;
-    const answer = await sendQuestionToLLM(prompt, question, apiKey, model);
+    const { question, model } = req.body;
+    console.log("Antes del send")
+    console.log("APIKEY: " + process.env.LLM_API_KEY)
+    console.log(process.env)
+    const answer = await sendQuestionToLLM(question, process.env.LLM_API_KEY, model);
+    console.log("Despues del send")
     res.json({ answer });
 
   } catch (error) {
@@ -86,5 +99,5 @@ const server = app.listen(port, () => {
   console.log(`LLM Service listening at http://localhost:${port}`);
 });
 
-module.exports = { sendQuestionToLLM, server };
+module.exports = server;
 

@@ -1,4 +1,6 @@
-const { sendQuestionToLLM } = require('./llm-service');
+//const { sendQuestionToLLM } = require('./llm-service');
+const  server = require('./llm-service');
+const axios = require('axios');
 
 const model = 'empathy';
 const prompt = `Eres un asistente virtual que debe dar una pista al usuario a responder correctamente una serie de preguntas.
@@ -36,16 +38,33 @@ const prompt = `Eres un asistente virtual que debe dar una pista al usuario a re
 
 async function getHint(userQuestion, question, idioma, apiKey) {
     try {
+        console.log("Comienza la fachada")
         const dataText = question.descripcion
             .map(item => `${item.propiedad}: ${item.valor}`)
             .join('\n');
-
         const formattedPrompt = prompt
             .replace('{question}', question.preguntas.idioma)
             .replace('{correctAnswer}', question.respuestaCorrecta)
             .replace('{datos}', dataText)
             .replace('{idioma}', idioma);
-        return await sendQuestionToLLM(formattedPrompt, userQuestion, apiKey, model);
+
+        let body = {question: userQuestion, model: model};
+        try {
+            // Forward the add user request to the user service
+            const llmResponse = await axios.post((process.env.LLM_SERVICE_URL || 'http://localhost:8003') + '/ask', body);
+
+            console.log('llmResponse:', llmResponse.data);
+
+            return llmResponse.data;
+
+        } catch (error) {
+            console.error('Error al obtener pista:', error.message);
+            return null;
+        }
+
+        //server.post('/ask', { prompt: formattedPrompt, question: userQuestion, model, apiKey });
+        //return await sendQuestionToLLM(formattedPrompt, userQuestion, apiKey, model);
+
     } catch (error) {
         console.error('Error al obtener pista:', error.message);
         return null;
