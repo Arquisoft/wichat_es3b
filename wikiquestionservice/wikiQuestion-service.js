@@ -34,9 +34,8 @@ app.get("/questions", async (req, res) => {
         return res.status(400).json({ error: "El límite de preguntas es 20" });
     }
 
-    if (locale !== "en" && locale !== "es") {
-        return res.status(400).json({ error: "El valor de 'locale' debe ser 'en' o 'es'" });
-    }
+    const validLocales = ["es", "en"];
+    const selectedLocale = validLocales.includes(locale) ? locale : "es";
 
     try {
         await questionManager.loadAllQuestions();
@@ -44,13 +43,20 @@ app.get("/questions", async (req, res) => {
         const allQuestions = questionManager.questions;
 
         const limitedQuestions = allQuestions.slice(0, numQuestions).map(q => {
+            const questionText = q.obtenerPreguntaPorIdioma(selectedLocale);
+
+            if (!questionText) {
+                return res.status(400).json({ error: `Pregunta no disponible en el idioma: ${selectedLocale}` });
+            }
+
+            const respuestas = q.obtenerRespuestas();
+
             return {
-                ...q,
-                pregunta: q.preguntas[locale],
+                pregunta: questionText,
                 respuestaCorrecta: q.respuestaCorrecta,
-                respuestasIncorrectas: q.respuestasIncorrectas,
+                respuestas: respuestas,
                 descripcion: q.descripcion,
-                img: q.img
+                img: q.obtenerImg()
             };
         });
 
@@ -58,6 +64,7 @@ app.get("/questions", async (req, res) => {
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
+
 });
 
 const server = app.listen(port, async () => {
