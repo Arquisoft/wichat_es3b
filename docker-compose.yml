@@ -22,7 +22,7 @@ services:
     networks:
       - mynetwork
     environment:
-      MONGODB_URI: mongodb://mongodb:27017/userdb
+      MONGODB_URI: ${MONGODB_URI}
 
   userservice:
     container_name: userservice-wichat_es3b
@@ -36,7 +36,21 @@ services:
     networks:
       - mynetwork
     environment:
-      MONGODB_URI: mongodb://mongodb:27017/userdb
+      MONGODB_URI: ${MONGODB_URI}
+
+  statsservice:
+    container_name: statsservice-wichat_es3b
+    image: ghcr.io/arquisoft/wichat_es3b/statsservice:latest
+    profiles: ["dev", "prod"]
+    build: ./users/statsservice  
+    depends_on:
+      - mongodb 
+    ports:
+      - "8004:8004" 
+    networks:
+      - mynetwork
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
 
   llmservice:
     container_name: llmservice-wichat_es3b
