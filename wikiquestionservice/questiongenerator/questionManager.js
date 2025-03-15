@@ -1,4 +1,4 @@
-const CategoryLoader = require('./CategoryLoader');
+const CategoryLoader = require('./categoryLoader');
 
 class QuestionManager {
     constructor() {

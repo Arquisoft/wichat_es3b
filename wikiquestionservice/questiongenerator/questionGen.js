@@ -1,5 +1,5 @@
 const axios = require('axios');
-const Question = require('./Question');
+const Question = require('./question');
 class WikidataQueryService {
     constructor(categoryName, entity, properties, questions,types,img) {
         this.wikidataEndpoint = "https://query.wikidata.org/sparql";
@@ -117,21 +117,17 @@ class WikidataQueryService {
 
             const preguntaAleatoria = this.questions[indiceAleatorio];
             const preguntasModificadas = {};
-            this.modifyQuestion(preguntaAleatoria, entityName, preguntasModificadas);
+            for (const idioma in preguntaAleatoria) {
+                if (preguntaAleatoria.hasOwnProperty(idioma)) {
+                    let preguntaEnIdioma = preguntaAleatoria[idioma];
+                    preguntaEnIdioma = preguntaEnIdioma.replace("%", entityName);
+                    preguntasModificadas[idioma] = preguntaEnIdioma;
+                }
+            }
             const imgprueba = await this.obtenerValoresDePropiedad(entity.id,this.img[0]);
             if (!imgprueba || imgprueba.length === 0) continue;
             const nuevaPregunta = new Question(respuestaCorrecta, preguntasModificadas, respuestasIncorrectas, descripcion, imgprueba);
             this.questionsArray.push(nuevaPregunta);
-        }
-    }
-
-    modifyQuestion(preguntaAleatoria, entityName, preguntasModificadas) {
-        for (const idioma in preguntaAleatoria) {
-            if (preguntaAleatoria.hasOwnProperty(idioma)) {
-                let preguntaEnIdioma = preguntaAleatoria[idioma];
-                preguntaEnIdioma = preguntaEnIdioma.replace("%", entityName);
-                preguntasModificadas[idioma] = preguntaEnIdioma;
-            }
         }
     }
 

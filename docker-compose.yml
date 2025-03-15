@@ -79,6 +79,16 @@ services:
       - gatewayservice
     ports:
       - "3000:3000"
+  wikiquestionservice:
+    container_name: wikiquestionservice-wichat_es3b
+    build: ./wikiquestionservice
+    image: ghcr.io/arquisoft/wichat_es3b/wikiquestionservice:latest
+    profiles: [ "dev", "prod" ]
+    ports:
+      - "8004:8004"
+    networks:
+      - mynetwork
+    restart: always
 
   prometheus:
     image: prom/prometheus

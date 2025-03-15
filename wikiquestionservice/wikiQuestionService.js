@@ -1,4 +1,4 @@
-const QuestionManager = require('./questiongenerator/QuestionManager');
+const QuestionManager = require('./questiongenerator/questionManager');
 
 (async () => {
     const questionManager = new QuestionManager();
