@@ -1,0 +1,218 @@
+/* Estilos para la tarjeta de perfil */
+
+/* Contenedor principal de la tarjeta de perfil */
+.profile-card {
+  display: flex;
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición para efecto hover */
+}
+
+.profile-card:hover {
+  transform: translateY(-2px); /* Ligero efecto de elevación */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+}
+
+/* Contenedor de la imagen de perfil */
+.profile-image {
+  margin-right: 20px;
+}
+
+.profile-image img {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease; /* Para efecto hover */
+}
+
+.profile-image img:hover {
+  transform: scale(1.05); /* Ligero aumento de tamaño */
+}
+
+/* Contenedor de la información del perfil */
+.profile-info {
+  flex: 1;
+}
+
+/* Cabecera con nombre y nivel */
+.profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.profile-header h2 {
+  margin: 0;
+  color: var(--primary);
+  margin-right: 15px;
+  font-size: 1.5rem;
+}
+
+.profile-level {
+  font-size: 14px;
+  color: var(--text-light);
+  background-color: #f0f0f0;
+  padding: 3px 8px;
+  border-radius: 12px;
+  transition: background-color 0.3s ease; /* Para efecto hover */
+}
+
+.profile-level:hover {
+  background-color: var(--primary-light);
+  color: var(--text);
+}
+
+/* Barra de progreso para el nivel */
+.progress-bar {
+  height: 8px;
+  background-color: #eaeaea;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: var(--primary);
+  border-radius: 4px;
+  transition: width 0.5s ease-out; /* Animación suave para cambios de progreso */
+  position: relative;
+}
+
+/* Efecto de brillo en la barra de progreso */
+.progress-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shine 2s infinite; /* Animación de brillo */
+}
+
+@keyframes shine {
+  to {
+    left: 100%;
+  }
+}
+
+/* Contenedor de estadísticas */
+.profile-stats {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Cada elemento de estadística */
+.profile-stat {
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease; /* Para efecto hover */
+}
+
+.profile-stat:hover {
+  transform: translateY(-3px); /* Efecto de elevación */
+}
+
+/* Iconos de estadísticas */
+.stat-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  position: relative;
+  transition: background-color 0.3s ease; /* Para efecto hover */
+}
+
+.stat-icon:hover {
+  background-color: var(--primary-light);
+}
+
+/* Icono de bandera */
+.flag-icon::before {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background-color: var(--primary);
+  clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 50%, 50% 50%, 50% 0);
+}
+
+/* Icono de reloj */
+.clock-icon::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+}
+
+.clock-icon::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 2px;
+  background-color: var(--primary);
+  transform: rotate(45deg);
+  top: 10px;
+  left: 15px;
+}
+
+/* Icono de marca de verificación */
+.check-icon::before {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 8px;
+  border-left: 2px solid var(--primary);
+  border-bottom: 2px solid var(--primary);
+  transform: rotate(-45deg);
+}
+
+/* Contenido de cada estadística */
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-weight: bold;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .profile-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-image {
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
+
+  .profile-stats {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
