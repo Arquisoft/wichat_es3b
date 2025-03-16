@@ -88,8 +88,8 @@ const Game = () => {
                 titleAccess="Siguiente pregunta"
                 fontSize="1.5em"
                 id="nextArrow"
-                onClick={handleNextQuestion}
-                disabled={!isAnswered}
+                onClick={isAnswered ? handleNextQuestion : null}
+                style={{ color: isAnswered ? "white" : "gray", cursor: isAnswered ? "pointer" : "not-allowed" }}
               ></ArrowForwardIcon>
             </div>
             <h1>{currentQuestion.pregunta}</h1>
@@ -98,12 +98,6 @@ const Game = () => {
             <div className="pointsAndRules">
               <div>
                 <span>Puntuación: </span> <span className="score">{score}</span>
-              </div>
-              <div>
-                <span>✅ Correctas: {correctAnswers}</span>
-              </div>
-              <div>
-                <span>❌ Incorrectas: {incorrectAnswers}</span>
               </div>
               <BaseButton text={"Reglas"} buttonType="buttonSecondary" />
             </div>
