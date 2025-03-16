@@ -11,14 +11,12 @@ function App() {
         <Routes>
             <Route path="/" element={<Home />} /> {/* Página principal */}
             <Route path="/auth" element={<AuthForm />} />
-
             {/* Ruta protegida para Play */}
             <Route path="/play" element={
                 <PrivateRoute>
                     <Game />
                 </PrivateRoute>
             } />
-
             <Route path="/home" element={<Home />} />
         </Routes>
     );

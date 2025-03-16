@@ -2,13 +2,13 @@ import React from "react";
 import Nav from "../../components/nav/Nav.js";
 import Footer from "../../components/Footer.js";
 import { Box, Typography, Button, Grid, Container } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./Home.css";
 
 // Simulación de autenticación (cambia esto según cómo manejes la autenticación)
 const isAuthenticated = () => {
-    return localStorage.getItem("user") !== null; // Puedes cambiarlo según tu lógica
+    return localStorage.getItem("username") !== null; // Puedes cambiarlo según tu lógica
 };
 
 const Home = () => {
