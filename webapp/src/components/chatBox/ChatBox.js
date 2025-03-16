@@ -22,16 +22,6 @@ const ChatBox = ({ question, language = "es" }) => {
       // URL del gateway
       const URL = "http://localhost:8000/";
 
-    /*
-      // Datos para enviar al servicio LLM
-     const requestData = {
-        userQuestion: input,
-        question: question,
-        idioma: language,
-        model: "empathy"
-      };
-      */
-
       const requestData = {
         userQuestion: input,
         question: question,
@@ -42,14 +32,17 @@ const ChatBox = ({ question, language = "es" }) => {
       // Llamar al servicio LLM
       const response = await axios.post(`${URL}askllm`, requestData);
 
-      // Mostrar la pista
-      // Hasta aquí llega
-      setHint(response.data.answer);
-      console.log("Respuesta en el chatBox: " + response.data.answer)
+      // Obtener la respuesta
+      const answer = response.data.answer;
 
+      // Actualizar el estado hint
+      setHint(answer);
+      console.log("Respuesta en el chatBox: " + answer);
+
+      // Añadir el mensaje usando directamente answer, no hint
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: hint, isSender: false },
+        { text: answer, isSender: false },
       ]);
     } catch (error) {
       console.error("Error al obtener pista:", error);
