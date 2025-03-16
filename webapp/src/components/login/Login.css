@@ -12,7 +12,7 @@ h2 {
   margin-bottom: 6%;
 }
 
-button {
+.buttonPanel button {
   width: 30%;
 }
 
@@ -106,7 +106,7 @@ button {
   font-weight: bold;
 }
 
-img {
+.logoAuth {
   position: relative;
   height: 10%;
   right: 39%;

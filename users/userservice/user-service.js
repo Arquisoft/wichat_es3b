@@ -7,7 +7,7 @@ const User = require('./user-model')
 const app = express();
 const port = 8001;
 
-// Middleware to parse JSON in request body
+// Middleware to parse JSON in request bodydocker ps --filter "name=mongodb-wichat_es3b"
 app.use(express.json());
 
 // Connect to MongoDB

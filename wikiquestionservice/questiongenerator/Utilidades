@@ -1,0 +1,161 @@
+Consulta que me devuelve el nombre de propiedades país:
+
+    SELECT ?propiedad ?propiedadLabel
+    WHERE {
+      VALUES ?propiedad {wd:P36 wd:P35 wd:P1344 wd:P37 wd:P47 wd:P2250 wd:P571 wd:P122 wd:P1451}
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],es". }
+    }
+
+    {
+      "paises": {
+        "entity": "wdt:P31 wd:Q6256",
+        "properties": [
+          "P36",
+          "P35",
+          "P1344",
+          "P37",
+          "P47"
+        ],
+
+        "preguntas": [
+          {
+            "es": "¿Cuál es la capital de %?",
+            "en": "What is the capital of %?"
+          },
+          {
+            "es": "¿Quién es el jefe de estado de %?",
+            "en": "Who is the head of state of %?"
+          },
+          {
+            "es": "¿En qué evento histórico participó %?",
+            "en": "In what historical event did % participate?"
+          },
+          {
+            "es": "¿Cuál es uno de los idiomas oficiales de %?",
+            "en": "What is one of the official languages of %?"
+          },
+          {
+            "es": "¿Con qué país comparte frontera %?",
+            "en": "Which country shares a border with %?"
+          }
+        ]
+      },
+      "peliculas": {
+      "entity": "wdt:P31 wd:Q11424",
+        "properties": [
+          "", "", "", "", "", "", "", "", "", ""
+        ],
+
+        "preguntas": [
+          {
+            "es": "¿En qué fecha se estrenó el film %?",
+            "en": "On what date was the film % released?"
+          },
+          {
+            "es": "¿Quién es el director de la película %?",
+            "en": "Who is the director of the movie %?"
+          },
+          {
+            "es": "¿Cuál fue el presupuesto (en USD) de la película %?",
+            "en": "What was the budget (in USD) of the movie %?"
+          },
+          {
+            "es": "¿Cuál es el género de la película %?",
+            "en": "What is the genre of the movie %?"
+          },
+          {
+            "es": "¿Qué premios ha ganado la película %?",
+            "en": "What awards has the movie % won?"
+          }
+        ]
+      },
+      "monumentos": {
+      "entity": "wdt:P31 wd:Q4989906",
+        "properties": [
+          "", "", "", "", "", "", "", "", "", ""
+        ],
+
+        "preguntas": [
+          {
+            "es": "¿En qué año se construyó el monumento %?",
+            "en": "In what year was the monument % built?"
+          },
+          {
+            "es": "¿En qué ciudad se encuentra el monumento %?",
+            "en": "In which city is the monument % located?"
+          },
+          {
+            "es": "¿Cuál es la historia detrás del monumento %?",
+            "en": "What is the history behind the monument %?"
+          },
+          {
+            "es": "¿Qué eventos importantes han ocurrido en el monumento %?",
+            "en": "What important events have occurred at the monument %?"
+          },
+          {
+            "es": "¿Quién fue el arquitecto del monumento %?",
+            "en": "Who was the architect of the monument %?"
+          }
+        ]
+      },
+      "deportes": {
+      "entity": "wdt:P31 wd:Q6256",
+        "properties": [
+          "", "", "", "", "", "", "", "", "", ""
+        ],
+
+        "preguntas": [
+          {
+            "es": "¿En qué posición juega el futbolista %?",
+            "en": "In what position does the football player % play?"
+          },
+          {
+            "es": "¿Cuál es el equipo actual del baloncestista %?",
+            "en": "What is the current team of the basketball player %?"
+          },
+          {
+            "es": "¿Qué número de camiseta usa el futbolista %?",
+            "en": "What shirt number does the football player % wear?"
+          },
+          {
+            "es": "¿Cuál es la altura del futbolista %?",
+            "en": "What is the height of the football player %?"
+          },
+          {
+            "es": "¿En qué torneo internacional ha jugado el futbolista %?",
+            "en": "In which international tournament has the football player % played?"
+          }
+        ]
+      },
+      "ciencias": {
+      "entity": "wdt:P31 wd:Q6256",
+        "properties": [
+          "", "", "", "", "", "", "", "", "", ""
+        ],
+
+        "preguntas": [
+          {
+            "es": "¿En qué año se descubrió el elemento %?",
+            "en": "In what year was the element % discovered?"
+          },
+          {
+            "es": "¿Quién descubrió el elemento %?",
+            "en": "Who discovered the element %?"
+          },
+          {
+            "es": "¿Cuál es la fórmula química de %?",
+            "en": "What is the chemical formula of %?"
+          },
+          {
+            "es": "¿Qué propiedades tiene el elemento %?",
+            "en": "What properties does the element % have?"
+          },
+          {
+            "es": "¿En qué industrias se usa el elemento %?",
+            "en": "In which industries is the element % used?"
+          }
+        ]
+      }
+    }
+
+
