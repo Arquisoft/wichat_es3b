@@ -184,7 +184,7 @@ const Game = () => {
         </div>
         <div></div>
         <div className="chatBoxContainer">
-          <ChatBox question={currentQuestion.pregunta} language="es" />
+          <ChatBox question={currentQuestion} language="es" />
         </div>
       </main>
       <Footer />
