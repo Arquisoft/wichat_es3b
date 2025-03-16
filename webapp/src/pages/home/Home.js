@@ -2,12 +2,26 @@ import React from "react";
 import Nav from "../../components/nav/Nav.js";
 import Footer from "../../components/Footer.js";
 import { Box, Typography, Button, Grid, Container } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./Home.css";
 
+// Simulación de autenticación (cambia esto según cómo manejes la autenticación)
+const isAuthenticated = () => {
+    return localStorage.getItem("user") !== null; // Puedes cambiarlo según tu lógica
+};
+
 const Home = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
+
+    const handleProtectedNavigation = (path) => {
+        if (isAuthenticated()) {
+            navigate(path);
+        } else {
+            navigate("/login");
+        }
+    };
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -19,7 +33,11 @@ const Home = () => {
                     <Typography variant="h6" sx={{ fontStyle: "italic", marginBottom: 3 }}>
                         {t("subtitle")}
                     </Typography>
-                    <Button variant="outlined" sx={{ borderColor: "#2196F3", color: "#2196F3", fontWeight: "bold", fontSize: "1.5rem", padding: "12px 30px" }} component={Link} to="/play">
+                    <Button
+                        variant="outlined"
+                        sx={{ borderColor: "#2196F3", color: "#2196F3", fontWeight: "bold", fontSize: "1.5rem", padding: "12px 30px" }}
+                        onClick={() => handleProtectedNavigation("/play")}
+                    >
                         {t("play")}
                     </Button>
                 </Box>

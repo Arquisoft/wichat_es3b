@@ -1,36 +1,48 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./Nav.css";
 import LanguageChangeMenu from "../languageChangeMenu/LanguageChangeMenu";
 
 const Nav = () => {
-  const { t } = useTranslation();
+    const navigate = useNavigate();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  return (
-    <nav className="navbar">
-      <Link className="nav-title" to="/home">
-        {t("title")}
-      </Link>
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        setIsAuthenticated(!!token);
+    }, []);
 
-      <div className="nav-center">
-        <div className="nav-links">
-          <Link to="/home">{t("home")}</Link>
-          <Link to="/play">{t("play")}</Link>
-          <Link to="/profile">{t("profile")}</Link>
-        </div>
-      </div>
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        setIsAuthenticated(false);
+        navigate("/auth");
+    };
 
-      <div className="nav-right">
-        <div className="auth-links">
-          <Link to="/auth" state={{ loginView: true }}>
-            {t("login")}
-          </Link>
-        </div>
-        <LanguageChangeMenu></LanguageChangeMenu>
-      </div>
-    </nav>
-  );
+    return (
+        <nav className="navbar">
+            <Link className="nav-title" to="/home">
+                WiChat
+            </Link>
+            <div className="nav-center">
+                <Link to="/home">Inicio</Link>
+                {isAuthenticated && <Link to="/play">Jugar</Link>}
+                {isAuthenticated && <Link to="/profile">Perfil</Link>}
+            </div>
+            <div className="nav-right">
+                {isAuthenticated ? (
+                    <button className="logout-button" onClick={handleLogout}>
+                        Cerrar Sesión
+                    </button>
+                ) : (
+                    <Link to="/auth" state={{ loginView: true }}>
+                        Iniciar Sesión
+                    </Link>
+                )}
+                <LanguageChangeMenu />
+            </div>
+        </nav>
+    );
 };
 
 export default Nav;

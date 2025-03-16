@@ -22,7 +22,13 @@
 .nav-center {
   display: flex;
   justify-content: center;
+  gap: 2em;
 }
+
+.nav-center a {
+  padding: 0.5em 1em;
+}
+
 
 .nav-right {
   display: flex;
