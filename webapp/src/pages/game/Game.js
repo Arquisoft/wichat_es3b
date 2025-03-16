@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react"; // Corregido useCallBack a useCallback
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import "./Game.css";
 import Nav from "../../components/nav/Nav";
 import Footer from "../../components/Footer";
@@ -6,6 +6,7 @@ import HintButton from "../../components/hintButton/HintButton";
 import BaseButton from "../../components/button/BaseButton";
 import { LinearProgress, Box } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+const TOTAL_TIME = 40; // Duración total de la pregunta en segundos
 
 const Game = () => {
   const [questionNumber, setQuestionNumber] = useState(0);
@@ -18,6 +19,10 @@ const Game = () => {
   const [isCorrect, setIsCorrect] = useState(null);
   const [score, setScore] = useState(0);
   const [isAnswered, setIsAnswered] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
+  const [progress, setProgress] = useState(100);
+
+  const timerRef = useRef(null); // Referencia para almacenar el ID del intervalo
 
   const URL = "http://localhost:8004/";
 
@@ -41,6 +46,20 @@ const Game = () => {
     fetchQuestions();
   }, [fetchQuestions]);
 
+  useEffect(() => {
+    if (timeLeft <= 0 || isAnswered) return; // Detener si el tiempo llega a 0 o si ya se respondió
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => Math.max(prev - 1, 0));
+    }, 1000);
+
+    return () => clearInterval(timerRef.current); // Limpiar el intervalo al desmontar
+  }, [timeLeft, isAnswered]); // Dependencias: timeLeft y isAnswered
+
+  useEffect(() => {
+    setProgress((timeLeft / TOTAL_TIME) * 100);
+  }, [timeLeft]);
+
   const handleNextQuestion = () => {
     setQuestionNumber((prevNumber) => {
       const newNumber = prevNumber + 1;
@@ -48,12 +67,15 @@ const Game = () => {
       setSelectedAnswer(null);
       setIsCorrect(null);
       setIsAnswered(false);
+      setProgress(100);
+      setTimeLeft(TOTAL_TIME);
       return newNumber;
     });
   };
 
   const handleAnswerClick = (respuesta) => {
     if (isAnswered) return;
+    clearInterval(timerRef.current);
     setSelectedAnswer(respuesta);
     setIsAnswered(true);
     if (respuesta === currentQuestion.respuestaCorrecta) {
@@ -64,6 +86,14 @@ const Game = () => {
       setIsCorrect(false);
       setIncorrectAnswers((prev) => prev + 1);
     }
+  };
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   if (isLoading) {
@@ -89,7 +119,10 @@ const Game = () => {
                 fontSize="1.5em"
                 id="nextArrow"
                 onClick={isAnswered ? handleNextQuestion : null}
-                style={{ color: isAnswered ? "white" : "gray", cursor: isAnswered ? "pointer" : "not-allowed" }}
+                style={{
+                  color: isAnswered ? "white" : "gray",
+                  cursor: isAnswered ? "pointer" : "not-allowed",
+                }}
               ></ArrowForwardIcon>
             </div>
             <h1>{currentQuestion.pregunta}</h1>
@@ -108,22 +141,23 @@ const Game = () => {
           {currentQuestion.img && (
             <img src={currentQuestion.img[0]} alt="imagen pregunta"></img>
           )}
-          {/* </div> */}
           <div className="answerPanel">
             {currentQuestion.respuestas &&
               currentQuestion.respuestas.map((respuesta, index) => (
-                <BaseButton key={index} text={respuesta}
-                            onClick={() => handleAnswerClick(respuesta)}
-                            buttonType={
-                              isAnswered
-                                  ? respuesta === currentQuestion.respuestaCorrecta
-                                      ? "buttonCorrect"
-                                      : selectedAnswer === respuesta
-                                          ? "buttonIncorrect"
-                                          : "buttonPrimary"
-                                  : "buttonPrimary"
-                            }
-                            disabled={isAnswered}
+                <BaseButton
+                  key={index}
+                  text={respuesta}
+                  onClick={() => handleAnswerClick(respuesta)}
+                  buttonType={
+                    isAnswered
+                      ? respuesta === currentQuestion.respuestaCorrecta
+                        ? "buttonCorrect"
+                        : selectedAnswer === respuesta
+                        ? "buttonIncorrect"
+                        : "buttonPrimary"
+                      : "buttonPrimary"
+                  }
+                  disabled={isAnswered}
                 ></BaseButton>
               ))}
           </div>
@@ -141,12 +175,13 @@ const Game = () => {
               <LinearProgress
                 id="progressBar"
                 variant="determinate"
-                value={70}
+                value={progress}
               ></LinearProgress>
             </Box>
-            <span>00:35</span>
+            <span>{formatTime(timeLeft)}</span>
           </Box>
         </div>
+        <div></div>
       </main>
       <Footer />
     </div>
