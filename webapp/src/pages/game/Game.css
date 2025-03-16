@@ -81,13 +81,21 @@
   width: 50%;
 }
 
-.midSection img {
+.midSection img{
+  object-fit: cover;
+  max-width: 40vw;
+  max-height: 40vh;
+  box-shadow: 4px 4px 4px rgba(0,0,0,0.1)
+}
+
+/* .midSection img {
   position: relative;
   border: 2px solid var(--color-primario);
   border-radius: 5px;
-  height: 20%;
+  height: 50%;
   width: 50%;
-}
+  object-fit: cover;
+} */
 
 .answerPanel {
   display: grid;

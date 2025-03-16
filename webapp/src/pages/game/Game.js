@@ -77,9 +77,11 @@ const Game = () => {
           </div>
         </div>
         <div className="midSection">
+          {/* <div className="questionImageContainer"> */}
           {currentQuestion.img && (
             <img src={currentQuestion.img[0]} alt="imagen pregunta"></img>
           )}
+          {/* </div> */}
           <div className="answerPanel">
             {currentQuestion.respuestas &&
               currentQuestion.respuestas.map((respuesta, index) => (
