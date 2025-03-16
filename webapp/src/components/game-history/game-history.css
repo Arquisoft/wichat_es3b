@@ -1,0 +1,224 @@
+/* Estilos para el historial de partidas */
+@import url("../../assets/global.css");
+
+/* Contenedor principal de la sección de historial */
+.history-section {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 20px; /* Espacio para el footer */
+}
+
+.history-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Título de la sección */
+.section-title {
+  color: var(--color-primario);
+  font-size: 24px;
+  margin-bottom: 20px;
+  position: relative;
+  display: inline-block;
+}
+
+/* Línea decorativa debajo del título */
+.section-title::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background-color: var(--color-primario);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.section-title:hover::after {
+  width: 100%;
+}
+
+/* Contenedor del carrusel completo */
+.carousel-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+}
+
+/* Contenedor de las tarjetas de partidas */
+.game-cards-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  height: 100%;
+  width: 100%;
+}
+
+/* Animación del carrusel */
+.game-cards-container.animating .game-card {
+  animation: card-slide 0.5s ease-in-out forwards;
+}
+
+@keyframes card-slide {
+  0% {
+    opacity: 0;
+    transform: translateX(50px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Tarjetas individuales de partidas */
+.game-card {
+  flex: 0 0 calc(33.33% - 14px); /* Cada tarjeta ocupa un tercio del contenedor menos el gap */
+  max-width: calc(33.33% - 14px);
+  background-image: url("../../assets/img/librosHistorial.jpg");
+  background-size: cover;
+  background-position: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px;
+  position: relative;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Efecto de gradiente para mejorar la legibilidad del texto */
+.game-card::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  border-radius: 8px;
+  transition: opacity 0.3s ease;
+}
+
+.game-card:hover::before {
+  opacity: 0.9;
+}
+
+/* Elementos de texto dentro de las tarjetas */
+.game-date,
+.game-number,
+.game-correct,
+.game-time {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 10px;
+  transition: transform 0.3s ease;
+}
+
+.game-card:hover .game-date,
+.game-card:hover .game-number,
+.game-card:hover .game-correct,
+.game-card:hover .game-time {
+  transform: translateY(-2px);
+}
+
+.game-number {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Botones de navegación */
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: var(--color-primario);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.nav-button.left {
+  left: 10px;
+}
+
+.nav-button.right {
+  right: 10px;
+}
+
+.nav-button:hover:not(:disabled) {
+  background-color: var(--color-hover-boton);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.nav-button:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Indicadores de paginación */
+.pagination-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  gap: 8px;
+}
+
+.pagination-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ddd;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination-dot.active {
+  background-color: var(--color-primario);
+  transform: scale(1.2);
+}
+
+.pagination-dot:hover {
+  background-color: var(--color-secundario);
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .carousel-container {
+    height: 250px;
+  }
+
+  .game-cards-container {
+    gap: 10px;
+  }
+
+  .game-card {
+    flex: 0 0 calc(100% - 20px);
+    max-width: calc(100% - 20px);
+  }
+}
