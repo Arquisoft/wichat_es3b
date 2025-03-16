@@ -58,7 +58,8 @@ function validateRequiredFields(req) {
 
     // Validación básica del objeto question
     const question = req.body.question;
-    if (!question.respuestaCorrecta || !question.preguntas || !question.descripcion) {
+    console.log(question);
+    if (!question.respuestaCorrecta || !question.pregunta || !question.descripcion) {
         throw new Error("Estructura de question inválida");
     }
 }

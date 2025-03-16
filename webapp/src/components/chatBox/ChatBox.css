@@ -1,0 +1,54 @@
+@import url("../../assets/global.css");
+
+.chat-box {
+  width: 90%;
+  max-width: 350px;
+  border: 2px solid var(--color-primario);
+  border-radius: 0.625rem;
+  padding: 1rem;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-top: auto;
+}
+
+.input-container input {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 1rem;
+  outline: none;
+  font-size: 1rem;
+}
+
+#sendMessageToAIButton {
+  background-color: var(--color-primario);
+  padding: 0.5em;
+  border-radius: 50%;
+  color: white;
+}
+
+#sendMessageToAIButton:hover {
+  cursor: pointer;
+  background-color: var(--color-hover-boton);
+  transition: 0.3s ease-in-out;
+}
+
+.send-button:hover {
+  background-color: var(--color-hover-boton);
+}
