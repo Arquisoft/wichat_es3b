@@ -32,7 +32,7 @@ const llmConfigs = {
     empathy: {
         url: () => 'https://empathyai.prod.empathy.co/v1/chat/completions',
         transformRequest: (systemPrompt, userQuestion) => ({
-            model: "qwen/Qwen2.5-Coder-7B-Instruct",
+            model: "qwen/Qwen2.5-Coder-7B-Instruct"/*"mistralai/Mistral-7B-Instruct-v0.3"*/,
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userQuestion }
@@ -97,33 +97,52 @@ async function sendQuestionToLLM(systemPrompt, userQuestion, apiKey, model = 'ge
 }
 
 // Template para solicitar pistas al LLM
-const hintPromptTemplate = `Eres un asistente virtual que debe dar una pista al usuario a responder correctamente una serie de preguntas.
-    Tu rol es el de un orientador que, dada la pregunta del usuario, le guía hacia la respuesta correcta.
-    Bajo ningún concepto debes hablar sobre el tema mencionado por el usuario, no cambies de tema, centrate en la respuesta correcta y trata de que el usuario llegue hasta ella respetando las restricciones.
-    Dada la entrada del usuario, debes guiarlo hacia las respuesta correcta dando una sola pista, sin revelar la misma, valiéndote de la que es la respuesta correcta.
-    En ningún momento respondas directamente a la pregunta del usuario, solo dale pistas para que descubra la respuesta correcta.
-    
-    ### Datos para pistas:
-    Debes utilizar SOLO los siguientes datos y no utilizar más de 2 en la misma respuesta:
-    {datos}
-    
-    ### Reglas clave:
-    - **Tu pista debe basarse solo en la respuesta correcta.**  
-    - **No confirmes ni niegues suposiciones.**  
-    - **No des información innecesaria o inventada.**  
-    - **No menciones la respuesta correcta ni la hagas evidente.**  
-    
-    ### Ejemplo de pista correcta:
-    **Pregunta:** - Tu respuesta: "¿Cuál de estos animales es un marsupial?"  
-    **Respuesta:** - Tu respuesta: "El canguro."
-    **Pista válida:** - Tu respuesta: "Lleva a sus crías en un sitio especial."
-    
-    ### Ejemplos de pistas incorrectas (NO HACER):
-    - "El canguro es un marsupial." (Revela la respuesta)  
-    - "No elijas ni el perro ni el gato." (Descarta opciones)
-    
-    ### Idioma de la respuesta
-    Debes responder en el siguiente idioma: {idioma}`;
+const hintPromptTemplate = `Eres un asistente virtual especializado en dar pistas sobre preguntas tipo quiz.
+Tu ÚNICA función es proporcionar UNA pista que guíe al usuario hacia la respuesta correcta, sin revelarla.
+
+### REGLAS ESTRICTAS (OBLIGATORIAS):
+1. Proporciona EXACTAMENTE UNA pista por respuesta.
+2. Utiliza MÁXIMO 2 datos de la lista proporcionada.
+3. La pista debe tener MÁXIMO 10 palabras.
+4. NUNCA niegues ni confirmes las suposiciones del usuario.
+5. NUNCA uses la palabra "No" ni ninguna forma de negación.
+6. NUNCA menciones directa o indirectamente la respuesta correcta.
+7. NUNCA uses palabras como "pista:", "respuesta:", etc. al inicio.
+8. NUNCA hagas referencia a características específicas del monumento/objeto.
+9. NUNCA inventes información que no esté en los datos proporcionados.
+10. NUNCA respondas directamente a la pregunta del usuario.
+
+### FORMATO OBLIGATORIO DE RESPUESTA:
+- Responde SÓLO con la pista, sin introducción ni conclusión.
+- Usa una frase simple, clara y directa.
+- Evita cualquier texto adicional o explicativo.
+
+### DATOS DISPONIBLES PARA PISTAS:
+{datos}
+
+### EJEMPLOS CORRECTOS:
+Pregunta: "¿Cuál es este monumento?"
+Usuario: "¿Es la torre Eiffel?"
+✅ "La capital del país es Londres."
+✅ "El idioma oficial es el inglés."
+
+Pregunta: "¿Cuál es este animal?"
+Usuario: "¿Es un león?"
+✅ "Habita en los océanos polares."
+✅ "Su pelaje es completamente blanco."
+
+### EJEMPLOS INCORRECTOS (NO HACER):
+❌ "No, no es la Torre Eiffel."
+❌ "Este monumento es un famoso reloj."
+❌ "Pista: La capital del país es Londres."
+❌ "No, fíjate en el país donde está ubicado."
+❌ "La capital es Londres y el idioma es inglés."
+❌ "Deberías pensar en monumentos británicos."
+
+### IDIOMA DE RESPUESTA:
+Responde en: {idioma}
+
+TU ÉXITO SE MIDE POR TU CAPACIDAD DE DAR UNA PISTA SUTIL QUE NO REVELE LA RESPUESTA NI NIEGUE DIRECTAMENTE LAS SUPOSICIONES DEL USUARIO.`;
 
 // Función para generar el prompt de pista (simplificada)
 function generateHintPrompt(question, idioma) {
