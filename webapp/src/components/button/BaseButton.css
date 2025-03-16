@@ -30,3 +30,13 @@ button.buttonSecondary:hover {
   background-color: var(--color-hover-boton); /* Azul más oscuro en hover */
   color: var(--color-texto-secundario);
 }
+
+.buttonCorrect {
+  background-color: green;
+  color: white;
+}
+
+.buttonIncorrect {
+  background-color: red;
+  color: white;
+}

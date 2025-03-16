@@ -12,6 +12,12 @@ const Game = () => {
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState("");
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [incorrectAnswers, setIncorrectAnswers] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [isCorrect, setIsCorrect] = useState(null);
+  const [score, setScore] = useState(0);
+  const [isAnswered, setIsAnswered] = useState(false);
 
   const URL = "http://localhost:8004/";
 
@@ -36,8 +42,28 @@ const Game = () => {
   }, [fetchQuestions]);
 
   const handleNextQuestion = () => {
-    setQuestionNumber(questionNumber + 1);
-    setCurrentQuestion(questions[questionNumber]);
+    setQuestionNumber((prevNumber) => {
+      const newNumber = prevNumber + 1;
+      setCurrentQuestion(questions[newNumber]);
+      setSelectedAnswer(null);
+      setIsCorrect(null);
+      setIsAnswered(false);
+      return newNumber;
+    });
+  };
+
+  const handleAnswerClick = (respuesta) => {
+    if (isAnswered) return;
+    setSelectedAnswer(respuesta);
+    setIsAnswered(true);
+    if (respuesta === currentQuestion.respuestaCorrecta) {
+      setIsCorrect(true);
+      setScore((prevScore) => prevScore + 10);
+      setCorrectAnswers((prev) => prev + 1);
+    } else {
+      setIsCorrect(false);
+      setIncorrectAnswers((prev) => prev + 1);
+    }
   };
 
   if (isLoading) {
@@ -63,6 +89,7 @@ const Game = () => {
                 fontSize="1.5em"
                 id="nextArrow"
                 onClick={handleNextQuestion}
+                disabled={!isAnswered}
               ></ArrowForwardIcon>
             </div>
             <h1>{currentQuestion.pregunta}</h1>
@@ -70,7 +97,13 @@ const Game = () => {
           <div className="rightUpperSection">
             <div className="pointsAndRules">
               <div>
-                <span>Puntuación: </span> <span className="score">100</span>
+                <span>Puntuación: </span> <span className="score">{score}</span>
+              </div>
+              <div>
+                <span>✅ Correctas: {correctAnswers}</span>
+              </div>
+              <div>
+                <span>❌ Incorrectas: {incorrectAnswers}</span>
               </div>
               <BaseButton text={"Reglas"} buttonType="buttonSecondary" />
             </div>
@@ -85,7 +118,19 @@ const Game = () => {
           <div className="answerPanel">
             {currentQuestion.respuestas &&
               currentQuestion.respuestas.map((respuesta, index) => (
-                <BaseButton key={index} text={respuesta}></BaseButton>
+                <BaseButton key={index} text={respuesta}
+                            onClick={() => handleAnswerClick(respuesta)}
+                            buttonType={
+                              isAnswered
+                                  ? respuesta === currentQuestion.respuestaCorrecta
+                                      ? "buttonCorrect"
+                                      : selectedAnswer === respuesta
+                                          ? "buttonIncorrect"
+                                          : "buttonPrimary"
+                                  : "buttonPrimary"
+                            }
+                            disabled={isAnswered}
+                ></BaseButton>
               ))}
           </div>
         </div>
