@@ -31,9 +31,9 @@ const Nav = () => {
             </div>
             <div className="nav-right">
                 {isAuthenticated ? (
-                    <button className="logout-button" onClick={handleLogout}>
+                    <Link to="#" state= {{loginView: true}} onClick={handleLogout}>
                         Cerrar Sesión
-                    </button>
+                    </Link>
                 ) : (
                     <Link to="/auth" state={{ loginView: true }}>
                         Iniciar Sesión

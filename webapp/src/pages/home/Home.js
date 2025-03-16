@@ -19,7 +19,7 @@ const Home = () => {
         if (isAuthenticated()) {
             navigate(path);
         } else {
-            navigate("/login");
+            navigate("/auth");
         }
     };
 
