@@ -38,6 +38,21 @@ services:
     environment:
       MONGODB_URI: ${MONGODB_URI}
 
+
+  statsservice:
+    container_name: statsservice-wichat_es3b
+    image: ghcr.io/arquisoft/wichat_es3b/statsservice:latest
+    profiles: ["dev", "prod"]
+    build: ./users/statsservice  
+    depends_on:
+      - mongodb 
+    ports:
+      - "8005:8005" 
+    networks:
+      - mynetwork
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+
   llmservice:
     container_name: llmservice-wichat_es3b
     image: ghcr.io/arquisoft/wichat_es3b/llmservice:latest
