@@ -5,7 +5,7 @@ const Stats = require('./stat-model');
 //const User = require('../userservice/user-model');  
 
 const app = express();
-const port = 8004;  
+const port = 8005;  
 
 
 app.use(express.json());
@@ -15,7 +15,7 @@ const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/statsdb';
 mongoose.connect(mongoUri);
 
 
-app.post('/saveStats', async (req, res) => {
+app.post('/savestats', async (req, res) => {
   try {
 
     const { username, rightAnswers, wrongAnswers, time, score } = req.body;
@@ -61,7 +61,7 @@ app.post('/saveStats', async (req, res) => {
   }
 });
 
-app.get('/get-stats/:username', async (req, res) => {
+app.get('/getstats/:username', async (req, res) => {
     try {
       const { username } = req.params;
   
@@ -91,7 +91,7 @@ app.get('/get-stats/:username', async (req, res) => {
     }
   });
 
-  app.get('/getRanking', async (req, res) => {
+  app.get('/getranking', async (req, res) => {
     try {
       const ranking = await Stats.find()
         .sort({ maxScore: -1 })  // -1 indica orden descendente
