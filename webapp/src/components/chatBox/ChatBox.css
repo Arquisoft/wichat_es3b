@@ -1,9 +1,8 @@
 @import url("../../assets/global.css");
 
 .chat-box {
-  width: 90%;
-  max-width: 350px;
-  height: 500px;
+  width: 100%;
+  height: 100%;
   border-radius: 0.625rem;
   padding: 1rem;
   background-color: #ffffff;
@@ -17,9 +16,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  max-height: 40vh;
-  overflow-y: auto; 
-  padding: 0.5rem; 
+  overflow-y: auto;
+  padding: 0.5rem;
 }
 
 .input-container {
@@ -38,19 +36,59 @@
   font-size: 1rem;
 }
 
-#sendMessageToAIButton {
+.send-button {
   background-color: var(--color-primario);
-  padding: 0.5em;
+  border: none;
   border-radius: 50%;
-  color: white;
-}
-
-#sendMessageToAIButton:hover {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
-  background-color: var(--color-hover-boton);
-  transition: 0.3s ease-in-out;
+  transition: background-color 0.3s ease;
 }
 
 .send-button:hover {
   background-color: var(--color-hover-boton);
+}
+
+#sendMessageToAIButton {
+  color: white;
+  font-size: 1.5rem;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .chat-box {
+    padding: 0.75rem;
+  }
+
+  .input-container input {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .send-button {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  #sendMessageToAIButton {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-box {
+    padding: 0.5rem;
+  }
+
+  .messages {
+    padding: 0.3rem;
+  }
+
+  .input-container {
+    gap: 0.4rem;
+  }
 }

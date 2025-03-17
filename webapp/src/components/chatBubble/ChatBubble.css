@@ -12,7 +12,7 @@
   .chat-container.received {
     justify-content: flex-start;
   }
-  
+
   .chat-bubble {
     max-width: 70%;
     padding: 12px;
