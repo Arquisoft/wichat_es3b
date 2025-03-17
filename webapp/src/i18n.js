@@ -18,7 +18,16 @@ i18n.use(initReactI18next).init({
                 "profile": "Perfil",
                 "login": "Iniciar sesión",
                 "signup": "Crear cuenta",
-                "footer_text": "© 2025 WIChat. Todos los derechos reservados."
+                "footer_text": "© 2025 WIChat. Todos los derechos reservados.",
+                "panel_text": "“ Cada pregunta es un reto, cada acierto un paso más hacia el triunfo.“",
+                "createAccount": "Crear cuenta",
+                "introduceData": "Introduce tus datos y únete a WiChat ya mismo.",
+                "email": "Correo electrónico*",
+                "username": "Nombre de usuario*",
+                "password": "Contraseña*",
+                "confirmPassword": "Confirmar contraseña*",
+                "or": "o",
+                "loginSuccessful": "Inicio de sesión correcto"
             }
         },
         en: {
@@ -36,7 +45,16 @@ i18n.use(initReactI18next).init({
                 "profile": "Profile",
                 "login": "Login",
                 "signup": "Sign Up",
-                "footer_text": "© 2025 WIChat. All rights reserved."
+                "footer_text": "© 2025 WIChat. All rights reserved.",
+                "panel_text": "“ Each question is a challenge, each correct answer a step closer to victory.“",
+                "createAccount": "Create account",
+                "introduceData": "Enter your data and join WiChat right now.",
+                "email": "Email*",
+                "username": "Username*",
+                "password": "Password*",
+                "confirmPassword": "Confirm password*",
+                "or": "or",
+                "loginSuccessful": "Login successful"
             }
         }
     },
