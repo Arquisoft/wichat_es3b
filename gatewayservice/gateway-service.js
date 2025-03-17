@@ -14,10 +14,6 @@ const questionServiceUrl = process.env.QUESTION_SERVICE_URL || 'http://localhost
 const llmServiceUrl = process.env.LLM_SERVICE_URL || 'http://localhost:8003';
 const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
-<<<<<<< HEAD
-=======
-const questionServiceUrl = process.env.QUESTION_SERVICE_URL || 'http://localhost:8004'; //added a new url for the new service
->>>>>>> 78952a5311ebb37e3e9132a652de8903d68369b7
 
 app.use(cors());
 app.use(express.json());
