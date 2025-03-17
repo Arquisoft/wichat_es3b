@@ -14,6 +14,10 @@ const questionServiceUrl = process.env.QUESTION_SERVICE_URL || 'http://localhost
 const llmServiceUrl = process.env.LLM_SERVICE_URL || 'http://localhost:8003';
 const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
+<<<<<<< HEAD
+=======
+const questionServiceUrl = process.env.QUESTION_SERVICE_URL || 'http://localhost:8004'; //added a new url for the new service
+>>>>>>> 78952a5311ebb37e3e9132a652de8903d68369b7
 
 app.use(cors());
 app.use(express.json());
@@ -57,11 +61,11 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
-// Add the /question endpoint for filling the data base
-app.get('/loadQuestion', async (req, res) => {
+// Add the /loadQuestion endpoint for filling the data base
+app.post('/loadQuestion', async (req, res) => {
   try {
     // Forward the request to the Question Service to get random cities and image URL
-    const questionResponse = await axios.get(questionServiceUrl+'/load', req.body);
+    const questionResponse = await axios.post(questionServiceUrl+'/load', req.body);
 
     // Respond with the data from the Question Service
     res.json(questionResponse.data);

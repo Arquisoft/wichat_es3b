@@ -1,16 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./GameStyles.css";
 import Chat from './LLMChat/LLMChat';
+import axios from "axios";
 
 
-const axios = require('axios');
-
-
+const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
 function Game() {
-    
-    const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
-
     const [round, setRound] = useState(1);
     const totalRounds = 10;
     const [roundData, setRoundData] = useState(null);
@@ -19,6 +15,7 @@ function Game() {
     const loadRound = async () => {
         try {
             const response = await axios.get(`${apiEndpoint}/getRound`);
+            console.log("Get Round");
             console.log(response.data);
             return response.data;
         }catch (error) {
@@ -38,7 +35,9 @@ function Game() {
         }
     }
 
-    gameSetup();
+    useEffect(() => {
+        gameSetup();
+    }, []);
 
     //Handles round change, score and other game logic when selecting an option.
     /*
