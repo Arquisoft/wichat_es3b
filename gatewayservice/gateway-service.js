@@ -57,7 +57,7 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
-// Add the /question endpoint for filling the data base
+// Add the /loadQuestion endpoint for filling the data base
 app.post('/loadQuestion', async (req, res) => {
   try {
     // Forward the request to the Question Service to get random cities and image URL
