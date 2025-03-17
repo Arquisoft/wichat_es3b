@@ -107,9 +107,6 @@ Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%8
 - Unified Language: Using JavaScript across the stack makes development smoother and faster.
 - Rich Ecosystem: With npm, we have access to a vast library of packages that speed up development.
 
-- By using Docker Compose, we can define all the services in a single file, making it simpler to orchestrate and scale
-the application as needed.
-
 *Consequences*
 
 - Learning Curve: Developers will need to get comfortable with asynchronous programming and patterns like Promises or async/await.
