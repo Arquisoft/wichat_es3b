@@ -55,7 +55,6 @@ const AddUser = ({ handleToggleView }) => {
         text={t("panel_text")}
       />
       <div className="form">
-        <img className="logoAuth" src={logo} alt="Logo de WiChat" />
         <h1>{t("createAccount")}</h1>
         <h2>{t("introduceData")}</h2>
 
