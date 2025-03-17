@@ -10,6 +10,7 @@ function Game() {
     const [round, setRound] = useState(1);
     const totalRounds = 10;
     const [roundData, setRoundData] = useState(null);
+    const [score, setScore] = useState(0);
 
     //Function to load the data for each round.
     const loadRound = async () => {
@@ -39,14 +40,35 @@ function Game() {
         gameSetup();
     }, []);
 
-    //Handles round change, score and other game logic when selecting an option.
-    /*
-    const handleOptionSelect = (index) => {
-        CorrectOption(index)? setScore(score+1): setScore(score);
+    
+    const handleOptionSelect = async (index) => {
+        CorrectOption(index)? setScore(score+50): setScore(score);
+
+        if(round === totalRounds) {
+            alert('Game Over');
+            setRoundData(null);
+            setRound(1);
+            setScore(0);
+            return;
+        }
+
         setRound(round+1);
-        setRoundData(loadRound());
+        setRoundData(null);
+
+        try{
+        const data =  await loadRound();
+        setRoundData(data);
+        } catch (error) {
+            console.error('Error loading new round', error);
+        }
     }
-    */
+
+    const CorrectOption = (index) => {
+        let selectedName = roundData.cities[index].name;
+        let correctName = roundData.cityWithImage.name;
+        return selectedName === correctName;
+    }
+    
     return (
         <div className="app-container">
             {/* Top Bar */}
@@ -54,7 +76,7 @@ function Game() {
                 <button className="btn logo">LOGO</button>
                 <div className="top-right">
                     <button className="btn">Coins 🪙</button>
-                    <button className="btn">Score</button>
+                    <button className="btn">Score: {score}</button>
                 </div>
             </div>
 
@@ -71,20 +93,21 @@ function Game() {
                 </div>
 
                 {/* Game Area */}
-                <div className="game-area">
-                    <h2 className="round-info">
-                        Round {round}/{totalRounds}
-                    </h2>
-                    <div className="image-container">
-                        <img src={"paris.jpg"} alt="Paris" className="game-image" />
+                {roundData && (
+                    <div className="game-area">
+                        <h2 className="round-info">
+                            Round {round}/{totalRounds}
+                        </h2>
+                        <div className="image-container">
+                            <img src={roundData.cityWithImage.imageUrl} alt={roundData.cityWithImage.imageAltText} className="game-image" />
+                        </div>
+                        <div className="options-grid">
+                            {roundData.cities.map((city, index) => (
+                                <button key={index} className="btn option" onClick={() => handleOptionSelect(index)}>{city.name}</button>
+                            ))}
+                        </div>
                     </div>
-                    <div className="options-grid">
-                        <button className="btn option">Option A</button>
-                        <button className="btn option">Option B</button>
-                        <button className="btn option">Option C</button>
-                        <button className="btn option">Option D</button>
-                    </div>
-                </div>
+                )}
 
                 {/* Right Side (Chat) */}
                 <div className="chat-container">
