@@ -96,6 +96,25 @@ the application as needed.
 
 - To make sure we’re deploying and troubleshooting containers effectively, we'll need a solid understanding of Docker-specific tools (like Docker Compose) and networking.
 
+== 9.7 Selecting JavaScript (Node.js) for the Backend
+We chose JavaScript (Node.js) for the backend because using the same language on both
+the frontend and backend simplifies development and improves team collaboration. +
+Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
+
+
+*Justification*
+
+- Unified Language: Using JavaScript across the stack makes development smoother and faster.
+- Rich Ecosystem: With npm, we have access to a vast library of packages that speed up development.
+
+- By using Docker Compose, we can define all the services in a single file, making it simpler to orchestrate and scale
+the application as needed.
+
+*Consequences*
+
+- Learning Curve: Developers will need to get comfortable with asynchronous programming and patterns like Promises or async/await.
+- Maintenance: While efficient, Node.js requires ongoing monitoring to maintain performance, especially as the app scales.
+
 ifdef::arc42help[]
 [role="arc42help"]
 ****
