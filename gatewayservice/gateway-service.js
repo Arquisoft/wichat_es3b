@@ -10,11 +10,10 @@ const YAML = require('yaml')
 const app = express();
 const port = 8000;
 
+const questionServiceUrl = process.env.QUESTION_SERVICE_URL || 'http://localhost:8004';
 const llmServiceUrl = process.env.LLM_SERVICE_URL || 'http://localhost:8003';
 const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
-const questionServiceUrl = process.env.QUESTION_SERVICE_URL || 'http://localhost:8004'; //added a new url for the new service
-
 
 app.use(cors());
 app.use(express.json());

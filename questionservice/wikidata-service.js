@@ -1,6 +1,5 @@
 const axios = require("axios");
-const City = require("../model/wikidata-model");
-
+const City = require("./wikidata-model");
 
 //Import mongo
 const mongoose = require('mongoose'); 
@@ -15,11 +14,8 @@ app.use(express.json());
 //define the port
 const port = 8004; 
 
-
 //Define the connection to DB
 const mongoDB = process.env.mongoDB || 'mongodb://localhost:27017/mongo-db-wichat_en3b'; 
-
-
 
 // SPARQL endpoint for WikiData
 const SPARQL_ENDPOINT = "https://query.wikidata.org/sparql";
@@ -39,8 +35,6 @@ LIMIT 50
 mongoose.connect(mongoDB)
 .then(() => console.log('Connected'))
 .catch(err => console.log('Error on the connection to the DB. ', err)); 
-
-
 
 // Function to fetch the alternative description of an image from Wikimedia Commons
 async function getImageDescription(imageUrl) {
@@ -104,16 +98,15 @@ async function fetchAndStoreCities() {
     }
 }
 
-
-app.get('/load' , async (req, res) => { //Calling the function to get the information from WikiData and store it on the DB
+app.post('/load' , async (req, res) => { //Calling the function to get the information from WikiData and store it on the DB
     try {
-        await fetchAndStoreCities();  
+        await fetchAndStoreCities();
+        res.status(200).json({ message: 'Cities successfully stored in MongoDB' });
     } catch(error) {
         console.error('Error fetching data from question service:', error);
         res.status(error.response?.status || 500).json({ error: 'Error fetching question data' });
     }
-})
-
+});
 
 async function getRandomCitiesWithImage() {
     try {
@@ -124,16 +117,13 @@ async function getRandomCitiesWithImage() {
         const randomCityIndex = Math.floor(Math.random() * cities.length); // Pick a random index
         const randomCity = cities[randomCityIndex];
 
-    
         return {
             cities: cities.map(city => ({
                 
                 name: city.name,
             })),
             cityWithImage: randomCity
-        };
-
-        
+        };        
     } catch (error) {
         console.error("Error fetching random cities:", error);
         throw error;

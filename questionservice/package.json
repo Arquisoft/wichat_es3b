@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "wikidata-service.js",
   "scripts": {
-    "start":"node service/wikidata-service.js",
+    "start":"node wikidata-service.js",
     "test": "jest"
   },
   "keywords": [],
