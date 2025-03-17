@@ -4,10 +4,13 @@ import Chat from './LLMChat/LLMChat';
 
 
 const axios = require('axios');
-const apiEndpoint = "http://localhost:8000";
+
 
 
 function Game() {
+    
+    const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
+
     const [round, setRound] = useState(1);
     const totalRounds = 10;
     const [roundData, setRoundData] = useState(null);
@@ -15,7 +18,7 @@ function Game() {
     //Function to load the data for each round.
     const loadRound = async () => {
         try {
-            const response = await axios.get('${apiEndpoint}/getRound');
+            const response = await axios.get(`${apiEndpoint}/getRound`);
             console.log(response.data);
             return response.data;
         }catch (error) {
@@ -26,9 +29,10 @@ function Game() {
     const gameSetup = async () => {
         try{
         //Loads the questions from wikidata into the database
-        await axios.get('${apiEndpoint}/loadQuestion');
+        await axios.post(`${apiEndpoint}/loadQuestion`);
         //First round
-        setRoundData(loadRound());
+        const data =  await loadRound();
+        setRoundData(data);
         }catch (error) {
             console.error('Error fetching data from question service:', error);
         }
