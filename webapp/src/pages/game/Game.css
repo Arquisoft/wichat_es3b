@@ -15,6 +15,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  border: 2px solid var(--color-primario);
 }
 
 /* Estilos para el componente chat-box */

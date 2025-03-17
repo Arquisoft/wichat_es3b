@@ -3,7 +3,7 @@
 .chat-box {
   width: 90%;
   max-width: 350px;
-  border: 2px solid var(--color-primario);
+  height: 500px;
   border-radius: 0.625rem;
   padding: 1rem;
   background-color: #ffffff;
@@ -13,11 +13,13 @@
 }
 
 .messages {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   max-height: 40vh;
-  overflow-y: auto;
+  overflow-y: auto; 
+  padding: 0.5rem; 
 }
 
 .input-container {
