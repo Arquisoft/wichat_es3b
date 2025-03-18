@@ -18,7 +18,7 @@ const Nav = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     setIsAuthenticated(false);
-    navigate("/auth");
+    navigate("/home");
   };
 
   return (
@@ -29,13 +29,19 @@ const Nav = () => {
       <div className="nav-center">
         <Link to="/home">{t("home")}</Link>
         {isAuthenticated && <Link to="/play">{t("play")}</Link>}
-        <Link to="/profile">Perfil</Link>
+          {isAuthenticated && <Link to="/profile">{t("profile")}</Link>}
       </div>
       <div className="nav-right">
         {isAuthenticated ? (
-          <Link to="#" state={{ loginView: true }} onClick={handleLogout}>
-              {t("logout")}
-          </Link>
+            <Link
+                to="/home"
+                onClick={(e) => {
+                    e.preventDefault(); // Evita la navegación inmediata
+                    handleLogout();
+                }}
+            >
+                {t("logout")}
+            </Link>
         ) : (
           <Link to="/auth" state={{ loginView: true }}>
               {t("login")}
