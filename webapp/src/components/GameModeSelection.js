@@ -14,7 +14,7 @@ import {
   Box,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
-import Game from "./Game"
+import { NavLink } from 'react-router-dom';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -82,39 +82,10 @@ const TopicOption = styled(FormControlLabel, {
 }))
 
 function GameModeSelection() {
-  const [selectedTopic, setSelectedTopic] = useState(null)
-  const [isWild, setIsWild] = useState(false)
   const [selectedMode, setSelectedMode] = useState(null)
-  const [showGame, setShowGame] = useState(false)
-
-  const handleTopicChange = (topic) => {
-    if (!isWild) {
-      setSelectedTopic(topic === selectedTopic ? null : topic)
-    }
-  }
-
-  const handleWildSelection = () => {
-    setIsWild(true)
-    setSelectedTopic("all")
-  }
-
-  const handleCustomSelection = () => {
-    setIsWild(false)
-    setSelectedTopic(null)
-  }
 
   const handleModeChange = (mode) => {
     setSelectedMode(mode === selectedMode ? null : mode)
-  }
-
-  const handleStartGame = () => {
-    setShowGame(true)
-  }
-
-  const isStartDisabled = !selectedTopic || !selectedMode
-
-  if (showGame) {
-    return <Game />
   }
 
   return (
@@ -122,65 +93,6 @@ function GameModeSelection() {
       <Typography variant="h3" component="h1" align="center" gutterBottom sx={{ fontWeight: "bold", color: "#3f51b5" }}>
         TRIVIA GAME
       </Typography>
-
-      <SectionPaper elevation={3}>
-        <SectionTitle variant="h5">SELECT THE TOPIC</SectionTitle>
-        <FormControl component="fieldset" fullWidth>
-          <RadioGroup value={isWild ? "wild" : "custom"}>
-            <TopicOption
-              value="custom"
-              control={<Radio color="primary" />}
-              label="CUSTOM"
-              onChange={handleCustomSelection}
-              isSelected={!isWild}
-            />
-
-            <Box sx={{ ml: 4, display: "flex", flexDirection: "column", gap: 1, mb: 2 }}>
-              <FormControlLabel
-                disabled={isWild}
-                control={
-                  <Checkbox
-                    checked={selectedTopic === "movies"}
-                    onChange={() => handleTopicChange("movies")}
-                    color="primary"
-                  />
-                }
-                label="MOVIES"
-              />
-              <FormControlLabel
-                disabled={isWild}
-                control={
-                  <Checkbox
-                    checked={selectedTopic === "flags"}
-                    onChange={() => handleTopicChange("flags")}
-                    color="primary"
-                  />
-                }
-                label="FLAGS"
-              />
-              <FormControlLabel
-                disabled={isWild}
-                control={
-                  <Checkbox
-                    checked={selectedTopic === "music"}
-                    onChange={() => handleTopicChange("music")}
-                    color="primary"
-                  />
-                }
-                label="MUSIC"
-              />
-            </Box>
-
-            <TopicOption
-              value="wild"
-              control={<Radio color="primary" />}
-              label="WILD - EVERYTHING ALL AT ONCE!"
-              onChange={handleWildSelection}
-              isSelected={isWild}
-            />
-          </RadioGroup>
-        </FormControl>
-      </SectionPaper>
 
       <SectionPaper elevation={3}>
         <SectionTitle variant="h5">SELECT THE MODE</SectionTitle>
@@ -212,16 +124,17 @@ function GameModeSelection() {
         </FormControl>
       </SectionPaper>
 
-      <StyledButton
-        variant="contained"
-        color="primary"
-        size="large"
-        onClick={handleStartGame}
-        disabled={isStartDisabled}
-        fullWidth
-      >
-        NEXT
-      </StyledButton>
+      <NavLink to="/gametopic">
+        <StyledButton
+          variant="contained"
+          color="primary"
+          size="large"
+          disabled={!selectedMode}
+          fullWidth
+        >
+          NEXT
+        </StyledButton>
+      </NavLink>
     </StyledContainer>
   )
 }
