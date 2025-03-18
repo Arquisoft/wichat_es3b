@@ -95,7 +95,7 @@ function App() {
 
         <Grid container spacing={2} sx={{ mt: 4 }}>
           <Grid item xs={12} sm={6}>
-            <StyledNavLink to="/welcome">
+            <StyledNavLink to="/gametopic">
               <GuestButton variant="contained" startIcon={<Person />}>
                 Continue as Guest
               </GuestButton>

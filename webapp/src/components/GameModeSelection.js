@@ -124,7 +124,7 @@ function GameModeSelection() {
         </FormControl>
       </SectionPaper>
 
-      <NavLink to="/gametopic">
+      <NavLink to="/game">
         <StyledButton
           variant="contained"
           color="primary"

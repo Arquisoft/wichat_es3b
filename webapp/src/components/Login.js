@@ -56,7 +56,7 @@ const Login = () => {
                   Your account was created on {new Date(createdAt).toLocaleDateString()}.
               </Typography>
           )}
-          <NavLink to="/gamemode">
+          <NavLink to="/gametopic">
               <Button variant="contained" color="secondary" fullWidth sx={{ marginTop: 2 }}>
                   Start the fun
               </Button>

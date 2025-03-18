@@ -227,7 +227,7 @@ function GameModeSelection() {
         </Typography>
       )}
 
-      <NavLink to="/game" style={{ width: "100%", textDecoration: "none" }}>
+      <NavLink to="/gamemode" style={{ width: "100%", textDecoration: "none" }}>
         <StyledButton variant="contained" color="primary" size="large" disabled={isNextDisabled} fullWidth>
           NEXT
         </StyledButton>
