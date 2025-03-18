@@ -8,13 +8,14 @@ import {
   RadioGroup,
   FormControlLabel,
   FormControl,
-  Checkbox,
   Button,
   Paper,
   Box,
+  Grid,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
-import { NavLink } from 'react-router-dom';
+import { NavLink } from "react-router-dom"
+import { Movie, Flag, MusicNote } from "@mui/icons-material"
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -81,25 +82,56 @@ const TopicOption = styled(FormControlLabel, {
   },
 }))
 
+const TopicButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== "isSelected",
+})(({ theme, isSelected }) => ({
+  padding: theme.spacing(2, 3),
+  borderRadius: theme.shape.borderRadius,
+  fontWeight: "bold",
+  background: isSelected ? "linear-gradient(to right, #2196f3, #9c27b0)" : theme.palette.background.paper,
+  color: isSelected ? theme.palette.common.white : theme.palette.text.primary,
+  border: isSelected ? "none" : `1px solid ${theme.palette.divider}`,
+  boxShadow: isSelected ? theme.shadows[3] : "none",
+  transition: theme.transitions.create(["background", "transform", "box-shadow"], {
+    duration: theme.transitions.duration.short,
+  }),
+  "&:hover": {
+    background: isSelected ? "linear-gradient(to right, #1e88e5, #1e88e5)" : theme.palette.action.hover,
+    transform: "translateY(-2px)",
+    boxShadow: isSelected ? theme.shadows[4] : theme.shadows[1],
+  },
+  "& .MuiButton-startIcon": {
+    marginRight: theme.spacing(1),
+  },
+}))
+
 function GameModeSelection() {
-  const [selectedTopic, setSelectedTopic] = useState(null)
+  const [selectedTopics, setSelectedTopics] = useState([])
   const [isWild, setIsWild] = useState(false)
 
   const handleTopicChange = (topic) => {
     if (!isWild) {
-      setSelectedTopic(topic === selectedTopic ? null : topic)
+      setSelectedTopics((prevTopics) => {
+        if (prevTopics.includes(topic)) {
+          return prevTopics.filter((t) => t !== topic)
+        } else {
+          return [...prevTopics, topic]
+        }
+      })
     }
   }
 
   const handleWildSelection = () => {
     setIsWild(true)
-    setSelectedTopic("all")
+    setSelectedTopics(["all"])
   }
 
   const handleCustomSelection = () => {
     setIsWild(false)
-    setSelectedTopic(null)
+    setSelectedTopics([])
   }
+
+  const isNextDisabled = selectedTopics.length === 0
 
   return (
     <StyledContainer maxWidth="md">
@@ -119,40 +151,62 @@ function GameModeSelection() {
               isSelected={!isWild}
             />
 
-            <Box sx={{ ml: 4, display: "flex", flexDirection: "column", gap: 1, mb: 2 }}>
-              <FormControlLabel
-                disabled={isWild}
-                control={
-                  <Checkbox
-                    checked={selectedTopic === "movies"}
-                    onChange={() => handleTopicChange("movies")}
-                    color="primary"
-                  />
-                }
-                label="MOVIES"
-              />
-              <FormControlLabel
-                disabled={isWild}
-                control={
-                  <Checkbox
-                    checked={selectedTopic === "flags"}
-                    onChange={() => handleTopicChange("flags")}
-                    color="primary"
-                  />
-                }
-                label="FLAGS"
-              />
-              <FormControlLabel
-                disabled={isWild}
-                control={
-                  <Checkbox
-                    checked={selectedTopic === "music"}
-                    onChange={() => handleTopicChange("music")}
-                    color="primary"
-                  />
-                }
-                label="MUSIC"
-              />
+            {/* Topic selection buttons - centered */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                width: "100%",
+                mb: 3,
+                mt: 2,
+              }}
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  maxWidth: "600px",
+                  mx: "auto",
+                }}
+              >
+                <Grid container spacing={2} justifyContent="center">
+                  <Grid item xs={12} sm={4}>
+                    <TopicButton
+                      fullWidth
+                      variant="outlined"
+                      startIcon={<Movie />}
+                      onClick={() => handleTopicChange("movies")}
+                      disabled={isWild}
+                      isSelected={selectedTopics.includes("movies")}
+                    >
+                      MOVIES
+                    </TopicButton>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <TopicButton
+                      fullWidth
+                      variant="outlined"
+                      startIcon={<Flag />}
+                      onClick={() => handleTopicChange("flags")}
+                      disabled={isWild}
+                      isSelected={selectedTopics.includes("flags")}
+                    >
+                      FLAGS
+                    </TopicButton>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <TopicButton
+                      fullWidth
+                      variant="outlined"
+                      startIcon={<MusicNote />}
+                      onClick={() => handleTopicChange("music")}
+                      disabled={isWild}
+                      isSelected={selectedTopics.includes("music")}
+                    >
+                      MUSIC
+                    </TopicButton>
+                  </Grid>
+                </Grid>
+              </Box>
             </Box>
 
             <TopicOption
@@ -166,14 +220,15 @@ function GameModeSelection() {
         </FormControl>
       </SectionPaper>
 
-      <NavLink to="/game">
-        <StyledButton
-          variant="contained"
-          color="primary"
-          size="large"
-          disabled={!selectedTopic}
-          fullWidth
-        >
+      {/* Show selected topics count when in custom mode */}
+      {!isWild && selectedTopics.length > 0 && (
+        <Typography variant="subtitle1" color="primary" sx={{ fontWeight: "bold", textAlign: "center" }}>
+          {selectedTopics.length} topic{selectedTopics.length > 1 ? "s" : ""} selected
+        </Typography>
+      )}
+
+      <NavLink to="/game" style={{ width: "100%", textDecoration: "none" }}>
+        <StyledButton variant="contained" color="primary" size="large" disabled={isNextDisabled} fullWidth>
           NEXT
         </StyledButton>
       </NavLink>
