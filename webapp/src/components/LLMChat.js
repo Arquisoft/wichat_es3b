@@ -60,7 +60,7 @@ const LLMChat = () => {
                 <Typography variant="h3" align="center">TipBot</Typography>
             </Container>
             <Divider />
-            <Container ref={chatContainer} onScroll={handleScroll} sx={{display: "flex", flexDirection: "column", overflow: "hidden", overflowY: "auto", height: "100%"}}>
+            <Container ref={chatContainer} onScroll={handleScroll} sx={{display: "flex", flexDirection: "column", overflow: "hidden", overflowY: "auto", height: "30vh"}}>
                 {messages.map((message, index) => (
                     message.sender === "user" ? (
                         <Typography key={index} sx={{

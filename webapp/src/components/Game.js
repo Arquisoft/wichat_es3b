@@ -1,21 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import axios from "axios"
-import Chat from "./LLMChat/LLMChat"
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Box,
-  Container,
-  Paper,
-  CircularProgress,
-} from "@mui/material"
+import { AppBar, Toolbar, Typography, Button, Card, CardContent, Grid, Box, Container, Paper, CircularProgress } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline"
 import PhoneIcon from "@mui/icons-material/Phone"
@@ -23,18 +9,22 @@ import ChatIcon from "@mui/icons-material/Chat"
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn"
 
+import axios from "axios"
+import Chat from "./LLMChat"
+
 const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000"
 
 // Custom styled components
 const GameContainer = styled(Container)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  height: "100%",
   paddingTop: theme.spacing(4),
   paddingBottom: theme.spacing(4),
-  minHeight: "100vh",
-  background: "linear-gradient(to bottom right, #e8f5fe, #f0e6ff)",
 }))
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  background: "linear-gradient(to right, #3f51b5, #7e57c2)",
+  background: "linear-gradient(to left, #3f51b5, #7e57c2)",
   boxShadow: theme.shadows[3],
 }))
 
@@ -49,7 +39,7 @@ const LogoButton = styled(Button)(({ theme }) => ({
 
 const ScoreChip = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1, 2),
-  backgroundColor: "#303f9f",
+  backgroundColor: "#7860d2",
   color: theme.palette.common.white,
   borderRadius: 20,
   display: "inline-flex",
@@ -97,14 +87,22 @@ const LifelineButton = styled(Button, {
 
 const OptionButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== "isHidden",
-})(({ theme, isHidden }) => ({
+})(({ theme, isHidden, isSelected, isCorrect }) => ({
   padding: theme.spacing(2),
   fontSize: "1rem",
   visibility: isHidden ? "hidden" : "visible",
-  backgroundColor: theme.palette.primary.main,
+  backgroundColor: isSelected !== null
+      ? isCorrect
+        ? theme.palette.success.main
+        : theme.palette.error.main
+      : theme.palette.primary.main,
   color: theme.palette.common.white,
   "&:hover": {
-    backgroundColor: theme.palette.primary.dark,
+    backgroundColor: isSelected !== null
+      ? isCorrect
+        ? theme.palette.success.dark
+        : theme.palette.error.dark
+      : theme.palette.primary.dark,
     transform: "scale(1.03)",
     boxShadow: theme.shadows[4],
   },
@@ -136,23 +134,30 @@ const LoadingContainer = styled(Box)(({ theme }) => ({
 }))
 
 function Game() {
-  const [round, setRound] = useState(1)
-  const totalRounds = 10
-  const [roundData, setRoundData] = useState(null)
-  const [score, setScore] = useState(0)
-  const [fiftyFiftyUsed, setFiftyFiftyUsed] = useState(false)
-  const [callFriendUsed, setCallFriendUsed] = useState(false)
-  const [useChatUsed, setUseChatUsed] = useState(false)
-  const [hiddenOptions, setHiddenOptions] = useState([])
-  const [loading, setLoading] = useState(true)
+  const totalRounds = 10;
+  
+  const [round, setRound] = useState(1);
+  const [roundData, setRoundData] = useState(null);
+  const [score, setScore] = useState(0);
+  
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+
+  const [fiftyFiftyUsed, setFiftyFiftyUsed] = useState(false);
+  const [callFriendUsed, setCallFriendUsed] = useState(false);
+  const [useChatUsed, setUseChatUsed] = useState(false);
+  const [hiddenOptions, setHiddenOptions] = useState([]);
+  
+  const [loading, setLoading] = useState(true);
+
+  const [chatKey, setChatKey] = useState(0); // resets the chat component every time it is updated
 
   // Function to load the data for each round.
   const loadRound = async () => {
     try {
+      setChatKey(chatKey + 1);
+
       setLoading(true)
       const response = await axios.get(`${apiEndpoint}/getRound`)
-      console.log("Get Round")
-      console.log(response.data)
       setHiddenOptions([])
       setLoading(false)
       return response.data
@@ -177,39 +182,48 @@ function Game() {
   }
 
   useEffect(() => {
-    gameSetup()
+    gameSetup();
   }, []);
 
   const handleOptionSelect = async (index) => {
-    const isCorrect = CorrectOption(index)
+    if (selectedAnswer !== null) return;
+
+    const isCorrect = CorrectOption(index);
+    setSelectedAnswer(index);
+
     if (isCorrect) {
-      setScore(score + 50)
+      setScore(score + 50);
     }
 
-    if (round === totalRounds) {
-      alert("Game Over")
-      setRoundData(null)
-      setRound(1)
-      setScore(0)
-      setFiftyFiftyUsed(false)
-      setCallFriendUsed(false)
-      setUseChatUsed(false)
-      setHiddenOptions([])
-      gameSetup()
-      return
-    }
+    setTimeout(async () => {
+      if (round === totalRounds) {
+        alert("Game Over");
+        setRoundData(null);
+        setRound(1);
+        setScore(0);
+        setFiftyFiftyUsed(false);
+        setCallFriendUsed(false);
+        setUseChatUsed(false);
+        setHiddenOptions([]);
+        setSelectedAnswer(null);
+        gameSetup();
+        return;
+      }
 
-    setRound(round + 1)
-    setRoundData(null)
-    setLoading(true)
+      setSelectedAnswer(null);
 
-    try {
-      const data = await loadRound()
-      setRoundData(data)
-    } catch (error) {
-      console.error("Error loading new round", error)
-      setLoading(false)
-    }
+      setRound(round + 1);
+      setRoundData(null);
+      setLoading(true);
+
+      try {
+        const data = await loadRound();
+        setRoundData(data);
+      } catch (error) {
+        console.error("Error loading new round", error);
+        setLoading(false);
+      }
+    }, 2000);
   }
 
   const CorrectOption = (index) => {
@@ -249,7 +263,7 @@ function Game() {
   }
 
   return (
-    <GameContainer maxWidth="100%">
+    <GameContainer maxWidth="100%" height="100%">
       {/* Top Bar */}
       <StyledAppBar position="static">
         <Toolbar>
@@ -270,12 +284,12 @@ function Game() {
       </StyledAppBar>
 
       {/* Main Content */}
-      <Grid container spacing={3} sx={{ mt: 2 }}>
+      <Grid container spacing={3} sx={{ flex: 1, mt: 2 }}>
         {/* Left Side (Lifelines) */}
         <Grid item xs={12} md={3}>
-          <Card elevation={3}>
+          <Card elevation={3} >
             <CardContent>
-              <Typography variant="h5" component="h3" gutterBottom color="primary">
+              <Typography variant="h4" component="h2" gutterBottom color="primary">
                 Lifelines
               </Typography>
               <LifelineButton
@@ -314,7 +328,7 @@ function Game() {
 
         {/* Game Area */}
         <Grid item xs={12} md={6}>
-          <Card elevation={3} sx={{ minHeight: 400 }}>
+          <Card elevation={3} sx={{ height: "100%", minHeight: 400 }}>
             <CardContent>
               {loading ? (
                 <LoadingContainer>
@@ -347,6 +361,8 @@ function Game() {
                             onClick={() => handleOptionSelect(index)}
                             disabled={hiddenOptions.includes(index)}
                             isHidden={hiddenOptions.includes(index)}
+                            isSelected={selectedAnswer}
+                            isCorrect={CorrectOption(index)}
                           >
                             {city.name}
                           </OptionButton>
@@ -364,20 +380,7 @@ function Game() {
         <Grid item xs={12} md={3}>
           <Card elevation={3} sx={{ height: "100%" }}>
             <CardContent>
-              <Typography variant="h5" component="h3" gutterBottom color="primary">
-                Chat
-              </Typography>
-              <Box
-                sx={{
-                  height: 400,
-                  overflow: "auto",
-                  bgcolor: "background.default",
-                  borderRadius: 1,
-                  p: 2,
-                }}
-              >
-                <Chat />
-              </Box>
+              <Chat key={chatKey} />
             </CardContent>
           </Card>
         </Grid>
@@ -386,5 +389,4 @@ function Game() {
   )
 }
 
-export default Game
-
+export default Game;

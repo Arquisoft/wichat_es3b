@@ -10,6 +10,7 @@ import SignUp from './components/AddUser';
 import GameModeSelection from './components/GameModeSelection';
 import Game from './components/Game';
 import Welcome from './components/Welcome';
+import Layout from './components/Layout';
 
 console.log(styles);
 
@@ -17,12 +18,14 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/welcome" element={<Welcome />} />
-      <Route path="/gamemode" element={<GameModeSelection />} />
-      <Route path="/game" element={<Game />} />
+      <Route element={<Layout />}>
+        <Route path="/" element={<App />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/welcome" element={<Welcome />} />
+        <Route path="/gamemode" element={<GameModeSelection />} />
+        <Route path="/game" element={<Game />} />
+      </Route>
     </Routes>
   </BrowserRouter>
 );

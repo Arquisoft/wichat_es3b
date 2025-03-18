@@ -6,14 +6,7 @@ import { Outlet, NavLink } from 'react-router';
 function App() {
 
   return (
-    <Container component="main" maxWidth="xs">
-
-      <nav>
-        <NavLink to="/login">Login</NavLink>
-        <NavLink to="/signup">Sign up</NavLink>
-        <NavLink to="/welcome">Guest</NavLink>
-      </nav>
-
+    <Container maxWidth="xs">
       <CssBaseline />
       <Typography component="h1" variant="h5" align="center" sx={{ marginTop: 2 }}>
         Welcome to the 2025 edition of the Software Architecture course!
