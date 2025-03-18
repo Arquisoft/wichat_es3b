@@ -87,22 +87,26 @@ const LifelineButton = styled(Button, {
 
 const OptionButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== "isHidden",
-})(({ theme, isHidden, isSelected, isCorrect }) => ({
+})(({ theme, isHidden, hasSelectedAnswer, isSelected, isCorrect }) => ({
   padding: theme.spacing(2),
-  fontSize: "1rem",
+  fontSize: "1.5rem",
+  fontWeight: "bold",
   visibility: isHidden ? "hidden" : "visible",
-  backgroundColor: isSelected !== null
-      ? isCorrect
-        ? theme.palette.success.main
-        : theme.palette.error.main
-      : theme.palette.primary.main,
+  backgroundColor:
+    isCorrect && hasSelectedAnswer // If it's the correct answer, always green
+      ? theme.palette.success.main
+      : isSelected // If it's the selected answer
+        ? theme.palette.error.main // Incorrect selection turns red
+        : theme.palette.primary.main, // Default color
+
   color: theme.palette.common.white,
   "&:hover": {
-    backgroundColor: isSelected !== null
-      ? isCorrect
+    backgroundColor:
+      isCorrect && hasSelectedAnswer
         ? theme.palette.success.dark
-        : theme.palette.error.dark
-      : theme.palette.primary.dark,
+        : isSelected
+          ? theme.palette.error.dark
+          : theme.palette.primary.dark,
     transform: "scale(1.03)",
     boxShadow: theme.shadows[4],
   },
@@ -289,7 +293,7 @@ function Game() {
         <Grid item xs={12} md={3}>
           <Card elevation={3} >
             <CardContent>
-              <Typography variant="h4" component="h2" gutterBottom color="primary">
+              <Typography variant="h4" component="h2" gutterBottom color="primary" sx={{ fontWeight: "bold", textDecoration: "underline" }}>
                 Lifelines
               </Typography>
               <LifelineButton
@@ -343,7 +347,7 @@ function Game() {
               ) : (
                 roundData && (
                   <>
-                    <Typography variant="h4" component="h2" align="center" gutterBottom color="primary">
+                    <Typography variant="h4" component="h2" align="center" gutterBottom color="primary" sx={{ fontWeight: "bold", textDecoration: "underline" }}>
                       Round {round}/{totalRounds}
                     </Typography>
                     <ImageContainer>
@@ -361,7 +365,8 @@ function Game() {
                             onClick={() => handleOptionSelect(index)}
                             disabled={hiddenOptions.includes(index)}
                             isHidden={hiddenOptions.includes(index)}
-                            isSelected={selectedAnswer}
+                            hasSelectedAnswer={selectedAnswer !== null}
+                            isSelected={selectedAnswer === index}
                             isCorrect={CorrectOption(index)}
                           >
                             {city.name}

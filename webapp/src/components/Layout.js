@@ -5,7 +5,7 @@ import { Outlet, NavLink } from 'react-router';
 const StyledNavlink = ({to, label, icon}) => {
     return (
         <NavLink to={to}>
-            <IconButton sx={{color: "white", gap: "0.5rem"}}>
+            <IconButton sx={{color: "white", gap: "0.5rem", "&:hover": {backgroundColor: "rgba(255, 255, 255, 0.1)"}}}>
                 {icon && (icon)}
                 {label}
             </IconButton>
