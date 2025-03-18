@@ -7,7 +7,6 @@ import WiChatTextField from "../textField/WiChatTextField";
 import PhotoPanel from "../photoPanel/PhotoPanel";
 import "../login/Login.css";
 import "../../assets/global.css";
-import logo from "../../assets/img/logo_base.png";
 import { useTranslation } from "react-i18next";
 
 const apiEndpoint =

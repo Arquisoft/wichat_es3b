@@ -27,7 +27,9 @@ i18n.use(initReactI18next).init({
                 "password": "Contraseña*",
                 "confirmPassword": "Confirmar contraseña*",
                 "or": "o",
-                "loginSuccessful": "Inicio de sesión correcto"
+                "loginSuccessful": "Inicio de sesión correcto",
+                "identify": "Identifícate",
+                "welcomeMessage": "¡Bienvenido a WIChat!"
             }
         },
         en: {
@@ -54,7 +56,9 @@ i18n.use(initReactI18next).init({
                 "password": "Password*",
                 "confirmPassword": "Confirm password*",
                 "or": "or",
-                "loginSuccessful": "Login successful"
+                "loginSuccessful": "Login successful",
+                "identify": "Identify",
+                "welcomeMessage": "¡Welcome to WIChat!"
             }
         }
     },
