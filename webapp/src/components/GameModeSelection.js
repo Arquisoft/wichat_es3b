@@ -1,4 +1,3 @@
-import "./GameModeSelection.css";
 import React, { useState } from "react";
 
 import Game from './Game';

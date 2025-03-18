@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 
 import { Container, CssBaseline, Typography, Button } from '@mui/material';
 import { Outlet, NavLink } from 'react-router';
