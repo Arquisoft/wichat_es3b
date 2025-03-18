@@ -29,7 +29,8 @@ i18n.use(initReactI18next).init({
                 "or": "o",
                 "loginSuccessful": "Inicio de sesión correcto",
                 "identify": "Identifícate",
-                "welcomeMessage": "¡Bienvenido a WIChat!"
+                "welcomeMessage": "¡Bienvenido a WIChat!",
+                "logout": "Cerrar sesión"
             }
         },
         en: {
@@ -58,7 +59,8 @@ i18n.use(initReactI18next).init({
                 "or": "or",
                 "loginSuccessful": "Login successful",
                 "identify": "Identify",
-                "welcomeMessage": "¡Welcome to WIChat!"
+                "welcomeMessage": "¡Welcome to WIChat!",
+                "logout": "Logout"
             }
         }
     },
