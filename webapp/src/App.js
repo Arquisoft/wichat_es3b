@@ -6,6 +6,7 @@ import PerfilPage from "./pages/profilePage/PerfilPage.js";
 import { Route, Routes } from "react-router-dom";
 import Game from "./pages/game/Game.js";
 import PrivateRoute from "./components/routes/PrivateRoute.js"; // Importar el componente
+import Settings from "./pages/gameSettings/Settings.js"
 
 function App() {
   return (
@@ -26,6 +27,11 @@ function App() {
               <PerfilPage />
           </PrivateRoute>
           } />
+        <Route path="/gameSettings" element={
+            <PrivateRoute>
+                <Settings />
+            </PrivateRoute>
+        } />
 
       <Route path="/home" element={<Home />} />
     </Routes>

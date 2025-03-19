@@ -1,0 +1,26 @@
+.container {
+    text-align: center;
+    padding-top: 20px;
+}
+
+.settings-box {
+    background-color: #E3F2FD;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    margin: auto;
+}
+
+.settings-title {
+    font-weight: bold;
+    color: #2196F3;
+}
+
+.settings-subtitle {
+    font-style: italic;
+    margin-bottom: 15px;
+}
+
+.form-control {
+    margin-bottom: 15px;
+}
