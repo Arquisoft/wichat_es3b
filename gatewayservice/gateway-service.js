@@ -61,7 +61,7 @@ app.post('/askllm', async (req, res) => {
 app.post('/loadQuestion', async (req, res) => {
   try {
     const hardcodedBody = {
-      "modes": ["city"]
+      "modes": ["flag"]
     };
 
     // Forward the request to the Question Service to get random options and image URL

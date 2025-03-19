@@ -28,11 +28,15 @@ const QUERIES = {
 ORDER BY DESC(?population)
 LIMIT 50`,
 
-    flag: `SELECT DISTINCT ?flag ?flagLabel ?image WHERE {
-        ?country wdt:P31 wd:Q6256;
-                 wdt:P41 ?image.
-        SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-    } ORDER BY DESC(?country wikibase:sitelinks) LIMIT 50`,
+    flag: `SELECT ?country ?countryLabel ?flag WHERE {
+  ?country wdt:P31 wd:Q6256;  # La entidad es un país
+           wikibase:sitelinks ?sitelinks;  # Número de enlaces en Wikipedia
+           wdt:P41 ?flag.  # Imagen de la bandera del país
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+ORDER BY DESC(?sitelinks)  # Ordenamos por popularidad
+LIMIT 50
+`,
 
     athlete: `SELECT ?athlete ?athleteLabel ?image (COUNT(?sitelink) AS ?numLangs) WHERE {
   ?athlete wdt:P31 wd:Q5;  # Es una persona
@@ -46,12 +50,21 @@ ORDER BY DESC(?numLangs)  # Ordenamos por número de idiomas
 LIMIT 50
 `,
 
-    singer: `SELECT DISTINCT ?singer ?singerLabel ?image WHERE {
-        ?singer wdt:P31 wd:Q5;
-                wdt:P106 wd:Q177220;
-                wdt:P18 ?image.
-        SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-    } ORDER BY DESC(?singer wikibase:sitelinks) LIMIT 50`
+    singer: `SELECT ?singer ?singerLabel ?image (COUNT(?sitelink) AS ?numLangs) WHERE {
+  ?singer wdt:P31 wd:Q5;  # Es una persona
+          wdt:P106 wd:Q177220;  # Es un cantante
+          wdt:P18 ?image.  # Tiene una imagen asociada
+
+  OPTIONAL {
+    ?sitelink schema:about ?singer.
+  }
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+GROUP BY ?singer ?singerLabel ?image
+ORDER BY DESC(?numLangs)  # Ordenamos por cantidad de enlaces en Wikipedia
+LIMIT 50
+`
 };
 
 
