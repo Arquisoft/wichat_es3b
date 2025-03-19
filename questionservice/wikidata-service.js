@@ -19,34 +19,41 @@ const SPARQL_ENDPOINT = "https://query.wikidata.org/sparql";
 let selectedModes = []; 
 
 const QUERIES = {
-    city: `SELECT DISTINCT ?city ?cityLabel ?image WHERE {  
-  ?city wdt:P31 wd:Q515;
-        wdt:P1082 ?population;
-        wdt:P18 ?image.
+    city: `SELECT ?city ?cityLabel ?image WHERE {
+  ?city wdt:P31 wd:Q515;  # La entidad es una ciudad
+        wikibase:sitelinks ?sitelinks;  # Número de enlaces en Wikipedia
+        wdt:P18 ?image.  # La ciudad tiene una imagen
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-} 
-ORDER BY DESC(?population)
+}
+ORDER BY DESC(?sitelinks)
 LIMIT 50`,
 
-    flag: `SELECT ?country ?countryLabel ?flag WHERE {
-  ?country wdt:P31 wd:Q6256;  # La entidad es un país
+    flag: `SELECT ?flag ?flagLabel ?image WHERE {
+  ?flag wdt:P31 wd:Q6256;  # La entidad es un país
            wikibase:sitelinks ?sitelinks;  # Número de enlaces en Wikipedia
-           wdt:P41 ?flag.  # Imagen de la bandera del país
+           wdt:P41 ?image.  # Imagen de la bandera del país
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 ORDER BY DESC(?sitelinks)  # Ordenamos por popularidad
 LIMIT 50
 `,
 
-    athlete: `SELECT ?athlete ?athleteLabel ?image (COUNT(?sitelink) AS ?numLangs) WHERE {
+    athlete: `SELECT DISTINCT ?athlete ?athleteLabel ?image WHERE {
   ?athlete wdt:P31 wd:Q5;  # Es una persona
-           wdt:P106 wd:Q2066131;  # Es un atleta
-           wdt:P18 ?image.  # Tiene imagen
+           wdt:P106 ?sport;  # Es un deportista
+           wikibase:sitelinks ?sitelinks;  # Número de enlaces en Wikipedia
+           wdt:P18 ?image;  # Tiene imagen obligatoria
+           wdt:P166 ?award.  # Ha ganado un premio importante
+
+  # Filtrar por tipos de deportistas
+  VALUES ?sport { wd:Q937857 wd:Q10833314 wd:Q3665646 }  
+  # Q937857 = Futbolista
+  # Q10833314 = Tenista
+  # Q3665646 = Baloncestista
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
-GROUP BY ?athlete ?athleteLabel ?image
-ORDER BY DESC(?numLangs)  # Ordenamos por número de idiomas
+ORDER BY DESC(?sitelinks)  # Ordenamos por popularidad
 LIMIT 50
 `,
 
@@ -98,7 +105,6 @@ async function fetchAndStoreData(modes) {
     try {
         const fetchPromises = modes.map(async (mode) => {
             if (!QUERIES[mode]) return;
-            console.log(`///////////////////////////Fetching data for mode: ${mode}`); 
 
             const response = await axios.get(SPARQL_ENDPOINT, {
                 params: { query: QUERIES[mode], format: "json" },
@@ -111,17 +117,24 @@ async function fetchAndStoreData(modes) {
                 const imageUrl = item.image?.value || "";
                 const imageAltText = item.image?.value ? await getImageDescription(item.image.value) : "No alternative text available";
 
-                console.log(`** ID: ${id}, Name: ${name}, Image: ${imageUrl}, Alt: ${imageAltText}, Mode: ${mode}`);
                 return { id, name, imageUrl, imageAltText, mode };
             }));            
-
-            await WikidataObject.insertMany(items, { ordered: false }).catch(err => console.log("Algunos elementos ya existen"));
+            
+            await WikidataObject.insertMany(items, { ordered: false }).catch(err => console.log("Some elements could not be saved: ", err));
         });
 
         await Promise.all(fetchPromises);
-        console.log("---------------Datos guardados correctamente en MongoDB---------------");
     } catch (error) {
-        console.error("Error al obtener y guardar datos:", error);
+        console.error("Error obtaining data from Wikidata:", error);
+    }
+}
+
+// Función para vaciar la base de datos
+async function clearDatabase() {
+    try {
+        await WikidataObject.deleteMany({});
+    } catch (error) {
+        console.error("Error clearing the database:", error);
     }
 }
 
@@ -134,6 +147,7 @@ app.post("/load", async (req, res) => {
         }
 
         selectedModes = modes; // Store the selected modes in the global variable
+        await clearDatabase(); // Clear the database before loading new data
         await fetchAndStoreData(modes); // Fetch data and store it in MongoDB
         
         res.status(200).json({ message: "Data successfully stored" });
