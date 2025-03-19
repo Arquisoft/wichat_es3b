@@ -11,6 +11,7 @@ import GameModeSelection from './components/GameModeSelection';
 import Game from './components/Game';
 import Welcome from './components/Welcome';
 import Layout from './components/Layout';
+import GameTopicSelection from './components/GameTopicSelection';
 
 console.log(styles);
 
@@ -24,6 +25,7 @@ root.render(
         <Route path="/signup" element={<SignUp />} />
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/gamemode" element={<GameModeSelection />} />
+        <Route path="/gametopic" element={<GameTopicSelection />} />
         <Route path="/game" element={<Game />} />
       </Route>
     </Routes>
