@@ -16,6 +16,7 @@ import {
 import { styled } from "@mui/material/styles"
 import { NavLink } from "react-router-dom"
 import { Movie, Flag, MusicNote } from "@mui/icons-material"
+import axios from 'axios';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -133,6 +134,16 @@ function GameModeSelection() {
 
   const isNextDisabled = selectedTopics.length === 0
 
+  const startGame = async () => {
+    try {
+      await axios.post("http://localhost:8004/load", {
+        modes: selectedTopics
+      });
+    } catch (error) {
+        console.error("Error fetching game data:", error);
+    }
+  };
+
   return (
     <StyledContainer maxWidth="md">
       <Typography variant="h3" component="h1" align="center" gutterBottom sx={{ fontWeight: "bold", color: "#3f51b5" }}>
@@ -228,7 +239,13 @@ function GameModeSelection() {
       )}
 
       <NavLink to="/gamemode" style={{ width: "100%", textDecoration: "none" }}>
-        <StyledButton variant="contained" color="primary" size="large" disabled={isNextDisabled} fullWidth>
+        <StyledButton 
+          variant="contained" 
+          color="primary" 
+          size="large" 
+          onClick={startGame} 
+          disabled={isNextDisabled} 
+          fullWidth>
           NEXT
         </StyledButton>
       </NavLink>
