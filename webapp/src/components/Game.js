@@ -233,7 +233,7 @@ function Game() {
   const CorrectOption = (index) => {
     if (!roundData) return false
     const selectedName = roundData.items[index].name
-    const correctName = roundData.itemsWithImage.name
+    const correctName = roundData.itemWithImage.name
     return selectedName === correctName
   }
 
