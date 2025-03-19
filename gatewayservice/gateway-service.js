@@ -60,8 +60,12 @@ app.post('/askllm', async (req, res) => {
 // Add the /loadQuestion endpoint for filling the data base
 app.post('/loadQuestion', async (req, res) => {
   try {
-    // Forward the request to the Question Service to get random cities and image URL
-    const questionResponse = await axios.post(questionServiceUrl+'/load', req.body);
+    const hardcodedBody = {
+      "modes": ["city"]
+    };
+
+    // Forward the request to the Question Service to get random options and image URL
+    const questionResponse = await axios.post(questionServiceUrl+'/load', hardcodedBody);
 
     // Respond with the data from the Question Service
     res.json(questionResponse.data);

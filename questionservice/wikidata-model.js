@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
 
-// Define the schema for cities
-const citySchema = new mongoose.Schema({
+// Define the schema for the objects
+const wikidataObjectSchema = new mongoose.Schema({
     id: { type: String, unique: true },
     name: String,
     imageUrl: String,
-    imageAltText: String
+    imageAltText: String,
+    mode: String
 });
 
-// Export the City model
-const City = mongoose.model("City", citySchema);
-module.exports = City;
+// Export the model
+const WikidataObject = mongoose.model("WikidataObject", wikidataObjectSchema);
+module.exports = WikidataObject;

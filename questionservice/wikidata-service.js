@@ -1,14 +1,9 @@
 const axios = require("axios");
-const City = require("./wikidata-model");
-
-//Import mongo
-const mongoose = require('mongoose'); 
-
-//Import express 
-const express = require('express'); 
+const mongoose = require("mongoose");
+const express = require("express");
+const WikidataObject = require("./wikidata-model");
 const app = express();
 
-//For using json
 app.use(express.json());
 
 //define the port
@@ -20,21 +15,50 @@ const mongoDB = process.env.mongoDB || 'mongodb://localhost:27017/mongo-db-wicha
 // SPARQL endpoint for WikiData
 const SPARQL_ENDPOINT = "https://query.wikidata.org/sparql";
 
-// SPARQL query to get the 50 most populated cities that have an image
-const SPARQL_QUERY = `
-SELECT DISTINCT ?city ?cityLabel ?image WHERE {  
+// Global variable to store the selected game modes
+let selectedModes = []; 
+
+const QUERIES = {
+    city: `SELECT DISTINCT ?city ?cityLabel ?image WHERE {  
   ?city wdt:P31 wd:Q515;
         wdt:P1082 ?population;
         wdt:P18 ?image.
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 } 
 ORDER BY DESC(?population)
+LIMIT 50`,
+
+    flag: `SELECT DISTINCT ?flag ?flagLabel ?image WHERE {
+        ?country wdt:P31 wd:Q6256;
+                 wdt:P41 ?image.
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+    } ORDER BY DESC(?country wikibase:sitelinks) LIMIT 50`,
+
+    athlete: `SELECT ?athlete ?athleteLabel ?image (COUNT(?sitelink) AS ?numLangs) WHERE {
+  ?athlete wdt:P31 wd:Q5;  # Es una persona
+           wdt:P106 wd:Q2066131;  # Es un atleta
+           wdt:P18 ?image.  # Tiene imagen
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+GROUP BY ?athlete ?athleteLabel ?image
+ORDER BY DESC(?numLangs)  # Ordenamos por número de idiomas
 LIMIT 50
-`;
+`,
+
+    singer: `SELECT DISTINCT ?singer ?singerLabel ?image WHERE {
+        ?singer wdt:P31 wd:Q5;
+                wdt:P106 wd:Q177220;
+                wdt:P18 ?image.
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+    } ORDER BY DESC(?singer wikibase:sitelinks) LIMIT 50`
+};
+
 
 mongoose.connect(mongoDB)
-.then(() => console.log('Connected'))
-.catch(err => console.log('Error on the connection to the DB. ', err)); 
+    .then(() => console.log('Connected'))
+    .catch(err => console.log('Error on the connection to the DB. ', err)); 
+
 
 // Function to fetch the alternative description of an image from Wikimedia Commons
 async function getImageDescription(imageUrl) {
@@ -57,104 +81,90 @@ async function getImageDescription(imageUrl) {
     }
 }
 
-// Function to fetch cities from WikiData and store them in MongoDB
-async function fetchAndStoreCities() {
+async function fetchAndStoreData(modes) {
     try {
-        // Fetch city data from WikiData
-        const response = await axios.get(SPARQL_ENDPOINT, {
-            params: { query: SPARQL_QUERY, format: "json" }, // Query parameters
-            headers: { "User-Agent": "QuizGame/1.0 (student project)" } // User-Agent to avoid request blocking
+        const fetchPromises = modes.map(async (mode) => {
+            if (!QUERIES[mode]) return;
+            console.log(`///////////////////////////Fetching data for mode: ${mode}`); 
+
+            const response = await axios.get(SPARQL_ENDPOINT, {
+                params: { query: QUERIES[mode], format: "json" },
+                headers: { "User-Agent": "QuizGame/1.0 (student project)" }
+            });
+
+            const items = await Promise.all(response.data.results.bindings.map(async (item) => {
+                const id = item[mode]?.value?.split("/").pop() || "Unknown";
+                const name = item[`${mode}Label`]?.value || "No Name";
+                const imageUrl = item.image?.value || "";
+                const imageAltText = item.image?.value ? await getImageDescription(item.image.value) : "No alternative text available";
+
+                console.log(`** ID: ${id}, Name: ${name}, Image: ${imageUrl}, Alt: ${imageAltText}, Mode: ${mode}`);
+                return { id, name, imageUrl, imageAltText, mode };
+            }));            
+
+            await WikidataObject.insertMany(items, { ordered: false }).catch(err => console.log("Algunos elementos ya existen"));
         });
 
-        // Process the retrieved data and format it
-        const cities = await Promise.all(response.data.results.bindings.map(async (city) => {
-            const imageUrl = city.image.value;
-            const imageAltText = await getImageDescription(imageUrl); // Fetch alternative text for the image
-
-            return {
-                id: city.city.value.split("/").pop(), // Extract city ID from the URL
-                name: city.cityLabel.value, // Get city name
-                imageUrl, // Store image URL
-                imageAltText // Store alternative image description
-            };
-        }));
-
-        // Insert or update city data in MongoDB
-        for (const city of cities) {
-            await City.findOneAndUpdate(
-                { id: city.id }, // Search for an existing document by city ID
-                city, // Update or insert this city data
-                { upsert: true, new: true } // If not found, insert it; return the updated document
-            );
-        }
-
-        console.log("Cities successfully stored in MongoDB");
-
-        //if this is uncommented the cities will be returned apart from being saved in the DB
-        //return cities; 
-
+        await Promise.all(fetchPromises);
+        console.log("---------------Datos guardados correctamente en MongoDB---------------");
     } catch (error) {
-        console.error("Error fetching and storing cities:", error);
+        console.error("Error al obtener y guardar datos:", error);
     }
 }
 
-app.post('/load' , async (req, res) => { //Calling the function to get the information from WikiData and store it on the DB
+// Endpoint to fetch data from Wikidata and store it in the database
+app.post("/load", async (req, res) => {
     try {
-        await fetchAndStoreCities();
-        res.status(200).json({ message: 'Cities successfully stored in MongoDB' });
-    } catch(error) {
-        console.error('Error fetching data from question service:', error);
-        res.status(error.response?.status || 500).json({ error: 'Error fetching question data' });
+        const { modes } = req.body;
+        if (!modes || !Array.isArray(modes)) {
+            return res.status(400).json({ error: "Invalid modes parameter" });
+        }
+
+        selectedModes = modes; // Store the selected modes in the global variable
+        await fetchAndStoreData(modes); // Fetch data and store it in MongoDB
+        
+        res.status(200).json({ message: "Data successfully stored" });
+    } catch (error) {
+        console.error("Error in /load endpoint:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 });
 
-async function getRandomCitiesWithImage() {
+// Function to get random items from MongoDB
+async function getRandomItems() {
     try {
-        // 4 random rows from the data base
-        const cities = await City.aggregate([{ $sample: { size: 4 } }]);
+        const randomMode = selectedModes[Math.floor(Math.random() * selectedModes.length)]; // Choose a random mode from the selected ones
+        const items = await WikidataObject.aggregate([
+            { $match: { mode: randomMode } }, // Filter by the chosen mode
+            { $sample: { size: 4 } } // Retrieve 4 random items
+        ]);
 
-        // Pick one randomly and get its url for the picture
-        const randomCityIndex = Math.floor(Math.random() * cities.length); // Pick a random index
-        const randomCity = cities[randomCityIndex];
-
+        const randomItem = items[Math.floor(Math.random() * items.length)]; // Choose one random item
         return {
-            cities: cities.map(city => ({
-                
-                name: city.name,
-            })),
-            cityWithImage: randomCity
-        };        
+            mode: randomMode,
+            items: items.map(item => ({ name: item.name })), // Return only names
+            itemWithImage: randomItem // Return one item with an image
+        };
     } catch (error) {
-        console.error("Error fetching random cities:", error);
+        console.error("Error fetching random items:", error);
         throw error;
     }
 }
 
-app.get('/getRound' , async (req, res) => { //Calling the function to get a question
+// Endpoint to get a game round with random items
+app.get("/getRound", async (req, res) => {
     try {
-        const dataFromDatabase = await getRandomCitiesWithImage(); 
-        res.json(dataFromDatabase); 
-    } catch(error) {
-        console.error('Error fetching data from question service:', error);
-        res.status(error.response?.status || 500).json({ error: 'Error fetching question data' });
-    }
-})
-
-async function getCityNameById(cityId) {
-    try {
-        
-        const city = await City.findOne({ id: cityId });
-
-        if (!city) {
-            throw new Error(`City with id ${cityId} not found`);
+        if (selectedModes.length === 0) {
+            return res.status(400).json({ error: "No modes available. Load data first." });
         }
 
-        return city.name;
+        const data = await getRandomItems(); // Use stored modes instead of receiving them in the request
+        res.json(data);
     } catch (error) {
-        console.error("Error fetching city name by id:", error);
-        throw error;
+        console.error("Error in /getRound endpoint:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
-}
+});
 
 const server = app.listen(port, () => {
     console.log(`Question Service listening at http://localhost:${port}`);

@@ -232,8 +232,8 @@ function Game() {
 
   const CorrectOption = (index) => {
     if (!roundData) return false
-    const selectedName = roundData.cities[index].name
-    const correctName = roundData.cityWithImage.name
+    const selectedName = roundData.items[index].name
+    const correctName = roundData.itemsWithImage.name
     return selectedName === correctName
   }
 
@@ -241,7 +241,7 @@ function Game() {
     if (fiftyFiftyUsed || !roundData) return
 
     // Find the correct answer index
-    const correctIndex = roundData.cities.findIndex((city) => city.name === roundData.cityWithImage.name)
+    const correctIndex = roundData.items.findIndex((item) => item.name === roundData.itemWithImage.name)
 
     // Get two random incorrect indices
     let incorrectIndices = [0, 1, 2, 3].filter((i) => i !== correctIndex)
@@ -255,7 +255,7 @@ function Game() {
   const handleCallFriend = () => {
     if (callFriendUsed || !roundData) return
     // Implement logic to simulate calling a friend
-    alert("Your friend thinks the answer might be: " + roundData.cityWithImage.name)
+    alert("Your friend thinks the answer might be: " + roundData.itemWithImage.name)
     setCallFriendUsed(true)
   }
 
@@ -352,12 +352,12 @@ function Game() {
                     </Typography>
                     <ImageContainer>
                       <img
-                        src={roundData.cityWithImage.imageUrl || "/placeholder.svg"}
-                        alt={roundData.cityWithImage.imageAltText || "City image"}
+                        src={roundData.itemWithImage.imageUrl || "/placeholder.svg"}
+                        alt={roundData.itemWithImage.imageAltText || "Item image"}
                       />
                     </ImageContainer>
                     <Grid container spacing={2}>
-                      {roundData.cities.map((city, index) => (
+                      {roundData.items.map((item, index) => (
                         <Grid item xs={6} key={index}>
                           <OptionButton
                             variant="contained"
@@ -369,7 +369,7 @@ function Game() {
                             isSelected={selectedAnswer === index}
                             isCorrect={CorrectOption(index)}
                           >
-                            {city.name}
+                            {item.name}
                           </OptionButton>
                         </Grid>
                       ))}
