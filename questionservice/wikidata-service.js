@@ -2,7 +2,12 @@ const axios = require("axios");
 const mongoose = require("mongoose");
 const express = require("express");
 const WikidataObject = require("./wikidata-model");
+const cors = require('cors');
 const app = express();
+// To allow access from port 3000
+app.use(cors({
+    origin: 'http://localhost:3000' // Only allow port 3000
+}));
 
 app.use(express.json());
 
