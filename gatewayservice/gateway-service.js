@@ -60,21 +60,20 @@ app.post('/askllm', async (req, res) => {
 // Add the /loadQuestion endpoint for filling the data base
 app.post('/loadQuestion', async (req, res) => {
   try {
-    const { modes } = req.body;
+    const hardcodedBody = {
+      "modes": ["flag"]
+    };
 
-    if (!modes || !Array.isArray(modes)) {
-      return res.status(400).json({ error: "Invalid modes parameter" });
-    }
+    // Forward the request to the Question Service to get random options and image URL
+    const questionResponse = await axios.post(questionServiceUrl+'/load', hardcodedBody);
 
-    const questionResponse = await axios.post(questionServiceUrl + '/load', { modes });
-
+    // Respond with the data from the Question Service
     res.json(questionResponse.data);
   } catch (error) {
     console.error('Error fetching data from question service:', error);
     res.status(error.response?.status || 500).json({ error: 'Error fetching question data' });
   }
 });
-
 
 app.get('/getRound', async (req, res) => {
   try {

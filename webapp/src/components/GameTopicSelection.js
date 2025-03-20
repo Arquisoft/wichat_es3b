@@ -137,7 +137,7 @@ function GameModeSelection() {
   const startGame = async () => {
     try {
       console.log("selectedTopics before request:", selectedTopics);
-      await axios.post("http://localhost:8004/loadQuestion", {
+      await axios.post("http://localhost:8004/load", {
         modes: selectedTopics
       });
     } catch (error) {
