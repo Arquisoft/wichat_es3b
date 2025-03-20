@@ -166,7 +166,7 @@ function Game() {
       return response.data
     } catch (error) {
       console.error("Error fetching data from question service:", error)
-      //setLoading(false)
+      setLoading(false)
     }
   }
 
@@ -177,7 +177,7 @@ function Game() {
       setRoundData(data)
     } catch (error) {
       console.error("Error fetching data from question service:", error)
-      //setLoading(false)
+      setLoading(false)
     }
   }
 
@@ -254,7 +254,7 @@ function Game() {
         setRoundData(data);
       } catch (error) {
         console.error("Error loading new round", error);
-        //setLoading(false);
+        setLoading(false);
       }
     }, 2000);
   }
