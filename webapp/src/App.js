@@ -68,24 +68,6 @@ const StyledNavLink = styled(NavLink)({
 })
 
 function App() {
-  const [message, setMessage] = useState('');
-  const [messageCreated, isMessageCreated] = useState(false);
-
-  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
-
-  useEffect(() => {
-    createMessage();
-  }, []);
-  
-  const createMessage = async () => {
-      const question = "Please, generate a greeting message for a student, tell them how fun they are going to have using this game. Really short and make it casual. REALLY SHORT";
-      const model = "empathy";
-      const msg = await axios.post(`${apiEndpoint}/askllm`, { question, model });
-      setMessage(msg.data.answer);
-
-      isMessageCreated(true);
-  };
-
   return (
     <Container maxWidth="sm">
       <CssBaseline />
@@ -107,20 +89,6 @@ function App() {
           </Typography>
           <Typography variant="h5" color="textSecondary" gutterBottom>
             Welcome to the 2025 edition of the Software Architecture course
-          </Typography>
-          <Divider sx={{ my: 3 }} />
-          <Typography variant="body1" color="textSecondary" paragraph>
-            {/*Welcome to WICHAT! 🎉 Developed by students from the University of Oviedo, test your knowledge and have fun! Good luck! 🚀*/}
-            {messageCreated && (
-              <div>
-                <Typewriter
-                    words={[message]}
-                    cursor
-                    cursorStyle="|"
-                    typeSpeed={2}
-                />
-            </div>
-            )}
           </Typography>
         </Box>
 

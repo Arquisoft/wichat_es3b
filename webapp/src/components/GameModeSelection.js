@@ -1,18 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import {
-  Container,
-  Typography,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  Checkbox,
-  Button,
-  Paper,
-  Box,
-} from "@mui/material"
+import { Container, Typography, FormControlLabel, FormControl, Checkbox, Button, Paper, Box } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import { NavLink } from 'react-router-dom';
 
@@ -139,5 +128,4 @@ function GameModeSelection() {
   )
 }
 
-export default GameModeSelection
-
+export default GameModeSelection;

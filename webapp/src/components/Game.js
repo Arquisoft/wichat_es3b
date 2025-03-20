@@ -150,7 +150,7 @@ function Game() {
   const [callFriendUsed, setCallFriendUsed] = useState(false);
   const [useChatUsed, setUseChatUsed] = useState(false);
   const [hiddenOptions, setHiddenOptions] = useState([]);
-  
+
   const [loading, setLoading] = useState(true);
 
   const [chatKey, setChatKey] = useState(0); // resets the chat component every time it is updated
@@ -158,36 +158,66 @@ function Game() {
   // Function to load the data for each round.
   const loadRound = async () => {
     try {
-      setChatKey(chatKey + 1);
-
       setLoading(true)
+      setChatKey(chatKey + 1);
+      
       const response = await axios.get(`${apiEndpoint}/getRound`)
       setHiddenOptions([])
-      setLoading(false)
       return response.data
     } catch (error) {
       console.error("Error fetching data from question service:", error)
-      setLoading(false)
+      //setLoading(false)
     }
   }
 
   const gameSetup = async () => {
     try {
-      setLoading(true)
-      // Loads the questions from wikidata into the database
-      //await axios.post(`${apiEndpoint}/loadQuestion`)
       // First round
       const data = await loadRound()
       setRoundData(data)
     } catch (error) {
       console.error("Error fetching data from question service:", error)
-      setLoading(false)
+      //setLoading(false)
     }
   }
 
+  // Set up the game when the component mounts
   useEffect(() => {
     gameSetup();
   }, []);
+
+  // Check if the game is still loading after modifying the round data
+  useEffect(() => {
+    if (roundData && roundData.items.length > 0) {
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+  }, [roundData]);
+
+  // Load data every 500ms while the game is loading
+  useEffect(() => {
+    let intervalId;
+  
+    if (loading) {
+      intervalId = setInterval(async () => {
+        try {
+          const data = await loadRound();
+          if (data && data.items.length > 0) {
+            setRoundData(data);
+          }
+        } catch (error) {
+          console.error("Error in interval loading round data:", error);
+        }
+      }, 500);
+    }
+  
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId); // Cleanup interval on unmount or when loading stops
+      }
+    };
+  }, [loading]);
 
   const handleOptionSelect = async (index) => {
     if (selectedAnswer !== null) return;
@@ -218,14 +248,13 @@ function Game() {
 
       setRound(round + 1);
       setRoundData(null);
-      setLoading(true);
 
       try {
         const data = await loadRound();
         setRoundData(data);
       } catch (error) {
         console.error("Error loading new round", error);
-        setLoading(false);
+        //setLoading(false);
       }
     }, 2000);
   }

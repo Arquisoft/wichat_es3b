@@ -1,22 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import {
-  Container,
-  Typography,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  Button,
-  Paper,
-  Box,
-  Grid,
-} from "@mui/material"
+import { Container, Typography, Radio, RadioGroup, FormControlLabel, FormControl, Button, Paper, Box, Grid } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import { NavLink } from "react-router-dom"
 import { LocationCity, Flag, SportsBasketball, MusicNote } from "@mui/icons-material"
 import axios from 'axios';
+
+const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000";
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -106,7 +97,7 @@ const TopicButton = styled(Button, {
   },
 }))
 
-function GameModeSelection() {
+const GameTopicSelection = () => {
   const [selectedTopics, setSelectedTopics] = useState([])
   const [isWild, setIsWild] = useState(false)
 
@@ -124,7 +115,7 @@ function GameModeSelection() {
 
   const handleWildSelection = () => {
     setIsWild(true)
-    setSelectedTopics(["all"])
+    setSelectedTopics(["city", "flag", "athlete", "singer"])
   }
 
   const handleCustomSelection = () => {
@@ -137,9 +128,8 @@ function GameModeSelection() {
   const startGame = async () => {
     try {
       console.log("selectedTopics before request:", selectedTopics);
-      await axios.post("http://localhost:8004/loadQuestion", {
-        modes: selectedTopics
-      });
+      const response = await axios.post(`${apiEndpoint}/loadQuestion`, {modes: selectedTopics});
+      console.log(response.data);
     } catch (error) {
         console.error("Error fetching game data:", error);
     }
@@ -266,5 +256,4 @@ function GameModeSelection() {
   )
 }
 
-export default GameModeSelection
-
+export default GameTopicSelection;
