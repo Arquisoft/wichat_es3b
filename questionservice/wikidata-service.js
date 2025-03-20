@@ -26,7 +26,8 @@ const QUERIES = {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 ORDER BY DESC(?sitelinks)
-LIMIT 50`,
+LIMIT 200
+`,
 
     flag: `SELECT ?flag ?flagLabel ?image WHERE {
   ?flag wdt:P31 wd:Q6256;  # La entidad es un país
@@ -35,7 +36,7 @@ LIMIT 50`,
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 ORDER BY DESC(?sitelinks)  # Ordenamos por popularidad
-LIMIT 50
+LIMIT 200
 `,
 
     athlete: `SELECT DISTINCT ?athlete ?athleteLabel ?image WHERE {
@@ -54,7 +55,7 @@ LIMIT 50
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 ORDER BY DESC(?sitelinks)  # Ordenamos por popularidad
-LIMIT 50
+LIMIT 200
 `,
 
     singer: `SELECT ?singer ?singerLabel ?image (COUNT(?sitelink) AS ?numLangs) WHERE {
@@ -70,7 +71,7 @@ LIMIT 50
 }
 GROUP BY ?singer ?singerLabel ?image
 ORDER BY DESC(?numLangs)  # Ordenamos por cantidad de enlaces en Wikipedia
-LIMIT 50
+LIMIT 200
 `
 };
 
@@ -102,11 +103,15 @@ async function getImageDescription(imageUrl) {
 }
 
 async function fetchAndStoreData(modes) {
+    console.log("---------------------------------------------------------------------------");
+    console.log("Fetching data from Wikidata and storing it in the database");
+
     try {
-        console.log("---------------------------------------------------------------------------");
-        console.log("Fetching data from Wikidata and storing it in the database");
         const fetchPromises = modes.map(async (mode) => {
             if (!QUERIES[mode]) return;
+
+            console.log(`-> Starting to fetch and store data for mode: ${mode}`);
+            console.time(`Time taken for ${mode}`);
 
             const response = await axios.get(SPARQL_ENDPOINT, {
                 params: { query: QUERIES[mode], format: "json" },
@@ -117,25 +122,33 @@ async function fetchAndStoreData(modes) {
                 const id = item[mode]?.value?.split("/").pop() || "Unknown";
                 const name = item[`${mode}Label`]?.value || "No Name";
                 const imageUrl = item.image?.value || "";
-                const imageAltText = item.image?.value ? await getImageDescription(item.image.value) : "No alternative text available";
+                const imageAltText = imageUrl ? await getImageDescription(imageUrl) : "No alternative text available";
 
                 return { id, name, imageUrl, imageAltText, mode };
-            }));            
-            
-            for (const item of items) {
-                await WikidataObject.updateOne(
-                    { id: item.id }, // Match existing document by ID
-                    { $set: item },  // Update existing fields or insert if not found
-                    { upsert: true } // Insert if not found
-                ).catch(err => console.log("Error upserting item: ", err));
-            }       
-            console.log(`        *${mode} items stored in the database`);
+            }));
+
+            // Construimos las operaciones bulkWrite
+            const bulkOps = items.map(item => ({
+                updateOne: {
+                    filter: { id: item.id },
+                    update: { $set: item },
+                    upsert: true
+                }
+            }));
+
+            // Ejecutamos las operaciones en lote (bulk)
+            if (bulkOps.length > 0) {
+                await WikidataObject.bulkWrite(bulkOps);
+            }
+
+            console.timeEnd(`Time taken for ${mode}`);
+            console.log(`✔ Finished storing ${mode} data in the database.`);
         });
 
         await Promise.all(fetchPromises);
-        console.log("Data successfully stored in the database");
+        console.log("✅ Data successfully stored in the database.");
     } catch (error) {
-        console.error("Error obtaining data from Wikidata:", error);
+        console.error("❌ Error obtaining data from Wikidata:", error);
     }
 }
 
