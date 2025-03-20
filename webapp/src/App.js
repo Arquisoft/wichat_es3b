@@ -1,8 +1,11 @@
 "use client"
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Container, CssBaseline, Typography, Button, Box, Paper, Grid, Divider } from "@mui/material"
 import { styled } from "@mui/material/styles"
-import { Outlet, NavLink } from "react-router-dom"
+import { Outlet, NavLink } from "react-router"
 import { School, Login, Person } from "@mui/icons-material"
+import { Typewriter } from "react-simple-typewriter";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -65,6 +68,24 @@ const StyledNavLink = styled(NavLink)({
 })
 
 function App() {
+  const [message, setMessage] = useState('');
+  const [messageCreated, isMessageCreated] = useState(false);
+
+  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
+
+  useEffect(() => {
+    createMessage();
+  }, []);
+  
+  const createMessage = async () => {
+      const question = "Please, generate a greeting message for a student, tell them how fun they are going to have using this game. Really short and make it casual. REALLY SHORT";
+      const model = "empathy";
+      const msg = await axios.post(`${apiEndpoint}/askllm`, { question, model });
+      setMessage(msg.data.answer);
+
+      isMessageCreated(true);
+  };
+
   return (
     <Container maxWidth="sm">
       <CssBaseline />
@@ -85,17 +106,27 @@ function App() {
             WICHAT
           </Typography>
           <Typography variant="h5" color="textSecondary" gutterBottom>
-            2025 Edition
+            Welcome to the 2025 edition of the Software Architecture course
           </Typography>
           <Divider sx={{ my: 3 }} />
           <Typography variant="body1" color="textSecondary" paragraph>
-          Welcome to WICHAT! 🎉 Developed by students from the University of Oviedo, test your knowledge and have fun! Good luck! 🚀
+            {/*Welcome to WICHAT! 🎉 Developed by students from the University of Oviedo, test your knowledge and have fun! Good luck! 🚀*/}
+            {messageCreated && (
+              <div>
+                <Typewriter
+                    words={[message]}
+                    cursor
+                    cursorStyle="|"
+                    typeSpeed={2}
+                />
+            </div>
+            )}
           </Typography>
         </Box>
 
         <Grid container spacing={2} sx={{ mt: 4 }}>
           <Grid item xs={12} sm={6}>
-            <StyledNavLink to="/welcome">
+            <StyledNavLink to="/gametopic">
               <GuestButton variant="contained" startIcon={<Person />}>
                 Continue as Guest
               </GuestButton>

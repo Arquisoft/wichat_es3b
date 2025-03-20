@@ -6,7 +6,16 @@ const mongoose = require('mongoose');
 
 //Import express 
 const express = require('express'); 
+
+// Import cors
+const cors = require('cors'); 
+
 const app = express();
+
+// To allow access from port 3000
+app.use(cors({
+    origin: 'http://localhost:3000' // Only allow port 3000
+}));
 
 //For using json
 app.use(express.json());

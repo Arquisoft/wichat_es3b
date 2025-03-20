@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "wikidata-service.js",
   "scripts": {
-    "start":"node wikidata-service.js",
+    "start": "node wikidata-service.js",
     "test": "jest"
   },
   "keywords": [],
@@ -12,8 +12,9 @@
   "description": "",
   "dependencies": {
     "axios": "^1.8.3",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express":"4.21.2", 
-    "mongoose":"8.12.1"
+    "express": "4.21.2",
+    "mongoose": "8.12.1"
   }
 }
