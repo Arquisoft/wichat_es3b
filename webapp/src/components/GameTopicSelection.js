@@ -15,7 +15,7 @@ import {
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import { NavLink } from "react-router-dom"
-import { Movie, Flag, MusicNote } from "@mui/icons-material"
+import { LocationCity, Flag, SportsBasketball, MusicNote } from "@mui/icons-material"
 import axios from 'axios';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
@@ -136,7 +136,8 @@ function GameModeSelection() {
 
   const startGame = async () => {
     try {
-      await axios.post("http://localhost:8004/load", {
+      console.log("selectedTopics before request:", selectedTopics);
+      await axios.post("http://localhost:8004/loadQuestion", {
         modes: selectedTopics
       });
     } catch (error) {
@@ -180,40 +181,52 @@ function GameModeSelection() {
                 }}
               >
                 <Grid container spacing={2} justifyContent="center">
-                  <Grid item xs={12} sm={4}>
+                  <Grid item xs={12} sm={3}>
                     <TopicButton
                       fullWidth
                       variant="outlined"
-                      startIcon={<Movie />}
-                      onClick={() => handleTopicChange("movies")}
+                      startIcon={<LocationCity />}
+                      onClick={() => handleTopicChange("city")}
                       disabled={isWild}
-                      isSelected={selectedTopics.includes("movies")}
+                      isSelected={selectedTopics.includes("city")}
                     >
-                      MOVIES
+                      CITIES
                     </TopicButton>
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid item xs={12} sm={3}>
                     <TopicButton
                       fullWidth
                       variant="outlined"
                       startIcon={<Flag />}
-                      onClick={() => handleTopicChange("flags")}
+                      onClick={() => handleTopicChange("flag")}
                       disabled={isWild}
-                      isSelected={selectedTopics.includes("flags")}
+                      isSelected={selectedTopics.includes("flag")}
                     >
                       FLAGS
                     </TopicButton>
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid item xs={12} sm={3}>
+                    <TopicButton
+                      fullWidth
+                      variant="outlined"
+                      startIcon={<SportsBasketball />}
+                      onClick={() => handleTopicChange("athlete")}
+                      disabled={isWild}
+                      isSelected={selectedTopics.includes("athlete")}
+                    >
+                      ATHLETES
+                    </TopicButton>
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
                     <TopicButton
                       fullWidth
                       variant="outlined"
                       startIcon={<MusicNote />}
-                      onClick={() => handleTopicChange("music")}
+                      onClick={() => handleTopicChange("singer")}
                       disabled={isWild}
-                      isSelected={selectedTopics.includes("music")}
+                      isSelected={selectedTopics.includes("singer")}
                     >
-                      MUSIC
+                      SINGERS
                     </TopicButton>
                   </Grid>
                 </Grid>

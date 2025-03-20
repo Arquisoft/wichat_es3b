@@ -175,7 +175,7 @@ function Game() {
     try {
       setLoading(true)
       // Loads the questions from wikidata into the database
-      await axios.post(`${apiEndpoint}/loadQuestion`)
+      //await axios.post(`${apiEndpoint}/loadQuestion`)
       // First round
       const data = await loadRound()
       setRoundData(data)

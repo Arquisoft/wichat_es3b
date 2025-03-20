@@ -125,10 +125,17 @@ async function fetchAndStoreData(modes) {
                 return { id, name, imageUrl, imageAltText, mode };
             }));            
             
-            await WikidataObject.insertMany(items, { ordered: false }).catch(err => console.log("Some elements could not be saved: ", err));
+            for (const item of items) {
+                await WikidataObject.updateOne(
+                    { id: item.id }, // Match existing document by ID
+                    { $set: item },  // Update existing fields or insert if not found
+                    { upsert: true } // Insert if not found
+                ).catch(err => console.log("Error upserting item: ", err));
+            }            
         });
 
         await Promise.all(fetchPromises);
+        console.log("Data successfully stored in the database");
     } catch (error) {
         console.error("Error obtaining data from Wikidata:", error);
     }
