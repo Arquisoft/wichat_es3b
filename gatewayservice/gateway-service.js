@@ -60,10 +60,14 @@ app.post('/askllm', async (req, res) => {
 // Add the /loadQuestion endpoint for filling the data base
 app.post('/loadQuestion', async (req, res) => {
   try {
-    // Forward the request to the Question Service to get random cities and image URL
-    const questionResponse = await axios.post(questionServiceUrl+'/load', req.body);
+    const { modes } = req.body;
 
-    // Respond with the data from the Question Service
+    if (!modes || !Array.isArray(modes)) {
+      return res.status(400).json({ error: "Invalid modes parameter" });
+    }
+
+    const questionResponse = await axios.post(questionServiceUrl + '/load', { modes });
+
     res.json(questionResponse.data);
   } catch (error) {
     console.error('Error fetching data from question service:', error);
