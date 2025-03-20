@@ -75,7 +75,6 @@ app.post('/loadQuestion', async (req, res) => {
   }
 });
 
-
 app.get('/getRound', async (req, res) => {
   try {
     const roundResponse = await axios.get(questionServiceUrl+'/getRound');

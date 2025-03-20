@@ -103,6 +103,8 @@ async function getImageDescription(imageUrl) {
 
 async function fetchAndStoreData(modes) {
     try {
+        console.log("---------------------------------------------------------------------------");
+        console.log("Fetching data from Wikidata and storing it in the database");
         const fetchPromises = modes.map(async (mode) => {
             if (!QUERIES[mode]) return;
 
@@ -126,7 +128,8 @@ async function fetchAndStoreData(modes) {
                     { $set: item },  // Update existing fields or insert if not found
                     { upsert: true } // Insert if not found
                 ).catch(err => console.log("Error upserting item: ", err));
-            }            
+            }       
+            console.log(`        *${mode} items stored in the database`);
         });
 
         await Promise.all(fetchPromises);
