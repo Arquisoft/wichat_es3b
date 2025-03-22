@@ -78,6 +78,29 @@ mongoose.connect(mongoDB)
     .catch(err => console.log('Error on the connection to the DB. ', err)); 
 
 
+// Function to clear the database
+async function clearDatabase() {
+    try {
+        await WikidataObject.deleteMany({});
+    } catch (error) {
+        console.error("Error clearing the database:", error);
+    }
+}
+
+// Function to load all data from Wikidata
+async function loadAllData() {
+    try {
+        selectedModes = ["city", "flag", "athlete", "singer"];
+        await fetchAndStoreData(selectedModes);
+    } catch (error) {
+        console.error("❌ Error loading data:", error);
+    }
+}
+
+// Call `loadAllData()` immediately on server startup
+clearDatabase();
+loadAllData();
+
 // Function to fetch the alternative description of an image from Wikimedia Commons
 async function getImageDescription(imageUrl) {
     const fileName = decodeURIComponent(imageUrl.split("/").pop()); // Extract the image filename
@@ -149,15 +172,6 @@ async function fetchAndStoreData(modes) {
     }
 }
 
-// Función para vaciar la base de datos
-async function clearDatabase() {
-    try {
-        await WikidataObject.deleteMany({});
-    } catch (error) {
-        console.error("Error clearing the database:", error);
-    }
-}
-
 // Endpoint to fetch data from Wikidata and store it in the database
 app.post("/load", async (req, res) => {
     try {
@@ -167,10 +181,10 @@ app.post("/load", async (req, res) => {
         }
 
         selectedModes = modes; // Store the selected modes in the global variable
-        await clearDatabase(); // Clear the database before loading new data
-        await fetchAndStoreData(modes); // Fetch data and store it in MongoDB
+        //await clearDatabase(); // Clear the database before loading new data
+        //await fetchAndStoreData(modes); // Fetch data and store it in MongoDB
         
-        res.status(200).json({ message: "Data successfully stored" });
+        //res.status(200).json({ message: "Data successfully stored" });
     } catch (error) {
         console.error("Error in /load endpoint:", error);
         res.status(500).json({ error: "Internal server error" });
@@ -212,6 +226,15 @@ app.get("/getRound", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
+async function loadAllData() {
+    try {
+        const modes = ["city", "flag", "athlete", "singer"];
+        await fetchAndStoreData(modes);
+    } catch (error) {
+        console.error("Error loading data:", error);
+    }
+}
 
 const server = app.listen(port, () => {
     console.log(`Question Service listening at http://localhost:${port}`);
