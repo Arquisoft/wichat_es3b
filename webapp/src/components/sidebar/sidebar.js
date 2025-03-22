@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import "./sidebar.css"
+import { useEffect } from "react";
+import "./Sidebar.css";
 
 // Componente para la barra lateral con información del usuario
 export default function Sidebar({ userData, isVisible, onClose }) {
@@ -13,8 +13,8 @@ export default function Sidebar({ userData, isVisible, onClose }) {
     // Limpieza al desmontar
     return () => {
       // No es necesario hacer nada aquí
-    }
-  }, [isVisible])
+    };
+  }, [isVisible]);
 
   return (
     <>
@@ -22,15 +22,14 @@ export default function Sidebar({ userData, isVisible, onClose }) {
         <div className="sidebar-header">
           <div className="user-header">
             <h2>{userData.username}</h2>
-            <button className="menu-button" onClick={onClose} aria-label="Cerrar menú">
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
           </div>
 
           <div className="avatar-container">
-            <img src={userData.avatar || "/placeholder.svg"} alt="Avatar de usuario" className="avatar" />
+            <img
+              src={userData.avatar || "/placeholder.svg"}
+              alt="Avatar de usuario"
+              className="avatar"
+            />
           </div>
         </div>
 
@@ -74,8 +73,13 @@ export default function Sidebar({ userData, isVisible, onClose }) {
       </aside>
 
       {/* Overlay para cerrar el sidebar en móviles */}
-      {isVisible && <div className="sidebar-overlay" onClick={onClose} aria-hidden="true"></div>}
+      {isVisible && (
+        <div
+          className="sidebar-overlay"
+          onClick={onClose}
+          aria-hidden="true"
+        ></div>
+      )}
     </>
-  )
+  );
 }
-

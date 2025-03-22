@@ -1,0 +1,38 @@
+/* Estilos para la página de perfil */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+.main-content {
+  display: flex;
+  height: auto;
+  flex-direction: row;
+  transition: margin-left 0.3s ease;
+  width: 100%;
+}
+
+.content-area {
+  width: 80%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+}
+
+.sidebar-stats {
+  padding: 1em;
+  height: 100%;
+  width: 15%;
+  min-width: 1vw;
+}
+
+/* Estilos para móviles: sidebar oculto por defecto */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
