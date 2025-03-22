@@ -7,6 +7,7 @@ import ProfileCard from "../../components/profile-card/profile-card";
 import "../../assets/global.css";
 import Footer from "../../components/Footer";
 import "./PerfilPage.css";
+import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarToggleButton";
 
 export default function PerfilPage() {
   // Estado para datos de usuario
@@ -76,8 +77,8 @@ export default function PerfilPage() {
   return (
     <div className="app-container">
       <Navbar />
-
       <div className={`main-content ${sidebarVisible ? "with-sidebar" : ""}`}>
+        <SidebarToggleButton onClick={toggleSidebar}></SidebarToggleButton>
         <div className="sidebar-stats">
           <Sidebar
             userData={userData}

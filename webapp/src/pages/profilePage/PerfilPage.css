@@ -7,11 +7,14 @@
 }
 
 .main-content {
+  position: relative;
   display: flex;
-  height: auto;
   flex-direction: row;
+  gap: 1em;
+  padding: 1em;
   transition: margin-left 0.3s ease;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .content-area {

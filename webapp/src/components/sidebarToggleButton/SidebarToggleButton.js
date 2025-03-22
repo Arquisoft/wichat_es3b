@@ -7,7 +7,7 @@ const SidebarToggleButton = ({ onClick }) => {
     <button
       className="sidebar-toggle-button"
       onClick={onClick}
-      aria-label="Abrir menú"
+      aria-label="Abrir/cerrar menú"
     >
       <Menu size={24}></Menu>
     </button>
