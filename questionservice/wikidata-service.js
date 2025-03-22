@@ -18,11 +18,12 @@ const SPARQL_ENDPOINT = "https://query.wikidata.org/sparql";
 // Global variable to store the selected game modes
 let selectedModes = []; 
 
+// Define the SPARQL queries to fetch data from Wikidata
 const QUERIES = {
     city: `SELECT ?city ?cityLabel ?image WHERE {
-  ?city wdt:P31 wd:Q515;  # La entidad es una ciudad
-        wikibase:sitelinks ?sitelinks;  # Número de enlaces en Wikipedia
-        wdt:P18 ?image.  # La ciudad tiene una imagen
+  ?city wdt:P31 wd:Q515;  # The entity is a city
+        wikibase:sitelinks ?sitelinks;  # Number of Wikipedia links
+        wdt:P18 ?image.  # The city has an image
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 ORDER BY DESC(?sitelinks)
@@ -30,47 +31,43 @@ LIMIT 200
 `,
 
     flag: `SELECT ?flag ?flagLabel ?image WHERE {
-  ?flag wdt:P31 wd:Q6256;  # La entidad es un país
-           wikibase:sitelinks ?sitelinks;  # Número de enlaces en Wikipedia
-           wdt:P41 ?image.  # Imagen de la bandera del país
+  ?flag wdt:P31 wd:Q6256;  # The entity is a country
+           wikibase:sitelinks ?sitelinks;  # Number of Wikipedia links
+           wdt:P41 ?image.  # Country flag image
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
-ORDER BY DESC(?sitelinks)  # Ordenamos por popularidad
+ORDER BY DESC(?sitelinks)  # Order by popularity
 LIMIT 200
 `,
 
     athlete: `SELECT DISTINCT ?athlete ?athleteLabel ?image WHERE {
-  ?athlete wdt:P31 wd:Q5;  # Es una persona
-           wdt:P106 ?sport;  # Es un deportista
-           wikibase:sitelinks ?sitelinks;  # Número de enlaces en Wikipedia
-           wdt:P18 ?image;  # Tiene imagen obligatoria
-           wdt:P166 ?award.  # Ha ganado un premio importante
+  ?athlete wdt:P31 wd:Q5;  # The entity is a person
+           wdt:P106 ?sport;  # The person is an athlete
+           wikibase:sitelinks ?sitelinks;  # Number of Wikipedia links
+           wdt:P18 ?image;  # The athlete must have an image
+           wdt:P166 ?award.  # The athlete has won a major award
 
-  # Filtrar por tipos de deportistas
+  # Filter by types of athletes
   VALUES ?sport { wd:Q937857 wd:Q10833314 wd:Q3665646 }  
-  # Q937857 = Futbolista
-  # Q10833314 = Tenista
-  # Q3665646 = Baloncestista
+  # Q937857 = Footballer
+  # Q10833314 = Tennis player
+  # Q3665646 = Basketball player
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
-ORDER BY DESC(?sitelinks)  # Ordenamos por popularidad
+ORDER BY DESC(?sitelinks)  # Order by popularity
 LIMIT 200
 `,
 
-    singer: `SELECT ?singer ?singerLabel ?image (COUNT(?sitelink) AS ?numLangs) WHERE {
-  ?singer wdt:P31 wd:Q5;  # Es una persona
-          wdt:P106 wd:Q177220;  # Es un cantante
-          wdt:P18 ?image.  # Tiene una imagen asociada
-
-  OPTIONAL {
-    ?sitelink schema:about ?singer.
-  }
+    singer: `SELECT ?singer ?singerLabel ?image WHERE {
+  ?singer wdt:P31 wd:Q5;  # The entity is a person
+          wdt:P106 wd:Q177220;  # The person is a singer
+          wikibase:sitelinks ?sitelinks;  # Number of Wikipedia links
+          wdt:P18 ?image.  # The person has an image
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
-GROUP BY ?singer ?singerLabel ?image
-ORDER BY DESC(?numLangs)  # Ordenamos por cantidad de enlaces en Wikipedia
+ORDER BY DESC(?sitelinks)
 LIMIT 200
 `
 };
