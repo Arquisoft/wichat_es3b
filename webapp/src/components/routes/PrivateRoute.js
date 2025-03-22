@@ -7,6 +7,10 @@ const isAuthenticated = () => {
 };
 
 const PrivateRoute = ({ children }) => {
+
+    // ELIMINAR ESTA LÍNEA
+    return children;
+
     return isAuthenticated() ? children : <Navigate to="/auth" />;
 };
 

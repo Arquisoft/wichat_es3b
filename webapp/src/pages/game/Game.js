@@ -22,6 +22,7 @@ const Game = () => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [progress, setProgress] = useState(100);
+  const [isChatBoxVisible, setIsChatBoxVisible] = useState(false); // State for ChatBox visibility
 
   const timerRef = useRef(null); // Referencia para almacenar el ID del intervalo
 
@@ -42,6 +43,27 @@ const Game = () => {
       setIsLoading(false);
     }
   }, []);
+
+  const fetchQuestions2 = useCallback(async () => {
+    try {
+      const response = await fetch('http://localhost:8000/questions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ n: 25, locale: 'es' }),
+      });
+      if (!response.ok) {
+        throw new Error('No se pudieron obtener las preguntas.');
+      }
+      const data = await response.json();
+      setQuestions(data);
+      setCurrentQuestion(data[questionNumber]);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+  }, [questionNumber]);
 
   useEffect(() => {
     fetchQuestions();
@@ -108,8 +130,7 @@ const Game = () => {
         <div className="upperSection">
           <div className="hintButton">
             <HintButton
-              text={"¿Necesitas una pista?"}
-              onClick={() => alert("Tienes una pista!")}
+                onClick={() => setIsChatBoxVisible((prev) => !prev)} // Toggle ChatBox visibility
             />
           </div>
           <div className="question">
@@ -183,9 +204,11 @@ const Game = () => {
           </Box>
         </div>
         <div></div>
-        <div className="chatBoxContainer">
-          <ChatBox question={currentQuestion} language="es" />
-        </div>
+        {isChatBoxVisible && (
+            <div className="chatBoxContainer">
+              <ChatBox question={currentQuestion} language="es" />
+            </div>
+        )}
       </main>
       <Footer />
     </div>
