@@ -87,20 +87,6 @@ async function clearDatabase() {
     }
 }
 
-// Function to load all data from Wikidata
-async function loadAllData() {
-    try {
-        selectedModes = ["city", "flag", "athlete", "singer"];
-        await fetchAndStoreData(selectedModes);
-    } catch (error) {
-        console.error("❌ Error loading data:", error);
-    }
-}
-
-// Call `loadAllData()` immediately on server startup
-clearDatabase();
-loadAllData();
-
 // Function to fetch the alternative description of an image from Wikimedia Commons
 async function getImageDescription(imageUrl) {
     const fileName = decodeURIComponent(imageUrl.split("/").pop()); // Extract the image filename
@@ -122,32 +108,25 @@ async function getImageDescription(imageUrl) {
     }
 }
 
-async function fetchAndStoreData(modes) {
-    console.log("---------------------------------------------------------------------------");
+async function fetchAndStoreData() {
     console.log("Fetching data from Wikidata and storing it in the database");
-
     try {
-        const fetchPromises = modes.map(async (mode) => {
-            if (!QUERIES[mode]) return;
-
-            console.log(`-> Starting to fetch and store data for mode: ${mode}`);
+        const fetchPromises = Object.entries(QUERIES).map(async ([mode, query]) => {
+            console.log(`-> Fetching data for mode: ${mode}`);
             console.time(`Time taken for ${mode}`);
 
             const response = await axios.get(SPARQL_ENDPOINT, {
-                params: { query: QUERIES[mode], format: "json" },
+                params: { query, format: "json" },
                 headers: { "User-Agent": "QuizGame/1.0 (student project)" }
             });
 
-            const items = await Promise.all(response.data.results.bindings.map(async (item) => {
-                const id = item[mode]?.value?.split("/").pop() || "Unknown";
-                const name = item[`${mode}Label`]?.value || "No Name";
-                const imageUrl = item.image?.value || "";
-                const imageAltText = imageUrl ? await getImageDescription(imageUrl) : "No alternative text available";
-
-                return { id, name, imageUrl, imageAltText, mode };
+            const items = response.data.results.bindings.map(item => ({
+                id: item[mode]?.value?.split("/").pop() || "Unknown",
+                name: item[`${mode}Label`]?.value || "No Name",
+                imageUrl: item.image?.value || "",
+                mode
             }));
 
-            // Construimos las operaciones bulkWrite
             const bulkOps = items.map(item => ({
                 updateOne: {
                     filter: { id: item.id },
@@ -156,13 +135,12 @@ async function fetchAndStoreData(modes) {
                 }
             }));
 
-            // Ejecutamos las operaciones en lote (bulk)
             if (bulkOps.length > 0) {
                 await WikidataObject.bulkWrite(bulkOps);
             }
 
             console.timeEnd(`Time taken for ${mode}`);
-            console.log(`✔ Finished storing ${mode} data in the database.`);
+            console.log(`✔ Finished storing ${mode} data.`);
         });
 
         await Promise.all(fetchPromises);
@@ -184,7 +162,7 @@ app.post("/load", async (req, res) => {
         //await clearDatabase(); // Clear the database before loading new data
         //await fetchAndStoreData(modes); // Fetch data and store it in MongoDB
         
-        //res.status(200).json({ message: "Data successfully stored" });
+        res.status(200).json({ message: "Data successfully stored" });
     } catch (error) {
         console.error("Error in /load endpoint:", error);
         res.status(500).json({ error: "Internal server error" });
@@ -227,14 +205,9 @@ app.get("/getRound", async (req, res) => {
     }
 });
 
-async function loadAllData() {
-    try {
-        const modes = ["city", "flag", "athlete", "singer"];
-        await fetchAndStoreData(modes);
-    } catch (error) {
-        console.error("Error loading data:", error);
-    }
-}
+// Call `loadAllData()` immediately on server startup
+clearDatabase();
+fetchAndStoreData();
 
 const server = app.listen(port, () => {
     console.log(`Question Service listening at http://localhost:${port}`);
