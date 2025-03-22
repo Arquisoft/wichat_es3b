@@ -13,8 +13,8 @@ class Question {
         this.img = img;
     }
 
-    obtenerPreguntaPorIdioma(idioma) {
-        return this.preguntas[idioma] || null;
+    obtenerPreguntaPorIdioma() {
+        return this.preguntas;
     }
     obtenerRespuestas() {
         return [this.respuestaCorrecta, ...this.respuestasIncorrectas];

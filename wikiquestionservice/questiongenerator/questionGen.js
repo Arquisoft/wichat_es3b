@@ -72,56 +72,39 @@ class WikidataQueryService {
             return [];
         }
         for (const entity of this.entitiesArray) {
+            if(this.questionsArray.length>=5){
+                return;
+            }
             const entityName = entity.label;
             const indiceAleatorio = Math.floor(Math.random() * this.questions.length);
-            const descripcion = [];
-            for (let i = 0; i < this.properties.length; i++) {
-                if(this.questionsArray.length>=5){
-                    return;
-                }
-                if (i === indiceAleatorio) {
-                    continue;
-                }
-                const property = this.properties[i];
-                const tipo = this.types[i];
-                const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, property,tipo);
-                if (valoresDePropiedad.length > 0) {
-                    const etiquetaPropiedad = await this.obtenerEtiquetaDePropiedad(property);
-                    if (this.validar(valoresDePropiedad[0])) {
-                        continue;
-                    }
-                    descripcion.push({
-                        propiedad: etiquetaPropiedad,
-                        valor: valoresDePropiedad[0]
-                    });
-                }
-            }
+            const descripcion = await this.generarDescripcion(entity.id, indiceAleatorio);
             if (descripcion.length === 0) {
                 continue;
             }
-            const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, this.properties[indiceAleatorio],this.types[indiceAleatorio]);
-            if (valoresDePropiedad.length === 0) {
-                continue;
-            }
-            const respuestaCorrecta = valoresDePropiedad[0];
-            if (this.validar(respuestaCorrecta)) {
-                continue;
-            }
-            const respuestasIncorrectas = await this.obtenerRespuestasIncorrectas(entity.id, this.properties[indiceAleatorio], valoresDePropiedad,this.types[indiceAleatorio]);
-            if (respuestasIncorrectas.some(respuesta => this.validar(respuesta))) {
-                continue;
-            }
-            if (respuestasIncorrectas.length !== 3) {
-                continue;
-            }
-
             const preguntaAleatoria = this.questions[indiceAleatorio];
             const preguntasModificadas = {};
+            const respuestaCorrecta={}
+            const respuestasIncorrectas={}
             for (const idioma in preguntaAleatoria) {
                 if (preguntaAleatoria.hasOwnProperty(idioma)) {
                     let preguntaEnIdioma = preguntaAleatoria[idioma];
                     preguntaEnIdioma = preguntaEnIdioma.replace("%", entityName);
                     preguntasModificadas[idioma] = preguntaEnIdioma;
+                }
+                const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, this.properties[indiceAleatorio],this.types[indiceAleatorio],idioma);
+                if (valoresDePropiedad.length === 0) {
+                    continue;
+                }
+                respuestaCorrecta[idioma] = valoresDePropiedad[0];
+                if (this.validar(respuestaCorrecta)) {
+                    continue;
+                }
+                respuestasIncorrectas[idioma]= await this.obtenerRespuestasIncorrectas(entity.id, this.properties[indiceAleatorio], valoresDePropiedad,this.types[indiceAleatorio],idioma);
+                if (respuestasIncorrectas.some(respuesta => this.validar(respuesta))) {
+                    continue;
+                }
+                if (respuestasIncorrectas.length !== 3) {
+                    continue;
                 }
             }
             const imgprueba = await this.obtenerValoresDePropiedad(entity.id,this.img[0]);
@@ -131,11 +114,11 @@ class WikidataQueryService {
         }
     }
 
-    async obtenerValoresDePropiedad(id, property,tipo) {
+    async obtenerValoresDePropiedad(id, property,tipo,idioma) {
         const sparqlQuery = `
         SELECT ?propertyValueLabel WHERE {
             wd:${id} wdt:${property} ?propertyValue.
-            SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],es". }
+            SERVICE wikibase:label { bd:serviceParam wikibase:language "${idioma}". }
         }`;
 
         try {
@@ -150,11 +133,11 @@ class WikidataQueryService {
             return [];
         }
     }
-    async obtenerRespuestasIncorrectas(entityId, property, valoresDePropiedadCorrectos,tipo) {
+    async obtenerRespuestasIncorrectas(entityId, property, valoresDePropiedadCorrectos,tipo,idioma) {
         let respuestasIncorrectas = [];
         for (const otherEntity of this.entitiesArray) {
             if (otherEntity.id !== entityId) {
-                const valoresDePropiedad = await this.obtenerValoresDePropiedad(otherEntity.id, property,tipo);
+                const valoresDePropiedad = await this.obtenerValoresDePropiedad(otherEntity.id, property,tipo,idioma);
                 for (const valor of valoresDePropiedad) {
                     if (!valoresDePropiedadCorrectos.includes(valor) && !respuestasIncorrectas.includes(valor)) {
                         respuestasIncorrectas.push(valor);
@@ -192,7 +175,33 @@ class WikidataQueryService {
         return regex.test(respuesta);
     }
 
-
+    async generarDescripcion(entityId, indiceAleatorio) {
+        const descripcion = [];
+        for (let i = 0; i < this.properties.length; i++) {
+            if (i === indiceAleatorio) {
+                continue;
+            }
+            const property = this.properties[i];
+            const tipo = this.types[i];
+            const valoresDePropiedad = await this.obtenerValoresDePropiedad(entityId, property, tipo);
+            if (valoresDePropiedad.length > 0) {
+                const etiquetaPropiedad = await this.obtenerEtiquetaDePropiedad(property);
+                for (const valorObj of valoresDePropiedad) {
+                    for (const idioma in valorObj) {
+                        if (this.validar(valorObj[idioma])) {
+                            continue;
+                        }
+                        descripcion.push({
+                            idioma: idioma,
+                            propiedad: etiquetaPropiedad,
+                            valor: valorObj[idioma]
+                        });
+                    }
+                }
+            }
+        }
+        return descripcion;
+    }
 
 }
 

@@ -30,7 +30,7 @@ const Game = () => {
   const fetchQuestions = useCallback(async () => {
     // Correcto
     try {
-      const response = await fetch(`${URL}questions?n=25&locale=es`);
+      const response = await fetch(`${URL}questions?n=25`);
       if (!response.ok) {
         throw new Error("No se pudieron obtener las preguntas.");
       }
