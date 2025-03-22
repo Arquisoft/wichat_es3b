@@ -17,7 +17,20 @@ class Question {
         return this.preguntas;
     }
     obtenerRespuestas() {
-        return [this.respuestaCorrecta, ...this.respuestasIncorrectas];
+        const respuestas = {};
+        for (const idioma in this.respuestaCorrecta) {
+            if (!this.respuestaCorrecta.hasOwnProperty(idioma)) continue;
+
+            const correcta = this.respuestaCorrecta[idioma] || "Respuesta no disponible";
+
+            const incorrectas = Array.isArray(this.respuestasIncorrectas[idioma])
+                ? this.respuestasIncorrectas[idioma]
+                : [];
+
+            respuestas[idioma] = [correcta, ...incorrectas].sort(() => Math.random() - 0.5);
+        }
+
+        return respuestas;
     }
     obtenerImg() {
         return this.img;
