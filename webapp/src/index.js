@@ -4,6 +4,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
 import styles from './index.css';
 
+import { AuthProvider } from './auth/AuthContext';
+import PrivateRoute from './auth/PrivateRoute';
+
 import App from './App';
 import Login from './components/Login';
 import SignUp from './components/AddUser';
@@ -17,19 +20,25 @@ console.log(styles);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <BrowserRouter>
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<App />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/welcome" element={<Welcome />} />
-        <Route path="/gamemode" element={<GameModeSelection />} />
-        <Route path="/gametopic" element={<GameTopicSelection />} />
-        <Route path="/game" element={<Game />} />
-      </Route>
-    </Routes>
-  </BrowserRouter>
+  <AuthProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          {/* Routes without authentication */}
+          <Route index element={<App />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          {/* Routes with authentication */}
+          <Route element={<PrivateRoute />}>
+            <Route path="/welcome" element={<Welcome />} />
+            <Route path="/gamemode" element={<GameModeSelection />} />
+            <Route path="/gametopic" element={<GameTopicSelection />} />
+            <Route path="/game" element={<Game />} />
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  </AuthProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
