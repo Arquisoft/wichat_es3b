@@ -81,6 +81,7 @@ class WikidataQueryService {
             if (descripcion.length === 0) {
                 continue;
             }
+            let entidadInvalida = false;
             const preguntaAleatoria = this.questions[indiceAleatorio];
             const preguntasModificadas = {};
             const respuestaCorrecta={}
@@ -93,19 +94,26 @@ class WikidataQueryService {
                 }
                 const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, this.properties[indiceAleatorio],this.types[indiceAleatorio],idioma);
                 if (valoresDePropiedad.length === 0) {
-                    continue;
+                    entidadInvalida = true;
+                    break;
                 }
                 respuestaCorrecta[idioma] = valoresDePropiedad[0];
                 if (this.validar(respuestaCorrecta)) {
-                    continue;
+                    entidadInvalida = true;
+                    break;
                 }
                 respuestasIncorrectas[idioma]= await this.obtenerRespuestasIncorrectas(entity.id, this.properties[indiceAleatorio], valoresDePropiedad,this.types[indiceAleatorio],idioma);
-                if (respuestasIncorrectas.some(respuesta => this.validar(respuesta))) {
-                    continue;
+                if (respuestasIncorrectas[idioma].some(respuesta => this.validar(respuesta))) {
+                    entidadInvalida = true;
+                    break;
                 }
-                if (respuestasIncorrectas.length !== 3) {
-                    continue;
+                if (respuestasIncorrectas[idioma].length !== 3) {
+                    entidadInvalida = true;
+                    break;
                 }
+            }
+            if (entidadInvalida) {
+                continue;
             }
             const imgprueba = await this.obtenerValoresDePropiedad(entity.id,this.img[0]);
             if (!imgprueba || imgprueba.length === 0) continue;
@@ -183,21 +191,16 @@ class WikidataQueryService {
             }
             const property = this.properties[i];
             const tipo = this.types[i];
-            const valoresDePropiedad = await this.obtenerValoresDePropiedad(entityId, property, tipo);
+            const valoresDePropiedad = await this.obtenerValoresDePropiedad(entityId, property,tipo,"es");
             if (valoresDePropiedad.length > 0) {
                 const etiquetaPropiedad = await this.obtenerEtiquetaDePropiedad(property);
-                for (const valorObj of valoresDePropiedad) {
-                    for (const idioma in valorObj) {
-                        if (this.validar(valorObj[idioma])) {
-                            continue;
-                        }
-                        descripcion.push({
-                            idioma: idioma,
-                            propiedad: etiquetaPropiedad,
-                            valor: valorObj[idioma]
-                        });
-                    }
+                if (this.validar(valoresDePropiedad[0])) {
+                    continue;
                 }
+                descripcion.push({
+                    propiedad: etiquetaPropiedad,
+                    valor: valoresDePropiedad[0]
+                });
             }
         }
         return descripcion;
