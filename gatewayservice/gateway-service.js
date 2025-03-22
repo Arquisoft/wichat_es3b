@@ -10,12 +10,13 @@ const YAML = require('yaml')
 const app = express();
 const port = 8000;
 
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
 const questionServiceUrl = process.env.QUESTION_SERVICE_URL || 'http://localhost:8004';
 const llmServiceUrl = process.env.LLM_SERVICE_URL || 'http://localhost:8003';
 const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
 
-app.use(cors());
+app.use(cors({ origin: frontendUrl, credentials: true }));
 app.use(express.json());
 
 //Prometheus configuration
@@ -31,6 +32,26 @@ app.post('/login', async (req, res) => {
   try {
     // Forward the login request to the authentication service
     const authResponse = await axios.post(authServiceUrl+'/login', req.body);
+    res.json(authResponse.data);
+  } catch (error) {
+    res.status(error.response.status).json({ error: error.response.data.error });
+  }
+});
+
+app.post('/logout', async (req, res) => {
+  try {
+    // Forward the logout request to the authentication service
+    const authResponse = await axios.post(authServiceUrl+'/logout', req.body);
+    res.json(authResponse.data);
+  } catch (error) {
+    res.status(error.response.status).json({ error: error.response.data.error });
+  }
+});
+
+app.get("/protected", async (req, res) => {
+  try {
+    // Forward the logout request to the authentication service
+    const authResponse = await axios.get(authServiceUrl+'/protected', req.body);
     res.json(authResponse.data);
   } catch (error) {
     res.status(error.response.status).json({ error: error.response.data.error });
