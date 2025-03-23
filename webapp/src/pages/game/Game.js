@@ -4,6 +4,7 @@ import Nav from "../../components/nav/Nav";
 import Footer from "../../components/Footer";
 import HintButton from "../../components/hintButton/HintButton";
 import BaseButton from "../../components/button/BaseButton";
+import ChatBox from "../../components/chatBox/ChatBox";
 import { LinearProgress, Box } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 const TOTAL_TIME = 40; // Duración total de la pregunta en segundos
@@ -47,14 +48,14 @@ const Game = () => {
   }, [fetchQuestions]);
 
   useEffect(() => {
-    if (timeLeft <= 0 || isAnswered) return; // Detener si el tiempo llega a 0 o si ya se respondió
+    if (timeLeft <= 0 || isAnswered) return;
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(prev - 1, 0));
     }, 1000);
 
-    return () => clearInterval(timerRef.current); // Limpiar el intervalo al desmontar
-  }, [timeLeft, isAnswered]); // Dependencias: timeLeft y isAnswered
+    return () => clearInterval(timerRef.current);
+  }, [timeLeft, isAnswered]);
 
   useEffect(() => {
     setProgress((timeLeft / TOTAL_TIME) * 100);
@@ -182,6 +183,9 @@ const Game = () => {
           </Box>
         </div>
         <div></div>
+        <div className="chatBoxContainer">
+          <ChatBox question={currentQuestion} language="es" />
+        </div>
       </main>
       <Footer />
     </div>
