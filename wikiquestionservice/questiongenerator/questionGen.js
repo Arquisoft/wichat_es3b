@@ -1,7 +1,7 @@
 const axios = require('axios');
 const Question = require('./question');
 class WikidataQueryService {
-    constructor(categoryName, entity, properties, questions,types,img) {
+    constructor(categoryName, entity, properties, questions,types,img,questionsPerCategory) {
         this.wikidataEndpoint = "https://query.wikidata.org/sparql";
         this.categoryName = categoryName;
         this.entity = entity;
@@ -11,6 +11,7 @@ class WikidataQueryService {
         this.types=types;
         this.questionsArray=[];
         this.img=img;
+        this.questionsPerCategory=questionsPerCategory;
     }
 
     async fetchData(sparqlQuery) {
@@ -72,7 +73,7 @@ class WikidataQueryService {
             return [];
         }
         for (const entity of this.entitiesArray) {
-            if(this.questionsArray.length>=5){
+            if(this.questionsArray.length>=this.questionsPerCategory){
                 return;
             }
             const entityName = entity.label;

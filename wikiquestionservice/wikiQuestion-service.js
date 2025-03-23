@@ -26,29 +26,30 @@ app.use((req, res, next) => {
 });
 
 app.get("/questions", async (req, res) => {
-  const { n = 10} = req.query;
+  const { n = 25,topic="all"} = req.query;
   const numQuestions = parseInt(n, 10);
   if (numQuestions > 25) {
     return res.status(400).json({ error: "El límite de preguntas es 25" });
   }
   try {
-    await questionManager.loadAllQuestions();
+    let topics = topic.split(",");
+    if (topics.includes("all")) {
+      topics = ["all"];
+    }
+    const selectedQuestions = await questionManager.loadAllQuestions(topics,numQuestions);
 
-    const allQuestions = questionManager.questions;
-
-    const limitedQuestions = allQuestions.slice(0, numQuestions).map((q) => {
-      const questionText = q.obtenerPreguntaPorIdioma();
-      const respuestas = q.obtenerRespuestas();
+    const formattedQuestions = selectedQuestions.map((q) => {
       return {
-        pregunta: questionText,
+        pregunta: q.obtenerPreguntaPorIdioma(),
         respuestaCorrecta: q.respuestaCorrecta,
-        respuestas: respuestas,
+        respuestas: q.obtenerRespuestas(),
         descripcion: q.descripcion,
         img: q.obtenerImg(),
       };
     });
 
-    res.json(limitedQuestions);
+
+    res.json(formattedQuestions);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
