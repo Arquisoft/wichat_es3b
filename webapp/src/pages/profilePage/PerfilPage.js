@@ -1,17 +1,19 @@
 import { useState } from "react";
 import Navbar from "../../components/nav/Nav";
-import Sidebar from "../../components/sidebar/sidebar";
+import Sidebar from "../../components/sidebar/Sidebar";
 import StatsGraphs from "../../components/stats-graphs/stats-graphs";
 import GameHistory from "../../components/game-history/game-history";
 import ProfileCard from "../../components/profile-card/profile-card";
 import "../../assets/global.css";
 import Footer from "../../components/Footer";
+import "./PerfilPage.css";
+import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarToggleButton";
 
 export default function PerfilPage() {
   // Estado para datos de usuario
   const [userData, setUserData] = useState({
     username: "Alejandro Vega",
-    level: 5,
+    level: 4,
     avatar:
       "https://i.pinimg.com/736x/8d/16/90/8d16902ae35c1e982c2990ff85fa11fb.jpg",
     stats: {
@@ -57,6 +59,8 @@ export default function PerfilPage() {
     setSidebarVisible(!sidebarVisible);
   };
 
+  const closeSideBar = () => setSidebarVisible(false);
+
   // Función para navegar por el historial de partidas
   const navigateGames = (direction) => {
     if (direction === "prev") {
@@ -72,15 +76,18 @@ export default function PerfilPage() {
 
   return (
     <div className="app-container">
-      {/* Barra de navegación superior */}
       <Navbar />
-
-      <div className="main-content">
+      <div className={`main-content ${sidebarVisible ? "with-sidebar" : ""}`}>
+        <SidebarToggleButton onClick={toggleSidebar}></SidebarToggleButton>
+        <div className="sidebar-stats">
+          <Sidebar
+            userData={userData}
+            isVisible={sidebarVisible}
+            onClose={closeSideBar}
+          ></Sidebar>
+        </div>
         <div className="content-area">
-          {/* Tarjeta de perfil */}
           <ProfileCard userData={userData} />
-
-          {/* Sección de gráficas */}
           <StatsGraphs
             monthlyData={userData.monthlyData}
             pieData={userData.pieData}
