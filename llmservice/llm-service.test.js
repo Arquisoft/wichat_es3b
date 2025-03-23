@@ -57,7 +57,7 @@ describe('LLM Service', () => {
   it('should process ask request with valid parameters', async () => {
     const testQuestion = {
       respuestaCorrecta: 'El Big Ben',
-      preguntas: {
+      pregunta: {
         es: '¿Cuál es este monumento?',
         en: 'What is this monument?',
         idioma: '¿Cuál es este monumento?'
