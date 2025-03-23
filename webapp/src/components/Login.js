@@ -10,6 +10,7 @@ const Login = () => {
   const { setAuth } = useAuth();
   const navigate = useNavigate();
   const from = useLocation().state?.from.pathname || "/";
+  
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
