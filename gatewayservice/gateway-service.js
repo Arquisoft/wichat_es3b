@@ -59,13 +59,9 @@ app.post('/askllm', async (req, res) => {
 
 app.post('/questions', async (req, res) => {
   try {
-    console.log("Request received in gateway");
     const { n, locale } = req.body;
     const questionServiceUrl = `${wikiQuestionServiceUrl}/questions?n=${n}&locale=${locale}`;
-    console.log("Requesting questions from: " + questionServiceUrl);
-    const response = await fetch(questionServiceUrl);
-    //const response = await axios.get(questionServiceUrl);
-    console.log("Response: " + response);
+    const response = await axios.get(questionServiceUrl);
     res.json(response.data);
   } catch (error) {
     res.status(error.response ? error.response.status : 500).json({ error: error.message });

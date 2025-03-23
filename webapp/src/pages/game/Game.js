@@ -29,22 +29,6 @@ const Game = () => {
   const URL = "http://localhost:8004/";
 
   const fetchQuestions = useCallback(async () => {
-    // Correcto
-    try {
-      const response = await fetch(`${URL}questions?n=25&locale=es`);
-      if (!response.ok) {
-        throw new Error("No se pudieron obtener las preguntas.");
-      }
-      const data = await response.json();
-      setQuestions(data);
-      setCurrentQuestion(data[questionNumber]);
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const fetchQuestions2 = useCallback(async () => {
     try {
       const response = await fetch('http://localhost:8000/questions', {
         method: 'POST',
