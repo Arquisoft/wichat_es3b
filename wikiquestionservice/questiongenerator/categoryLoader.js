@@ -4,18 +4,18 @@ const WikidataQueryService = require('./questionGen');
 
 class CategoryLoader {
     constructor(topics,numQuestions) {
-        this.services = {};
-        this.topics=topics;
+        this.services = {}
         const categoriesPath = path.join(__dirname, 'categories.json');
         const rawData = fs.readFileSync(categoriesPath, 'utf8');
         const CATEGORIES = JSON.parse(rawData);
-        let questionsPerCategory=numQuestions;
-        if(this.topics === ["all"]){
-            const totalCategories = Object.keys(CATEGORIES).length;
-            questionsPerCategory = Math.floor(numQuestions / totalCategories);
+        let selectedCategories = Object.keys(CATEGORIES);
+        if (!topics.includes("all")) {
+            selectedCategories = selectedCategories.filter(category => topics.includes(category));
         }
 
-        for (const categoryName in CATEGORIES) {
+        const questionsPerCategory = Math.floor(numQuestions / selectedCategories.length);
+
+        for (const categoryName of selectedCategories) {
             const categoryData = CATEGORIES[categoryName];
 
             if (categoryData.entity && categoryData.properties && categoryData.preguntas) {

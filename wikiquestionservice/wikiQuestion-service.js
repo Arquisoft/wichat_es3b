@@ -31,6 +31,15 @@ app.get("/questions", async (req, res) => {
   if (numQuestions > 25) {
     return res.status(400).json({ error: "El límite de preguntas es 25" });
   }
+  const validCategories = ["paises", "cine", "clubes", "literatura", "arte", "all"];
+  let topics = topic.split(",");
+
+  topics = topics.filter(t => validCategories.includes(t));
+
+  if (topics.length === 0) {
+    return res.status(400).json({ error: "No se proporcionaron categorías válidas." });
+  }
+
   try {
     let topics = topic.split(",");
     if (topics.includes("all")) {

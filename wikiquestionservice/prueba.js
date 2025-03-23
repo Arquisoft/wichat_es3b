@@ -3,7 +3,7 @@ async function test() {
     const manager = new QuestionManager();
 
     console.log("🔄 Cargando preguntas...");
-    await manager.loadAllQuestions(20);
+    await manager.loadAllQuestions( ["cine"],5);
 
     console.log("✅ Preguntas generadas:");
 
