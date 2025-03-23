@@ -22,6 +22,7 @@ const Game = () => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [progress, setProgress] = useState(100);
+  const [isChatBoxVisible, setIsChatBoxVisible] = useState(false);
 
   const timerRef = useRef(null); // Referencia para almacenar el ID del intervalo
 
@@ -93,8 +94,12 @@ const Game = () => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
     return `${minutes.toString().padStart(2, "0")}:${seconds
-      .toString()
-      .padStart(2, "0")}`;
+        .toString()
+        .padStart(2, "0")}`;
+  };
+
+  const toggleChatBox = () => {
+    setIsChatBoxVisible(!isChatBoxVisible);
   };
 
   if (isLoading) {
@@ -102,93 +107,92 @@ const Game = () => {
   }
 
   return (
-    <div>
-      <Nav />
-      <main>
-        <div className="upperSection">
-          <div className="hintButton">
-            <HintButton
-              text={"¿Necesitas una pista?"}
-              onClick={() => alert("Tienes una pista!")}
-            />
-          </div>
-          <div className="question">
-            <div className="questionNumber">
-              <h2>{`Pregunta ${questionNumber + 1}/25`}</h2>
-              <ArrowForwardIcon
-                titleAccess="Siguiente pregunta"
-                fontSize="1.5em"
-                id="nextArrow"
-                onClick={isAnswered ? handleNextQuestion : null}
-                style={{
-                  color: isAnswered ? "white" : "gray",
-                  cursor: isAnswered ? "pointer" : "not-allowed",
-                }}
-              ></ArrowForwardIcon>
+      <div>
+        <Nav />
+        <main>
+          <div className="upperSection">
+            <div className="hintButton">
+              <HintButton
+                  text={isChatBoxVisible ? "Ocultar pistas" : "¿Necesitas una pista?"}
+                  onClick={toggleChatBox}
+              />
             </div>
-            <h1>{currentQuestion.pregunta}</h1>
-          </div>
-          <div className="rightUpperSection">
-            <div className="pointsAndRules">
-              <div>
-                <span>Puntuación: </span> <span className="score">{score}</span>
+            <div className="question">
+              <div className="questionNumber">
+                <h2>{`Pregunta ${questionNumber + 1}/25`}</h2>
+                <ArrowForwardIcon
+                    titleAccess="Siguiente pregunta"
+                    fontSize="1.5em"
+                    id="nextArrow"
+                    onClick={isAnswered ? handleNextQuestion : null}
+                    style={{
+                      color: isAnswered ? "white" : "gray",
+                      cursor: isAnswered ? "pointer" : "not-allowed",
+                    }}
+                ></ArrowForwardIcon>
               </div>
-              <BaseButton text={"Reglas"} buttonType="buttonSecondary" />
+              <h1>{currentQuestion.pregunta}</h1>
+            </div>
+            <div className="rightUpperSection">
+              <div className="pointsAndRules">
+                <div>
+                  <span>Puntuación: </span> <span className="score">{score}</span>
+                </div>
+                <BaseButton text={"Reglas"} buttonType="buttonSecondary" />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="midSection">
-          {/* <div className="questionImageContainer"> */}
-          {currentQuestion.img && (
-            <img src={currentQuestion.img[0]} alt="imagen pregunta"></img>
-          )}
-          <div className="answerPanel">
-            {currentQuestion.respuestas &&
-              currentQuestion.respuestas.map((respuesta, index) => (
-                <BaseButton
-                  key={index}
-                  text={respuesta}
-                  onClick={() => handleAnswerClick(respuesta)}
-                  buttonType={
-                    isAnswered
-                      ? respuesta === currentQuestion.respuestaCorrecta
-                        ? "buttonCorrect"
-                        : selectedAnswer === respuesta
-                        ? "buttonIncorrect"
-                        : "buttonPrimary"
-                      : "buttonPrimary"
-                  }
-                  disabled={isAnswered}
-                ></BaseButton>
-              ))}
+          <div className="midSection">
+            {currentQuestion.img && (
+                <img src={currentQuestion.img[0]} alt="imagen pregunta"></img>
+            )}
+            <div className="answerPanel">
+              {currentQuestion.respuestas &&
+                  currentQuestion.respuestas.map((respuesta, index) => (
+                      <BaseButton
+                          key={index}
+                          text={respuesta}
+                          onClick={() => handleAnswerClick(respuesta)}
+                          buttonType={
+                            isAnswered
+                                ? respuesta === currentQuestion.respuestaCorrecta
+                                    ? "buttonCorrect"
+                                    : selectedAnswer === respuesta
+                                        ? "buttonIncorrect"
+                                        : "buttonPrimary"
+                                : "buttonPrimary"
+                          }
+                          disabled={isAnswered}
+                      ></BaseButton>
+                  ))}
+            </div>
           </div>
-        </div>
-        <div className="lowerSection">
-          <Box
-            display="flex"
-            alignItems="center"
-            width="50%"
-            margin="auto"
-            gap={2}
-          >
-            <span>Tiempo</span>
-            <Box width="100%" position="relative">
-              <LinearProgress
-                id="progressBar"
-                variant="determinate"
-                value={progress}
-              ></LinearProgress>
+          <div className="lowerSection">
+            <Box
+                display="flex"
+                alignItems="center"
+                width="50%"
+                margin="auto"
+                gap={2}
+            >
+              <span>Tiempo</span>
+              <Box width="100%" position="relative">
+                <LinearProgress
+                    id="progressBar"
+                    variant="determinate"
+                    value={progress}
+                ></LinearProgress>
+              </Box>
+              <span>{formatTime(timeLeft)}</span>
             </Box>
-            <span>{formatTime(timeLeft)}</span>
-          </Box>
-        </div>
-        <div></div>
-        <div className="chatBoxContainer">
-          <ChatBox question={currentQuestion} language="es" />
-        </div>
-      </main>
-      <Footer />
-    </div>
+          </div>
+          <div></div>
+          <div className={`chatBoxContainer ${isChatBoxVisible ? 'visible' : 'hidden'}`}>
+            <ChatBox question={currentQuestion} language="es" isVisible={true} />
+          </div>
+        </main>
+        <Footer />
+      </div>
   );
 };
 export default Game;
