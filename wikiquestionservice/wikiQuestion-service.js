@@ -33,7 +33,6 @@ app.get("/questions", async (req, res) => {
       topics = ["all"];
     }
 
-    // 🔥 Cargar preguntas solo cuando el usuario las solicite
     const selectedQuestions = await questionManager.loadAllQuestions(topics, numQuestions);
 
     const formattedQuestions = selectedQuestions.map((q) => ({

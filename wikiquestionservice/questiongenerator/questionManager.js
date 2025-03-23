@@ -37,6 +37,7 @@ class QuestionManager {
 
         console.log(`📌 Total de preguntas generadas: ${this.questions.length}`);
         this.shuffleQuestions();
+        return this.questions;
     }
 
     shuffleQuestions() {
