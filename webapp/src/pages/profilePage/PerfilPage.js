@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Navbar from "../../components/nav/Nav";
 import Sidebar from "../../components/sidebar/Sidebar";
 import StatsGraphs from "../../components/stats-graphs/stats-graphs";
@@ -10,36 +11,33 @@ import "./PerfilPage.css";
 import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarToggleButton";
 
 export default function PerfilPage() {
-  // Estado para datos de usuario
   const [userData, setUserData] = useState({
-    username: "Alejandro Vega",
-    level: 4,
+    username: "",
+    level: 1, // TODO: no está en el servicio de estadísticas
     avatar:
       "https://i.pinimg.com/736x/8d/16/90/8d16902ae35c1e982c2990ff85fa11fb.jpg",
     stats: {
-      gamesPlayed: 27,
-      correctAnswers: 200,
-      wrongAnswers: 50,
-      ratio: 0.79,
-      averageTime: "2s",
-      bestScore: 1200,
-      bestStreak: 18,
+      gamesPlayed: 0,
+      correctAnswers: 0,
+      wrongAnswers: 0,
+      ratio: 0,
+      averageTime: "0 s",
+      bestScore: 0,
+      bestStreak: 0,
     },
-    // Datos para el gráfico de línea
+
     monthlyData: [
       { month: "Enero", value: 18 },
       { month: "Febrero", value: 26 },
       { month: "Marzo", value: 22 },
       { month: "Abril", value: 35 },
       { month: "Mayo", value: 36 },
-    ],
-    // Datos para el gráfico circular
-    pieData: [
-      { name: "Aciertos", value: 79.4 },
-      { name: "Fallos", value: 20.6 },
-    ],
-    // Historial de partidas
+    ], // TODO: no está en el servicio de estadísticas.
+
+    pieData: [],
+
     gameHistory: [
+      // TODO: no está en el servicio de estadísticas
       { id: 124, date: "27/02/2024", correct: 16, time: "06:23" },
       { id: 123, date: "27/02/2024", correct: 10, time: "08:25" },
       { id: 122, date: "26/02/2024", correct: 19, time: "05:22" },
@@ -48,20 +46,16 @@ export default function PerfilPage() {
     ],
   });
 
-  // Estado para controlar la visibilidad del menú lateral en móviles
   const [sidebarVisible, setSidebarVisible] = useState(true);
 
-  // Estado para controlar el índice actual del carrusel de partidas
   const [currentGameIndex, setCurrentGameIndex] = useState(0);
 
-  // Función para alternar la visibilidad del menú lateral
   const toggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
   };
 
   const closeSideBar = () => setSidebarVisible(false);
 
-  // Función para navegar por el historial de partidas
   const navigateGames = (direction) => {
     if (direction === "prev") {
       setCurrentGameIndex((prev) =>
@@ -73,6 +67,56 @@ export default function PerfilPage() {
       );
     }
   };
+
+  const gatewayUrl = process.env.GATEWAY_URL || "http://localhost:8000";
+
+  const loadUserStats = async (username) => {
+    try {
+      console.log("Cargando estadísticas para el usuario:", username);
+      const response = await axios.get(
+        `http://localhost:8000/getstats/${username}`
+      );
+      console.log("Respuesta del servidor:", response.data);
+
+      const stats = response.data;
+      const roundedRatio = parseFloat(stats.ratio).toFixed(2);
+
+      setUserData((prevData) => ({
+        ...prevData,
+        stats: {
+          gamesPlayed: stats.games,
+          correctAnswers: stats.rightAnswers,
+          wrongAnswers: stats.wrongAnswers,
+          ratio: roundedRatio,
+          averageTime: `${stats.averageTime} s`,
+          bestScore: stats.maxScore,
+          bestStreak: 0, // TODO: Este dato no está en el servicio de estadísticas
+        },
+        pieData: [
+          { name: "Aciertos", value: roundedRatio * 100 },
+          { name: "Fallos", value: (1 - roundedRatio) * 100 },
+        ],
+      }));
+    } catch (error) {
+      console.error("Error al cargar las estadísticas: ", error);
+    }
+  };
+
+  // Cargar el nombre de usuario desde localStorage al montar el componente
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUserData((prevUserData) => ({
+        ...prevUserData,
+        username: storedUsername,
+      }));
+    }
+  }, []);
+
+  // Cargar estadísticas de usuario
+  useEffect(() => {
+    loadUserStats(userData.username);
+  }, [userData.username]);
 
   return (
     <div className="app-container">
@@ -92,8 +136,6 @@ export default function PerfilPage() {
             monthlyData={userData.monthlyData}
             pieData={userData.pieData}
           />
-
-          {/* Sección de historial de partidas */}
           <GameHistory
             games={userData.gameHistory}
             currentIndex={currentGameIndex}

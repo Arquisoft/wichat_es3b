@@ -27,7 +27,7 @@ const Nav = () => {
       <div className="nav-center">
         <Link to="/home">Inicio</Link>
         {isAuthenticated && <Link to="/play">Jugar</Link>}
-        <Link to="/profile">Perfil</Link>
+        {isAuthenticated && <Link to="/profile">Perfil</Link>}
       </div>
       <div className="nav-right">
         {isAuthenticated ? (
