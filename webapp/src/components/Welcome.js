@@ -34,7 +34,7 @@ const Welcome = () => {
               cursorStyle="|"
               typeSpeed={2} // Typing speed in ms
           />
-          <NavLink to="/gamemode">
+          <NavLink to="/gametopic">
               <Button variant="contained" color="secondary" fullWidth sx={{ marginTop: 2 }}>
                   Start the fun
               </Button>

@@ -1,23 +1,23 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+
+import axios from "../api/axios";
 
 const AuthContext = createContext();
-const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000";
 
 export const AuthProvider = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(null);
+    const [auth, setAuth] = useState(null);
 
     const verifyAuth = async () => {
         try {
-            const response = await axios.get(apiEndpoint + "/protected", { withCredentials: true });
+            const response = await axios.get("/protected", { withCredentials: true });
             if (response.status === 200) {
-                setIsAuthenticated(true);
+                setAuth(true);
             } else {
-                setIsAuthenticated(false);
+                setAuth(false);
             }
         } catch (error) {
             console.error("Error verifying authentication:", error);
-            setIsAuthenticated(false);
+            setAuth(false);
         }
     };
 
@@ -25,18 +25,8 @@ export const AuthProvider = ({ children }) => {
         verifyAuth();
     }, []);
 
-    const login = async (username, password) => {
-        try {
-            const response = await axios.post(apiEndpoint + "/login", { username, password }, { withCredentials: true });
-            setIsAuthenticated(true);
-            return response.data;
-        } catch (error) {
-            console.error("Login failed", error);
-        }
-    };
-
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login }}>
+        <AuthContext.Provider value={{ auth, setAuth }}>
             {children}
         </AuthContext.Provider>
     );

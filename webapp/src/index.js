@@ -20,8 +20,8 @@ console.log(styles);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <AuthProvider>
-    <BrowserRouter>
+  <BrowserRouter>
+    <AuthProvider>
       <Routes>
         <Route element={<Layout />}>
           {/* Routes without authentication */}
@@ -37,8 +37,8 @@ root.render(
           </Route>
         </Route>
       </Routes>
-    </BrowserRouter>
-  </AuthProvider>
+    </AuthProvider>
+  </BrowserRouter>
 );
 
 // If you want to start measuring performance in your app, pass a function

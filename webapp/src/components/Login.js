@@ -1,12 +1,15 @@
 // src/components/Login.js
 import React, { useState } from 'react';
 import { Container, Typography, TextField, Button, Snackbar } from '@mui/material';
-import { NavLink, useNavigate } from 'react-router';
+import { NavLink, useLocation, useNavigate } from 'react-router';
+
 import { useAuth } from '../auth/AuthContext';
+import axios from "../api/axios";
 
 const Login = () => {
-  const { login } = useAuth();
+  const { setAuth } = useAuth();
   const navigate = useNavigate();
+  const from = useLocation().state?.from.pathname || "/";
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -14,14 +17,15 @@ const Login = () => {
 
   const loginUser = async () => {
     try {
-      await login(username, password);
-
-      setOpenSnackbar(true);
-
-      navigate("/gametopic");
+      await axios.post("/login", { username, password });
+      setAuth(true);
+      navigate(from, { replace: true });
     } catch (error) {
-      setError(error.response.data.error);
+      setError(error.message);
+      setAuth(false);
     }
+    
+    setOpenSnackbar(true);
   };
 
   const handleCloseSnackbar = () => {

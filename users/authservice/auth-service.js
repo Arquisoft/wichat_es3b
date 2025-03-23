@@ -32,7 +32,6 @@ app.post('/login', [
 ], async (req, res) => {
   try {
     // Check if required fields are present in the request body
-
     validateRequiredFields(req, ['username', 'password']);
 
     const errors = validationResult(req);
@@ -40,8 +39,8 @@ app.post('/login', [
       return res.status(400).json({ error: errors.array().toString() });
     }
 
-    let username = req.body.username.toString();
-    let password = req.body.password.toString();
+    const username = req.body.username.toString();
+    const password = req.body.password.toString();
 
     // Find the user by username in the database
     const user = await User.findOne({ username });
@@ -49,15 +48,20 @@ app.post('/login', [
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Generate a JWT token
-    const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
+    // Generate JWT tokens
+    const accessToken = jwt.sign({ userId: user._id, username: username }, "accessTokenSecret", { expiresIn: '1h' });
+    const refreshToken = jwt.sign({ userId: user._id, username: username }, "refreshTokenSecret", { expiresIn: '7d' });
 
-    // Create a cookie with the token, with security measures and a 1 hour expiration
-    res.cookie("token", token, { httpOnly: true, sameSite: "strict", maxAge: 3600000, domain: "localhost" });
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    // Set the token in a cookie
+    res.cookie("jwt", refreshToken, { httpOnly: true, sameSite: "None", maxAge: 7 * 24 * 60 * 60 * 1000 });
 
     // Respond with the token and user information
-    res.json({ token: token, username: username, createdAt: user.createdAt });
+    res.json({ accessToken, username: username, createdAt: user.createdAt });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
