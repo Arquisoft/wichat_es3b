@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../../components/nav/Nav";
 import Sidebar from "../../components/sidebar/Sidebar";
 import StatsGraphs from "../../components/stats-graphs/stats-graphs";
@@ -12,8 +12,8 @@ import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarTog
 export default function PerfilPage() {
   // Estado para datos de usuario
   const [userData, setUserData] = useState({
-    username: "Alejandro Vega",
-    level: 4,
+    username: "", // Inicialmente vacío, se actualizará con localStorage
+    level: 5,
     avatar:
       "https://i.pinimg.com/736x/8d/16/90/8d16902ae35c1e982c2990ff85fa11fb.jpg",
     stats: {
@@ -47,6 +47,17 @@ export default function PerfilPage() {
       { id: 120, date: "24/02/2024", correct: 12, time: "04:45" },
     ],
   });
+
+  // Cargar el nombre de usuario desde localStorage al montar el componente
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUserData((prevUserData) => ({
+        ...prevUserData,
+        username: storedUsername,
+      }));
+    }
+  }, []);
 
   // Estado para controlar la visibilidad del menú lateral en móviles
   const [sidebarVisible, setSidebarVisible] = useState(true);

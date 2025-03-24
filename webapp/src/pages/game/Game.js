@@ -7,9 +7,12 @@ import BaseButton from "../../components/button/BaseButton";
 import ChatBox from "../../components/chatBox/ChatBox";
 import { LinearProgress, Box } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { useTranslation } from "react-i18next";
 const TOTAL_TIME = 40; // Duración total de la pregunta en segundos
 
 const Game = () => {
+  const { i18n } = useTranslation();
+  const currentLanguage = i18n.language || "es";
   const [questionNumber, setQuestionNumber] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +34,7 @@ const Game = () => {
   const fetchQuestions = useCallback(async () => {
     // Correcto
     try {
-      const response = await fetch(`${URL}questions?n=25&locale=es`);
+      const response = await fetch(`${URL}questions?n=25`);
       if (!response.ok) {
         throw new Error("No se pudieron obtener las preguntas.");
       }
@@ -80,7 +83,7 @@ const Game = () => {
     clearInterval(timerRef.current);
     setSelectedAnswer(respuesta);
     setIsAnswered(true);
-    if (respuesta === currentQuestion.respuestaCorrecta) {
+    if (respuesta === currentQuestion.respuestaCorrecta[currentLanguage]) {
       setIsCorrect(true);
       setScore((prevScore) => prevScore + 10);
       setCorrectAnswers((prev) => prev + 1);
@@ -131,7 +134,7 @@ const Game = () => {
                     }}
                 ></ArrowForwardIcon>
               </div>
-              <h1>{currentQuestion.pregunta}</h1>
+              <h1>{currentQuestion.pregunta[currentLanguage]}</h1>
             </div>
             <div className="rightUpperSection">
               <div className="pointsAndRules">
@@ -148,14 +151,14 @@ const Game = () => {
             )}
             <div className="answerPanel">
               {currentQuestion.respuestas &&
-                  currentQuestion.respuestas.map((respuesta, index) => (
+                  currentQuestion.respuestas[currentLanguage].map((respuesta, index) => (
                       <BaseButton
                           key={index}
                           text={respuesta}
                           onClick={() => handleAnswerClick(respuesta)}
                           buttonType={
                             isAnswered
-                                ? respuesta === currentQuestion.respuestaCorrecta
+                                ? respuesta === currentQuestion.respuestaCorrecta[currentLanguage]
                                     ? "buttonCorrect"
                                     : selectedAnswer === respuesta
                                         ? "buttonIncorrect"
@@ -188,7 +191,13 @@ const Game = () => {
           </div>
           <div></div>
           <div className={`chatBoxContainer ${isChatBoxVisible ? 'visible' : 'hidden'}`}>
-            <ChatBox question={currentQuestion} language="es" isVisible={true} />
+            <ChatBox  question={{
+              pregunta: currentQuestion.pregunta.es,
+              respuestaCorrecta: currentQuestion.respuestaCorrecta.es,
+              respuestas: currentQuestion.respuestas.es,
+              descripcion: currentQuestion.descripcion,
+              img: currentQuestion.img
+            }}  language="es" isVisible={true} />
           </div>
         </main>
         <Footer />
