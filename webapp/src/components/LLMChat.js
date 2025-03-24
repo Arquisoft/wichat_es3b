@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 
 import { Button, Container, Divider, TextField, Typography } from "@mui/material";
 import { Typewriter } from "react-simple-typewriter";
+import useAuth from "../hooks/useAuth";
+import useAxios from "../hooks/useAxios";
 
 const LLMChat = () => {
+    const { setAuth } = useAuth();
+    const axios = useAxios();
+
     const [messages, setMessages] = useState([]);
     const [question, setQuestion] = useState("");
 
@@ -28,6 +32,7 @@ const LLMChat = () => {
         } catch (error) {
             console.error("Error sending message to LLM:", error.message || error);
             setMessages(previous => [...previous, { sender: "llm", text: "An unexpected error has occurred." }]);
+            if (error.response.status === 403) setAuth({});
         }
     }
 

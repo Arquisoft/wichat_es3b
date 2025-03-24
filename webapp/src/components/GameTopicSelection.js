@@ -7,6 +7,7 @@ import { NavLink } from "react-router-dom"
 import { LocationCity, Flag, SportsBasketball, MusicNote } from "@mui/icons-material"
 import useRefreshToken from "../hooks/useRefreshToken"
 import useAxios from "../hooks/useAxios"
+import useAuth from "../hooks/useAuth"
 
 const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000";
 
@@ -99,6 +100,7 @@ const TopicButton = styled(Button, {
 }))
 
 const GameTopicSelection = () => {
+  const { setAuth } = useAuth();
   const refresh = useRefreshToken();
   const axios = useAxios();
 
@@ -132,10 +134,11 @@ const GameTopicSelection = () => {
   const startGame = async () => {
     try {
       console.log("selectedTopics before request:", selectedTopics);
-      const response = await axios.post(`${apiEndpoint}/loadQuestion`, {modes: selectedTopics});
+      const response = await axios.post(`${apiEndpoint}/loadQuestion`, { modes: selectedTopics });
       console.log(response.data);
     } catch (error) {
-        console.error("Error fetching game data:", error);
+      if (error.response.status === 403) setAuth({});
+      console.error("Error fetching game data:", error);
     }
   };
 
@@ -246,18 +249,16 @@ const GameTopicSelection = () => {
       )}
 
       <NavLink to="/gamemode" style={{ width: "100%", textDecoration: "none" }}>
-        <StyledButton 
-          variant="contained" 
-          color="primary" 
-          size="large" 
-          onClick={startGame} 
-          disabled={isNextDisabled} 
+        <StyledButton
+          variant="contained"
+          color="primary"
+          size="large"
+          onClick={startGame}
+          disabled={isNextDisabled}
           fullWidth>
           NEXT
         </StyledButton>
       </NavLink>
-
-      <Button onClick={() => refresh()}>REFRESH</Button>
     </StyledContainer>
   )
 }
