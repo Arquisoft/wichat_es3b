@@ -1,16 +1,16 @@
 // src/components/Login.js
-import React, { useState } from 'react';
-import { Container, Typography, TextField, Button, Snackbar } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Container, Typography, TextField, Button, Snackbar, Checkbox, FormControlLabel } from '@mui/material';
 import { NavLink, useLocation, useNavigate } from 'react-router';
 
 import useAuth from "../hooks/useAuth";
 import axios from "../api/axios";
 
 const Login = () => {
-  const { setAuth } = useAuth();
+  const { setAuth, persist, setPersist } = useAuth();
   const navigate = useNavigate();
   const from = useLocation().state?.from.pathname || "/";
-  
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,13 +27,21 @@ const Login = () => {
       setError(error.message);
       setAuth(false);
     }
-    
+
     setOpenSnackbar(true);
   };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
+
+  const togglePersist = () => {
+    setPersist(prev => !prev);
+  };
+
+  useEffect(() => {
+    localStorage.setItem("persist", persist);
+  }, [persist]);
 
   return (
     <Container component="main" maxWidth="xs" sx={{ marginTop: 4 }}>
@@ -55,6 +63,10 @@ const Login = () => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+        />
+        <FormControlLabel
+          control={<Checkbox onChange={togglePersist} checked={persist} />}
+          label="Remember me"
         />
         <Button variant="contained" color="primary" onClick={loginUser}>
           Login

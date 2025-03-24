@@ -1,8 +1,8 @@
-import { AppBar, Box, Button, Container, IconButton } from "@mui/material";
+import { AppBar, Box, Button, Container } from "@mui/material";
 import HomeIcon from '@mui/icons-material/Home';
 import { Outlet, NavLink } from 'react-router';
 import useAuth from "../hooks/useAuth";
-import useAxios from "../hooks/useAxios";
+import axios from "../api/axios";
 
 const StyledNavlink = ({ to, label, icon }) => {
     return (
@@ -16,11 +16,10 @@ const StyledNavlink = ({ to, label, icon }) => {
 
 const Layout = () => {
     const { auth, setAuth } = useAuth();
-    const axios = useAxios();
 
     const handleLogout = async () => {
         try {
-            await axios.post("/logout", {});
+            await axios.post("/logout", {}, { withCredentials: true });
         } catch (error) {
             console.error(error);
         } finally {
