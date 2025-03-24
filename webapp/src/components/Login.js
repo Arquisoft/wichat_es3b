@@ -18,7 +18,7 @@ const Login = () => {
 
   const loginUser = async () => {
     try {
-      const response = await axios.post("/login", { username, password });
+      const response = await axios.post("/login", { username, password }, { withCredentials: true });
       // store username and token in memory, where it is safest
       setAuth({ username, accessToken: response.data.accessToken });
       // redirect to the page the user was trying to access before logging in

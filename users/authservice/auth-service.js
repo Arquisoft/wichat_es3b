@@ -4,13 +4,15 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('./auth-model');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const { check, matchedData, validationResult } = require('express-validator');
 const app = express();
 const port = 8002;
 
 // Middleware to parse JSON in request body
 app.use(express.json());
-app.use(cors({ origin: "http://localhost.8000", credentials: true }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cookieParser());
 
 // Connect to MongoDB
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
@@ -56,24 +58,38 @@ app.post('/login', [
     await user.save();
 
     // Set the token in a cookie
-    res.cookie("jwt", refreshToken, { httpOnly: true, sameSite: "None", maxAge: 7 * 24 * 60 * 60 * 1000 });
+    res.cookie("jwt", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
 
     // Respond with the token and user information
     res.json({ accessToken, username: username, createdAt: user.createdAt });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
 app.post("/logout", async (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("jwt");
   res.json({ message: "Logged out successfully" });
 });
 
 // Used to check the validity of the token
-app.get("/protected", async (req, res) => {
-  res.status(200).json({ message: "You are authenticated" });
+app.get("/refresh", async (req, res) => {
+  const cookies = req.cookies;
+  if (!cookies?.jwt) return res.status(401).json({ error: "Unauthorized" });
+  const refreshToken = cookies.jwt;
+
+  const user = await User.findOne({ refreshToken }).exec();
+  if (!user) return res.status(403).json({ error: "Forbidden" });
+
+  jwt.verify(refreshToken,
+    "refreshTokenSecret",
+    (err, decoded) => {
+      if (err || user.username !== decoded.username) return res.status(403).json({ error: "Forbidden" });
+
+      const accessToken = jwt.sign({ userId: user._id, username: user.username }, "accessTokenSecret", { expiresIn: '1h' });
+      res.status(200).json({ accessToken });
+    }
+  );
 });
 
 // Start the server

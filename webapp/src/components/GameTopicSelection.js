@@ -6,6 +6,7 @@ import { styled } from "@mui/material/styles"
 import { NavLink } from "react-router-dom"
 import { LocationCity, Flag, SportsBasketball, MusicNote } from "@mui/icons-material"
 import axios from 'axios';
+import useRefreshToken from "../hooks/useRefreshToken"
 
 const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000";
 
@@ -98,6 +99,8 @@ const TopicButton = styled(Button, {
 }))
 
 const GameTopicSelection = () => {
+  const refresh = useRefreshToken();
+
   const [selectedTopics, setSelectedTopics] = useState([])
   const [isWild, setIsWild] = useState(false)
 
@@ -252,6 +255,8 @@ const GameTopicSelection = () => {
           NEXT
         </StyledButton>
       </NavLink>
+
+      <Button onClick={() => refresh()}>REFRESH</Button>
     </StyledContainer>
   )
 }
