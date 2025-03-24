@@ -133,9 +133,7 @@ const GameTopicSelection = () => {
 
   const startGame = async () => {
     try {
-      console.log("selectedTopics before request:", selectedTopics);
       const response = await axios.post(`${apiEndpoint}/loadQuestion`, { modes: selectedTopics });
-      console.log(response.data);
     } catch (error) {
       if (error.response.status === 403) setAuth({});
       console.error("Error fetching game data:", error);
