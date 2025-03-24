@@ -1,62 +1,55 @@
-import React, { useState } from "react";
-import Nav from "../../components/nav/Nav.js";
-import Footer from "../../components/Footer.js";
-import { Box, Typography, Grid, Container, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+import { useState } from "react";
+import Sidebar from "../../components/sidebarConfiguration/SidebarConfiguration";
+import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarToggleButton";
 import "./Settings.css";
+import Footer from "../../components/Footer";
+import Navbar from "../../components/nav/Nav";
 
-const Settings = () => {
-    const [timeLimit, setTimeLimit] = useState(40);
-    const [theme, setTheme] = useState("default");
-    const [questionCount, setQuestionCount] = useState(10);
+export default function Settings() {
+    const [sidebarVisible, setSidebarVisible] = useState(true);
+
+    const toggleSidebar = () => {
+        setSidebarVisible(!sidebarVisible);
+    };
+
+    const closeSidebar = () => setSidebarVisible(false);
+
+    const categories = [
+        { name: "Fútbol" },
+        { name: "Cine"},
+        { name: "Música"},
+        { name: "Países"},
+        { name: "Arte"},
+        { name: "Todo"},
+    ];
 
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-            <Nav />
+        <div className="app-container">
+            <Navbar />
+            <div className={`main-content ${sidebarVisible ? "with-sidebar" : ""}`}>
+                <SidebarToggleButton onClick={toggleSidebar} />
+                <div className="sidebar-stats">
+                    <Sidebar isVisible={sidebarVisible} onClose={closeSidebar} />
+                </div>
 
-            <Container maxWidth="lg" sx={{ textAlign: "center", paddingTop: 4, flexGrow: 1 }}>
-                <Box sx={{ backgroundColor: "#E3F2FD", padding: 4, borderRadius: 2 }}>
-                    <Typography variant="h3" sx={{ fontWeight: "bold", color: "#2196F3" }}>Game Settings</Typography>
-                    <Typography variant="h6" sx={{ fontStyle: "italic", marginBottom: 3 }}>Adjust your game preferences</Typography>
+                <div className="content-area">
+                <h1>Selecciona una categoría</h1>
+                <div className="category-grid">
+                    {categories.map((category) => (
+                        <div key={category.name} className="category-card">
+                            <h3>{category.name}</h3>
+                        </div>
+                    ))}
+                </div>
 
-                    <Grid container spacing={2} justifyContent="center">
-                        <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth>
-                                <InputLabel>Time Limit</InputLabel>
-                                <Select value={timeLimit} onChange={(e) => setTimeLimit(e.target.value)}>
-                                    <MenuItem value={30}>30 seconds</MenuItem>
-                                    <MenuItem value={40}>40 seconds</MenuItem>
-                                    <MenuItem value={60}>60 seconds</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth>
-                                <InputLabel>Theme</InputLabel>
-                                <Select value={theme} onChange={(e) => setTheme(e.target.value)}>
-                                    <MenuItem value="default">Default</MenuItem>
-                                    <MenuItem value="dark">Dark</MenuItem>
-                                    <MenuItem value="light">Light</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth>
-                                <InputLabel>Number of Questions</InputLabel>
-                                <Select value={questionCount} onChange={(e) => setQuestionCount(e.target.value)}>
-                                    <MenuItem value={5}>5</MenuItem>
-                                    <MenuItem value={10}>10</MenuItem>
-                                    <MenuItem value={15}>15</MenuItem>
-                                    <MenuItem value={20}>20</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                    </Grid>
-                </Box>
-            </Container>
+                    <a href="/play">
+                        <button className="play-button">Jugar</button>
+                    </a>
 
-            <Footer />
-        </Box>
+                </div>
+        </div>
+            <Footer/>
+        </div>
     );
-};
+}
 
-export default Settings;
