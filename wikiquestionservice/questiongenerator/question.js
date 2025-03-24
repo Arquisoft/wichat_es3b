@@ -27,7 +27,7 @@ class Question {
                 ? this.respuestasIncorrectas[idioma]
                 : [];
 
-            respuestas[idioma] = [correcta, ...incorrectas].sort(() => Math.random() - 0.5);
+            respuestas[idioma] = [correcta, ...incorrectas];
         }
 
         return respuestas;
