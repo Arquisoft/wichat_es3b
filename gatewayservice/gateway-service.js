@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const promBundle = require('express-prom-bundle');
+const jwt = require('jsonwebtoken');
 //libraries required for OpenAPI-Swagger
 const swaggerUi = require('swagger-ui-express');
 const fs = require("fs")
@@ -22,6 +23,19 @@ app.use(express.json());
 //Prometheus configuration
 const metricsMiddleware = promBundle({ includeMethod: true });
 app.use(metricsMiddleware);
+
+// Define a middleware to check authentication
+const verifyJWT = (req, res, next) => {
+  const authHeader = req.headers.authorization || req.headers.Authorization;
+  if (!authHeader?.startsWith('Bearer ')) return res.sendStatus(401);
+  const token = authHeader.split(' ')[1];
+  jwt.verify(token, "accessTokenSecret", (err, decoded) => {
+      if (err) return res.status(403).json({ error: 'Invalid token' });
+      req.user = decoded.username;
+      next();
+    }
+  );
+}
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -72,6 +86,9 @@ app.post('/adduser', async (req, res) => {
     res.status(error.response.status).json({ error: error.response.data.error });
   }
 });
+
+// Add the verifyJWT middleware to private endpoints
+app.use(verifyJWT);
 
 app.post('/askllm', async (req, res) => {
   try {

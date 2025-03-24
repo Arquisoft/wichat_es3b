@@ -51,7 +51,7 @@ app.post('/login', [
     }
 
     // Generate JWT tokens
-    const accessToken = jwt.sign({ userId: user._id, username: username }, "accessTokenSecret", { expiresIn: '1h' });
+    const accessToken = jwt.sign({ userId: user._id, username: username }, "accessTokenSecret", { expiresIn: '15m' });
     const refreshToken = jwt.sign({ userId: user._id, username: username }, "refreshTokenSecret", { expiresIn: '7d' });
 
     user.refreshToken = refreshToken;
@@ -75,7 +75,7 @@ app.post("/logout", async (req, res) => {
 // Used to check the validity of the token
 app.get("/refresh", async (req, res) => {
   const cookies = req.cookies;
-  if (!cookies?.jwt) return res.status(401).json({ error: "Unauthorized" });
+  if (!cookies.jwt) return res.status(401).json({ error: "Unauthorized" });
   const refreshToken = cookies.jwt;
 
   const user = await User.findOne({ refreshToken }).exec();
@@ -86,7 +86,7 @@ app.get("/refresh", async (req, res) => {
     (err, decoded) => {
       if (err || user.username !== decoded.username) return res.status(403).json({ error: "Forbidden" });
 
-      const accessToken = jwt.sign({ userId: user._id, username: user.username }, "accessTokenSecret", { expiresIn: '1h' });
+      const accessToken = jwt.sign({ userId: user._id, username: user.username }, "accessTokenSecret", { expiresIn: '15m' });
       res.status(200).json({ accessToken });
     }
   );

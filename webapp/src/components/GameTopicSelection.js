@@ -5,8 +5,8 @@ import { Container, Typography, Radio, RadioGroup, FormControlLabel, FormControl
 import { styled } from "@mui/material/styles"
 import { NavLink } from "react-router-dom"
 import { LocationCity, Flag, SportsBasketball, MusicNote } from "@mui/icons-material"
-import axios from 'axios';
 import useRefreshToken from "../hooks/useRefreshToken"
+import useAxios from "../hooks/useAxios"
 
 const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000";
 
@@ -100,6 +100,7 @@ const TopicButton = styled(Button, {
 
 const GameTopicSelection = () => {
   const refresh = useRefreshToken();
+  const axios = useAxios();
 
   const [selectedTopics, setSelectedTopics] = useState([])
   const [isWild, setIsWild] = useState(false)
