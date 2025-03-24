@@ -4,8 +4,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
 import styles from './index.css';
 
-import { AuthProvider } from './auth/AuthContext';
-import PrivateRoute from './auth/PrivateRoute';
+import { AuthProvider } from './context/AuthContext';
+import PrivateRoute from './components/PrivateRoute';
 
 import App from './App';
 import Login from './components/Login';

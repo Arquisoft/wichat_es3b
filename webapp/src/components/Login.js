@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Container, Typography, TextField, Button, Snackbar } from '@mui/material';
 import { NavLink, useLocation, useNavigate } from 'react-router';
 
-import { useAuth } from '../auth/AuthContext';
+import useAuth from "../hooks/useAuth";
 import axios from "../api/axios";
 
 const Login = () => {
@@ -18,8 +18,10 @@ const Login = () => {
 
   const loginUser = async () => {
     try {
-      await axios.post("/login", { username, password });
-      setAuth(true);
+      const response = await axios.post("/login", { username, password });
+      // store username and token in memory, where it is safest
+      setAuth({ username, accessToken: response.data.accessToken });
+      // redirect to the page the user was trying to access before logging in
       navigate(from, { replace: true });
     } catch (error) {
       setError(error.message);
