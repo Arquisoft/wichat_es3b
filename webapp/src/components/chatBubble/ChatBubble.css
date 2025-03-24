@@ -12,12 +12,13 @@
   .chat-container.received {
     justify-content: flex-start;
   }
-  
+
   .chat-bubble {
     max-width: 70%;
     padding: 12px;
     border-radius: 16px;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 0.5em;
   }
   
   .chat-bubble.sent {

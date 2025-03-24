@@ -26,7 +26,9 @@ const Game = () => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [progress, setProgress] = useState(100);
-  const timerRef = useRef(null);
+  const [isChatBoxVisible, setIsChatBoxVisible] = useState(false);
+
+  const timerRef = useRef(null); // Referencia para almacenar el ID del intervalo
 
   const fetchQuestions = useCallback(async () => {
     try {
@@ -98,7 +100,13 @@ const Game = () => {
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
+  };
+
+  const toggleChatBox = () => {
+    setIsChatBoxVisible(!isChatBoxVisible);
   };
 
   if (isLoading) return <div>Cargando...</div>;
@@ -109,11 +117,14 @@ const Game = () => {
         <main>
           <div className="upperSection">
             <div className="hintButton">
-              <HintButton text={"¿Necesitas una pista?"} onClick={() => alert("Tienes una pista!")} />
+              <HintButton
+                  text={isChatBoxVisible ? "Ocultar pistas" : "¿Necesitas una pista?"}
+                  onClick={toggleChatBox}
+              />
             </div>
             <div className="question">
               <div className="questionNumber">
-                <h2>{`Pregunta ${questionNumber + 1}/${questions.length}`}</h2>
+                <h2>{`Pregunta ${questionNumber + 1}/25`}</h2>
                 <ArrowForwardIcon
                     titleAccess="Siguiente pregunta"
                     fontSize="1.5em"
@@ -168,8 +179,8 @@ const Game = () => {
               <span>{formatTime(timeLeft)}</span>
             </Box>
           </div>
-          <div className="chatBoxContainer">
-            <ChatBox question={currentQuestion} language={selectedLanguage} />
+          <div className={`chatBoxContainer ${isChatBoxVisible ? 'visible' : 'hidden'}`}>
+            <ChatBox question={currentQuestion} language={selectedLanguage} isVisible={true} />
           </div>
         </main>
         <Footer />

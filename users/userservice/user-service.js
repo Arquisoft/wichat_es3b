@@ -28,12 +28,22 @@ function validateRequiredFields(req, requiredFields) {
 app.post('/adduser', async (req, res) => {
     try {
         // Check if required fields are present in the request body
-        validateRequiredFields(req, ['username', 'password']);
+        validateRequiredFields(req, ['email', 'username', 'password']);
+
+        const existingUser = await User.findOne({ 
+          $or: [{ username: req.body.username }, { email: req.body.email }]
+         });
+        if (existingUser) {
+            return res.status(400).json({ 
+              error: 'Ya existe un usuario con ese nombre o correo electrónico' 
+            });
+        }
 
         // Encrypt the password before saving it
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
         const newUser = new User({
+            email: req.body.email,
             username: req.body.username,
             password: hashedPassword,
         });
