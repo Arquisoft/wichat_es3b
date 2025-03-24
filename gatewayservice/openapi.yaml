@@ -1,144 +1,1035 @@
 openapi: 3.0.0
 info:
-  title: Gatewayservice API
-  description: Gateway OpenAPI specification.
-  version: 0.2.0
+  title: WIChat API
+  description: API REST para la aplicación WIChat - Juego de adivinanzas de imágenes con pistas conversacionales.
+  version: 0.4.0
 servers:
   - url: http://localhost:8000
     description: Development server
   - url: http://SOMEIP:8000
     description: Production server
 paths:
+  # Endpoints originales (mantienen compatibilidad)
   /adduser:
     post:
-      summary: Add a new user to the database.
-      operationId: addUser
+      summary: Add a new user to the database. (Legacy endpoint)
+      operationId: addUserLegacy
+      tags:
+        - Legacy
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  description: User ID.
-                  example: student
-                password:
-                  type: string
-                  description: User password.
-                  example: pass
+              $ref: '#/components/schemas/UserInput'
       responses:
-        '200':
+        '201':
           description: User added successfully.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                    description: User ID
-                  password:
-                    type: string
-                    description: Hashed password
-                    example: $2b$10$ZKdNYLWFQxzt5Rei/YTc/OsZNi12YiWz30JeUFHNdAt7MyfmkTuvC
-                  _id:
-                    type: string
-                    description: Identification
-                    example: 65f756db3fa22d227a4b7c7d
-                  createdAt:
-                    type: string
-                    description: Creation date.
-                    example: '2024-03-17T20:47:23.935Z'
-                  ___v:
-                    type: integer
-                    example: '0'                                        
+                $ref: '#/components/schemas/User'
         '400':
           description: Failed to add user.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Error information.
-                    example: getaddrinfo EAI_AGAIN mongodb
-  /health:
-    get:
-      summary: Check the health status of the service.
-      operationId: checkHealth
-      responses:
-        '200':
-          description: Service is healthy.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    description: Health status.
-                    example: OK
+                $ref: '#/components/schemas/Error'
+
   /login:
     post:
-      summary: Log in to the system.
-      operationId: loginUser
+      summary: Log in to the system. (Legacy endpoint)
+      operationId: loginUserLegacy
+      tags:
+        - Legacy
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  description: User ID.
-                  example: student
-                password:
-                  type: string
-                  description: User password.
-                  example: pass
+              $ref: '#/components/schemas/LoginInput'
       responses:
         '200':
           description: Login successful. Returns user token, username, and creation date.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    description: User token.
-                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NWY3NTZkYjNmYTIyZDIyN2E0YjdjN2QiLCJpYXQiOjE3MTA3MDg3NDUsImV4cCI6MTcxMDcxMjM0NX0.VMG_5DOyQ4GYlJQRcu1I6ICG1IGzuo2Xuei093ONHxw
-                  username:
-                    type: string
-                    description: Username.
-                    example: student
-                  createdAt:
-                    type: string
-                    description: Creation date.
-                    example: '2024-03-17T20:47:23.935Z'
+                $ref: '#/components/schemas/LoginResponse'
         '401':
           description: Invalid credentials.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Shows the error info..
-                    example: Invalid credentials
+                $ref: '#/components/schemas/Error'
         '500':
           description: Internal server error.
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/Error'
+
+  /askllm:
+    post:
+      summary: Send a question to the LLM service to get hints about an image. (Legacy endpoint)
+      operationId: askLLMLegacy
+      tags:
+        - Legacy
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LLMPrompt'
+      responses:
+        '200':
+          description: Successful response from LLM.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMResponse'
+        '401':
+          description: Unauthorized access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Error reaching LLM service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /health:
+    get:
+      summary: Check the health status of the service.
+      operationId: checkHealth
+      tags:
+        - System
+      responses:
+        '200':
+          description: Service is healthy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
+  # Nuevos endpoints REST
+  /auth:
+    post:
+      summary: Authenticate a user and get a token
+      operationId: authenticateUser
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInput'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users:
+    get:
+      summary: Get list of all users
+      operationId: getUsers
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [username, createdAt]
+          description: Field to sort by
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort order (ascending or descending)
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Maximum number of users to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+          description: Number of users to skip
+      responses:
+        '200':
+          description: List of users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserSummary'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create a new user
+      operationId: createUser
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid user data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Username already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{username}:
+    get:
+      summary: Get details of a specific user
+      operationId: getUserDetail
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update a user's information
+      operationId: updateUser
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateInput'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a user
+      operationId: deleteUser
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: User deleted successfully
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{username}/stats:
+    get:
+      summary: Get user statistics
+      operationId: getUserStats
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStats'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /questions:
+    get:
+      summary: Get list of all questions
+      operationId: getQuestions
+      tags:
+        - Questions
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: Filter by category
+        - in: query
+          name: difficulty
+          schema:
+            type: string
+            enum: [easy, medium, hard]
+          description: Filter by difficulty
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Maximum number of questions to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+          description: Number of questions to skip
+      responses:
+        '200':
+          description: List of questions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuestionSummary'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create a new question
+      operationId: createQuestion
+      tags:
+        - Questions
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionInput'
+      responses:
+        '201':
+          description: Question created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        '400':
+          description: Invalid question data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /questions/{questionId}:
+    get:
+      summary: Get details of a specific question
+      operationId: getQuestionDetail
+      tags:
+        - Questions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Question details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update a question
+      operationId: updateQuestion
+      tags:
+        - Questions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionUpdateInput'
+      responses:
+        '200':
+          description: Question updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a question
+      operationId: deleteQuestion
+      tags:
+        - Questions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Question deleted successfully
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /questions/{questionId}/hints:
+    post:
+      summary: Get a hint for a specific question
+      operationId: getQuestionHint
+      tags:
+        - Questions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt:
+                  type: string
+                  description: User's query to get a hint about the image
+                  example: "¿Esta imagen es de un animal?"
+              required:
+                - prompt
+      responses:
+        '200':
+          description: Hint retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMResponse'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Error reaching LLM service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /questions/{questionId}/answers:
+    post:
+      summary: Submit an answer for a question
+      operationId: submitAnswer
+      tags:
+        - Questions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                answer:
+                  type: string
+                  description: User's answer to the question
+                  example: "León"
+              required:
+                - answer
+      responses:
+        '200':
+          description: Answer submitted successfully
+          content:
+            application/json:
+              schema:
                 type: object
                 properties:
-                  error:
+                  correct:
+                    type: boolean
+                    description: Whether the answer is correct
+                  correctAnswer:
                     type: string
-                    description: Error information.
-                    example: Internal Server Error
+                    description: The correct answer (only provided if user's answer was incorrect)
+                  score:
+                    type: integer
+                    description: Points awarded for this answer
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /leaderboard:
+    get:
+      summary: Get the game leaderboard
+      operationId: getLeaderboard
+      tags:
+        - Game
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+          description: Maximum number of users to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Number of users to skip
+      responses:
+        '200':
+          description: Leaderboard retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                    games:
+                      type: integer
+                    rightAnswers:
+                      type: integer
+                    wrongAnswers:
+                      type: integer
+                    ratio:
+                      type: number
+                      format: float
+                    maxScore:
+                      type: integer
+                    rank:
+                      type: integer
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    UserInput:
+      type: object
+      properties:
+        username:
+          type: string
+          description: User ID
+          example: student
+        password:
+          type: string
+          description: User password
+          example: pass
+        email:
+          type: string
+          description: User email
+          example: student@example.com
+      required:
+        - username
+        - password
+        - email
+
+    UserUpdateInput:
+      type: object
+      properties:
+        password:
+          type: string
+          description: User password
+          example: newpass
+        email:
+          type: string
+          description: User email
+          example: newemail@example.com
+
+    LoginInput:
+      type: object
+      properties:
+        username:
+          type: string
+          description: User ID
+          example: student
+        password:
+          type: string
+          description: User password
+          example: pass
+      required:
+        - username
+        - password
+
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: User ID
+          example: 65f756db3fa22d227a4b7c7d
+        username:
+          type: string
+          description: Username
+          example: student
+        email:
+          type: string
+          description: User email
+          example: student@example.com
+        password:
+          type: string
+          description: Hashed password
+          example: $2b$10$ZKdNYLWFQxzt5Rei/YTc/OsZNi12YiWz30JeUFHNdAt7MyfmkTuvC
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date
+          example: '2024-03-17T20:47:23.935Z'
+        __v:
+          type: integer
+          example: 0
+
+    UserSummary:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username
+          example: student
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date
+          example: '2024-03-17T20:47:23.935Z'
+
+    UserDetail:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: User ID
+          example: 65f756db3fa22d227a4b7c7d
+        username:
+          type: string
+          description: Username
+          example: student
+        email:
+          type: string
+          description: User email
+          example: student@example.com
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date
+          example: '2024-03-17T20:47:23.935Z'
+        questionsAnswered:
+          type: array
+          items:
+            type: object
+            properties:
+              questionId:
+                type: string
+                example: 60d21b4667d0d8992e610c85
+              correct:
+                type: boolean
+              answerDate:
+                type: string
+                format: date-time
+
+    UserStats:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username
+          example: prueba2
+        games:
+          type: integer
+          description: Number of games played
+          example: 3
+        rightAnswers:
+          type: integer
+          description: Number of correct answers
+          example: 23
+        wrongAnswers:
+          type: integer
+          description: Number of incorrect answers
+          example: 7
+        ratio:
+          type: number
+          format: float
+          description: Ratio of correct answers
+          example: 0.76666666666666
+        averageTime:
+          type: integer
+          description: Average time to answer (seconds)
+          example: 110
+        maxScore:
+          type: integer
+          description: Maximum score achieved
+          example: 100
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: User token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NWY3NTZkYjNmYTIyZDIyN2E0YjdjN2QiLCJpYXQiOjE3MTA3MDg3NDUsImV4cCI6MTcxMDcxMjM0NX0.VMG_5DOyQ4GYlJQRcu1I6ICG1IGzuo2Xuei093ONHxw
+        username:
+          type: string
+          description: Username
+          example: student
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date
+          example: '2024-03-17T20:47:23.935Z'
+
+    LLMPrompt:
+      type: object
+      properties:
+        questionId:
+          type: string
+          description: ID of the question related to the image
+          example: 60d21b4667d0d8992e610c85
+        prompt:
+          type: string
+          description: User's query to get a hint about the image
+          example: "¿Esta imagen es de un animal?"
+      required:
+        - questionId
+        - prompt
+
+    LLMResponse:
+      type: object
+      properties:
+        response:
+          type: string
+          description: LLM hint response
+          example: "Sí, la imagen muestra un animal vertebrado."
+
+    QuestionInput:
+      type: object
+      properties:
+        imageUrl:
+          type: string
+          description: URL to the question image
+          example: "https://example.com/images/lion.jpg"
+        correctAnswer:
+          type: string
+          description: The correct answer to the question
+          example: "León"
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+          description: Question difficulty
+          example: "medium"
+        category:
+          type: string
+          description: Question category
+          example: "Animales"
+        wikidataId:
+          type: string
+          description: ID in Wikidata for the image subject
+          example: "Q140"
+      required:
+        - imageUrl
+        - correctAnswer
+        - difficulty
+        - category
+
+    QuestionUpdateInput:
+      type: object
+      properties:
+        imageUrl:
+          type: string
+          description: URL to the question image
+          example: "https://example.com/images/updated_lion.jpg"
+        correctAnswer:
+          type: string
+          description: The correct answer to the question
+          example: "León"
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+          description: Question difficulty
+          example: "hard"
+        category:
+          type: string
+          description: Question category
+          example: "Animales"
+        wikidataId:
+          type: string
+          description: ID in Wikidata for the image subject
+          example: "Q140"
+
+    QuestionSummary:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Question ID
+          example: 60d21b4667d0d8992e610c85
+        imageUrl:
+          type: string
+          description: URL to the question image
+          example: "https://example.com/images/lion.jpg"
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+          description: Question difficulty
+          example: "medium"
+        category:
+          type: string
+          description: Question category
+          example: "Animales"
+
+    Question:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Question ID
+          example: 60d21b4667d0d8992e610c85
+        imageUrl:
+          type: string
+          description: URL to the question image
+          example: "https://example.com/images/lion.jpg"
+        correctAnswer:
+          type: string
+          description: The correct answer to the question
+          example: "León"
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+          description: Question difficulty
+          example: "medium"
+        category:
+          type: string
+          description: Question category
+          example: "Animales"
+        wikidataId:
+          type: string
+          description: ID in Wikidata for the image subject
+          example: "Q140"
+
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Health status
+          example: OK
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Invalid credentials"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
