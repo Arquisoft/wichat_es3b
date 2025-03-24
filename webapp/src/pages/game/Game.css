@@ -6,8 +6,8 @@
   left: 2rem;
   top: 50%;
   transform: translateY(-50%);
-  width: 330px;
-  height: 430px;
+  width: 21rem;
+  height: 28rem;
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -15,6 +15,19 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  border: 2px solid var(--color-primario);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.chatBoxContainer.hidden {
+  transform: translateX(-110%) translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chatBoxContainer.visible {
+  transform: translateX(0) translateY(-50%);
+  opacity: 1;
 }
 
 /* Estilos para el componente chat-box */
@@ -22,7 +35,6 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 100%;
 }
 
 /* Contenedor de mensajes con scroll */
@@ -72,23 +84,77 @@
 /* Estilo para el botón de enviar */
 #sendMessageToAIButton {
   color: white;
+}
+
+.send-button {
   background-color: var(--color-primario);
   cursor: pointer;
   padding: 0.3rem;
   border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: background-color 0.2s;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
-#sendMessageToAIButton:hover {
+.send-button:hover {
   background-color: var(--color-hover-boton);
 }
 
 /* Responsividad para dispositivos móviles */
+@media (max-width: 1200px) {
+  .chatBoxContainer {
+    width: 18rem;
+    height: 25rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .chatBoxContainer {
+    width: 16rem;
+    height: 24rem;
+    left: 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
   .chatBoxContainer {
+    width: 15rem;
+    height: 22rem;
     left: 1rem;
-    width: 250px;
-    height: 350px;
+  }
+
+  .input-container input {
+    padding: 0.4rem 0.8rem;
+  }
+
+  .send-button {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .chatBoxContainer {
+    width: 14rem;
+    height: 20rem;
+    left: 0.5rem;
+  }
+
+  .messages {
+    padding: 0.75rem;
+  }
+
+  .input-container {
+    padding: 0.5rem;
+  }
+
+  .send-button {
+    width: 2rem;
+    height: 2rem;
   }
 }
 
@@ -179,15 +245,6 @@
   max-height: 40vh;
   box-shadow: 4px 4px 4px rgba(0,0,0,0.1)
 }
-
-/* .midSection img {
-  position: relative;
-  border: 2px solid var(--color-primario);
-  border-radius: 5px;
-  height: 50%;
-  width: 50%;
-  object-fit: cover;
-} */
 
 .answerPanel {
   display: grid;

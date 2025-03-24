@@ -4,7 +4,7 @@ import "./ChatBox.css";
 import ChatBubble from "../chatBubble/ChatBubble";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
-const ChatBox = ({ question, language = "es" }) => {
+const ChatBox = ({ question, language = "es", isVisible }) => {
   const [messages, setMessages] = useState([]);
   const [hint, setHint] = useState("");
   const [isLoadingHint, setIsLoadingHint] = useState(false);
@@ -63,6 +63,12 @@ const ChatBox = ({ question, language = "es" }) => {
     getHint();
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSend();
+    }
+  };
+
   useEffect(() => {
     let interval;
     if (isLoadingHint) {
@@ -77,31 +83,35 @@ const ChatBox = ({ question, language = "es" }) => {
     return () => clearInterval(interval);
   }, [isLoadingHint]);
 
+  if (!isVisible) return null;
+
   return (
-    <div className="chat-box">
-      <div className="messages">
-        {messages.map((msg, index) => (
-          <ChatBubble key={index} message={msg.text} isSender={msg.isSender} />
-        ))}
-        {isLoadingHint && (
-          <ChatBubble message={loadingMessage} isSender={false} />
-        )}
+      <div className="chat-box">
+        <div className="messages">
+          {messages.map((msg, index) => (
+              <ChatBubble key={index} message={msg.text} isSender={msg.isSender} />
+          ))}
+          {isLoadingHint && (
+              <ChatBubble message={loadingMessage} isSender={false} />
+          )}
+        </div>
+        <div className="input-container">
+          <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Pídele una pista a la IA..."
+              onKeyPress={handleKeyPress}
+          />
+          <button className="send-button" onClick={handleSend}>
+            <ArrowUpwardIcon
+                titleAccess="Envía un mensaje"
+                fontSize="inherit"
+                id="sendMessageToAIButton"
+            />
+          </button>
+        </div>
       </div>
-      <div className="input-container">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Pídele una pista a la IA..."
-        />
-        <ArrowUpwardIcon
-          titleAccess="Envía un mensaje"
-          fontSize="1.5em"
-          id="sendMessageToAIButton"
-          onClick={handleSend}
-        />
-      </div>
-    </div>
   );
 };
 

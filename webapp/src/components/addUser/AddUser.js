@@ -29,7 +29,7 @@ const AddUser = ({ handleToggleView }) => {
 
   const addUser = async () => {
     try {
-      await axios.post(`${apiEndpoint}/adduser`, { username, password });
+      await axios.post(`${apiEndpoint}/adduser`, { email, username, password });
       setOpenSnackbar(true);
     } catch (error) {
       setError(error.response.data.error);

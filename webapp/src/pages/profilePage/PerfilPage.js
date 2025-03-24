@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import Navbar from "../../components/nav/Nav";
-import Sidebar from "../../components/sidebar/sidebar";
+import Sidebar from "../../components/sidebar/Sidebar";
 import StatsGraphs from "../../components/stats-graphs/stats-graphs";
 import GameHistory from "../../components/game-history/game-history";
 import ProfileCard from "../../components/profile-card/profile-card";
 import "../../assets/global.css";
 import Footer from "../../components/Footer";
+import "./PerfilPage.css";
+import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarToggleButton";
 
 export default function PerfilPage() {
   // Estado para datos de usuario
@@ -13,7 +15,7 @@ export default function PerfilPage() {
     username: "", // Inicialmente vacío, se actualizará con localStorage
     level: 5,
     avatar:
-        "https://i.pinimg.com/736x/8d/16/90/8d16902ae35c1e982c2990ff85fa11fb.jpg",
+      "https://i.pinimg.com/736x/8d/16/90/8d16902ae35c1e982c2990ff85fa11fb.jpg",
     stats: {
       gamesPlayed: 27,
       correctAnswers: 200,
@@ -23,6 +25,7 @@ export default function PerfilPage() {
       bestScore: 1200,
       bestStreak: 18,
     },
+    // Datos para el gráfico de línea
     monthlyData: [
       { month: "Enero", value: 18 },
       { month: "Febrero", value: 26 },
@@ -30,10 +33,12 @@ export default function PerfilPage() {
       { month: "Abril", value: 35 },
       { month: "Mayo", value: 36 },
     ],
+    // Datos para el gráfico circular
     pieData: [
       { name: "Aciertos", value: 79.4 },
       { name: "Fallos", value: 20.6 },
     ],
+    // Historial de partidas
     gameHistory: [
       { id: 124, date: "27/02/2024", correct: 16, time: "06:23" },
       { id: 123, date: "27/02/2024", correct: 10, time: "08:25" },
@@ -65,45 +70,50 @@ export default function PerfilPage() {
     setSidebarVisible(!sidebarVisible);
   };
 
+  const closeSideBar = () => setSidebarVisible(false);
+
   // Función para navegar por el historial de partidas
   const navigateGames = (direction) => {
-    setCurrentGameIndex((prev) =>
-        direction === "prev"
-            ? prev > 0
-                ? prev - 1
-                : userData.gameHistory.length - 1
-            : prev < userData.gameHistory.length - 1
-                ? prev + 1
-                : 0
-    );
+    if (direction === "prev") {
+      setCurrentGameIndex((prev) =>
+        prev > 0 ? prev - 1 : userData.gameHistory.length - 1
+      );
+    } else {
+      setCurrentGameIndex((prev) =>
+        prev < userData.gameHistory.length - 1 ? prev + 1 : 0
+      );
+    }
   };
 
   return (
-      <div className="app-container">
-        {/* Barra de navegación superior */}
-        <Navbar />
-
-        <div className="main-content">
-          <div className="content-area">
-            {/* Tarjeta de perfil con los datos actualizados */}
-            <ProfileCard userData={userData} />
-
-            {/* Sección de gráficas */}
-            <StatsGraphs
-                monthlyData={userData.monthlyData}
-                pieData={userData.pieData}
-            />
-
-            {/* Sección de historial de partidas */}
-            <GameHistory
-                games={userData.gameHistory}
-                currentIndex={currentGameIndex}
-                onNavigate={navigateGames}
-            />
-          </div>
+    <div className="app-container">
+      <Navbar />
+      <div className={`main-content ${sidebarVisible ? "with-sidebar" : ""}`}>
+        <SidebarToggleButton onClick={toggleSidebar}></SidebarToggleButton>
+        <div className="sidebar-stats">
+          <Sidebar
+            userData={userData}
+            isVisible={sidebarVisible}
+            onClose={closeSideBar}
+          ></Sidebar>
         </div>
+        <div className="content-area">
+          <ProfileCard userData={userData} />
+          <StatsGraphs
+            monthlyData={userData.monthlyData}
+            pieData={userData.pieData}
+          />
 
-        <Footer />
+          {/* Sección de historial de partidas */}
+          <GameHistory
+            games={userData.gameHistory}
+            currentIndex={currentGameIndex}
+            onNavigate={navigateGames}
+          />
+        </div>
       </div>
+
+      <Footer></Footer>
+    </div>
   );
 }
