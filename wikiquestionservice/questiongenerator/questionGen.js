@@ -146,8 +146,6 @@ class WikidataQueryService {
                 }
             }
         }
-
-        console.log(`Se han generado ${this.questionsArray.length} preguntas.`);
     }
 
     async obtenerValoresDePropiedad(id, property, tipo, idioma) {
