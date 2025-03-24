@@ -61,6 +61,11 @@ app.post('/logout', async (req, res) => {
   try {
     // Forward the logout request to the authentication service
     const authResponse = await axios.post(authServiceUrl + '/logout', req.body, { withCredentials: true, headers: { ...req.headers } });
+
+    // Forward the cookie to the client from the authentication service
+    if (authResponse.headers["set-cookie"])
+      res.setHeader("Set-Cookie", authResponse.headers["set-cookie"]);
+    
     res.json(authResponse.data);
   } catch (error) {
     res.status(error.response.status).json({ error: error.response.data.error });

@@ -1,19 +1,33 @@
-import { AppBar, Box, Container, IconButton } from "@mui/material";
-import HomeIcon from '@mui/icons-material/Home'; 
+import { AppBar, Box, Button, Container, IconButton } from "@mui/material";
+import HomeIcon from '@mui/icons-material/Home';
 import { Outlet, NavLink } from 'react-router';
+import useAuth from "../hooks/useAuth";
+import useAxios from "../hooks/useAxios";
 
-const StyledNavlink = ({to, label, icon}) => {
+const StyledNavlink = ({ to, label, icon }) => {
     return (
         <NavLink to={to}>
-            <IconButton sx={{color: "white", gap: "0.5rem", "&:hover": {backgroundColor: "rgba(255, 255, 255, 0.1)"}}}>
-                {icon && (icon)}
-                {label}
-            </IconButton>
+            <Button sx={{ color: "white", gap: "0.5rem", "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" } }}>
+                {icon} {label}
+            </Button>
         </NavLink>
     );
 }
 
 const Layout = () => {
+    const { auth, setAuth } = useAuth();
+    const axios = useAxios();
+
+    const handleLogout = async () => {
+        try {
+            await axios.post("/logout", {});
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setAuth({});
+        }
+    }
+
     return (
         <Container component="main" disableGutters sx={{
             minWidth: "100vw",
@@ -28,9 +42,14 @@ const Layout = () => {
                 background: "linear-gradient(to right,rgb(70, 80, 180),rgb(100, 90, 200))"
             }}>
                 <StyledNavlink to="/" label="Home" icon={<HomeIcon />} />
-                <Box sx={{ml: "auto"}}>
-                    <StyledNavlink to="/login" label="Login" />
-                    <StyledNavlink to="/signup" label="Sign Up" />
+                <Box sx={{ ml: "auto" }}>
+                    <>
+                        {auth.username
+                            ? <Button onClick={handleLogout} sx={{ color: "white", gap: "0.5rem", "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" } }}>
+                                Log Out
+                            </Button>
+                            : <StyledNavlink to="/login" label="Login" />}
+                    </>
                 </Box>
             </AppBar>
 

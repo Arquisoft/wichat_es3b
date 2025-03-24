@@ -15,6 +15,7 @@ import Game from './components/Game';
 import Welcome from './components/Welcome';
 import Layout from './components/Layout';
 import GameTopicSelection from './components/GameTopicSelection';
+import PersistentLogin from './components/PersistentLogin';
 
 console.log(styles);
 
@@ -29,11 +30,13 @@ root.render(
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           {/* Routes with authentication */}
-          <Route element={<PrivateRoute />}>
-            <Route path="/welcome" element={<Welcome />} />
-            <Route path="/gamemode" element={<GameModeSelection />} />
-            <Route path="/gametopic" element={<GameTopicSelection />} />
-            <Route path="/game" element={<Game />} />
+          <Route element={<PersistentLogin />}>
+            <Route element={<PrivateRoute />}>
+              <Route path="/welcome" element={<Welcome />} />
+              <Route path="/gamemode" element={<GameModeSelection />} />
+              <Route path="/gametopic" element={<GameTopicSelection />} />
+              <Route path="/game" element={<Game />} />
+            </Route>
           </Route>
         </Route>
       </Routes>

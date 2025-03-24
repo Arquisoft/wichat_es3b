@@ -87,7 +87,7 @@ app.get("/refresh", async (req, res) => {
       if (err || user.username !== decoded.username) return res.status(403).json({ error: "Forbidden" });
 
       const accessToken = jwt.sign({ userId: user._id, username: user.username }, "accessTokenSecret", { expiresIn: '15m' });
-      res.status(200).json({ accessToken });
+      res.status(200).json({ username: user.username, accessToken });
     }
   );
 });
