@@ -8,7 +8,6 @@ import ChatBox from "../../components/chatBox/ChatBox";
 import { LinearProgress, Box } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useTranslation } from "react-i18next";
-const TOTAL_TIME = 40; // Duración total de la pregunta en segundos
 
 const Game = () => {
   const { i18n } = useTranslation();
@@ -23,18 +22,32 @@ const Game = () => {
   const [isCorrect, setIsCorrect] = useState(null);
   const [score, setScore] = useState(0);
   const [isAnswered, setIsAnswered] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [progress, setProgress] = useState(100);
   const [isChatBoxVisible, setIsChatBoxVisible] = useState(false);
-
   const timerRef = useRef(null); // Referencia para almacenar el ID del intervalo
 
   const URL = "http://localhost:8004/";
 
+  const [config, setConfig] = useState({
+    numPreguntas: 10,
+    tiempoPregunta: 30,
+    limitePistas: 3,
+    modoJuego: "Jugador vs IA",
+  });
+
+  useEffect(() => {
+    const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
+    if (storedConfig) {
+      setConfig(storedConfig);
+    }
+  }, []);
+
+  const [timeLeft, setTimeLeft] = useState(config.tiempoPregunta);
+  const TOTAL_TIME = config.tiempoPregunta;
+
   const fetchQuestions = useCallback(async () => {
-    // Correcto
     try {
-      const response = await fetch(`${URL}questions?n=25`);
+      const response = await fetch(`${URL}questions?n=${config.numPreguntas}`);
       if (!response.ok) {
         throw new Error("No se pudieron obtener las preguntas.");
       }
@@ -45,7 +58,7 @@ const Game = () => {
     } catch (error) {
       setIsLoading(false);
     }
-  }, []);
+  }, [config.numPreguntas]);
 
   useEffect(() => {
     fetchQuestions();

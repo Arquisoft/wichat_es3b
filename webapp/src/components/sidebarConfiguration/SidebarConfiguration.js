@@ -1,8 +1,21 @@
-import { useEffect } from "react";
+import {useEffect, useState} from "react";
 import "../sidebar/Sidebar.css";
 
 // Componente para la barra lateral con configuración del juego
-export default function Sidebar({ isVisible, onClose, children }) {
+export default function Sidebar({ isVisible, onClose }) {
+
+    const [config, setConfig] = useState({
+        numPreguntas: 10,
+        tiempoPregunta: 30,
+        limitePistas: 3,
+        modoJuego: "Jugador vs IA",
+    });
+
+    const handleChange = (e) => {
+        setConfig((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        localStorage.setItem("quizConfig", JSON.stringify({ ...config, [e.target.name]: e.target.value }));
+    };
+
     // Prevenir scroll del sidebar cuando está abierto en móviles
     useEffect(() => {
         return () => {
@@ -20,7 +33,7 @@ export default function Sidebar({ isVisible, onClose, children }) {
                 <div className="sidebar-content">
                     <label>
                         Número de preguntas
-                        <select>
+                        <select name="numPreguntas" onChange={handleChange} value={config.numPreguntas}>
                             <option>10 preguntas</option>
                             <option>20 preguntas</option>
                             <option>30 preguntas</option>
@@ -29,7 +42,7 @@ export default function Sidebar({ isVisible, onClose, children }) {
 
                     <label>
                         Tiempo por pregunta
-                        <select>
+                        <select name="tiempoPregunta" onChange={handleChange} value={config.tiempoPregunta}>
                             <option>30 segundos</option>
                             <option>45 segundos</option>
                             <option>60 segundos</option>
@@ -38,7 +51,7 @@ export default function Sidebar({ isVisible, onClose, children }) {
 
                     <label>
                         Límite de pistas IA
-                        <select>
+                        <select name="limitePistas" onChange={handleChange} value={config.limitePistas}>
                             <option>3 pistas</option>
                             <option>5 pistas</option>
                             <option>7 pistas</option>
@@ -47,7 +60,7 @@ export default function Sidebar({ isVisible, onClose, children }) {
 
                     <label>
                         Modo de juego
-                        <select>
+                        <select name="modoJuego" onChange={handleChange} value={config.modoJuego}>
                             <option>Jugador vs IA</option>
                             <option>Cooperativo</option>
                             <option>Contra Reloj</option>
