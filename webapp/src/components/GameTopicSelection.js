@@ -7,8 +7,6 @@ import { NavLink } from "react-router-dom"
 import { LocationCity, Flag, SportsBasketball, MusicNote } from "@mui/icons-material"
 import useAxios from "../hooks/useAxios"
 
-const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000";
-
 const StyledContainer = styled(Container)(({ theme }) => ({
   padding: theme.spacing(4),
   display: "flex",
@@ -129,7 +127,7 @@ const GameTopicSelection = () => {
 
   const startGame = async () => {
     try {
-      await axios.post(`${apiEndpoint}/loadQuestion`, { modes: selectedTopics });
+      await axios.post("/loadQuestion", { modes: selectedTopics });
     } catch (error) {
       console.error("Error fetching game data:", error);
     }

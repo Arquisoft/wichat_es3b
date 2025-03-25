@@ -12,8 +12,6 @@ const LLMChat = (roundData) => {
     const [autoScroll, setAutoScroll] = useState(true); // track auto scroll when generating messages
     const [prompt, setPrompt] = useState("");
 
-    const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
-
     const sendMessage = async () => {
         if (!question.trim()) return;
         
@@ -24,7 +22,7 @@ const LLMChat = (roundData) => {
         try {
             // create the history of messages (the memory of the llm) and send it through the gateway
             const history = [...messages, newMessage].map(message => `${message.sender}: ${message.text}`).join("\n");
-            const response = await axios.post(`${apiEndpoint}/askllm`, { question: history, prompt });
+            const response = await axios.post("/askllm", { question: history, prompt });
             
             setMessages(previous => [...previous, { sender: "llm", text: response.data.answer }]);
         } catch (error) {

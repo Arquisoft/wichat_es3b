@@ -11,8 +11,6 @@ import MonetizationOnIcon from "@mui/icons-material/MonetizationOn"
 import Chat from "./LLMChat"
 import useAxios from "../hooks/useAxios"
 
-const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000"
-
 // Custom styled components
 const GameContainer = styled(Container)(({ theme }) => ({
   display: "flex",
@@ -158,7 +156,7 @@ function Game() {
       setLoading(true)
       setChatKey(chatKey + 1);
 
-      const response = await axios.get(`${apiEndpoint}/getRound`)
+      const response = await axios.get("/getRound")
       setHiddenOptions([])
       return response.data
     } catch (error) {
