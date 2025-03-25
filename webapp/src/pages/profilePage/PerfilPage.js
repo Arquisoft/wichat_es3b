@@ -73,9 +73,7 @@ export default function PerfilPage() {
   const loadUserStats = async (username) => {
     try {
       console.log("Cargando estadísticas para el usuario:", username);
-      const response = await axios.get(
-        `http://localhost:8000/getstats/${username}`
-      );
+      const response = await axios.get(`${gatewayUrl}/getstats/${username}`);
       console.log("Respuesta del servidor:", response.data);
 
       const stats = response.data;
@@ -90,7 +88,6 @@ export default function PerfilPage() {
           ratio: roundedRatio,
           averageTime: `${stats.averageTime} s`,
           bestScore: stats.maxScore,
-          bestStreak: 0, // TODO: Este dato no está en el servicio de estadísticas
         },
         pieData: [
           { name: "Aciertos", value: roundedRatio * 100 },
@@ -99,6 +96,27 @@ export default function PerfilPage() {
       }));
     } catch (error) {
       console.error("Error al cargar las estadísticas: ", error);
+    }
+  };
+
+  const loadGameHistory = async (username) => {
+    try {
+      if (!username) return;
+      const response = await axios.get(`${gatewayUrl}/games/${username}`);
+      const games = response.data.map((game, index) => ({
+        id: index + 1, // TODO: Esto no debería estar hardcodeado
+        date: new Date(game.date).toLocaleDateString("es-Es"),
+        correct: game.rightAnswers,
+        time: `${game.time} s`,
+        score: game.score,
+        ratio: game.ratio,
+      }));
+      setUserData((prevData) => ({
+        ...prevData,
+        gameHistory: games,
+      }));
+    } catch (error) {
+      console.error("Error al cargar el historial de partidas: " + error);
     }
   };
 
@@ -116,6 +134,7 @@ export default function PerfilPage() {
   // Cargar estadísticas de usuario
   useEffect(() => {
     loadUserStats(userData.username);
+    loadGameHistory(userData.username);
   }, [userData.username]);
 
   return (

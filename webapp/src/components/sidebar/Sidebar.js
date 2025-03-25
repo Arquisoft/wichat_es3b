@@ -64,11 +64,6 @@ export default function Sidebar({ userData, isVisible, onClose }) {
             <span className="stat-label">Mejor puntuación:</span>
             <span className="stat-value">{userData.stats.bestScore}</span>
           </div>
-
-          <div className="stat-item">
-            <span className="stat-label">Mayor racha de aciertos:</span>
-            <span className="stat-value">{userData.stats.bestStreak}</span>
-          </div>
         </div>
       </aside>
 
