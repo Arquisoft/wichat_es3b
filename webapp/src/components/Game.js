@@ -10,7 +10,6 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn"
 import Chat from "./LLMChat"
 import useAxios from "../hooks/useAxios"
-import useAuth from "../hooks/useAuth"
 
 const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000"
 
@@ -138,7 +137,6 @@ const LoadingContainer = styled(Box)(({ theme }) => ({
 }))
 
 function Game() {
-  const { setAuth } = useAuth();
   const axios = useAxios();
 
   const totalRounds = 10;
@@ -158,14 +156,13 @@ function Game() {
     try {
       setLoading(true)
       setChatKey(chatKey + 1);
-      
+
       const response = await axios.get(`${apiEndpoint}/getRound`)
       setHiddenOptions([])
       return response.data
     } catch (error) {
       console.error("Error fetching data from question service:", error)
       setLoading(false)
-      if (error.response.status === 403) setAuth({});
     }
   }
 
@@ -197,7 +194,7 @@ function Game() {
   // Load data every 500ms while the game is loading
   useEffect(() => {
     let intervalId;
-  
+
     if (loading) {
       intervalId = setInterval(async () => {
         try {
@@ -210,7 +207,7 @@ function Game() {
         }
       }, 500);
     }
-  
+
     return () => {
       if (intervalId) {
         clearInterval(intervalId); // Cleanup interval on unmount or when loading stops
@@ -413,7 +410,7 @@ function Game() {
         <Grid item xs={12} md={3}>
           <Card elevation={3} sx={{ height: "100%" }}>
             <CardContent>
-              <Chat key={chatKey} />
+              {roundData && <Chat key={chatKey} roundData={roundData} />}
             </CardContent>
           </Card>
         </Grid>
