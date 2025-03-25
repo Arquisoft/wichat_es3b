@@ -1,14 +1,10 @@
 const mongoose = require('mongoose');
 
 
-const statSchema = new mongoose.Schema({
+const gameSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-  },
-  games: { 
-    type: Number, 
-    required: true
   },
   rightAnswers: {
     type: Number, 
@@ -22,25 +18,21 @@ const statSchema = new mongoose.Schema({
     type: Number, 
     required: true
   }, 
-  averageTime: { 
+  time: { 
     type: Number, 
     required: true 
   }, 
-  maxScore: { 
+  score: { 
     type: Number, 
     required: true 
   },
-  streak: {
-    type: Number,
-    required: true
+  date: {
+    type: Date,
+    default: Date.now, 
   },
-  maxStreak: {
-    type: Number,
-    required: true
-  }
 });
 
 
-const Stat = mongoose.model('Stat', statSchema);
+const Game = mongoose.model('Game', gameSchema);
 
-module.exports = Stat;
+module.exports = Game;
