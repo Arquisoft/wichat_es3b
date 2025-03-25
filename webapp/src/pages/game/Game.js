@@ -24,7 +24,7 @@ const Game = () => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [progress, setProgress] = useState(100);
   const [isChatBoxVisible, setIsChatBoxVisible] = useState(false);
-  const timerRef = useRef(null); // Referencia para almacenar el ID del intervalo
+  const timerRef = useRef(null);
 
   const URL = "http://localhost:8004/";
 
@@ -35,6 +35,8 @@ const Game = () => {
     modoJuego: "Jugador vs IA",
   });
 
+  const [timeLeft, setTimeLeft] = useState(config.tiempoPregunta);
+
   useEffect(() => {
     const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
     if (storedConfig) {
@@ -42,7 +44,10 @@ const Game = () => {
     }
   }, []);
 
-  const [timeLeft, setTimeLeft] = useState(config.tiempoPregunta);
+  useEffect(() => {
+    setTimeLeft(config.tiempoPregunta || 30);
+  }, [config.tiempoPregunta]);
+
   const TOTAL_TIME = config.tiempoPregunta;
 
   const fetchQuestions = useCallback(async () => {
@@ -58,25 +63,31 @@ const Game = () => {
     } catch (error) {
       setIsLoading(false);
     }
-  }, [config.numPreguntas]);
+  }, [config.numPreguntas, questionNumber]);
 
   useEffect(() => {
     fetchQuestions();
   }, [fetchQuestions]);
 
   useEffect(() => {
-    if (timeLeft <= 0 || isAnswered) return;
+    if (isAnswered || timeLeft <= 0) return;
 
     timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => Math.max(prev - 1, 0));
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
 
     return () => clearInterval(timerRef.current);
-  }, [timeLeft, isAnswered]);
+  }, [isAnswered]);
 
   useEffect(() => {
     setProgress((timeLeft / TOTAL_TIME) * 100);
-  }, [timeLeft]);
+  }, [timeLeft, TOTAL_TIME]);
 
   const handleNextQuestion = () => {
     setQuestionNumber((prevNumber) => {
@@ -86,7 +97,7 @@ const Game = () => {
       setIsCorrect(null);
       setIsAnswered(false);
       setProgress(100);
-      setTimeLeft(TOTAL_TIME);
+      setTimeLeft(config.tiempoPregunta);
       return newNumber;
     });
   };
@@ -109,9 +120,7 @@ const Game = () => {
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-    return `${minutes.toString().padStart(2, "0")}:${seconds
-        .toString()
-        .padStart(2, "0")}`;
+    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
   const toggleChatBox = () => {
@@ -135,7 +144,7 @@ const Game = () => {
             </div>
             <div className="question">
               <div className="questionNumber">
-                <h2>{`Pregunta ${questionNumber + 1}/25`}</h2>
+                <h2>{`Pregunta ${questionNumber + 1}/${config.numPreguntas}`}</h2>
                 <ArrowForwardIcon
                     titleAccess="Siguiente pregunta"
                     fontSize="1.5em"
@@ -159,9 +168,7 @@ const Game = () => {
             </div>
           </div>
           <div className="midSection">
-            {currentQuestion.img && (
-                <img src={currentQuestion.img[0]} alt="imagen pregunta"></img>
-            )}
+            {currentQuestion.img && <img src={currentQuestion.img[0]} alt="imagen pregunta"></img>}
             <div className="answerPanel">
               {currentQuestion.respuestas &&
                   currentQuestion.respuestas[currentLanguage].map((respuesta, index) => (
@@ -184,37 +191,32 @@ const Game = () => {
             </div>
           </div>
           <div className="lowerSection">
-            <Box
-                display="flex"
-                alignItems="center"
-                width="50%"
-                margin="auto"
-                gap={2}
-            >
+            <Box display="flex" alignItems="center" width="50%" margin="auto" gap={2}>
               <span>Tiempo</span>
               <Box width="100%" position="relative">
-                <LinearProgress
-                    id="progressBar"
-                    variant="determinate"
-                    value={progress}
-                ></LinearProgress>
+                <LinearProgress id="progressBar" variant="determinate" value={progress}></LinearProgress>
               </Box>
               <span>{formatTime(timeLeft)}</span>
             </Box>
           </div>
           <div></div>
           <div className={`chatBoxContainer ${isChatBoxVisible ? 'visible' : 'hidden'}`}>
-            <ChatBox  question={{
-              pregunta: currentQuestion.pregunta.es,
-              respuestaCorrecta: currentQuestion.respuestaCorrecta.es,
-              respuestas: currentQuestion.respuestas.es,
-              descripcion: currentQuestion.descripcion,
-              img: currentQuestion.img
-            }}  language="es" isVisible={true} />
+            <ChatBox
+                question={{
+                  pregunta: currentQuestion.pregunta.es,
+                  respuestaCorrecta: currentQuestion.respuestaCorrecta.es,
+                  respuestas: currentQuestion.respuestas.es,
+                  descripcion: currentQuestion.descripcion,
+                  img: currentQuestion.img,
+                }}
+                language="es"
+                isVisible={true}
+            />
           </div>
         </main>
         <Footer />
       </div>
   );
 };
+
 export default Game;
