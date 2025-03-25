@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Button } from '@mui/material';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import { Typewriter } from "react-simple-typewriter";
 
 const Welcome = () => {
@@ -16,12 +16,17 @@ const Welcome = () => {
   }, []);
 
   const createMessage = async () => {
+    try {
       const question = "Please, generate a greeting message for a student called Guest tell them how fun they are going to have using this game. Explain that they have to press the button to start playing. Really short and make it casual. REALLY SHORT";
       const model = "empathy";
       const msg = await axios.post(`${apiEndpoint}/askllm`, { question, model });
       setMessage(msg.data.answer);
-
       isMessageCreated(true);
+    } catch (error) {
+      console.error("Error fetching message:", error);
+      setMessage("Oops! Something went wrong.");
+      isMessageCreated(false);
+    }
   };
 
   return (
