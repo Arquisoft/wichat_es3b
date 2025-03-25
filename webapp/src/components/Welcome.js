@@ -1,11 +1,15 @@
 // src/components/Welcome.js
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Container, Button } from '@mui/material';
 import { NavLink } from 'react-router';
 import { Typewriter } from "react-simple-typewriter";
+import useAuth from "../hooks/useAuth";
+import useAxios from "../hooks/useAxios";
 
 const Welcome = () => {
+  const { setAuth } = useAuth();
+  const axios = useAxios();
+
   const [message, setMessage] = useState('');
   const [messageCreated, isMessageCreated] = useState(false);
 
@@ -23,9 +27,8 @@ const Welcome = () => {
       setMessage(msg.data.answer);
       isMessageCreated(true);
     } catch (error) {
-      console.error("Error fetching message:", error);
-      setMessage("Oops! Something went wrong.");
-      isMessageCreated(false);
+      console.error(error);
+      if (error.response.status === 403) setAuth({});
     }
   };
 
@@ -34,17 +37,17 @@ const Welcome = () => {
       {messageCreated && (
         <div>
           <Typewriter
-              words={[message]} // Pass your message as an array of strings
-              cursor
-              cursorStyle="|"
-              typeSpeed={2} // Typing speed in ms
+            words={[message]} // Pass your message as an array of strings
+            cursor
+            cursorStyle="|"
+            typeSpeed={2} // Typing speed in ms
           />
-          <NavLink to="/gamemode">
-              <Button variant="contained" color="secondary" fullWidth sx={{ marginTop: 2 }}>
-                  Start the fun
-              </Button>
+          <NavLink to="/gametopic">
+            <Button variant="contained" color="secondary" fullWidth sx={{ marginTop: 2 }}>
+              Start the fun
+            </Button>
           </NavLink>
-      </div>
+        </div>
       )}
     </Container>
   );

@@ -8,9 +8,9 @@ import PhoneIcon from "@mui/icons-material/Phone"
 import ChatIcon from "@mui/icons-material/Chat"
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn"
-
-import axios from "axios"
 import Chat from "./LLMChat"
+import useAxios from "../hooks/useAxios"
+import useAuth from "../hooks/useAuth"
 
 const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000"
 
@@ -138,21 +138,19 @@ const LoadingContainer = styled(Box)(({ theme }) => ({
 }))
 
 function Game() {
+  const { setAuth } = useAuth();
+  const axios = useAxios();
+
   const totalRounds = 10;
-  
   const [round, setRound] = useState(1);
   const [roundData, setRoundData] = useState(null);
   const [score, setScore] = useState(0);
-  
   const [selectedAnswer, setSelectedAnswer] = useState(null);
-
   const [fiftyFiftyUsed, setFiftyFiftyUsed] = useState(false);
   const [callFriendUsed, setCallFriendUsed] = useState(false);
   const [useChatUsed, setUseChatUsed] = useState(false);
   const [hiddenOptions, setHiddenOptions] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const [chatKey, setChatKey] = useState(0); // resets the chat component every time it is updated
 
   // Function to load the data for each round.
@@ -167,6 +165,7 @@ function Game() {
     } catch (error) {
       console.error("Error fetching data from question service:", error)
       setLoading(false)
+      if (error.response.status === 403) setAuth({});
     }
   }
 

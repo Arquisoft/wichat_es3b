@@ -4,6 +4,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
 import styles from './index.css';
 
+import { AuthProvider } from './context/AuthContext';
+import PrivateRoute from './components/PrivateRoute';
+
 import App from './App';
 import Login from './components/Login';
 import SignUp from './components/AddUser';
@@ -12,23 +15,32 @@ import Game from './components/Game';
 import Welcome from './components/Welcome';
 import Layout from './components/Layout';
 import GameTopicSelection from './components/GameTopicSelection';
+import PersistentLogin from './components/PersistentLogin';
 
 console.log(styles);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<App />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/welcome" element={<Welcome />} />
-        <Route path="/gamemode" element={<GameModeSelection />} />
-        <Route path="/gametopic" element={<GameTopicSelection />} />
-        <Route path="/game" element={<Game />} />
-      </Route>
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route element={<Layout />}>
+          {/* Routes without authentication */}
+          <Route index element={<App />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          {/* Routes with authentication */}
+          <Route element={<PersistentLogin />}>
+            <Route element={<PrivateRoute />}>
+              <Route path="/welcome" element={<Welcome />} />
+              <Route path="/gamemode" element={<GameModeSelection />} />
+              <Route path="/gametopic" element={<GameTopicSelection />} />
+              <Route path="/game" element={<Game />} />
+            </Route>
+          </Route>
+        </Route>
+      </Routes>
+    </AuthProvider>
   </BrowserRouter>
 );
 
