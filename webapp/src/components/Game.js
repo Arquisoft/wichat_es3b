@@ -142,6 +142,7 @@ function Game() {
   const totalRounds = 10;
   const [round, setRound] = useState(1);
   const [roundData, setRoundData] = useState(null);
+  const [roundPrompt, setRoundPrompt] = useState("");
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [fiftyFiftyUsed, setFiftyFiftyUsed] = useState(false);
@@ -185,6 +186,8 @@ function Game() {
   // Check if the game is still loading after modifying the round data
   useEffect(() => {
     if (roundData && roundData.items.length > 0) {
+      let wh = (roundData.mode === "athlete" || roundData.mode === "singer") ? "Who" : "What";
+      setRoundPrompt(`${wh} is this ${roundData.mode}?`);
       setLoading(false);
     } else {
       setLoading(true);
@@ -381,6 +384,9 @@ function Game() {
                         alt={roundData.itemWithImage.imageAltText || "Item image"}
                       />
                     </ImageContainer>
+                    <Container sx={{ textAlign: "center", mb: 2 }}>
+                      <Typography variant="h5" gutterBottom sx={{ fontWeight: "bold" }}>{roundPrompt}</Typography>
+                    </Container>
                     <Grid container spacing={2}>
                       {roundData.items.map((item, index) => (
                         <Grid item xs={6} key={index}>
