@@ -21,7 +21,7 @@ const Home = () => {
   useEffect(() => {
     const fetchRanking = async () => {
       try {
-        const response = await axios.get(`${gatewayUrl}/getranking`);
+        const response = await axios.get(`${gatewayUrl}/getTop3`);
         setRanking(response.data);
       } catch (error) {
         console.error("Error al obtener los datos del ranking: ", error);
@@ -114,7 +114,7 @@ const Home = () => {
                 {ranking.map((player, index) => (
                   <div key={index}>
                     <b>{index + 1}.</b> {player.username} - {player.maxScore}{" "}
-                    puntos
+                    puntos.
                   </div>
                 ))}
               </Typography>

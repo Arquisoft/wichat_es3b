@@ -129,6 +129,49 @@ app.get("/getranking", async (req, res) => {
   }
 });
 
+app.get("/getTop3", async (req, res) => {
+  try {
+    const rankingResponse = await axios.get(statsServiceUrl + "/getTop3");
+    res.json(rankingResponse.data);
+  } catch (error) {
+    res
+      .status(error.response.status)
+      .json({ error: error.response.data.error });
+  }
+});
+
+app.get("/games/:username", async (req, res) => {
+  try {
+    const username = req.params.username;
+    if (!username)
+      return res.status(400).json({ error: "Se requiere un username" });
+    const gamesResponse = await axios.get(
+      statsServiceUrl + `/games/${username}`
+    );
+    res.json(gamesResponse.data);
+  } catch (error) {
+    res
+      .status(error.response.status)
+      .json({ error: error.response.data.error });
+  }
+});
+
+app.get("/ratios-per-month/:username", async (req, res) => {
+  try {
+    const username = req.params.username;
+    if (!username)
+      return res.status(400).json({ error: "Se requiere un username" });
+    const ratiosResponse = await axios.get(
+      statsServiceUrl + `/ratios-per-month/${username}`
+    );
+    res.json(ratiosResponse.data);
+  } catch (error) {
+    res
+      .status(error.response.status)
+      .json({ error: error.response.data.error });
+  }
+});
+
 // Read the OpenAPI YAML file synchronously
 openapiPath = "./openapi.yaml";
 if (fs.existsSync(openapiPath)) {

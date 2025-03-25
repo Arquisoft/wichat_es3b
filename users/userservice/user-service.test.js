@@ -23,13 +23,14 @@ afterAll(async () => {
 describe('User Service', () => {
   it('should add a new user on POST /adduser', async () => {
     const newUser = {
+      email: 'testuser@example.com',
       username: 'testuser',
       password: 'testpassword',
     };
 
     const response = await request(app).post('/adduser').send(newUser);
     expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('username', 'testuser');
+    expect(response.body).toHaveProperty('email', 'username', 'testuser');
 
     // Check if the user is inserted into the database
     const userInDb = await User.findOne({ username: 'testuser' });
