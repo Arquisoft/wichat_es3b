@@ -61,7 +61,9 @@ app.post('/questions', async (req, res) => {
   try {
     const { n, locale } = req.body;
     const questionServiceUrl = `${wikiQuestionServiceUrl}/questions?n=${n}&locale=${locale}`;
+    console.log("Gateway to link: " + questionServiceUrl);
     const response = await axios.get(questionServiceUrl);
+    console.log(response);
     res.json(response.data);
   } catch (error) {
     res.status(error.response ? error.response.status : 500).json({ error: error.message });

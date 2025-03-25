@@ -35,7 +35,8 @@ const Game = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ n: 25, locale: 'es' }),
+        body: JSON.stringify({ n: 25, locale: 'es' }
+        ),
       });
       if (!response.ok) {
         throw new Error('No se pudieron obtener las preguntas.');
