@@ -52,6 +52,7 @@ const Game = () => {
   const TOTAL_TIME = config.tiempoPregunta;
 
   const fetchQuestions = useCallback(async () => {
+    console.log("Categorías seleccionadas: ", config.categories);
     try {
       const categories = config.categories.includes("all") ? ["all"] : config.categories;
       const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
