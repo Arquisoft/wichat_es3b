@@ -15,11 +15,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Log in to GitHub Docker Registry
+      - name: Log in to GitHub Container Registry (GHCR)
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          token: ${{ secrets.GITHUB_TOKEN }}  # GitHub Actions automatically provides this token
+          username: ${{ github.actor }}  # Usamos el actor (usuario que ejecuta la acción)
+          password: ${{ secrets.GITHUB_TOKEN }}  # Usamos el GITHUB_TOKEN para autenticar
 
       - name: Build and push authservice
         uses: docker/build-push-action@v2
