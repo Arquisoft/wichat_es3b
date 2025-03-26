@@ -1,0 +1,12 @@
+@import url("../../assets/global.css");
+
+input.textField {
+  border-radius: 5px;
+  border: none;
+  background-color: aliceblue;
+  font-size: var(--font-size-md);
+}
+
+input.textField:focus {
+  border: solid 0.1em var(--color-primario);
+}

@@ -1,0 +1,113 @@
+@import url("../../assets/global.css");
+
+input.textField {
+  margin: 0.5em 0;
+}
+
+h2 {
+  margin-top: 0;
+  font-weight: normal;
+  font-style: italic;
+  font-size: var(--font-size-sm);
+  margin-bottom: 6%;
+}
+
+.buttonPanel button {
+  width: 30%;
+}
+
+.mainDiv {
+  display: grid;
+  grid-template-columns: 50% 50%; /* Divide en dos columnas iguales */
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+}
+
+.form {
+  width: 70%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+  justify-content: center;
+  padding: 0 15%;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  width: 65%;
+}
+
+.formField input {
+  height: 1em;
+  padding: 0.8em;
+  width: 100%;
+}
+
+.formField input:focus {
+  outline: none;
+}
+
+.passwordContainer {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.passwordContainer span {
+  position: absolute;
+  left: 98%;
+  top: 25%;
+  cursor: pointer;
+}
+
+.buttonPanel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2em;
+  margin-top: 1.2%;
+}
+
+.rememberMe {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 0.7em;
+  margin: 1em 0;
+}
+
+.rememberMe input {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff;
+  border: 2px solid var(--color-primario);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.rememberMe input:checked {
+  background-color: var(--color-primario);
+  position: relative;
+}
+
+.rememberMe input:checked::after {
+  content: "✔";
+  font-size: var(--font-size-sm);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.logoAuth {
+  position: relative;
+  height: 10%;
+  right: 39%;
+}

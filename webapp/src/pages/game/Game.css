@@ -1,0 +1,324 @@
+@import url("../../assets/global.css");
+
+/* Contenedor principal del chat */
+.chatBoxContainer {
+  position: fixed;
+  left: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 21rem;
+  height: 28rem;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--color-primario);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.chatBoxContainer.hidden {
+  transform: translateX(-110%) translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chatBoxContainer.visible {
+  transform: translateX(0) translateY(-50%);
+  opacity: 1;
+}
+
+/* Estilos para el componente chat-box */
+.chat-box {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Contenedor de mensajes con scroll */
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  scrollbar-width: thin;
+}
+
+/* Estilo para la barra de desplazamiento */
+.messages::-webkit-scrollbar {
+  width: 5px;
+}
+
+.messages::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 5px;
+}
+
+/* Contenedor de input */
+.input-container {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  border-top: 1px solid #eee;
+  background-color: white;
+}
+
+.input-container input {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.input-container input:focus {
+  outline: none;
+  border-color: var(--color-primario);
+}
+
+/* Estilo para el botón de enviar */
+#sendMessageToAIButton {
+  color: white;
+}
+
+.send-button {
+  background-color: var(--color-primario);
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.send-button:hover {
+  background-color: var(--color-hover-boton);
+}
+
+/* Responsividad para dispositivos móviles */
+@media (max-width: 1200px) {
+  .chatBoxContainer {
+    width: 18rem;
+    height: 25rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .chatBoxContainer {
+    width: 16rem;
+    height: 24rem;
+    left: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .chatBoxContainer {
+    width: 15rem;
+    height: 22rem;
+    left: 1rem;
+  }
+
+  .input-container input {
+    padding: 0.4rem 0.8rem;
+  }
+
+  .send-button {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .chatBoxContainer {
+    width: 14rem;
+    height: 20rem;
+    left: 0.5rem;
+  }
+
+  .messages {
+    padding: 0.75rem;
+  }
+
+  .input-container {
+    padding: 0.5rem;
+  }
+
+  .send-button {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+.upperSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.hintButton,
+.question,
+.pointsAndRules {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hintButton {
+  justify-content: flex-start;
+  width: 25%;
+  margin-left: 2em;
+}
+
+.question {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+}
+
+.rightUpperSection {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 2em;
+  width: 25%;
+}
+
+.pointsAndRules {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+}
+
+.pointsAndRules div {
+  align-items: center;
+  font-size: var(--font-size-lg);
+}
+
+.score {
+  font-weight: bold;
+  color: var(--color-primario);
+}
+
+.pointsAndRules button {
+  width: 100%;
+}
+
+.answerPanel button {
+  width: 100%;
+}
+
+.question h2,
+.question h1 {
+  width: 100%;
+  text-align: center;
+}
+
+.question h2 {
+  font-style: normal;
+  font-size: var(--font-size-md);
+  margin-bottom: 0;
+}
+
+.midSection {
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  align-items: center;
+  width: 50%;
+}
+
+.midSection img{
+  object-fit: cover;
+  max-width: 40vw;
+  max-height: 40vh;
+  box-shadow: 4px 4px 4px rgba(0,0,0,0.1)
+}
+
+.answerPanel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1em;
+  width: 90%;
+  height: 100%;
+  margin: auto;
+  margin: 2em;
+}
+
+#progressBar {
+  height: 0.75em;
+  background-color: lightgray;
+  border-radius: 5px;
+}
+
+#progressBar .MuiLinearProgress-bar {
+  background-color: var(--color-primario);
+}
+
+.lowerSection span {
+  color: var(--color-primario);
+  font-weight: bold;
+}
+
+.lowerSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+main {
+  margin: 2em 0;
+}
+
+.questionNumber {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+}
+
+#nextArrow {
+  background-color: var(--color-primario);
+  padding: 0.5em;
+  border-radius: 50%;
+  color: white;
+}
+
+#nextArrow:hover {
+  cursor: pointer;
+  background-color: var(--color-hover-boton);
+  transition: 0.3s ease-in-out;
+}
+
+@media (max-width: 1500px) and (min-width: 1280px) {
+  main {
+    transform: scale(0.9);
+    transform-origin: top;
+  }
+}
+
+@media (max-width: 1279px) {
+  main {
+    transform: scale(0.85);
+    transform-origin: top;
+  }
+}
+
+@media (max-width: 768px) {
+  main {
+    transform: scale(0.75);
+    transform-origin: top;
+  }
+}

@@ -1,0 +1,49 @@
+/* AuthForm.css */
+.authForm {
+  position: relative;
+}
+
+.fade-enter {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.fade-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.authHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 20px;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.logoAuth {
+  height: 40px;
+}
+
+.language-menu-left {
+  margin-right: auto;  /* Empuja el botón de idioma hacia la izquierda */
+}
+
+.language-menu-right {
+  margin-left: auto;  /* Empuja el botón de idioma hacia la derecha */
+}
