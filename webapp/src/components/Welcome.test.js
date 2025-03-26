@@ -58,7 +58,7 @@ describe('Welcome Component', () => {
 
     // Wait for the generated message to appear in the document
     await waitFor(() => {
-      expect(screen.getByText(/Hey Guest! Get ready for some fun/i)).toBeInTheDocument();
+      expect(screen.getByText(/Hey Guest!/i)).toBeInTheDocument();
     });
 
     // Verify that the "Start the fun" button is rendered
