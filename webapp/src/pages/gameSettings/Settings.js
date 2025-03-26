@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../../components/sidebarConfiguration/SidebarConfiguration";
 import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarToggleButton";
 import "./Settings.css";
@@ -22,6 +22,7 @@ export default function Settings() {
         { name: "Arte", value: "arte" },
         { name: "Todo", value: "all" },
     ];
+
     useEffect(() => {
         const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
         if (storedConfig?.categories) {
@@ -39,6 +40,7 @@ export default function Settings() {
                     ? prev.filter((c) => c !== categoryValue)
                     : [...prev.filter((c) => c !== "all"), categoryValue];
 
+                // Si todas las categorías son deseleccionadas, "Todo" se selecciona
                 if (newSelection.length === 0) {
                     newSelection = ["all"];
                 }
@@ -53,11 +55,12 @@ export default function Settings() {
         config.categories = selectedCategories;
         localStorage.setItem("quizConfig", JSON.stringify(config));
     }, [selectedCategories]);
+
     return (
         <div className="app-container">
             <Navbar />
             <div className={`main-content ${sidebarVisible ? "with-sidebar" : ""}`}>
-                <SidebarToggleButton onClick={() => setSidebarVisible(!sidebarVisible)} />
+                <SidebarToggleButton onClick={toggleSidebar} />
                 <div className="sidebar-stats">
                     <Sidebar isVisible={sidebarVisible} onClose={() => setSidebarVisible(false)} />
                 </div>
@@ -76,9 +79,9 @@ export default function Settings() {
                         ))}
                     </div>
 
-                        <button className="play-button" disabled={selectedCategories.length === 0}>
-                            Jugar
-                        </button>
+                    <button className="play-button" disabled={selectedCategories.length === 0}>
+                        Jugar
+                    </button>
                 </div>
             </div>
             <Footer />
