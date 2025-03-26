@@ -76,11 +76,9 @@ export default function Settings() {
                         ))}
                     </div>
 
-                    <a href={selectedCategories.length > 0 ? "/play" : "#"} style={{ pointerEvents: selectedCategories.length > 0 ? "auto" : "none" }}>
                         <button className="play-button" disabled={selectedCategories.length === 0}>
                             Jugar
                         </button>
-                    </a>
                 </div>
             </div>
             <Footer />
