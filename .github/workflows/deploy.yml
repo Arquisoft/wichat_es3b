@@ -1,7 +1,7 @@
 on:
   release:
     types:
-      - created  # Se activa cuando se crea una nueva versión en el repositorio
+      - created  # Se activa cuando se crea una nueva release en el repositorio
 
 jobs:
   deploy:
