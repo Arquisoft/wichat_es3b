@@ -17,7 +17,7 @@ app.get("/questions", async (req, res) => {
   const { n = 25, topic = "all" } = req.query;
   const numQuestions = parseInt(n, 10);
 
-  if (numQuestions > 25) {
+  if (numQuestions > 30) {
     return res.status(400).json({ error: "El límite de preguntas es 25" });
   }
 
@@ -29,7 +29,7 @@ app.get("/questions", async (req, res) => {
   }
 
   try {
-    if (topics.includes("all")) {
+    if (topics.includes("all")|| topics.length === 0) {
       topics = ["all"];
     }
 

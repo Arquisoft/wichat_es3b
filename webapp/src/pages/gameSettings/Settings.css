@@ -209,6 +209,18 @@ select {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
+/* Estilo para las categorías seleccionadas */
+.category-card.selected {
+    background-color: #00aaff; /* Color de fondo al seleccionar */
+    color: white; /* Color del texto cuando se selecciona */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra más fuerte para resaltar */
+    transform: translateY(-5px); /* Efecto de elevación para mayor énfasis */
+}
+
+.category-card.selected:hover {
+    transform: translateY(-5px); /* Mantener el mismo efecto en hover */
+}
+
 /* Play Button */
 .play-button {
     background-color: #00aaff;

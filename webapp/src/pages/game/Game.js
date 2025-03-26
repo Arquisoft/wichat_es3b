@@ -33,6 +33,7 @@ const Game = () => {
     tiempoPregunta: 30,
     limitePistas: 3,
     modoJuego: "Jugador vs IA",
+    categories: ["all"],
   });
 
   const [timeLeft, setTimeLeft] = useState(config.tiempoPregunta);
@@ -52,7 +53,10 @@ const Game = () => {
 
   const fetchQuestions = useCallback(async () => {
     try {
-      const response = await fetch(`${URL}questions?n=${config.numPreguntas}`);
+      const categories = config.categories.includes("all") ? ["all"] : config.categories;
+      const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
+
+      const response = await fetch(`${URL}${queryString}`);
       if (!response.ok) {
         throw new Error("No se pudieron obtener las preguntas.");
       }
