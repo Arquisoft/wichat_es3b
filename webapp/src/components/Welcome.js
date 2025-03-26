@@ -27,8 +27,10 @@ const Welcome = () => {
       setMessage(msg.data.answer);
       isMessageCreated(true);
     } catch (error) {
-      console.error(error);
-      if (error.response.status === 403) setAuth({});
+      console.error("Error in createMessage:", error.message);
+      if (error.response && error.response.status === 403) {
+        setAuth({});
+      }
     }
   };
 

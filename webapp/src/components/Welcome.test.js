@@ -4,25 +4,38 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import axios from 'axios';
 import { MemoryRouter } from 'react-router';
-import Welcome from '../Welcome';
+import Welcome from './Welcome';
 
 // Mock axios to prevent real API calls
 jest.mock('axios', () => {
   const mockAxios = {
-    create: jest.fn(() => mockAxios), // Simulates axios.create()
-    post: jest.fn(), // Mock for axios.post()
-    interceptors: { request: { use: jest.fn() }, response: { use: jest.fn() } }, // Mock interceptors
+    create: jest.fn(() => mockAxios),
+    post: jest.fn(),
+    interceptors: { 
+      request: { use: jest.fn(), eject: jest.fn() },
+      response: { use: jest.fn(), eject: jest.fn() }
+    },
   };
   return mockAxios;
 });
 
+
 // Mock AuthContext if needed
-jest.mock('../../context/AuthProvider', () => ({
-  useAuth: () => ({
-    auth: { accessToken: 'fake-token' }, // Simulate an authenticated user
+jest.mock('../hooks/useAuth', () => ({
+  __esModule: true,
+  default: () => ({
+    auth: { accessToken: 'fake-token' }, // Simulate a logged-in user
     setAuth: jest.fn(),
   }),
 }));
+
+beforeAll(() => {
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+});
+
+afterAll(() => {
+  console.error.mockRestore();
+});
 
 describe('Welcome Component', () => {
   beforeEach(() => {
@@ -52,8 +65,8 @@ describe('Welcome Component', () => {
     const button = screen.getByRole('button', { name: /Start the fun/i });
     expect(button).toBeInTheDocument();
 
-    // Check that the button contains the correct link to /gamemode
-    expect(screen.getByRole('link')).toHaveAttribute('href', '/gamemode');
+    // Check that the button contains the correct link to /gametopic
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/gametopic');
   });
 
   it('handles API call failure gracefully', async () => {
