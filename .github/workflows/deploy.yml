@@ -1,3 +1,9 @@
+# Definir el evento que dispara el flujo de trabajo
+on:
+  release:
+    types:
+      - created  # Se activa cuando se crea una nueva versión en el repositorio
+
 deploy:
     name: Deploy over SSH
     runs-on: ubuntu-latest
