@@ -1,5 +1,6 @@
 const request = require('supertest');
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
 const app = require('./gateway-service'); 
 
 // Close the server after all tests
@@ -11,11 +12,14 @@ afterAll(async () => {
 jest.mock('axios');
 
 describe('Gateway Service', () => {
+    const token = jwt.sign("mockToken", "accessTokenSecret");
 
     // Mock responses from external services
     axios.post.mockImplementation((url, data) => {
         if (url.endsWith('/login')) {
             return Promise.resolve({ data: { accessToken: 'mockedToken' } });
+        } else if (url.endsWith('/logout')) {
+            return Promise.resolve({ data: { message: 'Logged out successfully' } });
         } else if (url.endsWith('/adduser')) {
             return Promise.resolve({ data: { userId: 'mockedUserId' } });
         } else if (url.endsWith('/ask')) {
@@ -29,14 +33,6 @@ describe('Gateway Service', () => {
         if (url.endsWith('/getRound')) {
             return Promise.resolve({ data: { round: 'mockedRoundData' } });
         }
-    });
-
-    let token;
-    beforeAll(async () => {
-        const loginResponse = await request(app)
-            .post('/login')
-            .send({ username: 'testuser', password: 'testpassword' });
-        token = loginResponse.body.accessToken;
     });
     
     // Test /health endpoint
@@ -54,6 +50,14 @@ describe('Gateway Service', () => {
 
         expect(response.statusCode).toBe(200);
         expect(response.body.accessToken).toBe('mockedToken');
+    });
+
+    // Test /logout endpoint
+    it('should forward logout request to auth service', async () => {
+        const response = await request(app).post('/logout')
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.message).toBe('Logged out successfully');
     });
     
     // Test /adduser endpoint
@@ -81,6 +85,7 @@ describe('Gateway Service', () => {
     it('should forward loadQuestion request to the question service', async () => {
         const response = await request(app)
             .post('/loadQuestion')
+            .set('Authorization', `Bearer ${token}`)
             .send({ modes: ['city', 'athlete'] });
 
         expect(response.statusCode).toBe(200);
@@ -89,7 +94,7 @@ describe('Gateway Service', () => {
     
     // Test /getRound endpoint
     it('should fetch round data from the question service', async () => {
-        const response = await request(app).get('/getRound');
+        const response = await request(app).get('/getRound').set('Authorization', `Bearer ${token}`);
         
         expect(response.statusCode).toBe(200);
         expect(response.body.round).toBe('mockedRoundData');
