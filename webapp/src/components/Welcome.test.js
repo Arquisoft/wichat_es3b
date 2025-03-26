@@ -4,19 +4,37 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import axios from 'axios';
 import { MemoryRouter } from 'react-router';
-import Welcome from './Welcome';
+import Welcome from '../Welcome';
 
 // Mock axios to prevent real API calls
-jest.mock('axios');
+jest.mock('axios', () => {
+  const mockAxios = {
+    create: jest.fn(() => mockAxios), // Simulates axios.create()
+    post: jest.fn(), // Mock for axios.post()
+    interceptors: { request: { use: jest.fn() }, response: { use: jest.fn() } }, // Mock interceptors
+  };
+  return mockAxios;
+});
+
+// Mock AuthContext if needed
+jest.mock('../../context/AuthProvider', () => ({
+  useAuth: () => ({
+    auth: { accessToken: 'fake-token' }, // Simulate an authenticated user
+    setAuth: jest.fn(),
+  }),
+}));
 
 describe('Welcome Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.clearAllMocks(); // Clear previous mocks before each test
   });
 
   it('fetches and displays the generated welcome message', async () => {
-    // Mock API response with a generated welcome message
-    axios.post.mockResolvedValue({ data: { answer: "Hey Guest! Get ready for some fun. Press start!" } });
+    // Simulate a successful API response with authentication
+    axios.post.mockResolvedValue({
+      data: { answer: "Hey Guest! Get ready for some fun. Press start!" },
+      headers: { Authorization: "Bearer fake-token" }
+    });
 
     // Render the component inside a MemoryRouter to handle <NavLink>
     render(
@@ -39,7 +57,7 @@ describe('Welcome Component', () => {
   });
 
   it('handles API call failure gracefully', async () => {
-    // Mock API failure
+    // Simulate an API failure
     axios.post.mockRejectedValue(new Error('API Error'));
 
     // Render the component

@@ -11,10 +11,11 @@ afterAll(async () => {
 jest.mock('axios');
 
 describe('Gateway Service', () => {
+
     // Mock responses from external services
     axios.post.mockImplementation((url, data) => {
         if (url.endsWith('/login')) {
-            return Promise.resolve({ data: { token: 'mockedToken' } });
+            return Promise.resolve({ data: { accessToken: 'mockedToken' } });
         } else if (url.endsWith('/adduser')) {
             return Promise.resolve({ data: { userId: 'mockedUserId' } });
         } else if (url.endsWith('/ask')) {
@@ -28,6 +29,14 @@ describe('Gateway Service', () => {
         if (url.endsWith('/getRound')) {
             return Promise.resolve({ data: { round: 'mockedRoundData' } });
         }
+    });
+
+    let token;
+    beforeAll(async () => {
+        const loginResponse = await request(app)
+            .post('/login')
+            .send({ username: 'testuser', password: 'testpassword' });
+        token = loginResponse.body.accessToken;
     });
     
     // Test /health endpoint
@@ -44,7 +53,7 @@ describe('Gateway Service', () => {
             .send({ username: 'testuser', password: 'testpassword' });
 
         expect(response.statusCode).toBe(200);
-        expect(response.body.token).toBe('mockedToken');
+        expect(response.body.accessToken).toBe('mockedToken');
     });
     
     // Test /adduser endpoint
@@ -61,6 +70,7 @@ describe('Gateway Service', () => {
     it('should forward askllm request to the llm service', async () => {
         const response = await request(app)
             .post('/askllm')
+            .set('Authorization', `Bearer ${token}`)
             .send({ question: 'question', apiKey: 'apiKey', model: 'gemini' });
 
         expect(response.statusCode).toBe(200);
