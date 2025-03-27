@@ -36,14 +36,7 @@ export default function PerfilPage() {
 
     pieData: [],
 
-    gameHistory: [
-      // TODO: no está en el servicio de estadísticas
-      { id: 124, date: "27/02/2024", correct: 16, time: "06:23" },
-      { id: 123, date: "27/02/2024", correct: 10, time: "08:25" },
-      { id: 122, date: "26/02/2024", correct: 19, time: "05:22" },
-      { id: 121, date: "25/02/2024", correct: 14, time: "07:15" },
-      { id: 120, date: "24/02/2024", correct: 12, time: "04:45" },
-    ],
+    gameHistory: [],
   });
 
   const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -120,6 +113,72 @@ export default function PerfilPage() {
     }
   };
 
+  // Obtiene los últimos 5 meses esperados (incluyendo el actual)
+  const getLastFiveMonths = () => {
+    const expectedMonths = [];
+    const now = new Date();
+
+    for (let i = 4; i >= 0; i--) {
+      const date = new Date(now);
+      date.setMonth(now.getMonth() - i);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      expectedMonths.push(`${year}-${month}`);
+    }
+
+    return expectedMonths;
+  };
+
+  // Obtiene los datos por mes
+  const createMonthDataMap = (apiData) => {
+    const dataByMonth = {};
+    apiData.forEach((item) => {
+      dataByMonth[item.month] = item.avgRatio;
+    });
+    return dataByMonth;
+  };
+
+  // Formatea un string de mes (YYYY-MM) a un nombre legible (Ej: "Enero 2023")
+  const formatMonthName = (monthKey) => {
+    const [year, month] = monthKey.split("-");
+    const date = new Date(year, month - 1);
+    const monthName = date.toLocaleDateString("es-ES", {
+      month: "short",
+      year: "numeric",
+    });
+    return monthName.charAt(0).toUpperCase() + monthName.slice(1);
+  };
+
+  // Procesa los datos para el gráfico
+  const processChartData = (expectedMonths, monthDataMap) => {
+    return expectedMonths.map((monthKey) => ({
+      month: formatMonthName(monthKey),
+      value: monthDataMap[monthKey]
+        ? parseFloat((monthDataMap[monthKey] * 100).toFixed(2))
+        : 0, // Si no hay datos para el mes correspondiente, el ratio de ese mes es 0% (no hay partidas registradas)
+    }));
+  };
+
+  // Función principal que carga las estadísticas mensuales.
+  const loadMonthlyStats = async (username) => {
+    try {
+      if (!username) return;
+      const response = await axios.get(
+        `${gatewayUrl}/ratios-per-month/${username}`
+      );
+      const expectedMonths = getLastFiveMonths();
+      const monthDataMap = createMonthDataMap(response.data);
+      const monthlyStats = processChartData(expectedMonths, monthDataMap);
+
+      setUserData((prevData) => ({
+        ...prevData,
+        monthlyData: monthlyStats,
+      }));
+    } catch (error) {
+      console.error("Error al cargar estadísticas mensuales: ", error);
+    }
+  };
+
   // Cargar el nombre de usuario desde localStorage al montar el componente
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
@@ -135,6 +194,7 @@ export default function PerfilPage() {
   useEffect(() => {
     loadUserStats(userData.username);
     loadGameHistory(userData.username);
+    loadMonthlyStats(userData.username);
   }, [userData.username]);
 
   return (
@@ -155,11 +215,13 @@ export default function PerfilPage() {
             monthlyData={userData.monthlyData}
             pieData={userData.pieData}
           />
-          <GameHistory
-            games={userData.gameHistory}
-            currentIndex={currentGameIndex}
-            onNavigate={navigateGames}
-          />
+          {userData.gameHistory && userData.gameHistory.length > 0 && (
+            <GameHistory
+              games={userData.gameHistory}
+              currentIndex={currentGameIndex}
+              onNavigate={navigateGames}
+            />
+          )}
         </div>
       </div>
 
