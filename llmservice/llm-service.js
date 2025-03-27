@@ -12,20 +12,20 @@ require('dotenv').config();
 // Define configurations for different LLM APIs
 const llmConfigs = (prompt) => {
   const model = {
-      url: () => 'https://empathyai.prod.empathy.co/v1/chat/completions',
-      transformRequest: (question) => ({
-        model: "mistralai/Mistral-7B-Instruct-v0.3",
-        messages: [
-          { role: "system", content: prompt },
-          { role: "user", content: question }
-        ]
-      }),
-      transformResponse: (response) => response.data.choices[0]?.message?.content,
-      headers: (apiKey) => ({
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      })
-    };
+    url: () => 'https://empathyai.prod.empathy.co/v1/chat/completions',
+    transformRequest: (question) => ({
+      model: "mistralai/Mistral-7B-Instruct-v0.3",
+      messages: [
+        { role: "system", content: prompt },
+        { role: "user", content: question }
+      ]
+    }),
+    transformResponse: (response) => response.data.choices[0]?.message?.content,
+    headers: (apiKey) => ({
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    })
+  };
 
   return model;
 };
@@ -61,7 +61,7 @@ async function sendQuestionToLLM(question, apiKey, prompt) {
 
   } catch (error) {
     console.error(`Error sending question to the LLM:`, error.message || error);
-    return null;
+    throw error;
   }
 }
 
@@ -74,12 +74,12 @@ app.post('/ask', async (req, res) => {
     //load the api key from an environment variable
     const apiKey = process.env.LLM_API_KEY;
     if (!apiKey) {
-      return res.status(400).json({ error: 'API key is missing.' });
+      return res.status(500).json({ error: 'API key is missing.' });
     }
     const answer = await sendQuestionToLLM(question, apiKey, prompt);
     res.json({ answer });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(error.response.status || 500).json({ error: error.message });
   }
 });
 
@@ -88,5 +88,3 @@ const server = app.listen(port, () => {
 });
 
 module.exports = server
-
-
