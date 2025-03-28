@@ -55,11 +55,10 @@ const Game = () => {
   }, [fetchQuestions]);
 
   useEffect( () => {
-    if (timeLeft <= 0 ) {// Si el contador de tiempo llega a 0, se cuenta la pregunta actual como incorrecta y se reinicia el juego
+    if (timeLeft <= 0 ) {// Si el contador de tiempo llega a 0, se cuenta la pregunta actual como incorrecta
       setIncorrectAnswers((prev) => prev + 1);
       const timeUsed = TOTAL_TIME - timeLeft; // Tiempo usado en esta pregunta
-      setTotalTimeUsed((prev) => prev + timeUsed); // ⏱️ Acumula el tiempo
-      setShowSummary(true);
+      setTotalTimeUsed((prev) => prev + timeUsed);
       return;
     }
 
@@ -120,21 +119,17 @@ const Game = () => {
       setScore((prevScore) => prevScore + 10);
       setCorrectAnswers((prev) => prev + 1);
 
-      if (questionNumber + 1 >= questions.length) {
-        saveStats();
-        setShowSummary(true);
-      } else {
-        await sleep(250);
-        handleNextQuestion();
-      }
     } else {
       setIsCorrect(false);
       setIncorrectAnswers((prev) => prev + 1);
+    }
+
+    if (questionNumber + 1 >= questions.length) {
       saveStats();
       setShowSummary(true);
     }
     const timeUsed = TOTAL_TIME - timeLeft; // Tiempo usado en esta pregunta
-    setTotalTimeUsed((prev) => prev + timeUsed); // ⏱️ Acumula el tiempo
+    setTotalTimeUsed((prev) => prev + timeUsed);
   };
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
