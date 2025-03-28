@@ -7,10 +7,11 @@ import WiChatTextField from "../textField/WiChatTextField";
 import PhotoPanel from "../photoPanel/PhotoPanel";
 import "../login/Login.css";
 import "../../assets/global.css";
-import logo from "../../assets/img/logo_base.png";
+import { useTranslation } from "react-i18next";
 
 const apiEndpoint =
   process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000";
+
 
 const AddUser = ({ handleToggleView }) => {
   const [email, setEmail] = useState("");
@@ -24,9 +25,11 @@ const AddUser = ({ handleToggleView }) => {
   const [error, setError] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
+  const { t } = useTranslation();
+
   const addUser = async () => {
     try {
-      await axios.post(`${apiEndpoint}/adduser`, { username, password });
+      await axios.post(`${apiEndpoint}/adduser`, { email, username, password });
       setOpenSnackbar(true);
     } catch (error) {
       setError(error.response.data.error);
@@ -48,30 +51,28 @@ const AddUser = ({ handleToggleView }) => {
   return (
     <div className="mainDiv">
       <PhotoPanel
-        text="“ 
-          Cada pregunta es un reto, cada acierto un paso más hacia el triunfo.“"
+        text={t("panel_text")}
       />
       <div className="form">
-        <img className="logoAuth" src={logo} alt="Logo de WiChat" />
-        <h1>Crear cuenta</h1>
-        <h2>Introduce tus datos y únete a WiChat ya mismo.</h2>
+        <h1>{t("createAccount")}</h1>
+        <h2>{t("introduceData")}</h2>
 
         <div className="formField">
-          <label>Correo electrónico*</label>
+          <label>{t("email")}</label>
           <WiChatTextField
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="formField">
-          <label>Nombre de usuario*</label>
+          <label>{t("username")}</label>
           <WiChatTextField
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
         </div>
         <div className="formField">
-          <label>Contraseña*</label>
+          <label>{t("password")}</label>
           <div className="passwordContainer">
             <WiChatTextField
               value={password}
@@ -83,7 +84,7 @@ const AddUser = ({ handleToggleView }) => {
         </div>
 
         <div className="formField">
-          <label>Confirmar contraseña*</label>
+          <label>{t("confirmPassword")}</label>
           <div className="passwordContainer">
             <WiChatTextField
               value={passwordConfirm}
@@ -94,10 +95,10 @@ const AddUser = ({ handleToggleView }) => {
           </div>
         </div>
         <div className="buttonPanel">
-          <BaseButton text="Crear Cuenta" onClick={addUser}></BaseButton>
-          <span> o </span>
+          <BaseButton text={t("createAccount")} onClick={addUser}></BaseButton>
+          <span>{t("or")}</span>
           <BaseButton
-            text="Iniciar Sesión"
+            text={t("login")}
             onClick={handleToggleView}
             buttonType="buttonSecondary"
           ></BaseButton>
@@ -106,7 +107,7 @@ const AddUser = ({ handleToggleView }) => {
           open={openSnackbar}
           autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          message="Login successful"
+          message={t("loginSuccessful")}
         />
         {error && (
           <Snackbar

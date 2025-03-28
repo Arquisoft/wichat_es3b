@@ -8,10 +8,15 @@ import ChatBox from "../../components/chatBox/ChatBox";
 import { LinearProgress, Box, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
+import { useTranslation } from "react-i18next";
+
 const TOTAL_TIME = 40;
 const USERNAME = "jugador1";
 
+
 const Game = () => {
+  const { i18n } = useTranslation();
+  const currentLanguage = i18n.language || "es";
   const [questionNumber, setQuestionNumber] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,9 +29,13 @@ const Game = () => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [progress, setProgress] = useState(100);
+
+  const [isChatBoxVisible, setIsChatBoxVisible] = useState(false);
+
   const [showSummary, setShowSummary] = useState(false);
   const timerRef = useRef(null);
   const [totalTimeUsed, setTotalTimeUsed] = useState(0);
+
 
 
 
@@ -37,7 +46,7 @@ const Game = () => {
 
   const fetchQuestions = useCallback(async () => {
     try {
-      const response = await fetch(`${URL}questions?n=25&locale=es`);
+      const response = await fetch(`${URL}questions?n=25`);
       if (!response.ok) {
         throw new Error("No se pudieron obtener las preguntas.");
       }
@@ -115,7 +124,7 @@ const Game = () => {
     clearInterval(timerRef.current);
     setSelectedAnswer(respuesta);
     setIsAnswered(true);
-    if (respuesta === currentQuestion.respuestaCorrecta) {
+    if (respuesta === currentQuestion.respuestaCorrecta[currentLanguage]) {
       setIsCorrect(true);
       setScore((prevScore) => prevScore + 10);
       setCorrectAnswers((prev) => prev + 1);
@@ -142,6 +151,12 @@ const Game = () => {
     return `${minutes.toString().padStart(2, "0")}:${seconds
         .toString()
         .padStart(2, "0")}`;
+
+  };
+
+  const toggleChatBox = () => {
+    setIsChatBoxVisible(!isChatBoxVisible);
+
   };
 
 
@@ -157,8 +172,12 @@ const Game = () => {
           <div className="upperSection">
             <div className="hintButton">
               <HintButton
-                  text={"¿Necesitas una pista?"}
-                  onClick={() => alert("Tienes una pista!")}
+
+                  text={isChatBoxVisible ? "Ocultar pistas" : "¿Necesitas una pista?"}
+                  onClick={toggleChatBox}
+
+               
+
               />
             </div>
             <div className="question">
@@ -175,7 +194,10 @@ const Game = () => {
                     }}
                 ></ArrowForwardIcon>
               </div>
-              <h1>{currentQuestion.pregunta}</h1>
+
+              <h1>{currentQuestion.pregunta[currentLanguage]}</h1>
+
+
             </div>
             <div className="rightUpperSection">
               <div className="pointsAndRules">
@@ -187,20 +209,28 @@ const Game = () => {
             </div>
           </div>
           <div className="midSection">
-            {/* <div className="questionImageContainer"> */}
+
+
+
             {currentQuestion.img && (
                 <img src={currentQuestion.img[0]} alt="imagen pregunta"></img>
             )}
             <div className="answerPanel">
               {currentQuestion.respuestas &&
-                  currentQuestion.respuestas.map((respuesta, index) => (
+
+                  currentQuestion.respuestas[currentLanguage].map((respuesta, index) => (
+
+
                       <BaseButton
                           key={index}
                           text={respuesta}
                           onClick={() => handleAnswerClick(respuesta)}
                           buttonType={
                             isAnswered
-                                ? respuesta === currentQuestion.respuestaCorrecta
+
+                                ? respuesta === currentQuestion.respuestaCorrecta[currentLanguage]
+
+
                                     ? "buttonCorrect"
                                     : selectedAnswer === respuesta
                                         ? "buttonIncorrect"
@@ -232,11 +262,19 @@ const Game = () => {
             </Box>
           </div>
           <div></div>
-          <div className="chatBoxContainer">
-            <ChatBox question={currentQuestion} language="es" />
+
+          <div className={`chatBoxContainer ${isChatBoxVisible ? 'visible' : 'hidden'}`}>
+            <ChatBox  question={{
+              pregunta: currentQuestion.pregunta.es,
+              respuestaCorrecta: currentQuestion.respuestaCorrecta.es,
+              respuestas: currentQuestion.respuestas.es,
+              descripcion: currentQuestion.descripcion,
+              img: currentQuestion.img
+            }}  language="es" isVisible={true} />
           </div>
         </main>
         <Footer />
+
         <Dialog open={showSummary} onClose={() => setShowSummary(false)}>
           <DialogTitle>Resumen de la partida</DialogTitle>
           <DialogContent>
@@ -255,6 +293,7 @@ const Game = () => {
             </Button>
           </DialogActions>
         </Dialog>
+
       </div>
   );
 };
