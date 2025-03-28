@@ -1,40 +1,37 @@
-/* Estilos para el historial de partidas */
 @import url("../../assets/global.css");
 
-/* Contenedor principal de la sección de historial */
 .history-section {
   background-color: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 0.5em;
+  box-shadow: 0 0.125em 0.25em rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin-bottom: 20px; /* Espacio para el footer */
+  margin-bottom: 1.25em;
+  padding: 1em;
+  box-sizing: border-box;
 }
 
 .history-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-0.125em);
+  box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.1);
 }
 
-/* Título de la sección */
 .section-title {
   color: var(--color-primario);
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 1.5em;
+  margin-bottom: 1.25em;
   position: relative;
   display: inline-block;
 }
 
-/* Línea decorativa debajo del título */
 .section-title::after {
   content: "";
   position: absolute;
-  bottom: -5px;
+  bottom: -0.3125em;
   left: 0;
-  width: 50px;
-  height: 3px;
+  width: 3.125em;
+  height: 0.1875em;
   background-color: var(--color-primario);
-  border-radius: 2px;
+  border-radius: 0.125em;
   transition: width 0.3s ease;
 }
 
@@ -42,24 +39,21 @@
   width: 100%;
 }
 
-/* Contenedor del carrusel completo */
 .carousel-container {
   position: relative;
   width: 100%;
-  height: 300px;
+  height: 18.75em;
   overflow: hidden;
 }
 
-/* Contenedor de las tarjetas de partidas */
 .game-cards-container {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 1.25em;
   height: 100%;
   width: 100%;
 }
 
-/* Animación del carrusel */
 .game-cards-container.animating .game-card {
   animation: card-slide 0.5s ease-in-out forwards;
 }
@@ -67,7 +61,7 @@
 @keyframes card-slide {
   0% {
     opacity: 0;
-    transform: translateX(50px) scale(0.8);
+    transform: translateX(3.125em) scale(0.8);
   }
   100% {
     opacity: 1;
@@ -75,10 +69,9 @@
   }
 }
 
-/* Tarjetas individuales de partidas */
 .game-card {
-  flex: 0 0 calc(33.33% - 14px); /* Cada tarjeta ocupa un tercio del contenedor menos el gap */
-  max-width: calc(33.33% - 14px);
+  flex: 0 0 calc(33.33% - 0.875em);
+  max-width: calc(33.33% - 0.875em);
   background-image: url("../../assets/img/librosHistorial.jpg");
   background-size: cover;
   background-position: center;
@@ -86,19 +79,18 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 20px;
+  padding: 1.25em;
   position: relative;
-  border-radius: 8px;
+  border-radius: 0.5em;
   transition: all 0.3s ease;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.1875em 0.375em rgba(0, 0, 0, 0.1);
 }
 
 .game-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-0.3125em);
+  box-shadow: 0 0.3125em 0.9375em rgba(0, 0, 0, 0.2);
 }
 
-/* Efecto de gradiente para mejorar la legibilidad del texto */
 .game-card::before {
   content: "";
   position: absolute;
@@ -107,7 +99,7 @@
   right: 0;
   height: 70%;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-  border-radius: 8px;
+  border-radius: 0.5em;
   transition: opacity 0.3s ease;
 }
 
@@ -115,14 +107,13 @@
   opacity: 0.9;
 }
 
-/* Elementos de texto dentro de las tarjetas */
 .game-date,
 .game-number,
 .game-correct,
 .game-time {
   position: relative;
   z-index: 1;
-  margin-bottom: 10px;
+  margin-bottom: 0.625em;
   transition: transform 0.3s ease;
 }
 
@@ -130,15 +121,14 @@
 .game-card:hover .game-number,
 .game-card:hover .game-correct,
 .game-card:hover .game-time {
-  transform: translateY(-2px);
+  transform: translateY(-0.125em);
 }
 
 .game-number {
-  font-size: 24px;
+  font-size: 1.5em;
   font-weight: bold;
 }
 
-/* Botones de navegación */
 .nav-button {
   position: absolute;
   top: 50%;
@@ -146,25 +136,25 @@
   background-color: var(--color-primario);
   color: white;
   border: none;
-  width: 40px;
-  height: 40px;
+  width: 2.5em;
+  height: 2.5em;
   border-radius: 50%;
-  font-size: 20px;
+  font-size: 1.25em;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 10;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.2);
 }
 
 .nav-button.left {
-  left: 10px;
+  left: 0.625em;
 }
 
 .nav-button.right {
-  right: 10px;
+  right: 0.625em;
 }
 
 .nav-button:hover:not(:disabled) {
@@ -181,17 +171,16 @@
   cursor: not-allowed;
 }
 
-/* Indicadores de paginación */
 .pagination-dots {
   display: flex;
   justify-content: center;
-  margin-top: 15px;
-  gap: 8px;
+  margin-top: 0.9375em;
+  gap: 0.5em;
 }
 
 .pagination-dot {
-  width: 10px;
-  height: 10px;
+  width: 0.625em;
+  height: 0.625em;
   border-radius: 50%;
   background-color: #ddd;
   cursor: pointer;
@@ -207,18 +196,17 @@
   background-color: var(--color-secundario);
 }
 
-/* Estilos responsivos */
-@media (max-width: 768px) {
+@media (max-width: 48em) {
   .carousel-container {
-    height: 250px;
+    height: 15.625em;
   }
 
   .game-cards-container {
-    gap: 10px;
+    gap: 0.625em;
   }
 
   .game-card {
-    flex: 0 0 calc(100% - 20px);
-    max-width: calc(100% - 20px);
+    flex: 0 0 calc(100% - 1.25em);
+    max-width: calc(100% - 1.25em);
   }
 }

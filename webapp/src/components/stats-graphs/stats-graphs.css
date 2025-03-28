@@ -1,92 +1,87 @@
-/* Estilos para la sección de gráficos */
-
-/* Contenedor principal de la sección de gráficos */
 .stats-section {
+  padding: 1em;
   background-color: white;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Para efecto hover */
+  border-radius: 0.5em;
+  margin-bottom: 1.25em;
+  box-shadow: 0 0.125em 0.25em rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .stats-section:hover {
-  transform: translateY(-2px); /* Ligero efecto de elevación */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+  transform: translateY(-0.125em);
+  box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.1);
 }
 
-/* Título de la sección */
 .section-title {
-  color: var(--primary);
-  font-size: 24px;
-  margin-bottom: 20px;
+  color: var(--color-primario);
+  font-size: 1.5em;
+  margin-bottom: 1.25em;
   position: relative;
   display: inline-block;
+  font-style: normal;
+  font-weight: 600;
 }
 
-/* Línea decorativa debajo del título */
 .section-title::after {
   content: "";
   position: absolute;
-  bottom: -5px;
+  bottom: -0.3125em;
   left: 0;
-  width: 50px;
-  height: 3px;
-  background-color: var(--primary);
-  border-radius: 2px;
-  transition: width 0.3s ease; /* Para efecto hover */
+  width: 3.125em;
+  height: 0.1875em;
+  background-color: var(--color-primario);
+  border-radius: 0.125em;
+  transition: width 0.3s ease;
 }
 
 .section-title:hover::after {
-  width: 100%; /* La línea se extiende al pasar el cursor */
+  width: 100%;
 }
 
-/* Contenedor de los gráficos */
 .graphs-container {
   display: flex;
-  gap: 20px;
-  height: 300px;
+  gap: 1.25em;
+  height: 18.75em;
 }
 
-/* Contenedores individuales para cada gráfico */
 .line-chart-container,
 .pie-chart-container {
   flex: 1;
   position: relative;
-  border-radius: 8px;
-  overflow: hidden; /* Para que los bordes redondeados se apliquen al canvas */
+  border-radius: 0.5em;
+  overflow: hidden;
   background-color: #fafafa;
-  padding: 10px;
-  transition: transform 0.3s ease; /* Para efecto hover */
+  padding: 0.625em;
+  transition: transform 0.3s ease;
 }
 
 .line-chart-container:hover,
 .pie-chart-container:hover {
-  transform: scale(1.02); /* Ligero aumento de tamaño */
+  transform: scale(1.02);
 }
 
-/* Etiqueta descriptiva para el gráfico de línea */
 .chart-label {
   position: absolute;
-  bottom: 10px;
+  bottom: 0.625em;
   left: 50%;
   transform: translateX(-50%);
   background-color: rgba(70, 70, 70, 0.8);
   color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
+  padding: 0.5em 1em;
+  border-radius: 1.25em;
+  font-size: 0.875em;
   text-align: center;
-  transition: all 0.3s ease; /* Para efecto hover */
+  transition: all 0.3s ease;
   z-index: 10;
 }
 
 .chart-label:hover {
-  background-color: var(--primary);
-  transform: translateX(-50%) translateY(-3px); /* Efecto de elevación */
+  background-color: var(--color-primario);
+  transform: translateX(-50%) translateY(-0.1875em);
 }
 
-/* Estilos responsivos */
 @media (max-width: 768px) {
   .graphs-container {
     flex-direction: column;
@@ -95,8 +90,7 @@
 
   .line-chart-container,
   .pie-chart-container {
-    height: 250px;
-    margin-bottom: 20px;
+    height: 15.625em;
+    margin-bottom: 1.25em;
   }
 }
-
