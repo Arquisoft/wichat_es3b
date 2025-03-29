@@ -28,56 +28,57 @@ const Game = () => {
 
   const URL = "http://localhost:8004/";
 
-  const [config, setConfig] = useState({
-    numPreguntas: 10,
-    tiempoPregunta: 30,
-    limitePistas: 3,
-    modoJuego: "Jugador vs IA",
-    categories: ["all"],
-  });
+  const [config, setConfig] = useState(null);
 
-  const [timeLeft, setTimeLeft] = useState(config.tiempoPregunta);
+  const [timeLeft, setTimeLeft] = useState(30);
 
   useEffect(() => {
     const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
     if (storedConfig) {
+      console.log("Configuración cargada desde localStorage:", storedConfig);
       setConfig(storedConfig);
+    }else{
+      console.warn("No se encontró configuración en localStorage");
     }
   }, []);
 
   useEffect(() => {
-    setTimeLeft(config.tiempoPregunta || 30);
-  }, [config.tiempoPregunta]);
-
-  const TOTAL_TIME = config.tiempoPregunta;
-
-  const fetchQuestions = useCallback(async () => {
-    console.log("Categorías seleccionadas: ", config.categories);
-    try {
-      const categories = config.categories.includes("all") ? ["all"] : config.categories;
-      const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
-
-      console.log("Solicitando preguntas con categorías: ", categories);
-
-      const response = await fetch(`${URL}${queryString}`);
-      if (!response.ok) {
-        throw new Error("No se pudieron obtener las preguntas.");
-      }
-      const data = await response.json();
-      setQuestions(data);
-      setCurrentQuestion(data[questionNumber]);
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
+    if (config && config.tiempoPregunta) {
+      setTimeLeft(config.tiempoPregunta);
     }
-  }, [config.numPreguntas, questionNumber]);
+  }, [config]);
+
+  const TOTAL_TIME = config?.tiempoPregunta || 30;
 
   useEffect(() => {
-    fetchQuestions();
-  }, [fetchQuestions]);
+    if (config) {
+      const fetchQuestions = async () => {
+        if (!config.categories || config.categories.length === 0) {
+          console.warn("No hay categorías seleccionadas, no se pueden obtener preguntas.");
+          return;
+        }
+        try {
+          console.log("Solicitando preguntas con categorías:", config.categories);
+          const categories = config.categories.includes("all") ? ["all"] : config.categories;
+          const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
+          const response = await fetch(`${URL}${queryString}`);
+          if (!response.ok) {
+            throw new Error("No se pudieron obtener las preguntas.");
+          }
+          const data = await response.json();
+          setQuestions(data);
+          setCurrentQuestion(data[questionNumber]);
+          setIsLoading(false);
+        } catch (error) {
+          setIsLoading(false);
+        }
+      };
+      fetchQuestions();
+    }
+  }, [config]);
 
   useEffect(() => {
-    if (isAnswered || timeLeft <= 0) return;
+    if (!config ||isAnswered || timeLeft <= 0) return;
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -90,7 +91,7 @@ const Game = () => {
     }, 1000);
 
     return () => clearInterval(timerRef.current);
-  }, [isAnswered]);
+  }, [isAnswered, timeLeft, config]);
 
   useEffect(() => {
     setProgress((timeLeft / TOTAL_TIME) * 100);

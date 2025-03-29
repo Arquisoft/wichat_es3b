@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/sidebarConfiguration/SidebarConfiguration";
 import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarToggleButton";
 import "./Settings.css";
@@ -7,7 +8,7 @@ import Navbar from "../../components/nav/Nav";
 
 export default function Settings() {
     const [sidebarVisible, setSidebarVisible] = useState(true);
-
+    const navigate = useNavigate(); // Hook para la navegación
     const toggleSidebar = () => {
         setSidebarVisible(!sidebarVisible);
     };
@@ -79,7 +80,11 @@ export default function Settings() {
                         ))}
                     </div>
 
-                    <button className="play-button" disabled={selectedCategories.length === 0}>
+                    <button
+                        className="play-button"
+                        disabled={selectedCategories.length === 0}
+                        onClick={() => navigate("/play")}
+                    >
                         Jugar
                     </button>
                 </div>
