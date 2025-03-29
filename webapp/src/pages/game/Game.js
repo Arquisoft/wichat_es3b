@@ -5,12 +5,16 @@ import Footer from "../../components/Footer";
 import HintButton from "../../components/hintButton/HintButton";
 import BaseButton from "../../components/button/BaseButton";
 import ChatBox from "../../components/chatBox/ChatBox";
-import { LinearProgress, Box } from "@mui/material";
+import { LinearProgress, Box, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useTranslation } from "react-i18next";
 
+const USERNAME = "jugador1";
+
 const Game = () => {
-  const { i18n } = useTranslation();
+    const TOTAL_TIME = config?.tiempoPregunta || 30;
+
+    const { i18n } = useTranslation();
   const currentLanguage = i18n.language || "es";
   const [questionNumber, setQuestionNumber] = useState(0);
   const [questions, setQuestions] = useState([]);
@@ -22,71 +26,81 @@ const Game = () => {
   const [isCorrect, setIsCorrect] = useState(null);
   const [score, setScore] = useState(0);
   const [isAnswered, setIsAnswered] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [progress, setProgress] = useState(100);
   const [isChatBoxVisible, setIsChatBoxVisible] = useState(false);
+
+  const [showSummary, setShowSummary] = useState(false);
   const timerRef = useRef(null);
+  const [totalTimeUsed, setTotalTimeUsed] = useState(0);
+
+
+
 
   const URL = "http://localhost:8004/";
+  const STATS_URL = "http://localhost:8005/savestats";
 
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const [config, setConfig] = useState(null);
 
-  const [timeLeft, setTimeLeft] = useState(30);
+    useEffect(() => {
+        const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
+        if (storedConfig) {
+            console.log("Configuración cargada desde localStorage:", storedConfig);
+            setConfig(storedConfig);
+        }else{
+            console.warn("No se encontró configuración en localStorage");
+            setConfig({
+                numPreguntas: 10,
+                tiempoPregunta: 30,
+                limitePistas: 3,
+                modoJuego: "Jugador vs IA",
+                categories:["all"]
+            });
+        }
+    }, []);
+    useEffect(() => {
+        if (config && config.tiempoPregunta) {
+            setTimeLeft(config.tiempoPregunta);
+        }
+    }, [config]);
+
+    useEffect(() => {
+        if (config) {
+            const fetchQuestions = async () => {
+                if (!config.categories || config.categories.length === 0) {
+                    console.warn("No hay categorías seleccionadas, no se pueden obtener preguntas.");
+                    return;
+                }
+                try {
+                    console.log("Solicitando preguntas con categorías:", config.categories);
+                    const categories = config.categories.includes("all") ? ["all"] : config.categories;
+                    const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
+                    const response = await fetch(`${URL}${queryString}`);
+                    if (!response.ok) {
+                        throw new Error("No se pudieron obtener las preguntas.");
+                    }
+                    const data = await response.json();
+                    setQuestions(data);
+                    setCurrentQuestion(data[questionNumber]);
+                    setTimeLeft(config.tiempoPregunta);
+                    setIsLoading(false);
+                } catch (error) {
+                    setIsLoading(false);
+                }
+            };
+            fetchQuestions();
+        }
+    }, [config]);
 
   useEffect(() => {
-    const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
-    if (storedConfig) {
-      console.log("Configuración cargada desde localStorage:", storedConfig);
-      setConfig(storedConfig);
-    }else{
-      console.warn("No se encontró configuración en localStorage");
-      setConfig({
-        numPreguntas: 10,
-        tiempoPregunta: 30,
-        limitePistas: 3,
-        modoJuego: "Jugador vs IA",
-        categories:["all"]
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (config && config.tiempoPregunta) {
-      setTimeLeft(config.tiempoPregunta);
-    }
-  }, [config]);
-
-  const TOTAL_TIME = config?.tiempoPregunta || 30;
-
-  useEffect(() => {
-    if (config) {
-      const fetchQuestions = async () => {
-        if (!config.categories || config.categories.length === 0) {
-          console.warn("No hay categorías seleccionadas, no se pueden obtener preguntas.");
+      if ( !currentQuestion ||isAnswered  ) return;
+      if (timeLeft <= 0 ) {// Si el contador de tiempo llega a 0, se cuenta la pregunta actual como incorrecta
+          setIncorrectAnswers((prev) => prev + 1);
+          const timeUsed = TOTAL_TIME - timeLeft; // Tiempo usado en esta pregunta
+          setTotalTimeUsed((prev) => prev + timeUsed);
           return;
-        }
-        try {
-          console.log("Solicitando preguntas con categorías:", config.categories);
-          const categories = config.categories.includes("all") ? ["all"] : config.categories;
-          const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
-          const response = await fetch(`${URL}${queryString}`);
-          if (!response.ok) {
-            throw new Error("No se pudieron obtener las preguntas.");
-          }
-          const data = await response.json();
-          setQuestions(data);
-          setCurrentQuestion(data[questionNumber]);
-          setTimeLeft(config.tiempoPregunta);
-          setIsLoading(false);
-        } catch (error) {
-          setIsLoading(false);
-        }
-      };
-      fetchQuestions();
-    }
-  }, [config]);
-
-  useEffect(() => {
-    if ( !currentQuestion ||isAnswered || timeLeft <= 0) return;
+      }
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -103,9 +117,31 @@ const Game = () => {
 
   useEffect(() => {
     setProgress((timeLeft / TOTAL_TIME) * 100);
-  }, [timeLeft, TOTAL_TIME]);
+  }, [timeLeft]);
 
-  const handleNextQuestion = () => {
+  const saveStats = async () => {
+    try {
+      await fetch(STATS_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: USERNAME,
+          games: 1,
+          rightAnswers: correctAnswers,
+          wrongAnswers: incorrectAnswers,
+          ratio: correctAnswers / (correctAnswers + incorrectAnswers || 1),
+          averageTime: totalTimeUsed / (correctAnswers + incorrectAnswers || 1),
+          maxScore: score,
+        }),
+      });
+    } catch (error) {
+      console.error("Error al guardar estadísticas:", error);
+    }
+  };
+
+  const handleNextQuestion =  () => {
     setQuestionNumber((prevNumber) => {
       const newNumber = prevNumber + 1;
       setCurrentQuestion(questions[newNumber]);
@@ -113,12 +149,12 @@ const Game = () => {
       setIsCorrect(null);
       setIsAnswered(false);
       setProgress(100);
-      setTimeLeft(config.tiempoPregunta);
+      setTimeLeft(TOTAL_TIME);
       return newNumber;
     });
   };
 
-  const handleAnswerClick = (respuesta) => {
+  const handleAnswerClick = async (respuesta) => {
     if (isAnswered) return;
     clearInterval(timerRef.current);
     setSelectedAnswer(respuesta);
@@ -131,12 +167,21 @@ const Game = () => {
       setIsCorrect(false);
       setIncorrectAnswers((prev) => prev + 1);
     }
+
+      if (questionNumber + 1 >= questions.length) {
+          saveStats();
+          setShowSummary(true);
+      }
+      const timeUsed = TOTAL_TIME - timeLeft; // Tiempo usado en esta pregunta
+      setTotalTimeUsed((prev) => prev + timeUsed);
   };
 
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
   };
 
   const toggleChatBox = () => {
@@ -207,10 +252,20 @@ const Game = () => {
             </div>
           </div>
           <div className="lowerSection">
-            <Box display="flex" alignItems="center" width="50%" margin="auto" gap={2}>
+            <Box
+                display="flex"
+                alignItems="center"
+                width="50%"
+                margin="auto"
+                gap={2}
+            >
               <span>Tiempo</span>
               <Box width="100%" position="relative">
-                <LinearProgress id="progressBar" variant="determinate" value={progress}></LinearProgress>
+                <LinearProgress
+                    id="progressBar"
+                    variant="determinate"
+                    value={progress}
+                ></LinearProgress>
               </Box>
               <span>{formatTime(timeLeft)}</span>
             </Box>
@@ -231,8 +286,27 @@ const Game = () => {
           </div>
         </main>
         <Footer />
+
+        <Dialog open={showSummary} onClose={() => setShowSummary(false)}>
+          <DialogTitle>Resumen de la partida</DialogTitle>
+          <DialogContent>
+            <p>Respuestas correctas: {correctAnswers}</p>
+            <p>Respuestas incorrectas: {incorrectAnswers}</p>
+            <p>Ratio de aciertos: {(correctAnswers / (correctAnswers + incorrectAnswers || 1)).toFixed(2)}</p>
+            <p>Tiempo promedio por pregunta: {(totalTimeUsed / (correctAnswers + incorrectAnswers || 1)).toFixed(2)}s</p>
+            <p>Puntuación máxima: {score}</p>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={async () =>{
+              setShowSummary(false);
+              window.location.reload();
+            }}>
+              Cerrar
+            </Button>
+          </DialogActions>
+        </Dialog>
+
       </div>
   );
 };
-
 export default Game;
