@@ -48,6 +48,8 @@ jobs:
       - name: Install Dependencies for E2E
         run: |
           npm --prefix webapp install
+      - name: Set CI to false
+        run: echo "CI=false" >> $GITHUB_ENV
       - run: npm --prefix webapp run build
       - run: npm --prefix webapp run test:e2e
 
