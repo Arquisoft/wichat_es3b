@@ -74,6 +74,7 @@ const Game = () => {
           const data = await response.json();
           setQuestions(data);
           setCurrentQuestion(data[questionNumber]);
+          setTimeLeft(config.tiempoPregunta);
           setIsLoading(false);
         } catch (error) {
           setIsLoading(false);
@@ -84,7 +85,7 @@ const Game = () => {
   }, [config]);
 
   useEffect(() => {
-    if (!config ||isAnswered || timeLeft <= 0) return;
+    if ( !currentQuestion ||isAnswered || timeLeft <= 0) return;
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -97,7 +98,7 @@ const Game = () => {
     }, 1000);
 
     return () => clearInterval(timerRef.current);
-  }, [isAnswered, timeLeft, config]);
+  }, [currentQuestion]);
 
   useEffect(() => {
     setProgress((timeLeft / TOTAL_TIME) * 100);
