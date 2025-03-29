@@ -12,6 +12,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Set CI to false
+        run: echo "CI=false" >> $GITHUB_ENV
       - name: Install Dependencies
         run: |
           npm --prefix users/authservice ci
