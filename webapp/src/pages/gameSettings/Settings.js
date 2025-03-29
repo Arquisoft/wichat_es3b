@@ -12,7 +12,10 @@ export default function Settings() {
     const toggleSidebar = () => {
         setSidebarVisible(!sidebarVisible);
     };
-    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [selectedCategories, setSelectedCategories] = useState(() => {
+        const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
+        return storedConfig?.categories || [];
+    });
     const closeSidebar = () => setSidebarVisible(false);
 
     const categories = [
@@ -23,6 +26,15 @@ export default function Settings() {
         { name: "Arte", value: "arte" },
         { name: "Todo", value: "all" },
     ];
+    const [, forceUpdate] = useState(0); // Un estado que forzará el re-render
+
+    useEffect(() => {
+        const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
+        if (storedConfig?.categories) {
+            setSelectedCategories(storedConfig.categories);
+            forceUpdate(prev => prev + 1);
+        }
+    }, []);
 
     useEffect(() => {
         const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));

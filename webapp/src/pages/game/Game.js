@@ -44,6 +44,7 @@ const Game = () => {
         tiempoPregunta: 30,
         limitePistas: 3,
         modoJuego: "Jugador vs IA",
+        categories:["all"]
       });
     }
   }, []);

@@ -4,11 +4,15 @@ import "../sidebar/Sidebar.css";
 // Componente para la barra lateral con configuración del juego
 export default function Sidebar({ isVisible, onClose }) {
 
-    const [config, setConfig] = useState({
-        numPreguntas: 10,
-        tiempoPregunta: 30,
-        limitePistas: 3,
-        modoJuego: "Jugador vs IA",
+    const [config, setConfig] = useState(() => {
+        const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
+        return storedConfig || {
+            numPreguntas: 10,
+            tiempoPregunta: 30,
+            limitePistas: 3,
+            modoJuego: "Jugador vs IA",
+            categories: [],
+        };
     });
     useEffect(() => {
         const storedConfig = JSON.parse(localStorage.getItem("quizConfig")) || {};
