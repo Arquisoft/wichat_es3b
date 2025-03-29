@@ -1,3 +1,8 @@
+jest.mock('mongoose', () => ({
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+}));
+
 let app;
 
 beforeAll(async () => {

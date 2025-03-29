@@ -1,3 +1,8 @@
+jest.mock('mongoose', () => ({
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+}));
+
 let app;
 
 beforeAll(async () => {
@@ -8,9 +13,10 @@ afterAll(async () => {
     app.close();
 });
 
-describe('WikiQuestion Service', () => {
+describe('Stats Service', () => {
     it('should always pass', async () => {
         // No hace nada, simplemente pasa el test
         expect(true).toBe(true);
     });
 });
+
