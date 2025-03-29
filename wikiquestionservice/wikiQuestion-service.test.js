@@ -8,7 +8,7 @@ beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
     process.env.MONGODB_URI = mongoUri;
-    app = require('./statsservice'); // Ajusta la ruta según tu estructura
+    app = require('./wikiQuestion-service'); // Ajusta la ruta según tu estructura
 });
 
 afterAll(async () => {
@@ -16,10 +16,9 @@ afterAll(async () => {
     await mongoServer.stop();
 });
 
-describe('Stats Service', () => {
-    it('should return status 200 on GET /stats', async () => {
-        const response = await request(app).get('/stats');
+describe('Wiki Question Service', () => {
+    it('should return status 200 on GET /questions', async () => {
+        const response = await request(app).get('/questions');
         expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty('message', 'Stats Service is running');
     });
 });
