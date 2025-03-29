@@ -39,6 +39,12 @@ const Game = () => {
       setConfig(storedConfig);
     }else{
       console.warn("No se encontró configuración en localStorage");
+      setConfig({
+        numPreguntas: 10,
+        tiempoPregunta: 30,
+        limitePistas: 3,
+        modoJuego: "Jugador vs IA",
+      });
     }
   }, []);
 

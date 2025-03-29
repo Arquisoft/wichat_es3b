@@ -10,10 +10,28 @@ export default function Sidebar({ isVisible, onClose }) {
         limitePistas: 3,
         modoJuego: "Jugador vs IA",
     });
+    useEffect(() => {
+        const storedConfig = JSON.parse(localStorage.getItem("quizConfig")) || {};
+        setConfig((prevConfig) => ({
+            ...prevConfig,
+            categories: storedConfig.categories || []
+        }));
+    }, []);
 
     const handleChange = (e) => {
-        setConfig((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-        localStorage.setItem("quizConfig", JSON.stringify({ ...config, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+        let updatedValue = value;
+
+        if (name === "numPreguntas" || name === "tiempoPregunta" || name === "limitePistas") {
+            updatedValue = parseInt(value.split(" ")[0]);
+        }
+        const updatedConfig = {
+            ...config,
+            [name]: updatedValue,
+            categories: config.categories
+        };
+        setConfig(updatedConfig);
+        localStorage.setItem("quizConfig", JSON.stringify(updatedConfig));
     };
 
     // Prevenir scroll del sidebar cuando está abierto en móviles
@@ -34,36 +52,36 @@ export default function Sidebar({ isVisible, onClose }) {
                     <label>
                         Número de preguntas
                         <select name="numPreguntas" onChange={handleChange} value={config.numPreguntas}>
-                            <option>10 preguntas</option>
-                            <option>20 preguntas</option>
-                            <option>30 preguntas</option>
+                            <option value={10}>10 preguntas</option>
+                            <option value={20}>20 preguntas</option>
+                            <option value={30}>30 preguntas</option>
                         </select>
                     </label>
 
                     <label>
                         Tiempo por pregunta
                         <select name="tiempoPregunta" onChange={handleChange} value={config.tiempoPregunta}>
-                            <option>30 segundos</option>
-                            <option>45 segundos</option>
-                            <option>60 segundos</option>
+                            <option value={30}>30 segundos</option>
+                            <option value={45}>45 segundos</option>
+                            <option value={60}>60 segundos</option>
                         </select>
                     </label>
 
                     <label>
                         Límite de pistas IA
                         <select name="limitePistas" onChange={handleChange} value={config.limitePistas}>
-                            <option>3 pistas</option>
-                            <option>5 pistas</option>
-                            <option>7 pistas</option>
+                            <option value={3}>3 pistas</option>
+                            <option value={5}>5 pistas</option>
+                            <option value={7}>7 pistas</option>
                         </select>
                     </label>
 
                     <label>
                         Modo de juego
                         <select name="modoJuego" onChange={handleChange} value={config.modoJuego}>
-                            <option>Jugador vs IA</option>
-                            <option>Cooperativo</option>
-                            <option>Contra Reloj</option>
+                            <option value="Jugador vs IA">Jugador vs IA</option>
+                            <option value="Cooperativo">Cooperativo</option>
+                            <option value="Contra Reloj">Contra Reloj</option>
                         </select>
                     </label>
 
