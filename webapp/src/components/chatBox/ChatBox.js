@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import "./ChatBox.css";
 import ChatBubble from "../chatBubble/ChatBubble";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import axios from "axios";
 
 const ChatBox = ({
   question,
@@ -28,7 +28,7 @@ const ChatBox = ({
     setLoadingMessage("...");
 
     try {
-      const URL = "http://localhost:8000/";
+      const URL = process.env.GATEWAY_URL || "http://localhost:8000/";
       const requestData = {
         userQuestion: input,
         question: question,
@@ -57,7 +57,10 @@ const ChatBox = ({
       setHint("No se pudo obtener una pista en este momento.");
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: hint, isSender: false },
+        {
+          text: "No se pudo obtener una pista en este momento.",
+          isSender: false,
+        },
       ]);
     } finally {
       setIsLoadingHint(false);
@@ -125,7 +128,7 @@ const ChatBox = ({
         <button
           className="send-button"
           onClick={handleSend}
-          disabled={hintsLeft <= 0}
+          disabled={hintsLeft <= 0 || input.trim() === ""}
         >
           <ArrowUpwardIcon
             titleAccess={
