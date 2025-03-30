@@ -124,7 +124,7 @@ main {
   justify-content: center;
   align-items: center;
   margin-bottom: 0.5rem;
-  height: 25vh; /* Altura relativa a la ventana */
+  height: 30vh;
   min-height: 150px;
   max-height: 250px;
   overflow: hidden;
