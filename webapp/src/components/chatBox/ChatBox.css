@@ -52,6 +52,36 @@
   background-color: var(--color-hover-boton);
 }
 
+.chat-box-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+}
+
+.hints-counter {
+  font-weight: bold;
+  margin-left: 5px;
+  color: var(--color-primario);
+}
+
+.hints-counter.no-hints {
+  color: #f44336;
+}
+
+.send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input-container input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
 #sendMessageToAIButton {
   color: white;
   font-size: 1.5rem;

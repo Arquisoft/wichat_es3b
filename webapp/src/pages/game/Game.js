@@ -31,13 +31,13 @@ const Game = () => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [progress, setProgress] = useState(100);
-
   const [isChatBoxVisible, setIsChatBoxVisible] = useState(false);
-
   const [showSummary, setShowSummary] = useState(false);
   const timerRef = useRef(null);
   const [totalTimeUsed, setTotalTimeUsed] = useState(0);
   const [showRules, setShowRules] = useState(false);
+  const HINT_LIMIT = 5;
+  const [hintsLeft, setHintsLeft] = useState(HINT_LIMIT);
 
   const URL = "http://localhost:8004/";
   const GATEWAY_URL = process.env.GATEWAY_URL || "http://localhost:8000";
@@ -287,6 +287,8 @@ const Game = () => {
             }}
             language="es"
             isVisible={true}
+            hintsLeft={hintsLeft}
+            setHintsLeft={setHintsLeft}
           />
         </div>
       </main>
