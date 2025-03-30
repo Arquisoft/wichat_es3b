@@ -8,6 +8,7 @@ const isAuthenticated = () => {
 
 const PrivateRoute = ({ children }) => {
     return isAuthenticated() ? children : <Navigate to="/auth" />;
+    //return children; // Cambiar la línea anterior por esta para desactivar la protección de rutas
 };
 
 export default PrivateRoute;

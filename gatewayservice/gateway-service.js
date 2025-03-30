@@ -4,16 +4,18 @@ const cors = require('cors');
 const promBundle = require('express-prom-bundle');
 //libraries required for OpenAPI-Swagger
 const swaggerUi = require('swagger-ui-express');
-const fs = require("fs")
-const YAML = require('yaml')
+const fs = require('fs');
+const YAML = require('yaml');
 
 const app = express();
 const port = 8000;
 
+// Unificar URLs de servicios (considerando que wikiQuestionServiceUrl y questionServiceUrl son el mismo)
+const questionServiceUrl = process.env.QUESTION_SERVICE_URL || process.env.WIKIQUESTION_SERVICE_URL || 'http://localhost:8004';
 const llmServiceUrl = process.env.LLM_SERVICE_URL || 'http://localhost:8003';
 const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
-const questionServiceUrl = process.env.QUESTION_SERVICE_URL || 'http://localhost:8004';
+const statsServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:8005';
 
 app.use(cors());
 app.use(express.json());
@@ -78,7 +80,7 @@ app.post('/adduser', async (req, res) => {
   }
 });
 
-app.post('/askllm', verifyToken, async (req, res) => {
+app.post('/askllm', async (req, res) => {
   try {
     // Forward the ask request to the LLM service
     const llmResponse = await axios.post(llmServiceUrl + '/ask', req.body);
@@ -88,6 +90,127 @@ app.post('/askllm', verifyToken, async (req, res) => {
       res.status(error.response.status).json({ error: error.response.data.error });
     } else {
       res.status(500).json({ error: 'Error reaching LLM service' });
+    }
+  }
+});
+
+// ============= STATS ENDPOINTS =============
+
+app.post('/savestats', async (req, res) => {
+  try {
+    const statsResponse = await axios.post(
+        statsServiceUrl + '/savestats',
+        req.body
+    );
+    res.json(statsResponse.data);
+  } catch (error) {
+    console.error('Error en el gateway:', error.message);
+
+    if (error.response) {
+      res
+          .status(error.response.status)
+          .json({ error: error.response.data.error });
+    } else if (error.request) {
+      res
+          .status(500)
+          .json({ error: 'El servidor de estadísticas no está disponible' });
+    } else {
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  }
+});
+
+app.get('/getstats/:username', async (req, res) => {
+  try {
+    const username = req.params.username;
+    console.log('Link: ' + statsServiceUrl + `/getstats/${username}`);
+    const statsResponse = await axios.get(
+        statsServiceUrl + `/getstats/${username}`
+    );
+    res.json(statsResponse.data);
+  } catch (error) {
+    console.error('Error en el gateway:', error.message);
+
+    if (error.response) {
+      res
+          .status(error.response.status)
+          .json({ error: error.response.data.error });
+    } else if (error.request) {
+      res
+          .status(500)
+          .json({ error: 'El servidor de estadísticas no está disponible' });
+    } else {
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  }
+});
+
+app.get('/getranking', async (req, res) => {
+  try {
+    const rankingResponse = await axios.get(statsServiceUrl + '/getranking');
+    res.json(rankingResponse.data);
+  } catch (error) {
+    if (error.response) {
+      res
+          .status(error.response.status)
+          .json({ error: error.response.data.error });
+    } else {
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  }
+});
+
+app.get('/getTop3', async (req, res) => {
+  try {
+    const rankingResponse = await axios.get(statsServiceUrl + '/getTop3');
+    res.json(rankingResponse.data);
+  } catch (error) {
+    if (error.response) {
+      res
+          .status(error.response.status)
+          .json({ error: error.response.data.error });
+    } else {
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  }
+});
+
+app.get('/games/:username', async (req, res) => {
+  try {
+    const username = req.params.username;
+    if (!username)
+      return res.status(400).json({ error: 'Se requiere un username' });
+    const gamesResponse = await axios.get(
+        statsServiceUrl + `/games/${username}`
+    );
+    res.json(gamesResponse.data);
+  } catch (error) {
+    if (error.response) {
+      res
+          .status(error.response.status)
+          .json({ error: error.response.data.error });
+    } else {
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  }
+});
+
+app.get('/ratios-per-month/:username', async (req, res) => {
+  try {
+    const username = req.params.username;
+    if (!username)
+      return res.status(400).json({ error: 'Se requiere un username' });
+    const ratiosResponse = await axios.get(
+        statsServiceUrl + `/ratios-per-month/${username}`
+    );
+    res.json(ratiosResponse.data);
+  } catch (error) {
+    if (error.response) {
+      res
+          .status(error.response.status)
+          .json({ error: error.response.data.error });
+    } else {
+      res.status(500).json({ error: 'Error interno del servidor' });
     }
   }
 });
@@ -204,11 +327,10 @@ app.get('/users/:username/stats', verifyToken, async (req, res) => {
 });
 
 // Question endpoints
-
 app.get('/questions/:n/:locale', async (req, res) => {
   try {
     const { n, locale } = req.params;
-    console.log(`${questionServiceUrl}/questions`)
+    console.log(`${questionServiceUrl}/questions`);
     const response = await axios.get(`${questionServiceUrl}/questions`);
     res.json(response.data);
   } catch (error) {
@@ -232,7 +354,7 @@ app.get('/leaderboard', verifyToken, async (req, res) => {
 });
 
 // Read the OpenAPI YAML file synchronously
-openapiPath='./openapi.yaml'
+openapiPath = './openapi.yaml';
 if (fs.existsSync(openapiPath)) {
   const file = fs.readFileSync(openapiPath, 'utf8');
 
@@ -244,7 +366,7 @@ if (fs.existsSync(openapiPath)) {
   // It takes the parsed Swagger document as input
   app.use('/api-doc', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 } else {
-  console.log("Not configuring OpenAPI. Configuration file not present.")
+  console.log('Not configuring OpenAPI. Configuration file not present.');
 }
 
 // Start the gateway service
@@ -252,5 +374,4 @@ const server = app.listen(port, () => {
   console.log(`Gateway Service listening at http://localhost:${port}`);
 });
 
-module.exports = server
-
+module.exports = server;
