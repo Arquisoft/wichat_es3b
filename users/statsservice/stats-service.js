@@ -64,8 +64,13 @@ app.post('/savestats', async (req, res) => {
 
     await stats.save();
 
+    const lastGame = await Game.findOne({ username }).sort({ gameId: -1 });
+
+    let gameId = lastGame ? lastGame.gameId + 1 : 1;
+
     let game = new Game({
       username, 
+      gameId,
       rightAnswers,
       wrongAnswers,
       ratio: rightAnswers + wrongAnswers > 0 ? rightAnswers / (rightAnswers + wrongAnswers) : 0,
@@ -116,7 +121,7 @@ app.get('/getstats/:username', async (req, res) => {
   app.get('/getranking', async (req, res) => {
     try {
       const ranking = await Stats.find()
-        .sort({ maxScore: -1 })  // -1 indica orden descendente
+        .sort({ maxScore: -1 })  
         .select('username maxScore') 
         .limit(10);
   
@@ -130,7 +135,7 @@ app.get('/getstats/:username', async (req, res) => {
   app.get('/getTop3', async (req, res) => {
     try {
       const ranking = await Stats.find()
-        .sort({ maxScore: -1 })  // -1 indica orden descendente
+        .sort({ maxScore: -1 })  
         .select('username maxScore') 
         .limit(3);
   

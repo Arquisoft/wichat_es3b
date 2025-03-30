@@ -3,10 +3,15 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const cron = require("node-cron");
 const QuestionManager = require("./questiongenerator/questionManager");
+const mongoose = require("mongoose");
+const Question = require("./question-model");
 
 const app = express();
 const port = 8004;
 let questionsLoaded = false;
+
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/statsdb';
+mongoose.connect(mongoUri);
 
 const questionManager = new QuestionManager();
 
@@ -69,10 +74,67 @@ app.get("/questions", async (req, res) => {
   }
 });
 
+app.get("/question", async (req, res) => {
+  try {
+    const count = await Question.countDocuments();
+    if (count === 0) {
+      return res.status(404).json({ error: "No hay preguntas disponibles" });
+    }
+
+    const randomIndex = Math.floor(Math.random() * count);
+    const randomQuestion = await Question.findOne().skip(randomIndex);
+
+    res.json(randomQuestion);
+  } catch (error) {
+    console.error("Error obteniendo pregunta aleatoria:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+app.get("/question/:category", async (req, res) => {
+  try {
+    const { category } = req.params;
+    const count = await Question.countDocuments({ category: category });
+
+    if (count === 0) {
+      return res.status(404).json({ error: `No hay preguntas en la categoría '${category}'` });
+    }
+
+    const randomIndex = Math.floor(Math.random() * count);
+    const randomQuestion = await Question.findOne({ category: category }).skip(randomIndex);
+
+    res.json(randomQuestion);
+  } catch (error) {
+    console.error(`Error obteniendo pregunta aleatoria de la categoría '${category}':`, error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+async function saveQuestionsToDB(questions) {
+  try {
+    for (const q of questions) {
+      const newQuestion = new Question({
+        category: q.categoria,
+        question: q.preguntas,
+        correctAnswer: q.respuestaCorrecta,
+        incorrectAnswers: q.respuestasIncorrectas,  
+        description: q.descripcion,
+        img: q.img
+      });
+
+      await newQuestion.save();
+    }
+    console.log("Preguntas guardadas en MongoDB.");
+  } catch (error) {
+    console.error("Error al guardar preguntas:", error);
+  }
+}
+
 const server = app.listen(port, async () => {
   console.log(`Question Service listening at http://localhost:${port}`);
   try {
-    await questionManager.loadAllQuestions();
+    const questions = await questionManager.loadAllQuestions();
+    await saveQuestionsToDB(questions);
     questionsLoaded = true;
     console.log("Generadores de preguntas cargados con éxito!");
   } catch (error) {
@@ -82,7 +144,8 @@ const server = app.listen(port, async () => {
 
 cron.schedule("0 3 * * *", async () => {
   try {
-    await questionManager.loadAllQuestions();
+    const questions = await questionManager.loadAllQuestions();
+    await saveQuestionsToDB(questions);
     console.log("Generadores de preguntas recargados.");
   } catch (error) {
     console.error("Error al recargar los generadores de preguntas:", error);
