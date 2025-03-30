@@ -70,11 +70,7 @@ const Game = () => {
   }, [fetchQuestions]);
 
   useEffect(() => {
-    if (timeLeft <= 0) {
-      // Si el contador de tiempo llega a 0, se cuenta la pregunta actual como incorrecta
-      setIncorrectAnswers((prev) => prev + 1);
-      const timeUsed = TOTAL_TIME - timeLeft; // Tiempo usado en esta pregunta
-      setTotalTimeUsed((prev) => prev + timeUsed);
+    if (timeLeft <= 0 || isAnswered) {
       return;
     }
 
