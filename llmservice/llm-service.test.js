@@ -56,11 +56,11 @@ describe("LLM Service", () => {
   // Test del endpoint /ask con los parámetros correctos
   it("should process ask request with valid parameters", async () => {
     const testQuestion = {
-      respuestaCorrecta: 'El Big Ben',
+      respuestaCorrecta: "El Big Ben",
       pregunta: {
-        es: '¿Cuál es este monumento?',
-        en: 'What is this monument?',
-        idioma: '¿Cuál es este monumento?'
+        es: "¿Cuál es este monumento?",
+        en: "What is this monument?",
+        idioma: "¿Cuál es este monumento?",
       },
       descripcion: [
         { propiedad: "Capital", valor: "Londres" },

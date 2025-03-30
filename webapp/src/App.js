@@ -21,12 +21,14 @@ function App() {
           </PrivateRoute>
         }
       />
-      <Route path="/profile" element={
+      <Route
+        path="/profile"
+        element={
           <PrivateRoute>
-              <PerfilPage />
+            <PerfilPage />
           </PrivateRoute>
-          } />
-
+        }
+      />
       <Route path="/home" element={<Home />} />
     </Routes>
   );
