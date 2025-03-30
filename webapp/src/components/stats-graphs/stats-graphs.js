@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from "react"
-import { Chart, registerables } from "chart.js"
-import "./stats-graphs.css"
+import { useEffect, useRef } from "react";
+import { Chart, registerables } from "chart.js";
+import "./stats-graphs.css";
 
 // Registramos los componentes necesarios de Chart.js
-Chart.register(...registerables)
+Chart.register(...registerables);
 
 export default function StatsGraphs({ monthlyData, pieData }) {
   // Referencias para los canvas de los gráficos
-  const lineChartRef = useRef(null)
-  const pieChartRef = useRef(null)
+  const lineChartRef = useRef(null);
+  const pieChartRef = useRef(null);
 
   // Colores armoniosos para los gráficos
   const colors = {
@@ -18,18 +18,20 @@ export default function StatsGraphs({ monthlyData, pieData }) {
     secondary: "#FF9F40", // Naranja para contraste
     tertiary: "#4BC0C0", // Turquesa para línea
     background: "#f5f9ff", // Fondo claro
-  }
+    error: "#FF6384", // Rojo para fallos
+    success: "#4CAF50", // Verde para aciertos
+  };
 
   useEffect(() => {
     // Creamos el gráfico de línea cuando el componente se monta
     if (lineChartRef.current) {
-      const lineCtx = lineChartRef.current.getContext("2d")
+      const lineCtx = lineChartRef.current.getContext("2d");
 
       if (lineCtx) {
         // Destruimos cualquier gráfico existente
-        const existingChart = Chart.getChart(lineChartRef.current)
+        const existingChart = Chart.getChart(lineChartRef.current);
         if (existingChart) {
-          existingChart.destroy()
+          existingChart.destroy();
         }
 
         // Creamos el nuevo gráfico de línea
@@ -76,19 +78,19 @@ export default function StatsGraphs({ monthlyData, pieData }) {
               },
             },
           },
-        })
+        });
       }
     }
 
     // Creamos el gráfico circular cuando el componente se monta
     if (pieChartRef.current) {
-      const pieCtx = pieChartRef.current.getContext("2d")
+      const pieCtx = pieChartRef.current.getContext("2d");
 
       if (pieCtx) {
         // Destruimos cualquier gráfico existente
-        const existingChart = Chart.getChart(pieChartRef.current)
+        const existingChart = Chart.getChart(pieChartRef.current);
         if (existingChart) {
-          existingChart.destroy()
+          existingChart.destroy();
         }
 
         // Creamos el nuevo gráfico circular
@@ -99,7 +101,7 @@ export default function StatsGraphs({ monthlyData, pieData }) {
             datasets: [
               {
                 data: pieData.map((item) => item.value),
-                backgroundColor: [colors.primary, colors.secondary],
+                backgroundColor: [colors.success, colors.error],
                 borderWidth: 0,
               },
             ],
@@ -122,27 +124,27 @@ export default function StatsGraphs({ monthlyData, pieData }) {
               },
             },
           },
-        })
+        });
       }
     }
 
     // Limpiamos los gráficos cuando el componente se desmonta
     return () => {
       if (lineChartRef.current) {
-        const chart = Chart.getChart(lineChartRef.current)
+        const chart = Chart.getChart(lineChartRef.current);
         if (chart) {
-          chart.destroy()
+          chart.destroy();
         }
       }
 
       if (pieChartRef.current) {
-        const chart = Chart.getChart(pieChartRef.current)
+        const chart = Chart.getChart(pieChartRef.current);
         if (chart) {
-          chart.destroy()
+          chart.destroy();
         }
       }
-    }
-  }, [monthlyData, pieData])
+    };
+  }, [monthlyData, pieData]);
 
   return (
     <section className="stats-section">
@@ -158,6 +160,5 @@ export default function StatsGraphs({ monthlyData, pieData }) {
         </div>
       </div>
     </section>
-  )
+  );
 }
-

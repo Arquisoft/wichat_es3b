@@ -10,6 +10,7 @@ const LanguageChangeMenu = () => {
 
   const handleLanguageChange = (selectedLang) => {
     i18n.changeLanguage(selectedLang);
+      localStorage.setItem("selectedLanguage",selectedLang);
   };
 
   const items = [
