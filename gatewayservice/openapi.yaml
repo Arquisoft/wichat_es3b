@@ -363,292 +363,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /questions:
+  /questions/{n}/{locale}:
     get:
-      summary: Get list of all questions
-      operationId: getQuestions
+      summary: Get questions by number and locale
+      operationId: getQuestionsByLocale
       tags:
         - Questions
-      security:
-        - bearerAuth: []
       parameters:
-        - in: query
-          name: category
-          schema:
-            type: string
-          description: Filter by category
-        - in: query
-          name: difficulty
-          schema:
-            type: string
-            enum: [easy, medium, hard]
-          description: Filter by difficulty
-        - in: query
-          name: limit
+        - name: n
+          in: path
+          required: true
           schema:
             type: integer
-            minimum: 1
-            maximum: 100
-          description: Maximum number of questions to return
-        - in: query
-          name: offset
+          description: Number of questions to retrieve
+        - name: locale
+          in: path
+          required: true
           schema:
-            type: integer
-            minimum: 0
-          description: Number of questions to skip
+            type: string
+          description: Locale for the questions
       responses:
         '200':
-          description: List of questions retrieved successfully
+          description: Questions retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/QuestionSummary'
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    post:
-      summary: Create a new question
-      operationId: createQuestion
-      tags:
-        - Questions
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/QuestionInput'
-      responses:
-        '201':
-          description: Question created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Question'
-        '400':
-          description: Invalid question data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /questions/{questionId}:
-    get:
-      summary: Get details of a specific question
-      operationId: getQuestionDetail
-      tags:
-        - Questions
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: questionId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Question details retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Question'
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Question not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      summary: Update a question
-      operationId: updateQuestion
-      tags:
-        - Questions
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: questionId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/QuestionUpdateInput'
-      responses:
-        '200':
-          description: Question updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Question'
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Question not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      summary: Delete a question
-      operationId: deleteQuestion
-      tags:
-        - Questions
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: questionId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Question deleted successfully
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Question not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /questions/{questionId}/hints:
-    post:
-      summary: Get a hint for a specific question
-      operationId: getQuestionHint
-      tags:
-        - Questions
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: questionId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                prompt:
-                  type: string
-                  description: User's query to get a hint about the image
-                  example: "¿Esta imagen es de un animal?"
-              required:
-                - prompt
-      responses:
-        '200':
-          description: Hint retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LLMResponse'
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Question not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
-          description: Error reaching LLM service
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /questions/{questionId}/answers:
-    post:
-      summary: Submit an answer for a question
-      operationId: submitAnswer
-      tags:
-        - Questions
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: questionId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                answer:
-                  type: string
-                  description: User's answer to the question
-                  example: "León"
-              required:
-                - answer
-      responses:
-        '200':
-          description: Answer submitted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  correct:
-                    type: boolean
-                    description: Whether the answer is correct
-                  correctAnswer:
-                    type: string
-                    description: The correct answer (only provided if user's answer was incorrect)
-                  score:
-                    type: integer
-                    description: Points awarded for this answer
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Question not found
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -907,81 +651,53 @@ components:
           description: LLM hint response
           example: "Sí, la imagen muestra un animal vertebrado."
 
-    QuestionInput:
-      type: object
-      properties:
-        imageUrl:
-          type: string
-          description: URL to the question image
-          example: "https://example.com/images/lion.jpg"
-        correctAnswer:
-          type: string
-          description: The correct answer to the question
-          example: "León"
-        difficulty:
-          type: string
-          enum: [easy, medium, hard]
-          description: Question difficulty
-          example: "medium"
-        category:
-          type: string
-          description: Question category
-          example: "Animales"
-        wikidataId:
-          type: string
-          description: ID in Wikidata for the image subject
-          example: "Q140"
-      required:
-        - imageUrl
-        - correctAnswer
-        - difficulty
-        - category
-
-    QuestionUpdateInput:
-      type: object
-      properties:
-        imageUrl:
-          type: string
-          description: URL to the question image
-          example: "https://example.com/images/updated_lion.jpg"
-        correctAnswer:
-          type: string
-          description: The correct answer to the question
-          example: "León"
-        difficulty:
-          type: string
-          enum: [easy, medium, hard]
-          description: Question difficulty
-          example: "hard"
-        category:
-          type: string
-          description: Question category
-          example: "Animales"
-        wikidataId:
-          type: string
-          description: ID in Wikidata for the image subject
-          example: "Q140"
-
     QuestionSummary:
       type: object
       properties:
-        _id:
+        pregunta:
           type: string
-          description: Question ID
-          example: 60d21b4667d0d8992e610c85
-        imageUrl:
+          description: Pregunta generada por wikidata
+          example: "¿Cuál es la capital de Japón?"
+        respuestaCorrecta:
           type: string
-          description: URL to the question image
-          example: "https://example.com/images/lion.jpg"
-        difficulty:
-          type: string
-          enum: [easy, medium, hard]
-          description: Question difficulty
-          example: "medium"
-        category:
-          type: string
-          description: Question category
-          example: "Animales"
+          description: Respuesta correcta a la pregunta
+          example: "Tokio"
+        respuestas:
+          type: array
+          description: Respuestas a la pregunta
+          example: [
+            "Tokio",
+            "Ottawa",
+            "Oslo",
+            "Dublín"
+          ]
+        descripcion:
+          type: array
+          description: Datos de la entidad en Wikidata
+          example: [
+            {
+              "propiedad": "jefe de Estado",
+              "valor": "Naruhito"
+            },
+            {
+              "propiedad": "participó en",
+              "valor": "Grupo de los cuatro"
+            },
+            {
+              "propiedad": "idioma oficial",
+              "valor": "japonés"
+            },
+            {
+              "propiedad": "comparte fronteras con",
+              "valor": "Estados Unidos"
+            }
+          ]
+        img:
+          type: array
+          description: Imagen de la entidad en Wikidata
+          example: [
+            "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Japan.svg"
+          ]
 
     Question:
       type: object

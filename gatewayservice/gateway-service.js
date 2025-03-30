@@ -204,123 +204,15 @@ app.get('/users/:username/stats', verifyToken, async (req, res) => {
 });
 
 // Question endpoints
-app.get('/questions', verifyToken, async (req, res) => {
+
+app.get('/questions/:n/:locale', async (req, res) => {
   try {
-    const { category, difficulty, limit, offset } = req.query;
-    let queryString = '';
-
-    if (category) queryString += `category=${category}&`;
-    if (difficulty) queryString += `difficulty=${difficulty}&`;
-    if (limit) queryString += `limit=${limit}&`;
-    if (offset) queryString += `offset=${offset}&`;
-
-    // Remove trailing '&' if exists
-    queryString = queryString ? `?${queryString.slice(0, -1)}` : '';
-
-    const questionsResponse = await axios.get(`${questionServiceUrl}/questions${queryString}`);
-    res.json(questionsResponse.data);
+    const { n, locale } = req.params;
+    console.log(`${questionServiceUrl}/questions`)
+    const response = await axios.get(`${questionServiceUrl}/questions`);
+    res.json(response.data);
   } catch (error) {
-    if (error.response) {
-      res.status(error.response.status).json({ error: error.response.data.error });
-    } else {
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  }
-});
-
-app.post('/questions', verifyToken, async (req, res) => {
-  try {
-    const questionResponse = await axios.post(questionServiceUrl + '/questions', req.body);
-    res.status(201).json(questionResponse.data);
-  } catch (error) {
-    if (error.response) {
-      res.status(error.response.status).json({ error: error.response.data.error });
-    } else {
-      res.status(400).json({ error: 'Invalid question data' });
-    }
-  }
-});
-
-app.get('/questions/:questionId', verifyToken, async (req, res) => {
-  try {
-    const questionResponse = await axios.get(questionServiceUrl + '/questions/' + req.params.questionId);
-    res.json(questionResponse.data);
-  } catch (error) {
-    if (error.response) {
-      res.status(error.response.status).json({ error: error.response.data.error });
-    } else {
-      res.status(404).json({ error: 'Question not found' });
-    }
-  }
-});
-
-app.put('/questions/:questionId', verifyToken, async (req, res) => {
-  try {
-    const questionResponse = await axios.put(questionServiceUrl + '/questions/' + req.params.questionId, req.body);
-    res.json(questionResponse.data);
-  } catch (error) {
-    if (error.response) {
-      res.status(error.response.status).json({ error: error.response.data.error });
-    } else {
-      res.status(404).json({ error: 'Question not found' });
-    }
-  }
-});
-
-app.delete('/questions/:questionId', verifyToken, async (req, res) => {
-  try {
-    await axios.delete(questionServiceUrl + '/questions/' + req.params.questionId);
-    res.status(204).send();
-  } catch (error) {
-    if (error.response) {
-      res.status(error.response.status).json({ error: error.response.data.error });
-    } else {
-      res.status(404).json({ error: 'Question not found' });
-    }
-  }
-});
-
-app.post('/questions/:questionId/hints', verifyToken, async (req, res) => {
-  try {
-    const questionId = req.params.questionId;
-    const prompt = req.body.prompt;
-
-    // Construir el objeto de solicitud para el servicio LLM
-    const llmRequest = {
-      questionId,
-      prompt
-    };
-
-    const llmResponse = await axios.post(llmServiceUrl + '/ask', llmRequest);
-    res.json(llmResponse.data);
-  } catch (error) {
-    if (error.response) {
-      res.status(error.response.status).json({ error: error.response.data.error });
-    } else {
-      res.status(500).json({ error: 'Error reaching LLM service' });
-    }
-  }
-});
-
-app.post('/questions/:questionId/answers', verifyToken, async (req, res) => {
-  try {
-    const questionId = req.params.questionId;
-    const answer = req.body.answer;
-    const username = req.user.username; // Obtenido del token de autenticación
-
-    // Enviar la respuesta al servicio de preguntas
-    const answerResponse = await axios.post(questionServiceUrl + '/questions/' + questionId + '/answer', {
-      username,
-      answer
-    });
-
-    res.json(answerResponse.data);
-  } catch (error) {
-    if (error.response) {
-      res.status(error.response.status).json({ error: error.response.data.error });
-    } else {
-      res.status(404).json({ error: 'Question not found' });
-    }
+    res.status(error.response ? error.response.status : 500).json({ error: error.message });
   }
 });
 
@@ -336,17 +228,6 @@ app.get('/leaderboard', verifyToken, async (req, res) => {
     } else {
       res.status(500).json({ error: 'Internal server error' });
     }
-  }
-});
-
-app.get('/questions/:n/:locale', async (req, res) => {
-  try {
-    const { n, locale } = req.params;
-    console.log(`${questionServiceUrl}/questions`)
-    const response = await axios.get(`${questionServiceUrl}/questions`);
-    res.json(response.data);
-  } catch (error) {
-    res.status(error.response ? error.response.status : 500).json({ error: error.message });
   }
 });
 
