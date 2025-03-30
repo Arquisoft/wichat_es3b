@@ -9,18 +9,12 @@ import InfoDialog from "../../components/infoDialog/InfoDialog";
 import {
   LinearProgress,
   Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 import { useTranslation } from "react-i18next";
 
 const TOTAL_TIME = 40;
-const USERNAME = "jugador1";
 
 const Game = () => {
   const { i18n } = useTranslation();
@@ -46,7 +40,8 @@ const Game = () => {
   const [showRules, setShowRules] = useState(false);
 
   const URL = "http://localhost:8004/";
-  const STATS_URL = "http://localhost:8005/savestats";
+  const GATEWAY_URL = process.env.GATEWAY_URL || "http://localhost:8000";
+  let loggedUsername = localStorage.getItem("username");
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -64,6 +59,36 @@ const Game = () => {
       setIsLoading(false);
     }
   }, []);
+
+  const saveStats = async () => {
+    try {
+      const statsData = {
+        username: loggedUsername,
+        rightAnswers: correctAnswers,
+        wrongAnswers: incorrectAnswers,
+        time: totalTimeUsed,
+        score: score,
+        date: new Date().toISOString(),
+        win: correctAnswers > incorrectAnswers // TODO: esto hay que quitarlo
+      };
+      const response = await fetch(`${GATEWAY_URL}/savestats`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(statsData),
+      });
+
+      if (!response.ok) {
+        throw new Error();
+      }
+
+      const data = await response.json();
+      console.log("Estadísticas guardadas", data);
+    } catch (error) {
+      console.error("Error al guardar estadísticas: ", error);
+    }
+  };
 
   useEffect(() => {
     return () => {
@@ -102,28 +127,6 @@ const Game = () => {
   useEffect(() => {
     setProgress((timeLeft / TOTAL_TIME) * 100);
   }, [timeLeft]);
-
-  const saveStats = async () => {
-    try {
-      await fetch(STATS_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: USERNAME,
-          games: 1,
-          rightAnswers: correctAnswers,
-          wrongAnswers: incorrectAnswers,
-          ratio: correctAnswers / (correctAnswers + incorrectAnswers || 1),
-          averageTime: totalTimeUsed / (correctAnswers + incorrectAnswers || 1),
-          maxScore: score,
-        }),
-      });
-    } catch (error) {
-      console.error("Error al guardar estadísticas:", error);
-    }
-  };
 
   const handleNextQuestion = () => {
     setQuestionNumber((prevNumber) => {
