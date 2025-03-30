@@ -234,11 +234,11 @@ const Game = () => {
                       isAnswered
                         ? respuesta ===
                           currentQuestion.respuestaCorrecta[currentLanguage]
-                          ? "buttonCorrect" 
-                          : timeLeft <= 0 
-                          ? "buttonPrimary" 
+                          ? "buttonCorrect"
+                          : timeLeft <= 0
+                          ? "buttonPrimary"
                           : selectedAnswer === respuesta
-                          ? "buttonIncorrect" 
+                          ? "buttonIncorrect"
                           : "buttonPrimary"
                         : "buttonPrimary" // Si no se contestó, no se resalta el botón
                     }
@@ -310,37 +310,39 @@ const Game = () => {
         </div>
       )}
       <Footer />
-      <Dialog open={showSummary} onClose={() => setShowSummary(false)}>
-        <DialogTitle>Resumen de la partida</DialogTitle>
-        <DialogContent>
-          <p>Respuestas correctas: {correctAnswers}</p>
-          <p>Respuestas incorrectas: {incorrectAnswers}</p>
-          <p>
-            Ratio de aciertos:{" "}
-            {(
-              correctAnswers / (correctAnswers + incorrectAnswers || 1)
-            ).toFixed(2)}
-          </p>
-          <p>
-            Tiempo promedio por pregunta:{" "}
-            {(totalTimeUsed / (correctAnswers + incorrectAnswers || 1)).toFixed(
-              2
-            )}
-            s
-          </p>
-          <p>Puntuación máxima: {score}</p>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={async () => {
-              setShowSummary(false);
-              window.location.reload();
-            }}
-          >
-            Cerrar
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {showSummary && (
+        <div className="overlay">
+          <div className="dialogGameRulesContainer">
+            <InfoDialog
+              title="Resumen de la partida"
+              content={
+                <div className="summaryContent">
+                  <p>Respuestas correctas: {correctAnswers}</p>
+                  <p>Respuestas incorrectas: {incorrectAnswers}</p>
+                  <p>
+                    Ratio de aciertos:{" "}
+                    {(
+                      correctAnswers / (correctAnswers + incorrectAnswers || 1)
+                    ).toFixed(2)}
+                  </p>
+                  <p>
+                    Tiempo promedio por pregunta:{" "}
+                    {(
+                      totalTimeUsed / (correctAnswers + incorrectAnswers || 1)
+                    ).toFixed(2)}
+                    s
+                  </p>
+                  <p>Puntuación máxima: {score}</p>
+                </div>
+              }
+              onClose={async () => {
+                setShowSummary(false);
+                window.location.reload();
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
