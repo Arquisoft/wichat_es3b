@@ -10,9 +10,9 @@ import PrivateRoute from "./components/routes/PrivateRoute.js"; // Importar el c
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} /> {/* Página principal */}
+      <Route path="/" element={<Home />} />
       <Route path="/auth" element={<AuthForm />} />
-      {/* Ruta protegida para Play */}
+
       <Route
         path="/play"
         element={

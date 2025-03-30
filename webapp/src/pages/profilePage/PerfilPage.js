@@ -26,19 +26,25 @@ export default function PerfilPage() {
       bestStreak: 0,
     },
 
-    monthlyData: [
-      { month: "Enero", value: 18 },
-      { month: "Febrero", value: 26 },
-      { month: "Marzo", value: 22 },
-      { month: "Abril", value: 35 },
-      { month: "Mayo", value: 36 },
-    ], // TODO: no está en el servicio de estadísticas.
+    monthlyData: [], // TODO: no está en el servicio de estadísticas.
 
     pieData: [],
 
     gameHistory: [],
   });
 
+  // Cargar el nombre de usuario desde localStorage al montar el componente
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUserData((prevUserData) => ({
+        ...prevUserData,
+        username: storedUsername,
+      }));
+    }
+  }, []);
+
+  // Estado para controlar la visibilidad del menú lateral en móviles
   const [sidebarVisible, setSidebarVisible] = useState(true);
 
   const [currentGameIndex, setCurrentGameIndex] = useState(0);
@@ -120,6 +126,7 @@ export default function PerfilPage() {
 
     for (let i = 4; i >= 0; i--) {
       const date = new Date(now);
+      date.setDate(1);
       date.setMonth(now.getMonth() - i);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -167,6 +174,7 @@ export default function PerfilPage() {
         `${gatewayUrl}/ratios-per-month/${username}`
       );
       const expectedMonths = getLastFiveMonths();
+      console.log("Meses esperados:", expectedMonths);
       const monthDataMap = createMonthDataMap(response.data);
       const monthlyStats = processChartData(expectedMonths, monthDataMap);
 
