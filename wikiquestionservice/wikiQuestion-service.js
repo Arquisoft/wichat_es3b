@@ -26,6 +26,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/questions", async (req, res) => {
+  console.log("GET /questions");
   const { n = 10, locale = "es" } = req.query;
 
   const numQuestions = parseInt(n, 10);

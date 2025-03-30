@@ -339,6 +339,17 @@ app.get('/leaderboard', verifyToken, async (req, res) => {
   }
 });
 
+app.get('/questions/:n/:locale', async (req, res) => {
+  try {
+    const { n, locale } = req.params;
+    console.log(`${questionServiceUrl}/questions`)
+    const response = await axios.get(`${questionServiceUrl}/questions`);
+    res.json(response.data);
+  } catch (error) {
+    res.status(error.response ? error.response.status : 500).json({ error: error.message });
+  }
+});
+
 // Read the OpenAPI YAML file synchronously
 openapiPath='./openapi.yaml'
 if (fs.existsSync(openapiPath)) {
