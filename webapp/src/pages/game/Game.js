@@ -66,20 +66,38 @@ const Game = () => {
   }, []);
 
   useEffect(() => {
+    return () => {
+      clearInterval(timerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
     fetchQuestions();
   }, [fetchQuestions]);
 
   useEffect(() => {
-    if (timeLeft <= 0 || isAnswered) {
+    if (timeLeft <= 0 && !isAnswered) {
+      clearInterval(timerRef.current);
+      setIsAnswered(true);
+      setIncorrectAnswers((prev) => prev + 1);
+      const timeUsed = TOTAL_TIME;
+      setTotalTimeUsed((prev) => prev + timeUsed);
+
+      if (questionNumber + 1 >= questions.length) {
+        saveStats();
+        setShowSummary(true);
+      }
       return;
     }
+
+    if (isAnswered) return;
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(prev - 1, 0));
     }, 1000);
 
     return () => clearInterval(timerRef.current);
-  }, [timeLeft, isAnswered]);
+  }, [timeLeft, isAnswered, questionNumber, questions.length]);
 
   useEffect(() => {
     setProgress((timeLeft / TOTAL_TIME) * 100);
@@ -138,7 +156,7 @@ const Game = () => {
       saveStats();
       setShowSummary(true);
     }
-    const timeUsed = TOTAL_TIME - timeLeft; // Tiempo usado en esta pregunta
+    const timeUsed = TOTAL_TIME - timeLeft;
     setTotalTimeUsed((prev) => prev + timeUsed);
   };
   const formatTime = (time) => {
@@ -216,11 +234,13 @@ const Game = () => {
                       isAnswered
                         ? respuesta ===
                           currentQuestion.respuestaCorrecta[currentLanguage]
-                          ? "buttonCorrect"
+                          ? "buttonCorrect" 
+                          : timeLeft <= 0 
+                          ? "buttonPrimary" 
                           : selectedAnswer === respuesta
-                          ? "buttonIncorrect"
+                          ? "buttonIncorrect" 
                           : "buttonPrimary"
-                        : "buttonPrimary"
+                        : "buttonPrimary" // Si no se contestó, no se resalta el botón
                     }
                     disabled={isAnswered}
                   ></BaseButton>
