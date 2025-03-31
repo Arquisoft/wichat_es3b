@@ -13,10 +13,11 @@ const Footer = () => {
         textAlign: "center",
         padding: "1em",
         minHeight: "6vh",
-        marginTop: "auto",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        width: "100%",
+        zIndex: "100"
       }}
     >
       <Typography variant="body1" sx={{ fontWeight: "normal" }}>

@@ -85,7 +85,7 @@ export default function PerfilPage() {
           correctAnswers: stats.rightAnswers,
           wrongAnswers: stats.wrongAnswers,
           ratio: roundedRatio,
-          averageTime: `${stats.averageTime} s`,
+          averageTime: `${parseFloat(stats.averageTime).toFixed(2)} s`,
           bestScore: stats.maxScore,
         },
         pieData: [
