@@ -7,7 +7,7 @@ const AuthHeader = () => {
   return (
     <div className="authHeader">
         <img className="logoAuth" src={logo} alt="Logo de WiChat" />
-        <LanguageChangeMenu />
+        <LanguageChangeMenu variant='secondary'/>
     </div>
   )
 }
