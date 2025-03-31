@@ -97,6 +97,8 @@ services:
       - gatewayservice
     ports:
       - "3000:3000"
+
+
   wikiquestionservice:
     container_name: wikiquestionservice-wichat_es3b
     build: ./wikiquestionservice

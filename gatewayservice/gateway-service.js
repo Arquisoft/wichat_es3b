@@ -11,7 +11,7 @@ const app = express();
 const port = 8000;
 
 const wikiQuestionServiceUrl =
-  process.env.WIKIQUESTION_SERVICE_URL || "http://localhost:8004";
+  process.env.QUESTION_SERVICE_URL || "http://localhost:8004";
 const llmServiceUrl = process.env.LLM_SERVICE_URL || "http://localhost:8003";
 const authServiceUrl = process.env.AUTH_SERVICE_URL || "http://localhost:8002";
 const userServiceUrl = process.env.USER_SERVICE_URL || "http://localhost:8001";
@@ -173,11 +173,11 @@ app.get("/ratios-per-month/:username", async (req, res) => {
 });
 
 // Question endpoints
-app.get('/questions/:n/:locale', async (req, res) => {
+app.get('/questions/:n', async (req, res) => {
     try {
-        const { n, locale } = req.params;
-        console.log(`${questionServiceUrl}/questions`);
-        const response = await axios.get(`${questionServiceUrl}/questions`);
+        const { n } = req.params;
+        console.log(`${wikiQuestionServiceUrl}/questions`);
+        const response = await axios.get(`${wikiQuestionServiceUrl}/questions?n=${n}`);
         res.json(response.data);
     } catch (error) {
         res.status(error.response ? error.response.status : 500).json({ error: error.message });
