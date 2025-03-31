@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState, useCallback, useRef } from "react"
 import "./Game.css"
 import Nav from "../../components/nav/Nav"
@@ -8,6 +10,7 @@ import ChatBox from "../../components/chatBox/ChatBox"
 import InfoDialog from "../../components/infoDialog/InfoDialog"
 import { LinearProgress, Box } from "@mui/material"
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
+import { motion } from "framer-motion"
 
 import { useTranslation } from "react-i18next"
 
@@ -35,6 +38,7 @@ const Game = () => {
   const [showRules, setShowRules] = useState(false)
   const HINT_LIMIT = 5
   const [hintsLeft, setHintsLeft] = useState(HINT_LIMIT)
+  const [questionAnimationComplete, setQuestionAnimationComplete] = useState(false)
 
   const URL = "http://localhost:8004/"
   const GATEWAY_URL = process.env.GATEWAY_URL || "http://localhost:8000"
@@ -134,6 +138,7 @@ const Game = () => {
       setIsAnswered(false)
       setProgress(100)
       setTimeLeft(TOTAL_TIME)
+      setQuestionAnimationComplete(false)
       return newNumber
     })
   }
@@ -202,7 +207,19 @@ const Game = () => {
               </div>
             </div>
           </div>
-          <div className="center-column">
+          <motion.div
+            className="center-column"
+            key={questionNumber}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{
+              duration: 0.7,
+              type: "spring",
+              stiffness: 100,
+              damping: 15,
+            }}
+            onAnimationComplete={() => setQuestionAnimationComplete(true)}
+          >
             <div className="question-section">
               <div className="questionNumber">
                 <h2>{`Pregunta ${questionNumber + 1}/25`}</h2>
@@ -258,7 +275,7 @@ const Game = () => {
                 <span>{formatTime(timeLeft)}</span>
               </Box>
             </div>
-          </div>
+          </motion.div>
           <div className="right-column">
             <div className="rules-points-section">
               <div className="points-display">
@@ -319,4 +336,5 @@ const Game = () => {
   )
 }
 
-export default Game;
+export default Game
+
