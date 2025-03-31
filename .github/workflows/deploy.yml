@@ -45,8 +45,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Install Dependencies for E2E
+        run: |
+          npm --prefix webapp install
+      - name: Set CI to false
+        run: echo "CI=false" >> $GITHUB_ENV
       - run: npm --prefix webapp run build
-
+      
   docker-push-webapp:
     name: Push webapp Docker Image to GitHub Packages
     runs-on: ubuntu-latest
