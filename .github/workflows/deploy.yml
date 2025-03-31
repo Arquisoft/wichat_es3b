@@ -37,21 +37,15 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  #e2e-tests:
-   # needs: [unit-tests]
-    #runs-on: ubuntu-latest
-    #steps:
-     # - uses: actions/checkout@v4
-      #- uses: actions/setup-node@v4
-       # with:
-        #  node-version: 22
-     # - name: Install Dependencies for E2E
-      #  run: |
-       #   npm --prefix webapp install
-     # - name: Set CI to false
-      #  run: echo "CI=false" >> $GITHUB_ENV
-     # - run: npm --prefix webapp run build
-     # - run: npm --prefix webapp run test:e2e
+  e2e-tests:
+    needs: [unit-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm --prefix webapp run build
 
   docker-push-webapp:
     name: Push webapp Docker Image to GitHub Packages
