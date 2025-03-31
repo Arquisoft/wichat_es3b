@@ -9,8 +9,7 @@ import "../login/Login.css";
 import "../../assets/global.css";
 import { useTranslation } from "react-i18next";
 
-const apiEndpoint =
-  process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000";
+const apiEndpoint = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
 
 
 const AddUser = ({ handleToggleView }) => {
