@@ -51,7 +51,7 @@ jobs:
       - name: Set CI to false
         run: echo "CI=false" >> $GITHUB_ENV
       - run: npm --prefix webapp run build
-      
+
   docker-push-webapp:
     name: Push webapp Docker Image to GitHub Packages
     runs-on: ubuntu-latest
@@ -194,6 +194,23 @@ jobs:
     runs-on: ubuntu-latest
     needs: [docker-push-userservice, docker-push-authservice, docker-push-llmservice, docker-push-gatewayservice, docker-push-webapp, docker-push-wikiquestionservice, docker-push-statsservice]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up SSH key
+        run: |
+          # Crear el directorio para las claves SSH
+          mkdir -p ~/.ssh
+          
+          # Escribir la clave SSH en un archivo en ~/.ssh/deploy_key
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
+          
+          # Asignar permisos adecuados (lectura/escritura solo para el propietario)
+          chmod 600 ~/.ssh/deploy_key
+          
+          # Configurar los hosts conocidos para evitar advertencias al conectar
+          touch ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
       - name: Deploy over SSH
         uses: fifsky/ssh-action@master
         with:
