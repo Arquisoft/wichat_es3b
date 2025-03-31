@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Navbar from "../../components/nav/Nav";
 import Sidebar from "../../components/sidebar/Sidebar";
 import StatsGraphs from "../../components/stats-graphs/stats-graphs";
@@ -10,42 +11,26 @@ import "./PerfilPage.css";
 import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarToggleButton";
 
 export default function PerfilPage() {
-  // Estado para datos de usuario
   const [userData, setUserData] = useState({
-    username: "", // Inicialmente vacío, se actualizará con localStorage
-    level: 5,
+    username: "",
+    level: 1, // TODO: no está en el servicio de estadísticas
     avatar:
       "https://i.pinimg.com/736x/8d/16/90/8d16902ae35c1e982c2990ff85fa11fb.jpg",
     stats: {
-      gamesPlayed: 27,
-      correctAnswers: 200,
-      wrongAnswers: 50,
-      ratio: 0.79,
-      averageTime: "2s",
-      bestScore: 1200,
-      bestStreak: 18,
+      gamesPlayed: 0,
+      correctAnswers: 0,
+      wrongAnswers: 0,
+      ratio: 0,
+      averageTime: "0 s",
+      bestScore: 0,
+      bestStreak: 0,
     },
-    // Datos para el gráfico de línea
-    monthlyData: [
-      { month: "Enero", value: 18 },
-      { month: "Febrero", value: 26 },
-      { month: "Marzo", value: 22 },
-      { month: "Abril", value: 35 },
-      { month: "Mayo", value: 36 },
-    ],
-    // Datos para el gráfico circular
-    pieData: [
-      { name: "Aciertos", value: 79.4 },
-      { name: "Fallos", value: 20.6 },
-    ],
-    // Historial de partidas
-    gameHistory: [
-      { id: 124, date: "27/02/2024", correct: 16, time: "06:23" },
-      { id: 123, date: "27/02/2024", correct: 10, time: "08:25" },
-      { id: 122, date: "26/02/2024", correct: 19, time: "05:22" },
-      { id: 121, date: "25/02/2024", correct: 14, time: "07:15" },
-      { id: 120, date: "24/02/2024", correct: 12, time: "04:45" },
-    ],
+
+    monthlyData: [], // TODO: no está en el servicio de estadísticas.
+
+    pieData: [],
+
+    gameHistory: [],
   });
 
   // Cargar el nombre de usuario desde localStorage al montar el componente
@@ -62,17 +47,14 @@ export default function PerfilPage() {
   // Estado para controlar la visibilidad del menú lateral en móviles
   const [sidebarVisible, setSidebarVisible] = useState(true);
 
-  // Estado para controlar el índice actual del carrusel de partidas
   const [currentGameIndex, setCurrentGameIndex] = useState(0);
 
-  // Función para alternar la visibilidad del menú lateral
   const toggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
   };
 
   const closeSideBar = () => setSidebarVisible(false);
 
-  // Función para navegar por el historial de partidas
   const navigateGames = (direction) => {
     if (direction === "prev") {
       setCurrentGameIndex((prev) =>
@@ -84,6 +66,144 @@ export default function PerfilPage() {
       );
     }
   };
+
+  const gatewayUrl = process.env.GATEWAY_URL || "http://localhost:8000";
+
+  const loadUserStats = async (username) => {
+    try {
+      console.log("Cargando estadísticas para el usuario:", username);
+      const response = await axios.get(`${gatewayUrl}/getstats/${username}`);
+      console.log("Respuesta del servidor:", response.data);
+
+      const stats = response.data;
+      const roundedRatio = parseFloat(stats.ratio).toFixed(2);
+
+      setUserData((prevData) => ({
+        ...prevData,
+        stats: {
+          gamesPlayed: stats.games,
+          correctAnswers: stats.rightAnswers,
+          wrongAnswers: stats.wrongAnswers,
+          ratio: roundedRatio,
+          averageTime: `${stats.averageTime} s`,
+          bestScore: stats.maxScore,
+        },
+        pieData: [
+          { name: "Aciertos", value: roundedRatio * 100 },
+          { name: "Fallos", value: (1 - roundedRatio) * 100 },
+        ],
+      }));
+    } catch (error) {
+      console.error("Error al cargar las estadísticas: ", error);
+    }
+  };
+
+  const loadGameHistory = async (username) => {
+    try {
+      if (!username) return;
+      const response = await axios.get(`${gatewayUrl}/games/${username}`);
+      const games = response.data.map((game, index) => ({
+        id: index + 1, // TODO: Esto no debería estar hardcodeado
+        date: new Date(game.date).toLocaleDateString("es-Es"),
+        correct: game.rightAnswers,
+        time: `${game.time} s`,
+        score: game.score,
+        ratio: game.ratio,
+      }));
+      setUserData((prevData) => ({
+        ...prevData,
+        gameHistory: games,
+      }));
+    } catch (error) {
+      console.error("Error al cargar el historial de partidas: " + error);
+    }
+  };
+
+  // Obtiene los últimos 5 meses esperados (incluyendo el actual)
+  const getLastFiveMonths = () => {
+    const expectedMonths = [];
+    const now = new Date();
+
+    for (let i = 4; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(1);
+      date.setMonth(now.getMonth() - i);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      expectedMonths.push(`${year}-${month}`);
+    }
+
+    return expectedMonths;
+  };
+
+  // Obtiene los datos por mes
+  const createMonthDataMap = (apiData) => {
+    const dataByMonth = {};
+    apiData.forEach((item) => {
+      dataByMonth[item.month] = item.avgRatio;
+    });
+    return dataByMonth;
+  };
+
+  // Formatea un string de mes (YYYY-MM) a un nombre legible (Ej: "Enero 2023")
+  const formatMonthName = (monthKey) => {
+    const [year, month] = monthKey.split("-");
+    const date = new Date(year, month - 1);
+    const monthName = date.toLocaleDateString("es-ES", {
+      month: "short",
+      year: "numeric",
+    });
+    return monthName.charAt(0).toUpperCase() + monthName.slice(1);
+  };
+
+  // Procesa los datos para el gráfico
+  const processChartData = (expectedMonths, monthDataMap) => {
+    return expectedMonths.map((monthKey) => ({
+      month: formatMonthName(monthKey),
+      value: monthDataMap[monthKey]
+        ? parseFloat((monthDataMap[monthKey] * 100).toFixed(2))
+        : 0, // Si no hay datos para el mes correspondiente, el ratio de ese mes es 0% (no hay partidas registradas)
+    }));
+  };
+
+  // Función principal que carga las estadísticas mensuales.
+  const loadMonthlyStats = async (username) => {
+    try {
+      if (!username) return;
+      const response = await axios.get(
+        `${gatewayUrl}/ratios-per-month/${username}`
+      );
+      const expectedMonths = getLastFiveMonths();
+      console.log("Meses esperados:", expectedMonths);
+      const monthDataMap = createMonthDataMap(response.data);
+      const monthlyStats = processChartData(expectedMonths, monthDataMap);
+
+      setUserData((prevData) => ({
+        ...prevData,
+        monthlyData: monthlyStats,
+      }));
+    } catch (error) {
+      console.error("Error al cargar estadísticas mensuales: ", error);
+    }
+  };
+
+  // Cargar el nombre de usuario desde localStorage al montar el componente
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUserData((prevUserData) => ({
+        ...prevUserData,
+        username: storedUsername,
+      }));
+    }
+  }, []);
+
+  // Cargar estadísticas de usuario
+  useEffect(() => {
+    loadUserStats(userData.username);
+    loadGameHistory(userData.username);
+    loadMonthlyStats(userData.username);
+  }, [userData.username]);
 
   return (
     <div className="app-container">
@@ -103,13 +223,13 @@ export default function PerfilPage() {
             monthlyData={userData.monthlyData}
             pieData={userData.pieData}
           />
-
-          {/* Sección de historial de partidas */}
-          <GameHistory
-            games={userData.gameHistory}
-            currentIndex={currentGameIndex}
-            onNavigate={navigateGames}
-          />
+          {userData.gameHistory && userData.gameHistory.length > 0 && (
+            <GameHistory
+              games={userData.gameHistory}
+              currentIndex={currentGameIndex}
+              onNavigate={navigateGames}
+            />
+          )}
         </div>
       </div>
 
