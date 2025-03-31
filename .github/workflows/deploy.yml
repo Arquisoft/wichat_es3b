@@ -1,6 +1,9 @@
 name: CI for wichat_es3b
 
 on:
+  push:
+    branches:
+      - deployment_branch
   release:
     types: [published]
 
