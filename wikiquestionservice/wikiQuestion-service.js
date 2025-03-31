@@ -26,35 +26,19 @@ app.use((req, res, next) => {
 });
 
 app.get("/questions", async (req, res) => {
-  console.log("GET /questions");
-  const { n = 10, locale = "es" } = req.query;
-
+  const { n = 10} = req.query;
   const numQuestions = parseInt(n, 10);
   if (numQuestions > 25) {
     return res.status(400).json({ error: "El límite de preguntas es 25" });
   }
-
-  const validLocales = ["es", "en"];
-  const selectedLocale = validLocales.includes(locale) ? locale : "es";
-
   try {
     await questionManager.loadAllQuestions();
 
     const allQuestions = questionManager.questions;
 
     const limitedQuestions = allQuestions.slice(0, numQuestions).map((q) => {
-      const questionText = q.obtenerPreguntaPorIdioma(selectedLocale);
-
-      if (!questionText) {
-        return res
-          .status(400)
-          .json({
-            error: `Pregunta no disponible en el idioma: ${selectedLocale}`,
-          });
-      }
-
+      const questionText = q.obtenerPreguntaPorIdioma();
       const respuestas = q.obtenerRespuestas();
-
       return {
         pregunta: questionText,
         respuestaCorrecta: q.respuestaCorrecta,

@@ -1,0 +1,27 @@
+@import url("../../assets/global.css");
+
+.sidebar-toggle-button {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 200;
+  background-color: var(--color-primario);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 3em;
+  height: 3em;
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0.15em 0.625em rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.sidebar-toggle-button:hover {
+  transform: scale(1.05);
+  background-color: var(--color-hover-boton);
+}
