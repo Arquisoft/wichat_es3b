@@ -106,14 +106,5 @@ h2 {
   font-weight: bold;
 }
 
-.logoAuth {
-  height: 50%
-}
 
-.authHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  height: 20%;
-}
+

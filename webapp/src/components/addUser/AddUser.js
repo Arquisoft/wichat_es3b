@@ -8,6 +8,7 @@ import PhotoPanel from "../photoPanel/PhotoPanel";
 import "../login/Login.css";
 import "../../assets/global.css";
 import { useTranslation } from "react-i18next";
+import AuthHeader from '../authHeader/AuthHeader'
 
 const apiEndpoint =
   process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000";
@@ -54,6 +55,7 @@ const AddUser = ({ handleToggleView }) => {
         text={t("panel_text")}
       />
       <div className="form">
+        <AuthHeader></AuthHeader>
         <h1>{t("createAccount")}</h1>
         <h2>{t("introduceData")}</h2>
 
