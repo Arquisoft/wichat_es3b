@@ -21,7 +21,7 @@ const AddUser = ({ handleToggleView }) => {
   const [passwordConfirm, setPasswordConfirm] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState("");
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   const [error, setError] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -42,7 +42,7 @@ const AddUser = ({ handleToggleView }) => {
   };
 
   const toggleShowPasswordConfirm = () => {
-    setShowPasswordConfirm(!showPassword);
+    setShowPasswordConfirm(!showPasswordConfirm);
   };
 
   const handleCloseSnackbar = () => {

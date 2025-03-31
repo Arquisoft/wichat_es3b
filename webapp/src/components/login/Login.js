@@ -19,6 +19,7 @@ const Login = ({ handleToggleView }) => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -32,6 +33,10 @@ const Login = ({ handleToggleView }) => {
     }
   }, []);
 
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+  
   // Iniciar sesión
   const loginUser = async () => {
     try {
@@ -85,12 +90,15 @@ const Login = ({ handleToggleView }) => {
                 </div>
                 <div className="formField">
                   <label>{t("password")}</label>
-                  <WiChatTextField
-                      type="password"
+                  <div className="passwordContainer">
+                    <WiChatTextField
                       value={password}
+                      type={showPassword ? "text" : "password"}
                       onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
+                    />
+                  <span onClick={toggleShowPassword}>👁️‍🗨️</span>
+                </div>    
+              </div>
                 <div className="buttonPanel">
                   <BaseButton text={t("login")} onClick={loginUser} />
                   <span> o </span>
