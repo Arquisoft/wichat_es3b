@@ -28,7 +28,7 @@ const ChatBox = ({
     setLoadingMessage("...");
 
     try {
-      const URL = process.env.GATEWAY_URL || "http://localhost:8000/";
+      const URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000/";
       const requestData = {
         userQuestion: input,
         question: question,

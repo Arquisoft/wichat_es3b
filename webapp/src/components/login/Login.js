@@ -19,6 +19,8 @@ const Login = ({ handleToggleView }) => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const navigate = useNavigate();
+  
+  const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
 
   const { t } = useTranslation();
 
@@ -33,7 +35,7 @@ const Login = ({ handleToggleView }) => {
   // Iniciar sesión
   const loginUser = async () => {
     try {
-      const response = await axios.post("http://localhost:8000/login", {
+      const response = await axios.post( `${GATEWAY_URL}/login`, {
         username,
         password,
       });

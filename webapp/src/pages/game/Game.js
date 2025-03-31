@@ -36,7 +36,6 @@ const Game = () => {
   const HINT_LIMIT = 5
   const [hintsLeft, setHintsLeft] = useState(HINT_LIMIT)
 
-  const URL = "http://localhost:8004/"
   const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000"
   const loggedUsername = localStorage.getItem("username")
 
@@ -44,8 +43,8 @@ const Game = () => {
 
   const fetchQuestions = useCallback(async () => {
     try {
-      console.log(`${GATEWAY_URL}/questions/${25}`)
       let n = 25
+      console.log(`${GATEWAY_URL}/questions/${n}`)
       const response = await fetch(`${GATEWAY_URL}/questions/${n}`)
       if (!response.ok) {
         throw new Error("No se pudieron obtener las preguntas.")
