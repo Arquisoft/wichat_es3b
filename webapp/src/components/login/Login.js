@@ -8,6 +8,8 @@ import PhotoPanel from "../photoPanel/PhotoPanel";
 import "./Login.css";
 import "../../assets/global.css";
 import { useTranslation } from "react-i18next";
+import logo from "../../assets/img/logo_base.png";
+import LanguageChangeMenu from "../../components/languageChangeMenu/LanguageChangeMenu"; 
 
 
 const Login = ({ handleToggleView }) => {
@@ -71,6 +73,10 @@ const Login = ({ handleToggleView }) => {
         ) : (
             <div className="mainDiv">
               <div className="form">
+              <div className="authHeader">
+              <img className="logoAuth" src={logo} alt="Logo de WiChat" />
+                <LanguageChangeMenu />
+              </div>
                 <h1>{t("identify")}</h1>
                 <h2>{t("introduceData")}</h2>
                 <div className="formField">
