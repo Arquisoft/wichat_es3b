@@ -92,6 +92,7 @@ services:
     build:
       context: ./webapp
       args:
+        API_URI: ${API_URI}
         LLM_API_KEY: ${LLM_API_KEY}
     depends_on:
       - gatewayservice
