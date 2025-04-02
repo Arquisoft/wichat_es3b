@@ -30,8 +30,7 @@ const Nav = () => {
         <Link to="/home">{t("home")}</Link>
         {isAuthenticated && <Link to="/play">{t("play")}</Link>}
         {isAuthenticated && <Link to="/profile">{t("profile")}</Link>}
-
-        <Link to="/settings">{t("settings")}</Link>
+        {isAuthenticated && <Link to="/settings">{t("settings")}</Link>}
       </div>
       <div className="nav-right">
         {isAuthenticated ? (
