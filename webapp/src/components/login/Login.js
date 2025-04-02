@@ -8,6 +8,8 @@ import PhotoPanel from "../photoPanel/PhotoPanel";
 import "./Login.css";
 import "../../assets/global.css";
 import { useTranslation } from "react-i18next";
+import AuthHeader from "../authHeader/AuthHeader";
+
 
 
 const Login = ({ handleToggleView }) => {
@@ -17,6 +19,7 @@ const Login = ({ handleToggleView }) => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -30,6 +33,10 @@ const Login = ({ handleToggleView }) => {
     }
   }, []);
 
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+  
   // Iniciar sesión
   const loginUser = async () => {
     try {
@@ -71,6 +78,7 @@ const Login = ({ handleToggleView }) => {
         ) : (
             <div className="mainDiv">
               <div className="form">
+                <AuthHeader></AuthHeader>
                 <h1>{t("identify")}</h1>
                 <h2>{t("introduceData")}</h2>
                 <div className="formField">
@@ -82,12 +90,15 @@ const Login = ({ handleToggleView }) => {
                 </div>
                 <div className="formField">
                   <label>{t("password")}</label>
-                  <WiChatTextField
-                      type="password"
+                  <div className="passwordContainer">
+                    <WiChatTextField
                       value={password}
+                      type={showPassword ? "text" : "password"}
                       onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
+                    />
+                  <span onClick={toggleShowPassword}>👁️‍🗨️</span>
+                </div>    
+              </div>
                 <div className="buttonPanel">
                   <BaseButton text={t("login")} onClick={loginUser} />
                   <span> o </span>

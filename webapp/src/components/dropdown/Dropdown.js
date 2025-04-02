@@ -3,7 +3,7 @@ import DropDownButton from "./dropdownButton/DropDownButton";
 import DropdownContent from "./dropdownContent/DropdownContent";
 import "./Dropdown.css";
 
-const Dropdown = ({ buttonText, content }) => {
+const Dropdown = ({ buttonText, content, variant}) => {
   const [open, setOpen] = useState(false);
 
   const toggleDropdown = () => setOpen(!open);
@@ -26,10 +26,10 @@ const Dropdown = ({ buttonText, content }) => {
 
   return (
     <div className="dropdown" ref={dropdownRef}>
-      <DropDownButton toggle={toggleDropdown} open={open}>
+      <DropDownButton toggle={toggleDropdown} open={open} variant={variant}>
         {buttonText}
       </DropDownButton>
-      <DropdownContent open={open}>{content}</DropdownContent>
+      <DropdownContent variant={variant}open={open}>{content}</DropdownContent>
     </div>
   );
 };

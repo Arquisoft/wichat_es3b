@@ -5,7 +5,7 @@ import "./LanguageChangeMenu.css";
 import Dropdown from "../dropdown/Dropdown";
 import DropdownItem from "../dropdown/dropdownItem/DropdownItem";
 
-const LanguageChangeMenu = () => {
+const LanguageChangeMenu = ({variant="primary"}) => {
   const { i18n } = useTranslation();
 
   const handleLanguageChange = (selectedLang) => {
@@ -21,7 +21,7 @@ const LanguageChangeMenu = () => {
   return (
     <div className="menu">
       <div className="content">
-        <Dropdown
+        <Dropdown variant={variant}
           buttonText="Idioma"
           content={
             <>

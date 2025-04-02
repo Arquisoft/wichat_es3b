@@ -11,6 +11,12 @@
   cursor: pointer;
 }
 
+/* Variante secondary */
+.dropdown-btn.secondary {
+  background-color: var(--color-primario); 
+  color: white;
+}
+
 .toggle-icon {
   display: flex;
   align-items: center;

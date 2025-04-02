@@ -1,9 +1,9 @@
 import React from "react";
 import "./DropdownContent.css";
 
-const DropdownContent = ({ children, open }) => {
+const DropdownContent = ({ children, open, variant}) => {
   return (
-    <div className={`dropdown-content ${open ? "content-open" : null}`}>
+    <div className={`dropdown-content ${variant} ${open ? "content-open" : ""}`}>
       {children}
     </div>
   );
