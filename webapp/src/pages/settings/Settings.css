@@ -1,0 +1,29 @@
+.mainSettingsPageContainer{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.mainGameSettingsContainer{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    gap: 1.2em;
+}
+
+.mainCategoriesGrid{
+    height: 50%;
+    display: grid;
+}
+
+.gameButtonPanel{
+    width: 10%;
+    height: 10%;
+}
+
+.gameButtonPanel button{
+    width: 100%;
+    height: 100%;
+}
