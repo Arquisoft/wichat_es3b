@@ -8,6 +8,19 @@ on:
     types: [published]
 
 jobs:
+  pull-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        ref: 'deployment_branch' 
+
+    - name: Pull branch
+      run: |
+        git pull origin deployment_branch
+
   unit-tests:
     runs-on: ubuntu-latest
     steps:
