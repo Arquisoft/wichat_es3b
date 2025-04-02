@@ -85,6 +85,20 @@ services:
       STATS_SERVICE_URL: http://statsservice:8005
       QUESTION_SERVICE_URL: http://wikiquestionservice:8004
 
+  apiservice:
+    container_name: apiservice-wichat_es3b
+    image: ghcr.io/arquisoft/wichat_es3b/apiservice:latest
+    profiles: [ "dev", "prod" ]
+    build: ./apiservice
+    depends_on:
+      - gatewayservice
+    ports:
+      - "8006:8006"
+    networks:
+      - mynetwork
+    environment:
+      GATEWAY_SERVICE_URL: http://gatewayservice:8000
+
   webapp:
     container_name: webapp-wichat_es3b
     image: ghcr.io/arquisoft/wichat_es3b/webapp:latest
