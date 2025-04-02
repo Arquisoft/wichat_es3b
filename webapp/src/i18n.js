@@ -29,7 +29,7 @@ i18n.use(initReactI18next).init({
                 "or": "o",
                 "loginSuccessful": "Inicio de sesión correcto",
                 "identify": "Identifícate",
-                "welcomeMessage": "¡Bienvenido a WIChat!",
+                "loginMessageInPanel": "“ El conocimiento es un viaje sin final, una aventura que nos enriquece cada dia. Aprender, descubrir y compartir es lo que nos hace crecer, Porque en cada pregunta hay una oportunidad y en cada respuesta, un nuevo reto. Sigamos jugando y ganando juntos! “",
                 "logout": "Cerrar sesión"
             }
         },
@@ -59,7 +59,7 @@ i18n.use(initReactI18next).init({
                 "or": "or",
                 "loginSuccessful": "Login successful",
                 "identify": "Identify",
-                "welcomeMessage": "¡Welcome to WIChat!",
+                "loginMessageInPanel": "“Knowledge is a never-ending journey, an adventure that enriches us every day. Learning, discovering, and sharing are what make us grow. Because in every question, there is an opportunity, and in every answer, a new challenge. Let's keep playing and winning together!“",
                 "logout": "Logout"
             }
         }
