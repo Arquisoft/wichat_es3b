@@ -44,7 +44,7 @@ export default function StatsGraphs({ monthlyData, pieData }) {
                 label: "Ratio de aciertos",
                 data: monthlyData.map((item) => item.value),
                 borderColor: colors.tertiary,
-                backgroundColor: colors.tertiary + "20", // Con transparencia
+                backgroundColor: colors.tertiary + "20",
                 tension: 0.3,
                 fill: true,
               },

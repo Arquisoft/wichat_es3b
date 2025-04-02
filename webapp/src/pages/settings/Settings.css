@@ -1,29 +1,73 @@
-.mainSettingsPageContainer{
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+.mainSettingsPageContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.mainGameSettingsContainer{
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-    gap: 1.2em;
+
+.mainGameSettingsContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5em;
+  margin: 1em 0; 
 }
 
-.mainCategoriesGrid{
-    height: 50%;
+.gameCategoriesGrid {
     display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2em;
+    justify-content: center;
+    align-items: center;
+    width: 40%;
+    margin: 0 auto;
+    margin-bottom: 1em;
 }
 
-.gameButtonPanel{
-    width: 10%;
-    height: 10%;
+.gameButtonPanel {
+  width: 10%;
+  min-height: 50px;
 }
 
-.gameButtonPanel button{
-    width: 100%;
-    height: 100%;
+.gameButtonPanel button {
+  width: 100%;
+  height: 100%;
+  font-size: var(--font-size-lg);
 }
+
+/* Media queries para asegurar responsividad */
+@media (max-height: 700px) {
+    .mainGameSettingsContainer {
+      padding: 2rem 0; /* Padding más pequeño para pantallas más bajas */
+    }
+  }
+  
+  @media (max-height: 500px) {
+    .mainGameSettingsContainer {
+      padding: 1rem 0; /* Padding aún más pequeño para pantallas muy bajas */
+    }
+  }
+  
+  /* Para pantallas más pequeñas, ajustamos la cuadrícula */
+  @media (max-width: 768px) {
+    .gameCategoriesGrid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .gameButtonPanel {
+      width: 30%; /* Botón más ancho en móviles */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .gameCategoriesGrid {
+      grid-template-columns: 1fr;
+      max-width: 300px;
+    }
+  
+    .gameButtonPanel {
+      width: 50%; /* Botón aún más ancho en pantallas muy pequeñas */
+    }
+  }
