@@ -103,6 +103,7 @@ jobs:
             registry: ghcr.io
             workdir: users/authservice
             platforms: linux/amd64,linux/arm64
+            buildargs: MONGODB_URI
 
   docker-push-userservice:
     name: Push user service Docker Image to GitHub Packages
@@ -123,6 +124,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
           workdir: users/userservice
+          buildargs: MONGODB_URI
 
   docker-push-statsservice:
     name: Push stats service Docker Image to GitHub Packages
@@ -143,6 +145,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
           workdir: users/statsservice
+          buildargs: MONGODB_URI
 
   docker-push-llmservice:
     name: Push llm service Docker Image to GitHub Packages
