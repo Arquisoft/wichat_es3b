@@ -221,6 +221,6 @@ jobs:
           user: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           command: |
-            wget https://raw.githubusercontent.com/arquisoft/wichat_es3b/master/docker-compose.yml -O docker-compose.yml
+            wget https://raw.githubusercontent.com/arquisoft/wichat_es3b/deployment_branch/docker-compose.yml -O docker-compose.yml
             docker compose --profile prod down
             docker compose --profile prod up -d --pull always
