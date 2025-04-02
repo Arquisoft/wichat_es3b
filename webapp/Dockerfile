@@ -8,7 +8,7 @@ RUN npm install --omit=dev
 
 ARG API_URI
 ARG LLM_API_KEY
-ENV REACT_APP_API_ENDPOINT=$API_URI
+ENV REACT_APP_GATEWAY_SERVICE_URL=$API_URI
 ENV REACT_APP_LLM_API_KEY=$LLM_API_KEY
 
 #Create an optimized version of the webapp
