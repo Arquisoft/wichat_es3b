@@ -91,7 +91,7 @@ Once we have our machine ready, we could deploy by hand the application, taking 
 
 As you can see, unitary tests of each module and e2e tests are executed before pushing the docker images and deploying them. Using this approach we avoid deploying versions that do not pass the tests.
 
-The deploy action is the following:
+The deploy action is the following: 
 
 ```yml
 deploy:
