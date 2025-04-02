@@ -12,7 +12,6 @@ import { useTranslation } from "react-i18next";
 const USERNAME = "jugador1";
 
 const Game = () => {
-    const TOTAL_TIME = config?.tiempoPregunta || 30;
 
     const { i18n } = useTranslation();
   const currentLanguage = i18n.language || "es";
@@ -26,7 +25,7 @@ const Game = () => {
   const [isCorrect, setIsCorrect] = useState(null);
   const [score, setScore] = useState(0);
   const [isAnswered, setIsAnswered] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
+  const [timeLeft, setTimeLeft] = useState(30);
   const [progress, setProgress] = useState(100);
   const [isChatBoxVisible, setIsChatBoxVisible] = useState(false);
 
@@ -64,6 +63,7 @@ const Game = () => {
             setTimeLeft(config.tiempoPregunta);
         }
     }, [config]);
+    const TOTAL_TIME = config?.tiempoPregunta || 30;
 
     useEffect(() => {
         if (config) {
