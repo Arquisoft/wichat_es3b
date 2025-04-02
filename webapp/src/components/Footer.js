@@ -17,7 +17,7 @@ const Footer = () => {
         alignItems: "center",
         justifyContent: "center",
         width: "100%",
-        zIndex: "100"
+        zIndex: "100",
       }}
     >
       <Typography variant="body1" sx={{ fontWeight: "normal" }}>
