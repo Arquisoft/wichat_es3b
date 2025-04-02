@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import CategoryCard from "../../components/categoryCard/CategoryCard";
 import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarToggleButton";
 import GameSettingsSidebar from "../../components/gameSettingsSidebar/GameSettingsSidebar";
-import {motion} from "framer-motion";
+import { motion } from "framer-motion";
 
 import footballCategory from "../../assets/img/categories/footballCategory.jpg";
 import cinemaCategory from "../../assets/img/categories/cinemaCategory.jpg";
@@ -18,25 +18,38 @@ import allCategory from "../../assets/img/categories/allCategory.jpg";
 
 const Settings = () => {
   const { t } = useTranslation();
-  const categories = useMemo(() => [
-    { id: "football", name: t("football"), imageSrc: footballCategory },
-    { id: "cinema", name: t("cinema"), imageSrc: cinemaCategory },
-    { id: "literature", name: t("literature"), imageSrc: literatureCategory },
-    { id: "countries", name: t("countries"), imageSrc: countriesCategory },
-    { id: "art", name: t("art"), imageSrc: artCategory },
-    { id: "all", name: t("all"), imageSrc: allCategory },
-  ], [t]);
+  const categories = useMemo(
+    () => [
+      { id: "football", name: t("football"), imageSrc: footballCategory },
+      { id: "cinema", name: t("cinema"), imageSrc: cinemaCategory },
+      { id: "literature", name: t("literature"), imageSrc: literatureCategory },
+      { id: "countries", name: t("countries"), imageSrc: countriesCategory },
+      { id: "art", name: t("art"), imageSrc: artCategory },
+      { id: "all", name: t("all"), imageSrc: allCategory },
+    ],
+    [t]
+  );
 
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategories, setSelectedCategories] = useState(["all"]);
 
-  // Mantener la selección tras el cambio de idioma
-  useEffect(() => {
-    const prevCategoryId = selectedCategory;
-    const categoryExists = categories.some((cat) => cat.id === prevCategoryId);
-    if (!categoryExists) {
-      setSelectedCategory("all");
-    }
-  }, [categories, selectedCategory.id]);
+  const toggleCategory = (categoryId) => {
+    setSelectedCategories((prevCategories) => {
+      if (categoryId === "all") {
+        return prevCategories.includes("all") ? prevCategories : ["all"];
+      }
+
+      let newCategories = prevCategories.includes(categoryId)
+        ? prevCategories.filter((id) => id !== categoryId)
+        : [...prevCategories.filter((id) => id !== "all"), categoryId];
+
+      // Si se deselecciona la última categoría, evitarlo
+      if (newCategories.length === 0) {
+        return ["all"];
+      }
+
+      return newCategories;
+    });
+  };
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -45,16 +58,15 @@ const Settings = () => {
   };
 
   // Animación para los elementos del grid
-
-   const gridAnimation = {
+  const gridAnimation = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+        delayChildren: 0.2,
+      },
+    },
   };
 
   const cardAnimation = {
@@ -65,12 +77,12 @@ const Settings = () => {
       transition: {
         type: "spring",
         stiffness: 100,
-        damping: 10
-      }
-    }
-  }
+        damping: 10,
+      },
+    },
+  };
 
-   return (
+  return (
     <div className="mainSettingsPageContainer">
       <Nav />
       <div className="gameSettingsContentWrapper">
@@ -79,9 +91,7 @@ const Settings = () => {
           toggleButton={<SidebarToggleButton onClick={toggleSidebar} />}
         />
         <div
-          className={`mainGameSettingsContainer ${
-            sidebarOpen ? "gameSidebar-open" : ""
-          }`}
+          className={`mainGameSettingsContainer ${sidebarOpen ? "gameSidebar-open" : ""}`}
         >
           {!sidebarOpen && (
             <div className="content-toggle-container">
@@ -96,21 +106,18 @@ const Settings = () => {
               animate="visible"
               variants={gridAnimation}
             >
-              {categories.map((category, index) => (
-                <motion.div
-                  key={index}
-                  variants={cardAnimation}
-                >
+              {categories.map((category) => (
+                <motion.div key={category.id} variants={cardAnimation}>
                   <CategoryCard
                     name={category.name}
                     imageSrc={category.imageSrc}
-                    isSelected={selectedCategory === category.id}
-                    onClick={() => setSelectedCategory(category.id)}
+                    isSelected={selectedCategories.includes(category.id)}
+                    onClick={() => toggleCategory(category.id)}
                   />
                 </motion.div>
               ))}
             </motion.div>
-            
+
             <div className="gameButtonPanel">
               <BaseButton text={t("play")} />
             </div>
