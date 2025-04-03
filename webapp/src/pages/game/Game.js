@@ -13,7 +13,7 @@ const Game = () => {
   const [questionNumber, setQuestionNumber] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentQuestion, setCurrentQuestion] = useState("");
+  const [currentQuestion, setCurrentQuestion] = useState(null);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -22,6 +22,7 @@ const Game = () => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [progress, setProgress] = useState(100);
+  const [shuffledAnswers, setShuffledAnswers] = useState([]);
 
   const timerRef = useRef(null); // Referencia para almacenar el ID del intervalo
 
@@ -30,13 +31,14 @@ const Game = () => {
   const fetchQuestions = useCallback(async () => {
     // Correcto
     try {
-      const response = await fetch(`${URL}questions?n=25&locale=es`);
+      const response = await fetch(`${URL}questions-random?n=25&locale=es`);
       if (!response.ok) {
         throw new Error("No se pudieron obtener las preguntas.");
       }
       const data = await response.json();
       setQuestions(data);
-      setCurrentQuestion(data[questionNumber]);
+      setCurrentQuestion(data[0]);
+      console.log("Pregunta:", currentQuestion);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -60,6 +62,18 @@ const Game = () => {
   useEffect(() => {
     setProgress((timeLeft / TOTAL_TIME) * 100);
   }, [timeLeft]);
+
+  useEffect(() => {
+    if (currentQuestion) {
+      const allAnswers = [
+        ...currentQuestion.respuestas,
+        currentQuestion.respuestaCorrecta,
+      ];
+
+      const shuffled = allAnswers.sort(() => Math.random() - 0.5);
+      setShuffledAnswers(shuffled);
+    }
+  }, [currentQuestion]);
 
   const handleNextQuestion = () => {
     setQuestionNumber((prevNumber) => {
@@ -143,24 +157,23 @@ const Game = () => {
             <img src={currentQuestion.img[0]} alt="imagen pregunta"></img>
           )}
           <div className="answerPanel">
-            {currentQuestion.respuestas &&
-              currentQuestion.respuestas.map((respuesta, index) => (
-                <BaseButton
-                  key={index}
-                  text={respuesta}
-                  onClick={() => handleAnswerClick(respuesta)}
-                  buttonType={
-                    isAnswered
-                      ? respuesta === currentQuestion.respuestaCorrecta
-                        ? "buttonCorrect"
-                        : selectedAnswer === respuesta
-                        ? "buttonIncorrect"
-                        : "buttonPrimary"
+            {shuffledAnswers.map((respuesta, index) => (
+              <BaseButton
+                key={index}
+                text={respuesta}
+                onClick={() => handleAnswerClick(respuesta)}
+                buttonType={
+                  isAnswered
+                    ? respuesta === currentQuestion.respuestaCorrecta
+                      ? "buttonCorrect"
+                      : selectedAnswer === respuesta
+                      ? "buttonIncorrect"
                       : "buttonPrimary"
-                  }
-                  disabled={isAnswered}
-                ></BaseButton>
-              ))}
+                    : "buttonPrimary"
+                }
+                disabled={isAnswered}
+              ></BaseButton>
+            ))}
           </div>
         </div>
         <div className="lowerSection">

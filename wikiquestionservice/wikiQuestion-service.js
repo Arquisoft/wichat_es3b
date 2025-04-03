@@ -74,6 +74,41 @@ app.get("/questions", async (req, res) => {
   }
 });
 
+app.get("/questions-random", async (req, res) => {
+  const { n = 1, locale = "es" } = req.query;
+  const numQuestions = parseInt(n, 10);
+
+  if (numQuestions < 1) {
+    return res.status(400).json({ error: "Debes solicitar al menos 1 pregunta" });
+  }
+
+  try {
+    const matchStage = { [`question.${locale}`]: { $exists: true } };
+
+    const randomQuestions = await Question.aggregate([
+      { $match: matchStage },
+      { $sample: { size: numQuestions } }
+    ]);
+
+    if (!randomQuestions.length) {
+      return res.status(404).json({ error: `No hay preguntas disponibles en el idioma: ${locale}` });
+    }
+
+    const formattedQuestions = randomQuestions.map(q => ({
+      pregunta: q.question[locale],
+      respuestaCorrecta: q.correctAnswer,
+      respuestas: q.incorrectAnswers,
+      descripcion: q.description,
+      img: q.img,
+    }));
+
+    res.json(formattedQuestions);
+  } catch (error) {
+    console.error("Error obteniendo preguntas aleatorias:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
 app.get("/question", async (req, res) => {
   try {
     const count = await Question.countDocuments();
