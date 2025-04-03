@@ -73,6 +73,7 @@ services:
       - authservice
       - llmservice
       - statsservice
+      - wikiquestionservice
     ports:
       - "8000:8000"
     networks:
@@ -82,6 +83,21 @@ services:
       USER_SERVICE_URL: http://userservice:8001
       LLM_SERVICE_URL: http://llmservice:8003
       STATS_SERVICE_URL: http://statsservice:8005
+      QUESTION_SERVICE_URL: http://wikiquestionservice:8004
+
+  apiservice:
+    container_name: apiservice-wichat_es3b
+    image: ghcr.io/arquisoft/wichat_es3b/apiservice:latest
+    profiles: [ "dev", "prod" ]
+    build: ./apiservice
+    depends_on:
+      - gatewayservice
+    ports:
+      - "8006:8006"
+    networks:
+      - mynetwork
+    environment:
+      GATEWAY_SERVICE_URL: http://gatewayservice:8000
 
   webapp:
     container_name: webapp-wichat_es3b
@@ -90,11 +106,14 @@ services:
     build:
       context: ./webapp
       args:
+        API_URI: ${API_URI}
         LLM_API_KEY: ${LLM_API_KEY}
     depends_on:
       - gatewayservice
     ports:
       - "3000:3000"
+
+
   wikiquestionservice:
     container_name: wikiquestionservice-wichat_es3b
     build: ./wikiquestionservice
