@@ -32,11 +32,10 @@ const GameSettingsSidebar = ({ isOpen, toggleButton }) => {
     if (name === "numPreguntas" || name === "tiempoPregunta" || name === "limitePistas") {
       updatedValue = parseInt(value);
     }
-
+    const storedConfig = JSON.parse(localStorage.getItem("quizConfig")) || {};
     const updatedConfig = {
-      ...config,
-      [name]: updatedValue,
-      categories: config.categories
+      ...storedConfig,
+      [name]: updatedValue
     };
     setConfig(updatedConfig);
     localStorage.setItem("quizConfig", JSON.stringify(updatedConfig));
