@@ -23,7 +23,11 @@ const RankingWidget = () => {
 
   return (
     <div className='ranking-container'>
-        <h1 className='ranking-title'>{t('user-ranking')}</h1>
+        <div className='ranking-header'>
+            <h1 className='ranking-title'>{t('user-ranking')}</h1>
+            <p>Este es el ranking de usuarios cuyo récord de puntos es mayor. ¡Compite para entrar en el top! </p>
+        </div>
+        
         <div className='ranking-list'>
             {users.map((user, index) => (
                 <div className='ranking-item'>
