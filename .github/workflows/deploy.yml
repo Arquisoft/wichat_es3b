@@ -205,6 +205,24 @@ jobs:
           registry: ghcr.io
           workdir: wikiquestionservice
 
+  docker-push-apiservice:
+    name: Push apiservice Docker Image to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [ e2e-tests ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          name: arquisoft/wichat_es3b/apiservice
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          workdir: apiservice
+
   deploy:
     name: Deploy over SSH
     runs-on: ubuntu-latest
