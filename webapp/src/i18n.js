@@ -10,8 +10,11 @@ i18n.use(initReactI18next).init({
                 "all": "Todo",
                 "answer": "⏳ Responde en el menor tiempo posible.",
                 "art": "Arte",
+                "averageTime": "Tiempo promedio",
+                "bestScore": "Mejor puntuación",
                 "cinema": "Cine",
                 "confirmPassword": "Confirmar contraseña*",
+                "correctAnswers": "Respuestas correctas",
                 "countries": "Países",
                 "createAccount": "Crear cuenta",
                 "email": "Correo electrónico*",
@@ -29,6 +32,7 @@ i18n.use(initReactI18next).init({
                 "loginMessageInPanel": "“ El conocimiento es un viaje sin final, una aventura que nos enriquece cada dia. Aprender, descubrir y compartir es lo que nos hace crecer, Porque en cada pregunta hay una oportunidad y en cada respuesta, un nuevo reto. Sigamos jugando y ganando juntos! “",
                 "loginSuccessful": "Inicio de sesión correcto",
                 "logout": "Cerrar sesión",
+                "matches": "Partidas",
                 "numQuestions": "Número de preguntas",
                 "observe": "👁️ Observa la imagen.",
                 "or": "o",
@@ -49,7 +53,9 @@ i18n.use(initReactI18next).init({
                 "timePerQuestion": "Tiempo por pregunta",
                 "title": "WIChat",
                 "top_players": "Top 3 jugadores",
-                "username": "Nombre de usuario*"
+                "user-ranking": "Ranking de usuarios",
+                "username": "Nombre de usuario*",
+                "wrongAnswers": "Respuestas incorrectas"
             }
         },
         en: {
@@ -58,9 +64,12 @@ i18n.use(initReactI18next).init({
                 "all": "All",
                 "answer": "⏳ Answer as quickly as possible.",
                 "art": "Art",
+                "averageTime": "Average time",
+                "bestScore": "Best score",
                 "cinema": "Cinema",
                 "confirmPassword": "Confirm password*",
                 "countries": "Countries",
+                "correctAnswers": "Correct answers",
                 "createAccount": "Create account",
                 "email": "Email*",
                 "football": "Football",
@@ -77,6 +86,7 @@ i18n.use(initReactI18next).init({
                 "loginMessageInPanel": "“Knowledge is a never-ending journey, an adventure that enriches us every day. Learning, discovering, and sharing are what make us grow. Because in every question, there is an opportunity, and in every answer, a new challenge. Let's keep playing and winning together!“",
                 "loginSuccessful": "Login successful",
                 "logout": "Logout",
+                "matches": "Matches",
                 "numQuestions": "Number of questions",
                 "observe": "👁️ Observe the image.",
                 "or": "or",
@@ -97,7 +107,9 @@ i18n.use(initReactI18next).init({
                 "timePerQuestion": "Time per question",
                 "title": "WIChat",
                 "top_players": "Top 3 players",
-                "username": "Username*"
+                "user-ranking": "User ranking",
+                "username": "Username*",
+                "wrongAnswers": "Wrong answers"
             }
         }
     },
