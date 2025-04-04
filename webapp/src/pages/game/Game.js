@@ -14,7 +14,6 @@ import { motion } from "framer-motion"
 
 import { useTranslation } from "react-i18next"
 
-const TOTAL_TIME = 40
 
 const Game = () => {
   const { i18n } = useTranslation()
@@ -29,39 +28,75 @@ const Game = () => {
   const [isCorrect, setIsCorrect] = useState(null)
   const [score, setScore] = useState(0)
   const [isAnswered, setIsAnswered] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME)
+  const [timeLeft, setTimeLeft] = useState(30)
   const [progress, setProgress] = useState(100)
   const [isChatBoxVisible, setIsChatBoxVisible] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
   const timerRef = useRef(null)
   const [totalTimeUsed, setTotalTimeUsed] = useState(0)
   const [showRules, setShowRules] = useState(false)
-  const HINT_LIMIT = 5
-  const [hintsLeft, setHintsLeft] = useState(HINT_LIMIT)
+  const [hintsLeft, setHintsLeft] = useState(5)
   const [questionAnimationComplete, setQuestionAnimationComplete] = useState(false)
 
   const URL = "http://localhost:8004/"
   const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000"
   const loggedUsername = localStorage.getItem("username")
+  const [config, setConfig] = useState(null);
 
-
-  const fetchQuestions = useCallback(async () => {
-    try {
-      console.log(`${GATEWAY_URL}/questions/${25}`)
-      let n = 25
-      const response = await fetch(`${GATEWAY_URL}/questions/${n}`)
-      if (!response.ok) {
-        throw new Error("No se pudieron obtener las preguntas.")
-      }
-      const data = await response.json()
-      setQuestions(data)
-      setCurrentQuestion(data[0])
-      setIsLoading(false)
-    } catch (error) {
-      setIsLoading(false)
+  useEffect(() => {
+    const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
+    if (storedConfig) {
+      console.log("Configuración cargada desde localStorage:", storedConfig);
+      setConfig(storedConfig);
+      setHintsLeft(storedConfig.limitePistas || 5);
+    }else{
+      console.warn("No se encontró configuración en localStorage");
+      setConfig({
+        numPreguntas: 10,
+        tiempoPregunta: 30,
+        limitePistas: 3,
+        modoJuego: "Jugador vs IA",
+        categories:["all"]
+      });
+      setHintsLeft(3);
     }
-  }, [])
+  }, []);
 
+  useEffect(() => {
+    if (config && config.tiempoPregunta) {
+      setTimeLeft(config.tiempoPregunta);
+    }
+  }, [config]);
+  const TOTAL_TIME = config?.tiempoPregunta || 30;
+  useEffect(() => {
+    if (config) {
+      const fetchQuestions = async () => {
+        if (!config.categories || config.categories.length === 0) {
+          console.warn("No hay categorías seleccionadas, no se pueden obtener preguntas.");
+          return;
+        }
+        try {
+          console.log("Solicitando preguntas con categorías:", config.categories);
+          const categories = config.categories.includes("all") ? ["all"] : config.categories;
+          const baseUrl = `${GATEWAY_URL}/`;
+          const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
+          const url = new URL(queryString, baseUrl);
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error("No se pudieron obtener las preguntas.");
+          }
+          const data = await response.json();
+          setQuestions(data);
+          setCurrentQuestion(data[questionNumber]);
+          setTimeLeft(config.tiempoPregunta);
+          setIsLoading(false);
+        } catch (error) {
+          setIsLoading(false);
+        }
+      };
+      fetchQuestions();
+    }
+  }, [config]);
   const saveStats = async () => {
     try {
       const statsData = {
@@ -98,9 +133,6 @@ const Game = () => {
     }
   }, [])
 
-  useEffect(() => {
-    fetchQuestions()
-  }, [fetchQuestions])
 
   useEffect(() => {
     if (timeLeft <= 0 && !isAnswered) {
@@ -225,7 +257,7 @@ useEffect(() => {
           >
             <div className="question-section">
               <div className="questionNumber">
-                <h2>{`Pregunta ${questionNumber + 1}/25`}</h2>
+                <h2>{`Pregunta ${questionNumber + 1}/${config.numPreguntas}`}</h2>
                 <ArrowForwardIcon
                   titleAccess="Siguiente pregunta"
                   fontSize="1.5em"
