@@ -226,7 +226,9 @@ jobs:
   deploy:
     name: Deploy over SSH
     runs-on: ubuntu-latest
-    needs: [docker-push-userservice, docker-push-authservice, docker-push-llmservice, docker-push-gatewayservice, docker-push-webapp, docker-push-wikiquestionservice, docker-push-statsservice]
+    needs: [docker-push-userservice, docker-push-authservice, docker-push-llmservice, docker-push-gatewayservice,
+            docker-push-webapp, docker-push-wikiquestionservice, docker-push-statsservice,
+              docker-push-apiservice]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
