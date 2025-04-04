@@ -1,31 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './RankingWidget.css';
 import { useTranslation } from "react-i18next";
+import axios from 'axios';
 
 const RankingWidget = () => {
     const {t} = useTranslation();
+    const [users, setUsers] = useState([]);
 
-    const users = Array.from({ length: 10 }, (_, index) => ({
-        id: index + 1,
-        name: `Usuario ${index + 1}`,
-        profilePic: "https://i.pinimg.com/736x/8d/16/90/8d16902ae35c1e982c2990ff85fa11fb.jpg",
-        stats: {
-          gamesPlayed: Math.floor(Math.random() * 100),
-          correctAnswers: Math.floor(Math.random() * 80),
-          wrongAnswers: Math.floor(Math.random() * 20),
-          ratio: (Math.random() * 100).toFixed(2),
-          averageTime: `${(Math.random() * 10).toFixed(1)} s`,
-          bestScore: Math.floor(Math.random() * 1000),
-        },
-      }));
+    const GATEWAY_URL = 'http://localhost:8000';
 
+    const fetchRanking = async () => {
+        try{
+            console.log(`${GATEWAY_URL}/getranking`);
+            const response = await axios.get(`${GATEWAY_URL}/getranking`);
+            const data = response.data;
+            const usersInRanking = data.map((user) => ({
+                id: user._id,
+                name: user.username,
+                profilePic: "https://i.pinimg.com/736x/8d/16/90/8d16902ae35c1e982c2990ff85fa11fb.jpg", // TODO. Guardar avatar en BD
+                stats: {
+                    gamesPlayed: Math.floor(Math.random() * 100),
+                    correctAnswers: Math.floor(Math.random() * 80),
+                    wrongAnswers: Math.floor(Math.random() * 20),
+                    ratio: (Math.random() * 100).toFixed(2),
+                    averageTime: `${(Math.random() * 10).toFixed(1)} s`,
+                    bestScore: user.maxScore
+                }
+            }));
+            setUsers(usersInRanking);
+        }catch(error){
+            console.error('Error al obtener el ranking', error);
+        }
+    };
+
+    useEffect(()=> fetchRanking(), []);
 
 
   return (
     <div className='ranking-container'>
         <div className='ranking-header'>
             <h1 className='ranking-title'>{t('user-ranking')}</h1>
-            <p>Este es el ranking de usuarios cuyo récord de puntos es mayor. ¡Compite para entrar en el top! </p>
+            <p>{t("rankingInfo")}</p>
         </div>
         
         <div className='ranking-list'>

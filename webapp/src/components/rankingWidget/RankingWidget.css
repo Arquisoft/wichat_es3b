@@ -97,6 +97,7 @@
 .ranking-stat-item{
     display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 
 .ranking-stat-label{
