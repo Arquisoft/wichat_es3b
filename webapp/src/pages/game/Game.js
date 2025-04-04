@@ -38,7 +38,6 @@ const Game = () => {
   const [hintsLeft, setHintsLeft] = useState(5)
   const [questionAnimationComplete, setQuestionAnimationComplete] = useState(false)
 
-  const URL = "http://localhost:8004/"
   const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000"
   const loggedUsername = localStorage.getItem("username")
   const [config, setConfig] = useState(null);
@@ -79,7 +78,7 @@ const Game = () => {
           console.log("Solicitando preguntas con categorías:", config.categories);
           const categories = config.categories.includes("all") ? ["all"] : config.categories;
           const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
-          const response = await fetch(`${URL}${queryString}`);
+          const response = await fetch(`${GATEWAY_URL}${queryString}`);
           if (!response.ok) {
             throw new Error("No se pudieron obtener las preguntas.");
           }
