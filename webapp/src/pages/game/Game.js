@@ -44,7 +44,6 @@ const Game = () => {
   const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000"
   const loggedUsername = localStorage.getItem("username")
 
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
   const fetchQuestions = useCallback(async () => {
     try {
@@ -110,11 +109,6 @@ const Game = () => {
       setIncorrectAnswers((prev) => prev + 1)
       const timeUsed = TOTAL_TIME
       setTotalTimeUsed((prev) => prev + timeUsed)
-
-      if (questionNumber + 1 >= questions.length) {
-        saveStats()
-        setShowSummary(true)
-      }
       return
     }
 
@@ -158,14 +152,21 @@ const Game = () => {
       setIsCorrect(false)
       setIncorrectAnswers((prev) => prev + 1)
     }
-
-    if (questionNumber + 1 >= questions.length) {
-      saveStats()
-      setShowSummary(true)
-    }
     const timeUsed = TOTAL_TIME - timeLeft
     setTotalTimeUsed((prev) => prev + timeUsed)
   }
+
+const hasSavedStats = useRef(false);
+
+useEffect(() => {
+  if (questionNumber + 1 >= questions.length && !hasSavedStats.current) {
+    if (isAnswered || timeLeft <= 0) {
+      saveStats();
+      setShowSummary(true);
+      hasSavedStats.current = true;
+    }
+  }
+}, [isAnswered, timeLeft, questionNumber, questions.length]);
 
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60)

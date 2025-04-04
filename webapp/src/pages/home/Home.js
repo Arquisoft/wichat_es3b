@@ -93,7 +93,7 @@ const Home = () => {
                 <br />
                 {t("answer")}
                 <br />
-                {t("hints")}
+                {t("hintInfo")}
               </Typography>
             </Box>
           </Grid>

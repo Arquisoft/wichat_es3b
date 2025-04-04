@@ -116,7 +116,7 @@ const Login = ({ handleToggleView }) => {
                 />
                 {error && <p className="error">{error}</p>}
               </div>
-              <PhotoPanel text={t("welcomeMessage")} />
+              <PhotoPanel text={t("loginMessageInPanel")} />
             </div>
         )}
       </div>

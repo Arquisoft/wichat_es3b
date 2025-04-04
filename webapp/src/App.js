@@ -5,7 +5,8 @@ import Home from "./pages/home/Home.js";
 import PerfilPage from "./pages/profilePage/PerfilPage.js";
 import { Route, Routes } from "react-router-dom";
 import Game from "./pages/game/Game.js";
-import PrivateRoute from "./components/routes/PrivateRoute.js"; // Importar el componente
+import PrivateRoute from "./components/routes/PrivateRoute.js";
+import Settings from "./pages/settings/Settings.js";
 
 function App() {
   return (
@@ -26,6 +27,14 @@ function App() {
         element={
           <PrivateRoute>
             <PerfilPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <PrivateRoute>
+            <Settings />
           </PrivateRoute>
         }
       />

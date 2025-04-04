@@ -1,0 +1,90 @@
+.gameSettingsSidebar {
+  position: absolute;
+  top: 0;
+  left: -25%;
+  width: 25%;
+  height: 100%;
+  background-color: #f8f9fa;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-toggle-top-right {
+  position: absolute;
+  top: 10px;
+  right: 50px;
+}
+
+.gameSettingsSidebar.open {
+  transform: translateX(100%);
+}
+
+.gameSettingsSidebar-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: calc(100% - 2rem);
+  box-sizing: border-box;
+  overflow-y: auto; 
+}
+
+.sidebar-header {
+  position: relative;
+}
+
+.gameSettingsSidebar h2 {
+  margin-bottom: 1.5rem;
+  color: var(--color-primario);
+  font-size: var(--font-size-xl);
+  text-align: center;
+  font-style: normal;
+  font-weight: bold;
+}
+
+.gameSettingsSidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.gameSettingsSidebar-section label {
+  font-weight: bold;
+  color: #333;
+}
+
+.sidebar-select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: white;
+  font-size: var(--font-size-md);
+}
+
+.sidebar-button-container {
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.sidebar-button-container button {
+  width: 50%;
+}
+
+/* Para pantallas pequeñas */
+@media (max-height: 700px) {
+  .gameSettingsSidebar-content {
+    gap: 1rem; /* Reducir espacio entre elementos */
+    padding: 1rem;
+  }
+  
+  .gameSettingsSidebar-section {
+    margin-bottom: 0.5rem;
+  }
+  
+  .sidebar-button-container {
+    margin: 0.5rem 0;
+  }
+}
