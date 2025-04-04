@@ -7,7 +7,7 @@ on:
   release:
     types: [published]
 
-jobs:
+jobs: 
   unit-tests:
     runs-on: ubuntu-latest
     steps:
@@ -15,6 +15,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Checkout branch
+        run: git checkout deployment_branch
+      - name: Pull branch
+        run: git pull origin deployment_branch
       - name: Set CI to false
         run: echo "CI=false" >> $GITHUB_ENV
       - name: Install Dependencies
@@ -85,18 +89,21 @@ jobs:
       packages: write
     needs: [e2e-tests]
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-    - name: Publish to Registry
-      uses: elgohr/Publish-Docker-Github-Action@v5
-      with:
-          name: arquisoft/wichat_es3b/authservice
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: ghcr.io
-          workdir: users/authservice
-          platforms: linux/amd64,linux/arm64
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        with:
+            name: arquisoft/wichat_es3b/authservice
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+            registry: ghcr.io
+            workdir: users/authservice
+            platforms: linux/amd64,linux/arm64
+            buildargs: MONGODB_URI
 
   docker-push-userservice:
     name: Push user service Docker Image to GitHub Packages
@@ -109,12 +116,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
         with:
           name: arquisoft/wichat_es3b/userservice
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
           workdir: users/userservice
+          buildargs: MONGODB_URI
 
   docker-push-statsservice:
     name: Push stats service Docker Image to GitHub Packages
@@ -127,12 +137,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
         with:
           name: arquisoft/wichat_es3b/statsservice
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
           workdir: users/statsservice
+          buildargs: MONGODB_URI
 
   docker-push-llmservice:
     name: Push llm service Docker Image to GitHub Packages
@@ -215,12 +228,15 @@ jobs:
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy over SSH
+        env: 
+          MONGO_URI: ${{ secrets.MONGODB_URI }}
         uses: fifsky/ssh-action@master
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           user: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           command: |
-            wget https://raw.githubusercontent.com/arquisoft/wichat_es3b/master/docker-compose.yml -O docker-compose.yml
+            wget https://raw.githubusercontent.com/arquisoft/wichat_es3b/deployment_branch/docker-compose.yml -O docker-compose.yml
+            echo "MONGODB_URI= \"$MONGO_URI\"" > .env
             docker compose --profile prod down
             docker compose --profile prod up -d --pull always

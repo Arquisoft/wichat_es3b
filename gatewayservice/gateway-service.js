@@ -37,7 +37,7 @@ app.post("/login", async (req, res) => {
     res.json(authResponse.data);
   } catch (error) {
     res
-      .status(error.response.status)
+      .status(error?.response?.status)
       .json({ error: error.response.data.error });
   }
 });
