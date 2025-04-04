@@ -78,10 +78,8 @@ const Game = () => {
         try {
           console.log("Solicitando preguntas con categorías:", config.categories);
           const categories = config.categories.includes("all") ? ["all"] : config.categories;
-          const baseUrl = `${GATEWAY_URL}/`;
           const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
-          const url = new URL(queryString, baseUrl);
-          const response = await fetch(url);
+          const response = await fetch(`${URL}${queryString}`);
           if (!response.ok) {
             throw new Error("No se pudieron obtener las preguntas.");
           }
