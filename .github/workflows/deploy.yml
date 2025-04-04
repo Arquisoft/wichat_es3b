@@ -174,10 +174,6 @@ jobs:
     needs: [e2e-tests]
     steps:
       - uses: actions/checkout@v4
-      - name: Update OpenAPI configuration
-        run: |
-          DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}
-          sed -i "s/SOMEIP/${DEPLOY_HOST}/g" gatewayservice/openapi.yaml
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
@@ -206,7 +202,7 @@ jobs:
           workdir: wikiquestionservice
 
   docker-push-apiservice:
-    name: Push apiservice Docker Image to GitHub Packages
+    name: Push api service Docker Image to GitHub Packages
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -214,6 +210,10 @@ jobs:
     needs: [ e2e-tests ]
     steps:
       - uses: actions/checkout@v4
+      - name: Update OpenAPI configuration
+        run: |
+          DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}
+          sed -i "s/SOMEIP/${DEPLOY_HOST}/g" apiservice/openapi.yaml
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:

@@ -89,7 +89,10 @@ services:
     container_name: apiservice-wichat_es3b
     image: ghcr.io/arquisoft/wichat_es3b/apiservice:deployment_branch
     profiles: [ "dev", "prod" ]
-    build: ./apiservice
+    build:
+      context: ./apiservice
+      args:
+        API_URI: ${API_URI}
     depends_on:
       - gatewayservice
     ports:

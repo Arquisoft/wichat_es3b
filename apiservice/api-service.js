@@ -10,7 +10,7 @@ const app = express();
 const port = 8006; // Nuevo puerto para el API service
 
 // URL del gateway service
-const gatewayServiceUrl = process.env.GATEWAY_SERVICE_URL || "http://localhost:8000";
+const gatewayServiceUrl = process.env.GATEWAY_SERVICE_URL || "http://xxxxxx:8000";
 
 app.use(cors());
 app.use(express.json());
