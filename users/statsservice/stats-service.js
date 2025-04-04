@@ -25,11 +25,6 @@ app.post('/savestats', async (req, res) => {
       return res.status(400).json({ error: 'Faltan datos requeridos' });
     }
 
-    /*const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }*/
-
     let stats = await Stats.findOne({ username }); 
 
     if (!stats) {

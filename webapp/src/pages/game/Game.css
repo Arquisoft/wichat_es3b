@@ -107,9 +107,10 @@ main {
 
 .question-section h1 {
   font-size: calc(var(--font-size-xl) * 0.9);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   max-height: 4.5em;
   overflow-y: auto;
+  transform-origin: center;
 }
 
 .question-section h2 {
@@ -128,6 +129,7 @@ main {
   min-height: 150px;
   max-height: 250px;
   overflow: hidden;
+  margin-bottom: 1em;
 }
 
 .question-image img {
@@ -163,6 +165,10 @@ main {
   width: 100%;
   margin-top: 0.5rem;
   padding-bottom: 0.5rem;
+}
+
+.timer-active {
+  animation: pulse 1s ease-in-out;
 }
 
 #progressBar {
@@ -316,6 +322,8 @@ main {
   background-color: var(--color-hover-boton);
 }
 
+
+
 @media (max-width: 1200px) {
   .game-layout {
     flex-direction: column;
@@ -411,3 +419,16 @@ main {
     max-height: 3.6em;
   }
 }
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+

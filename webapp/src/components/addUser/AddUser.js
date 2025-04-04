@@ -8,6 +8,7 @@ import PhotoPanel from "../photoPanel/PhotoPanel";
 import "../login/Login.css";
 import "../../assets/global.css";
 import { useTranslation } from "react-i18next";
+import AuthHeader from '../authHeader/AuthHeader'
 
 const apiEndpoint = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
 
@@ -19,7 +20,7 @@ const AddUser = ({ handleToggleView }) => {
   const [passwordConfirm, setPasswordConfirm] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState("");
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   const [error, setError] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -40,7 +41,7 @@ const AddUser = ({ handleToggleView }) => {
   };
 
   const toggleShowPasswordConfirm = () => {
-    setShowPasswordConfirm(!showPassword);
+    setShowPasswordConfirm(!showPasswordConfirm);
   };
 
   const handleCloseSnackbar = () => {
@@ -53,6 +54,7 @@ const AddUser = ({ handleToggleView }) => {
         text={t("panel_text")}
       />
       <div className="form">
+        <AuthHeader></AuthHeader>
         <h1>{t("createAccount")}</h1>
         <h2>{t("introduceData")}</h2>
 
