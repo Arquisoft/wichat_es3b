@@ -30,7 +30,8 @@ const RankingWidget = () => {
         
         <div className='ranking-list'>
             {users.map((user, index) => (
-                <div className='ranking-item'>
+                <div className='ranking-item'
+                    style={{ animationDelay: `${index * 0.4}s` }}>
                     <div className='ranking-position'>{index + 1}</div>
                     <div className='ranking-user-info'>
                         <img src={user.profilePic} alt='Avatar' className='ranking-profile-pic'/>

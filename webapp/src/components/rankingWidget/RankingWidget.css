@@ -32,7 +32,7 @@
 .ranking-list{
     display: flex;
     flex-direction: column;
-    gap: 0.75em;
+    gap: 1em;
 }
 
 .ranking-item{
@@ -41,7 +41,10 @@
     padding: 0.75em;
     border-radius: 8px;
     background-color: #f5f9ff;
-    transition: transform 0.2 ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+    will-change: transform;
 }
 
 .ranking-item:hover{
@@ -125,6 +128,17 @@
   @media (max-width: 400px) {
     .ranking-user-stats {
       grid-template-columns: 1fr;
+    }
+  }
+
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
   
