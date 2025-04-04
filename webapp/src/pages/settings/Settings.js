@@ -15,32 +15,58 @@ import literatureCategory from "../../assets/img/categories/literatureCategory.j
 import countriesCategory from "../../assets/img/categories/countriesCategory.jpg";
 import artCategory from "../../assets/img/categories/artCategory.jpg";
 import allCategory from "../../assets/img/categories/allCategory.jpg";
+import {useNavigate} from "react-router-dom";
 
 const Settings = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const categories = useMemo(
     () => [
-      { id: "football", name: t("football"), imageSrc: footballCategory },
-      { id: "cinema", name: t("cinema"), imageSrc: cinemaCategory },
-      { id: "literature", name: t("literature"), imageSrc: literatureCategory },
-      { id: "countries", name: t("countries"), imageSrc: countriesCategory },
-      { id: "art", name: t("art"), imageSrc: artCategory },
-      { id: "all", name: t("all"), imageSrc: allCategory },
+      { id: "football", name: t("football"), imageSrc: footballCategory, value: "clubes" },
+      { id: "cinema", name: t("cinema"), imageSrc: cinemaCategory, value: "cine" },
+      { id: "literature", name: t("literature"), imageSrc: literatureCategory , value: "literatura"},
+      { id: "countries", name: t("countries"), imageSrc: countriesCategory , value: "paises"},
+      { id: "art", name: t("art"), imageSrc: artCategory , value: "arte" },
+      { id: "all", name: t("all"), imageSrc: allCategory, value: "all" },
     ],
     [t]
   );
 
-  const [selectedCategories, setSelectedCategories] = useState(["all"]);
+  const [selectedCategories, setSelectedCategories] = useState(() => {
+    const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
+    return storedConfig?.categories || [];
+  })
 
-  const toggleCategory = (categoryId) => {
+  useEffect(() => {
+    const config = JSON.parse(localStorage.getItem("quizConfig")) || {};
+    config.categories = selectedCategories;
+    localStorage.setItem("quizConfig", JSON.stringify(config));
+  }, [selectedCategories]);
+  const [, forceUpdate] = useState(0);
+  useEffect(() => {
+    const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
+    if (storedConfig?.categories) {
+      setSelectedCategories(storedConfig.categories);
+      forceUpdate(prev => prev + 1);
+    }
+  }, []);
+
+  useEffect(() => {
+    const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
+    if (storedConfig?.categories) {
+      setSelectedCategories(storedConfig.categories);
+    }
+  }, []);
+
+  const toggleCategory = (categoryValue) => {
     setSelectedCategories((prevCategories) => {
-      if (categoryId === "all") {
+      if (categoryValue === "all") {
         return prevCategories.includes("all") ? prevCategories : ["all"];
       }
 
-      let newCategories = prevCategories.includes(categoryId)
-        ? prevCategories.filter((id) => id !== categoryId)
-        : [...prevCategories.filter((id) => id !== "all"), categoryId];
+      let newCategories = prevCategories.includes(categoryValue)
+        ? prevCategories.filter((id) => id !== categoryValue)
+        : [...prevCategories.filter((id) => id !== "all"), categoryValue];
 
       // Si se deselecciona la última categoría, evitarlo
       if (newCategories.length === 0) {
@@ -50,6 +76,12 @@ const Settings = () => {
       return newCategories;
     });
   };
+
+  useEffect(() => {
+    const config = JSON.parse(localStorage.getItem("quizConfig")) || {};
+    config.categories = selectedCategories;
+    localStorage.setItem("quizConfig", JSON.stringify(config));
+  }, [selectedCategories]);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -111,15 +143,16 @@ const Settings = () => {
                   <CategoryCard
                     name={category.name}
                     imageSrc={category.imageSrc}
-                    isSelected={selectedCategories.includes(category.id)}
-                    onClick={() => toggleCategory(category.id)}
+                    isSelected={selectedCategories.includes(category.value)}
+                    onClick={() => toggleCategory(category.value)}
                   />
                 </motion.div>
               ))}
             </motion.div>
 
             <div className="gameButtonPanel">
-              <BaseButton text={t("play")} />
+              <BaseButton text={t("play")}
+                          onClick={() => navigate("/play")}/>
             </div>
           </div>
         </div>

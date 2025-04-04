@@ -1,16 +1,17 @@
 const axios = require('axios');
 const Question = require('./question');
 class WikidataQueryService {
-    constructor(categoryName, entity, properties, questions,types,img) {
+    constructor(categoryName, entity, properties, questions, types, img, questionsPerCategory) {
         this.wikidataEndpoint = "https://query.wikidata.org/sparql";
         this.categoryName = categoryName;
         this.entity = entity;
         this.properties = properties;
         this.questions = questions;
         this.entitiesArray = [];
-        this.types=types;
-        this.questionsArray=[];
-        this.img=img;
+        this.types = types;
+        this.questionsArray = [];
+        this.img = img;
+        this.questionsPerCategory = questionsPerCategory;
     }
 
     async fetchData(sparqlQuery) {
@@ -23,6 +24,7 @@ class WikidataQueryService {
             throw error;
         }
     }
+
     convertirValorPorTipo(valor, tipo) {
         if (tipo === "date") {
             const fecha = new Date(valor);
@@ -54,7 +56,6 @@ class WikidataQueryService {
                     return { id: entityId, label: entityLabel };
                 })
                 .filter(entidad => entidad.label && entidad.label !== entidad.id);
-
         } catch (error) {
             console.error('Error al obtener datos de Wikidata:', error);
             this.entitiesArray = [];
@@ -71,58 +72,83 @@ class WikidataQueryService {
             console.warn("⚠️ No hay entidades disponibles para generar preguntas.");
             return [];
         }
-        for (const entity of this.entitiesArray) {
-            if(this.questionsArray.length>=5){
-                return;
+
+        let entidadesProcesadas = 0;
+
+        while (this.questionsArray.length < this.questionsPerCategory) {
+            if (entidadesProcesadas >= this.entitiesArray.length) {
+                console.log("No se alcanzaron suficientes entidades, buscando más...");
+                await this.obtenerIdsDeWikidata(50);
             }
-            const entityName = entity.label;
-            const indiceAleatorio = Math.floor(Math.random() * this.questions.length);
-            const descripcion = await this.generarDescripcion(entity.id, indiceAleatorio);
-            if (descripcion.length === 0) {
-                continue;
-            }
-            let entidadInvalida = false;
-            const preguntaAleatoria = this.questions[indiceAleatorio];
-            const preguntasModificadas = {};
-            const respuestaCorrecta={}
-            const respuestasIncorrectas={}
-            for (const idioma in preguntaAleatoria) {
-                if (preguntaAleatoria.hasOwnProperty(idioma)) {
-                    let preguntaEnIdioma = preguntaAleatoria[idioma];
-                    preguntaEnIdioma = preguntaEnIdioma.replace("%", entityName);
-                    preguntasModificadas[idioma] = preguntaEnIdioma;
-                }
-                const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, this.properties[indiceAleatorio],this.types[indiceAleatorio],idioma);
-                if (valoresDePropiedad.length === 0) {
-                    entidadInvalida = true;
+
+            for (const entity of this.entitiesArray) {
+                if (this.questionsArray.length >= this.questionsPerCategory) {
                     break;
                 }
-                respuestaCorrecta[idioma] = valoresDePropiedad[0];
-                if (this.validar(respuestaCorrecta)) {
-                    entidadInvalida = true;
-                    break;
+
+                const entityName = entity.label;
+                const indiceAleatorio = Math.floor(Math.random() * this.questions.length);
+                const descripcion = await this.generarDescripcion(entity.id, indiceAleatorio);
+                if (descripcion.length === 0) {
+                    continue;
                 }
-                respuestasIncorrectas[idioma]= await this.obtenerRespuestasIncorrectas(entity.id, this.properties[indiceAleatorio], valoresDePropiedad,this.types[indiceAleatorio],idioma);
-                if (respuestasIncorrectas[idioma].some(respuesta => this.validar(respuesta))) {
-                    entidadInvalida = true;
-                    break;
+
+                let entidadInvalida = false;
+                const preguntaAleatoria = this.questions[indiceAleatorio];
+                const preguntasModificadas = {};
+                const respuestaCorrecta = {};
+                const respuestasIncorrectas = {};
+
+                for (const idioma in preguntaAleatoria) {
+                    if (preguntaAleatoria.hasOwnProperty(idioma)) {
+                        let preguntaEnIdioma = preguntaAleatoria[idioma];
+                        preguntaEnIdioma = preguntaEnIdioma.replace("%", entityName);
+                        preguntasModificadas[idioma] = preguntaEnIdioma;
+                    }
+
+                    const valoresDePropiedad = await this.obtenerValoresDePropiedad(entity.id, this.properties[indiceAleatorio], this.types[indiceAleatorio], idioma);
+                    if (valoresDePropiedad.length === 0) {
+                        entidadInvalida = true;
+                        break;
+                    }
+
+                    respuestaCorrecta[idioma] = valoresDePropiedad[0];
+                    if (this.validar(respuestaCorrecta)) {
+                        entidadInvalida = true;
+                        break;
+                    }
+
+                    respuestasIncorrectas[idioma] = await this.obtenerRespuestasIncorrectas(entity.id, this.properties[indiceAleatorio], valoresDePropiedad, this.types[indiceAleatorio], idioma);
+                    if (respuestasIncorrectas[idioma].some(respuesta => this.validar(respuesta))) {
+                        entidadInvalida = true;
+                        break;
+                    }
+
+                    if (respuestasIncorrectas[idioma].length !== 3) {
+                        entidadInvalida = true;
+                        break;
+                    }
                 }
-                if (respuestasIncorrectas[idioma].length !== 3) {
-                    entidadInvalida = true;
+
+                if (entidadInvalida) {
+                    continue;
+                }
+
+                const imgprueba = await this.obtenerValoresDePropiedad(entity.id, this.img[0]);
+                if (!imgprueba || imgprueba.length === 0) continue;
+
+                const nuevaPregunta = new Question(respuestaCorrecta, preguntasModificadas, respuestasIncorrectas, descripcion, imgprueba);
+                this.questionsArray.push(nuevaPregunta);
+                entidadesProcesadas++;
+
+                if (this.questionsArray.length >= this.questionsPerCategory) {
                     break;
                 }
             }
-            if (entidadInvalida) {
-                continue;
-            }
-            const imgprueba = await this.obtenerValoresDePropiedad(entity.id,this.img[0]);
-            if (!imgprueba || imgprueba.length === 0) continue;
-            const nuevaPregunta = new Question(respuestaCorrecta, preguntasModificadas, respuestasIncorrectas, descripcion, imgprueba);
-            this.questionsArray.push(nuevaPregunta);
         }
     }
 
-    async obtenerValoresDePropiedad(id, property,tipo,idioma) {
+    async obtenerValoresDePropiedad(id, property, tipo, idioma) {
         const sparqlQuery = `
         SELECT ?propertyValueLabel WHERE {
             wd:${id} wdt:${property} ?propertyValue.
@@ -141,11 +167,12 @@ class WikidataQueryService {
             return [];
         }
     }
-    async obtenerRespuestasIncorrectas(entityId, property, valoresDePropiedadCorrectos,tipo,idioma) {
+
+    async obtenerRespuestasIncorrectas(entityId, property, valoresDePropiedadCorrectos, tipo, idioma) {
         let respuestasIncorrectas = [];
         for (const otherEntity of this.entitiesArray) {
             if (otherEntity.id !== entityId) {
-                const valoresDePropiedad = await this.obtenerValoresDePropiedad(otherEntity.id, property,tipo,idioma);
+                const valoresDePropiedad = await this.obtenerValoresDePropiedad(otherEntity.id, property, tipo, idioma);
                 for (const valor of valoresDePropiedad) {
                     if (!valoresDePropiedadCorrectos.includes(valor) && !respuestasIncorrectas.includes(valor)) {
                         respuestasIncorrectas.push(valor);
@@ -167,7 +194,6 @@ class WikidataQueryService {
 
         try {
             const data = await this.fetchData(sparqlQuery);
-
             if (data.results.bindings.length > 0) {
                 return data.results.bindings[0].propertyLabel.value;
             } else {
@@ -178,6 +204,7 @@ class WikidataQueryService {
             return property;
         }
     }
+
     validar(respuesta) {
         const regex = /^[Qq].*/i;
         return regex.test(respuesta);
@@ -191,7 +218,7 @@ class WikidataQueryService {
             }
             const property = this.properties[i];
             const tipo = this.types[i];
-            const valoresDePropiedad = await this.obtenerValoresDePropiedad(entityId, property,tipo,"es");
+            const valoresDePropiedad = await this.obtenerValoresDePropiedad(entityId, property, tipo, "es");
             if (valoresDePropiedad.length > 0) {
                 const etiquetaPropiedad = await this.obtenerEtiquetaDePropiedad(property);
                 if (this.validar(valoresDePropiedad[0])) {
@@ -205,7 +232,6 @@ class WikidataQueryService {
         }
         return descripcion;
     }
-
 }
 
 module.exports = WikidataQueryService;
