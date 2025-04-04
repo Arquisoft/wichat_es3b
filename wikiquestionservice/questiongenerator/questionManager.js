@@ -16,7 +16,10 @@ class QuestionManager {
             if (wikidataService) {
                 const promise = wikidataService.generateQuestions()
                     .then(() => {
-                        const preguntas = wikidataService.getQuestions();
+                        const preguntas = wikidataService.getQuestions().map(pregunta => ({
+                            ...pregunta,
+                            categoria: categoryName
+                        }));
                         console.log(`✅ ${preguntas.length} preguntas generadas para '${categoryName}'`);
                         return preguntas;
                     })
@@ -38,6 +41,8 @@ class QuestionManager {
 
         console.log(`📌 Total de preguntas generadas: ${this.questions.length}`);
         this.shuffleQuestions();
+
+        return this.questions;
     }
 
 

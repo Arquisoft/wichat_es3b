@@ -118,12 +118,16 @@ services:
     container_name: wikiquestionservice-wichat_es3b
     build: ./wikiquestionservice
     image: ghcr.io/arquisoft/wichat_es3b/wikiquestionservice:latest
-    profiles: ["dev", "prod"]
+    profiles: [ "dev", "prod" ]
+    depends_on:
+      - mongodb 
     ports:
       - "8004:8004"
     networks:
       - mynetwork
     restart: always
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
 
   prometheus:
     image: prom/prometheus
