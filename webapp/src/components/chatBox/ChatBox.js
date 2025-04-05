@@ -3,6 +3,7 @@ import "./ChatBox.css";
 import ChatBubble from "../chatBubble/ChatBubble";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import axios from "axios";
+import { useTranslation } from "react-i18next"
 
 const ChatBox = ({
   question,
@@ -11,6 +12,7 @@ const ChatBox = ({
   hintsLeft,
   setHintsLeft,
 }) => {
+  const {t} = useTranslation();
   const [messages, setMessages] = useState([]);
   const [hint, setHint] = useState("");
   const [isLoadingHint, setIsLoadingHint] = useState(false);
@@ -54,11 +56,11 @@ const ChatBox = ({
       setHintsLeft((prev) => prev - 1);
     } catch (error) {
       console.error("Error al obtener pista:", error);
-      setHint("No se pudo obtener una pista en este momento.");
+      setHint(t('hintError'));
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          text: "No se pudo obtener una pista en este momento.",
+          text: t('hintError'),
           isSender: false,
         },
       ]);
@@ -99,7 +101,7 @@ const ChatBox = ({
   return (
     <div className="chat-box">
       <div className="chat-box-header">
-        <span>Pistas disponibles: </span>
+        <span>{`${t('hintsLeft')}: `} </span>
         <span className={`hints-counter ${hintsLeft <= 0 ? "no-hints" : ""}`}>
           {hintsLeft}
         </span>
@@ -119,8 +121,8 @@ const ChatBox = ({
           onChange={(e) => setInput(e.target.value)}
           placeholder={
             hintsLeft > 0
-              ? "Pídele una pista a la IA..."
-              : "No te quedan pistas"
+              ? t('askAIForHints')
+              : t('noHintsLeft')
           }
           onKeyDown={handleKeyPress}
           disabled={hintsLeft <= 0}
@@ -132,7 +134,7 @@ const ChatBox = ({
         >
           <ArrowUpwardIcon
             titleAccess={
-              hintsLeft > 0 ? "Envía un mensaje" : "No te quedan pistas"
+              hintsLeft > 0 ? t('askAIForHints') : t('noHintsLeft')
             }
             fontSize="inherit"
             id="sendMessageToAIButton"
