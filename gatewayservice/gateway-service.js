@@ -169,15 +169,19 @@ app.get("/ratios-per-month/:username", async (req, res) => {
 });
 
 // Question endpoints
-app.get('/questions/:n', async (req, res) => {
-    try {
-        const { n } = req.params;
-        console.log(`${wikiQuestionServiceUrl}/questions`);
-        const response = await axios.get(`${wikiQuestionServiceUrl}/questions?n=${n}`);
-        res.json(response.data);
-    } catch (error) {
-        res.status(error.response ? error.response.status : 500).json({ error: error.message });
-    }
+app.get('/questions', async (req, res) => {
+  try {
+    const { n = 10, topic = "all" } = req.query;
+
+    const fullURL = `${wikiQuestionServiceUrl}/questions?n=${n}&topic=${encodeURIComponent(topic)}`;
+    console.log("Redirigiendo a:", fullURL);
+
+    const response = await axios.get(fullURL);
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error al obtener preguntas:", error.message);
+    res.status(error.response?.status || 500).json({ error: error.message });
+  }
 });
 
 // Start the gateway service

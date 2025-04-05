@@ -6,71 +6,59 @@ const QuestionManager = require("./questiongenerator/questionManager");
 
 const app = express();
 const port = 8004;
-let questionsLoaded = false;
 
 const questionManager = new QuestionManager();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use(cors());
 
-app.use((req, res, next) => {
-  if (!questionsLoaded) {
-    return res.status(500).json({
-      error:
-        "Las preguntas aún no han sido cargadas. Por favor, inténtalo de nuevo más tarde.",
-    });
-  }
-  next();
-});
-
 app.get("/questions", async (req, res) => {
-  const { n = 10} = req.query;
+  const { n = 25, topic = "all" } = req.query;
   const numQuestions = parseInt(n, 10);
-  if (numQuestions > 25) {
+
+  if (numQuestions > 30) {
     return res.status(400).json({ error: "El límite de preguntas es 25" });
   }
+
+  const validCategories = ["paises", "cine", "clubes", "literatura", "arte", "all"];
+  let topics = topic.split(",").filter(t => validCategories.includes(t));
+
+  if (topics.length === 0) {
+    return res.status(400).json({ error: "No se proporcionaron categorías válidas." });
+  }
+
   try {
-    await questionManager.loadAllQuestions();
+    if (topics.includes("all")|| topics.length === 0) {
+      topics = ["all"];
+    }
 
-    const allQuestions = questionManager.questions;
+    const selectedQuestions = await questionManager.loadAllQuestions(topics, numQuestions);
 
-    const limitedQuestions = allQuestions.slice(0, numQuestions).map((q) => {
-      const questionText = q.obtenerPreguntaPorIdioma();
-      const respuestas = q.obtenerRespuestas();
-      return {
-        pregunta: questionText,
-        respuestaCorrecta: q.respuestaCorrecta,
-        respuestas: respuestas,
-        descripcion: q.descripcion,
-        img: q.obtenerImg(),
-      };
-    });
+    const formattedQuestions = selectedQuestions.map((q) => ({
+      pregunta: q.obtenerPreguntaPorIdioma(),
+      respuestaCorrecta: q.respuestaCorrecta,
+      respuestas: q.obtenerRespuestas(),
+      descripcion: q.descripcion,
+      img: q.obtenerImg(),
+    }));
 
-    res.json(limitedQuestions);
+    res.json(formattedQuestions);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
-const server = app.listen(port, async () => {
-  console.log(`Question Service listening at http://localhost:${port}`);
-  try {
-    await questionManager.loadAllQuestions();
-    questionsLoaded = true;
-    console.log("Generadores de preguntas cargados con éxito!");
-  } catch (error) {
-    console.error("Error al cargar los generadores de preguntas:", error);
-  }
+const server = app.listen(port, () => {
+  console.log(`🚀 Question Service listening at http://localhost:${port}`);
 });
 
 cron.schedule("0 3 * * *", async () => {
   try {
     await questionManager.loadAllQuestions();
-    console.log("Generadores de preguntas recargados.");
+    console.log("🔄 Generadores de preguntas recargados automáticamente.");
   } catch (error) {
-    console.error("Error al recargar los generadores de preguntas:", error);
+    console.error("❌ Error al recargar los generadores de preguntas:", error);
   }
 });
 
