@@ -36,12 +36,16 @@ describe("AddUser component", () => {
 
         userEvent.type(screen.getByLabelText(/Correo electrónico*o/i), "test@example.com");
         userEvent.type(screen.getByLabelText(/Nombre de usuario*/i), "testuser");
-        // Utiliza `getByLabelText` para los campos de contraseña con el texto exacto
-        userEvent.type(screen.getByLabelText(/Contraseña*/i, { exact: false }), "123456");
-        userEvent.type(screen.getByLabelText(/Confirmar contraseña*/i, { exact: false }), "654321");
+        // Usamos queryAllByText para encontrar todos los elementos con texto "Contraseña"
+        const passwordFields = screen.queryAllByText(/Contraseña*/i);
+
+        // Asumimos que el primer campo corresponde a la "Contraseña" y el segundo a "Confirmar contraseña"
+        userEvent.type(passwordFields[0].closest('label').nextElementSibling, "123456");
+        userEvent.type(passwordFields[1].closest('label').nextElementSibling, "654321");
 
         userEvent.click(screen.getByText(/Crear cuenta*/i));
 
-        expect(await screen.findByText(/Las contraseñas no coinciden/i)).toBeInTheDocument(); // asegúrate que `passwordsDoNotMatch` esté traducido correctamente
+        // Verifica que el mensaje de error aparezca si las contraseñas no coinciden
+        expect(await screen.findByText(/Las contraseñas no coinciden/i)).toBeInTheDocument();
     });
 });
