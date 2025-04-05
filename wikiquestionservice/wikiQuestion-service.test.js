@@ -1,5 +1,6 @@
+const server = require("./wikiQuestion-service");
+const request = require("supertest");
 const CategoryLoader = require("./questiongenerator/categoryLoader");
-
 describe('Wikidata Service', () => {
     /* Test para combrobar que todo va bien
      */
@@ -157,6 +158,25 @@ describe('Wikidata Service', () => {
     });
 
 
+    it("should return 400 if the number of questions is more than 30", async () => {
+        const response = await request(server).get("/questions?n=31");
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("El límite de preguntas es 30");
+    });
 
+    it("should return 400 if no valid categories are provided", async () => {
+        const response = await request(server).get("/questions?topic=invalidCategory");
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("No se proporcionaron categorías válidas.");
+    });
 
+    it("should return questions for valid categories", async () => {
+        const response = await request(server).get("/questions?topic=paises,cine&n=5");
+        expect(response.status).toBe(200);
+        expect(response.body).toBeInstanceOf(Array);
+    }, 30000);
+
+});
+afterAll(async () => {
+    await new Promise(resolve => server.close(resolve));
 });
