@@ -8,7 +8,7 @@ const RankingWidget = () => {
   const { t, ready } = useTranslation();
   const [users, setUsers] = useState([]);
 
-  const GATEWAY_URL = "http://localhost:8000";
+  const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
 
   const fetchRanking = async () => {
     try {
