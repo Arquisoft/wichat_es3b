@@ -21,11 +21,11 @@ const RankingWidget = () => {
         profilePic:
           "https://i.pinimg.com/736x/8d/16/90/8d16902ae35c1e982c2990ff85fa11fb.jpg", // TODO. Guardar avatar en BD
         stats: {
-          gamesPlayed: Math.floor(Math.random() * 100),
-          correctAnswers: Math.floor(Math.random() * 80),
-          wrongAnswers: Math.floor(Math.random() * 20),
-          ratio: (Math.random() * 100).toFixed(2),
-          averageTime: `${(Math.random() * 10).toFixed(1)} s`,
+          gamesPlayed: user.games,
+          correctAnswers: user.rightAnswers,
+          wrongAnswers: user.wrongAnswers,
+          ratio: parseFloat(user.ratio).toFixed(2),
+          averageTime: `${parseFloat(user.averageTime).toFixed(2)} s`,
           bestScore: user.maxScore,
         },
       }));
