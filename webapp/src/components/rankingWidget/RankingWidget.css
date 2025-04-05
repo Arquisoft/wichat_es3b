@@ -1,0 +1,145 @@
+.ranking-container{
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.ranking-header{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5em;
+    margin-bottom: 2em;
+}
+
+.ranking-title{
+    color: var(--color-primario);
+    text-align: center;
+}
+
+.ranking-header p{
+    font-size: var(--font-size-md);
+    color: #333;
+    font-style: italic;
+}
+
+.ranking-list{
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.ranking-item{
+    display: flex;
+    align-items: center;
+    padding: 0.75em;
+    border-radius: 8px;
+    background-color: #f5f9ff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+    will-change: transform;
+}
+
+.ranking-item:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(56, 182, 255, 0.2);
+}
+
+.ranking-position{
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 2em;
+}
+
+.ranking-user-info{
+    display: flex;
+    align-items: center;
+    flex: 1;
+    margin-left: 1em;
+}
+
+.ranking-profile-pic{
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-primario);
+    margin-right: 2em;
+}
+
+.ranking-user-name{
+    margin-bottom: 1em;  
+    font-size: var(--font-size-lg);
+    font-style: normal;
+    font-weight: 600;
+}
+
+.ranking-user-stats{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25em;
+    font-size: var(--font-size-md);
+}
+
+.ranking-stat-item{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ranking-stat-label{
+    color: #333;
+    margin-right: 0.5em;
+}
+
+.ranking-stat-value{
+    font-weight: 600;
+    color: var(--color-primario);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .ranking-user-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .ranking-container {
+      padding: 15px;
+    }
+  
+    .ranking-profile-pic {
+      width: 50px;
+      height: 50px;
+    }
+  }
+  
+  @media (max-width: 400px) {
+    .ranking-user-stats {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
