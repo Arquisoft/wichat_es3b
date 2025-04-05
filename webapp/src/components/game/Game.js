@@ -1,13 +1,11 @@
 "use client"
 
-import { useEffect, useState, useCallback, useRef } from "react"
+import { useEffect, useState, useRef } from "react"
 import "./Game.css"
-import Nav from "../../components/nav/Nav"
-import Footer from "../../components/Footer"
-import HintButton from "../../components/hintButton/HintButton"
-import BaseButton from "../../components/button/BaseButton"
-import ChatBox from "../../components/chatBox/ChatBox"
-import InfoDialog from "../../components/infoDialog/InfoDialog"
+import HintButton from "../hintButton/HintButton"
+import BaseButton from "../button/BaseButton"
+import ChatBox from "../chatBox/ChatBox"
+import InfoDialog from "../infoDialog/InfoDialog"
 import { LinearProgress, Box } from "@mui/material"
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
 import { motion } from "framer-motion"
@@ -16,7 +14,7 @@ import { useTranslation } from "react-i18next"
 
 
 const Game = () => {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const currentLanguage = i18n.language || "es"
   const [questionNumber, setQuestionNumber] = useState(0)
   const [questions, setQuestions] = useState([])
@@ -37,6 +35,7 @@ const Game = () => {
   const [showRules, setShowRules] = useState(false)
   const [hintsLeft, setHintsLeft] = useState(5)
   const [questionAnimationComplete, setQuestionAnimationComplete] = useState(false)
+  const [shuffledAnswers, setShuffledAnswers] = useState([]);
 
   const URL = "http://localhost:8004/"
   const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000"
@@ -47,8 +46,15 @@ const Game = () => {
     const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
     if (storedConfig) {
       console.log("Configuración cargada desde localStorage:", storedConfig);
-      setConfig(storedConfig);
-      setHintsLeft(storedConfig.limitePistas || 5);
+      const finalConfig = {
+        numPreguntas: storedConfig.numPreguntas ?? 10,
+        tiempoPregunta: storedConfig.tiempoPregunta ?? 30,
+        limitePistas: storedConfig.limitePistas ?? 3,
+        modoJuego: storedConfig.modoJuego ?? "Jugador vs IA",
+        categories: storedConfig.categories?.length ? storedConfig.categories : ["all"]
+      };
+      setConfig(finalConfig);
+      setHintsLeft(finalConfig.limitePistas || 5);
     }else{
       console.warn("No se encontró configuración en localStorage");
       setConfig({
@@ -78,6 +84,7 @@ const Game = () => {
         try {
           console.log("Solicitando preguntas con categorías:", config.categories);
           const categories = config.categories.includes("all") ? ["all"] : config.categories;
+          const numPreguntas = config.numPreguntas ?? 10;
           const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
           const response = await fetch(`${GATEWAY_URL}/${queryString}`);
           if (!response.ok) {
@@ -208,13 +215,24 @@ useEffect(() => {
     setIsChatBoxVisible(!isChatBoxVisible)
   }
 
+  useEffect(() => {
+    if (currentQuestion) {
+      const allAnswers = [
+        ...currentQuestion.respuestas[currentLanguage], 
+        currentQuestion.respuestaCorrecta[currentLanguage],
+      ];
+
+      const shuffled = allAnswers.sort(() => Math.random() - 0.5);
+      setShuffledAnswers(shuffled);
+    }
+  }, [currentQuestion, currentLanguage]);
+
   if (isLoading) {
-    return <div>Cargando...</div>
+    return <div className="loading-div"><h1>{t('loading')}</h1></div>
   }
 
   return (
     <div className="gameContainer">
-      <Nav />
       <main className={showRules ? "blurred" : ""}>
         <div className="game-layout">
           <div className="left-column">
@@ -255,7 +273,7 @@ useEffect(() => {
           >
             <div className="question-section">
               <div className="questionNumber">
-                <h2>{`Pregunta ${questionNumber + 1}/${config.numPreguntas}`}</h2>
+                <h2>{`${t('question')} ${questionNumber + 1}/${config.numPreguntas}`}</h2>
                 <ArrowForwardIcon
                   titleAccess="Siguiente pregunta"
                   fontSize="1.5em"
@@ -277,8 +295,7 @@ useEffect(() => {
             )}
 
             <div className="answerPanel">
-              {currentQuestion.respuestas &&
-                currentQuestion.respuestas[currentLanguage].map((respuesta, index) => (
+              {shuffledAnswers.map((respuesta, index) => (
                   <BaseButton
                     key={index}
                     text={respuesta}
@@ -301,7 +318,7 @@ useEffect(() => {
 
             <div className="timer-section">
               <Box display="flex" alignItems="center" width="100%" gap={2}>
-                <span>Tiempo</span>
+                <span>{t('time')}</span>
                 <Box width="100%" position="relative">
                   <LinearProgress id="progressBar" variant="determinate" value={progress} />
                 </Box>
@@ -312,10 +329,10 @@ useEffect(() => {
           <div className="right-column">
             <div className="rules-points-section">
               <div className="points-display">
-                <span>Puntuación: </span>
+                <span>{`${t('score')}: `} </span>
                 <span className="score">{score}</span>
               </div>
-              <BaseButton text={"Reglas"} buttonType="buttonSecondary" onClick={() => setShowRules(true)} />
+              <BaseButton text={t('rules')} buttonType="buttonSecondary" onClick={() => setShowRules(true)} />
             </div>
           </div>
         </div>
@@ -325,12 +342,12 @@ useEffect(() => {
         <div className="overlay">
           <div className="dialogGameRulesContainer">
             <InfoDialog
-              title={"Reglas del juego"}
+              title={t("gameRules")}
               content={
                 <ol>
-                  <li>Observa la imagen.</li>
-                  <li>Responde en el menor tiempo posible, dentro de los límites ofrecidos.</li>
-                  <li>Usa las pistas generadas por nuestra IA si lo necesitas.</li>
+                  <li>{t('observe')}</li>
+                  <li>{t('answer')}</li>
+                  <li>{t('hintInfo')}</li>
                 </ol>
               }
               onClose={() => setShowRules(false)}
@@ -364,7 +381,6 @@ useEffect(() => {
           </div>
         </div>
       )}
-      <Footer />
     </div>
   )
 }

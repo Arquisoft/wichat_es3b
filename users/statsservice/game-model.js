@@ -6,6 +6,10 @@ const gameSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  gameId: {
+    type: Number, 
+    required: true
+  }, 
   rightAnswers: {
     type: Number, 
     required: true
