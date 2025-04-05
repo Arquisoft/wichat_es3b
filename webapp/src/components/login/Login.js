@@ -10,8 +10,6 @@ import "../../assets/global.css";
 import { useTranslation } from "react-i18next";
 import AuthHeader from "../authHeader/AuthHeader";
 
-
-
 const Login = ({ handleToggleView }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -20,9 +18,8 @@ const Login = ({ handleToggleView }) => {
   const [error, setError] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
   const navigate = useNavigate();
-  
+
   const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
 
   const { t } = useTranslation();
@@ -38,27 +35,24 @@ const Login = ({ handleToggleView }) => {
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
-  
+
   // Iniciar sesión
   const loginUser = async () => {
     try {
-      const response = await axios.post( `${GATEWAY_URL}/login`, {
-        username,
-        password,
-      });
-
+      const response = await axios.post(
+          `${GATEWAY_URL}/login`,
+          { username, password },
+      );
       const { token } = response.data;
-
       // Guardar token en localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("username", username);
-
       setLoginSuccess(true);
       setOpenSnackbar(true);
       setMessage(`Bienvenido, ${username}!`);
       navigate("/home");
     } catch (error) {
-      setError(error.response?.data?.error || "Error al iniciar sesión");
+      setError(error.response?.data?.error || t("failedLogin"));
     }
   };
 
@@ -85,37 +79,21 @@ const Login = ({ handleToggleView }) => {
                 <h2>{t("introduceData")}</h2>
                 <div className="formField">
                   <label>{t("username")}</label>
-                  <WiChatTextField
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                  />
+                  <WiChatTextField value={username} onChange={(e) => setUsername(e.target.value)} />
                 </div>
                 <div className="formField">
                   <label>{t("password")}</label>
                   <div className="passwordContainer">
-                    <WiChatTextField
-                      value={password}
-                      type={showPassword ? "text" : "password"}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  <span onClick={toggleShowPassword}>👁️‍🗨️</span>
-                </div>    
-              </div>
+                    <WiChatTextField value={password} type={showPassword ? "text" : "password"} onChange={(e) => setPassword(e.target.value)} />
+                    <span onClick={toggleShowPassword}>👁️‍🗨️</span>
+                  </div>
+                </div>
                 <div className="buttonPanel">
                   <BaseButton text={t("login")} onClick={loginUser} />
                   <span> o </span>
-                  <BaseButton
-                      text={t("signup")}
-                      onClick={handleToggleView}
-                      buttonType="buttonSecondary"
-                  />
+                  <BaseButton text={t("signup")} onClick={handleToggleView} buttonType="buttonSecondary" />
                 </div>
-                <Snackbar
-                    open={openSnackbar}
-                    autoHideDuration={6000}
-                    message={t("loginSuccessful")}
-                    onClose={() => setOpenSnackbar(false)}
-                />
+                <Snackbar open={openSnackbar} autoHideDuration={6000} message={t("loginSuccessful")} onClose={() => setOpenSnackbar(false)} />
                 {error && <p className="error">{error}</p>}
               </div>
               <PhotoPanel text={t("loginMessageInPanel")} />
