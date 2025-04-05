@@ -9,8 +9,11 @@ beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const uri = mongoServer.getUri();
   await mongoose.disconnect();
-  await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-});
+  await mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+}, 60000); 
 
 afterAll(async () => {
   await mongoose.connection.dropDatabase();
@@ -53,7 +56,7 @@ describe('Stats Service API', () => {
       username: 'player2',
     });
     expect(res.status).toBe(400);
-    expect(res.body.error).toMatch(/Faltan datos requeridos/);
+    expect(res.body.error).toContain('Faltan datos requeridos');
   });
 
   it('GET /getstats/:username - obtiene estadísticas correctamente', async () => {
