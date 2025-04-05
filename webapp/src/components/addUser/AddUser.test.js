@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import i18n from "../../i18n"; // Ajusta la ruta según tu estructura de proyecto
 import { I18nextProvider } from "react-i18next";
-import AddUser from "../addUser/AddUser";
+import AddUser from "./AddUser";
 import userEvent from "@testing-library/user-event";
 import axios from 'axios';
 
@@ -42,7 +42,7 @@ describe("AddUser component", () => {
         userEvent.type(passwordFields[0].closest('label').nextElementSibling, "123456");
         userEvent.type(passwordFields[1].closest('label').nextElementSibling, "654321");
 
-        userEvent.click(screen.getByText(/Crear cuenta*/i));
+        userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
         // Utiliza una expresión regular que permite saltos de línea y otros elementos
         const errorMessage = await screen.findByText((content, element) =>
@@ -71,7 +71,7 @@ describe("AddUser component", () => {
         userEvent.type(passwordFields[0].closest('label').nextElementSibling, "123456");
         userEvent.type(passwordFields[1].closest('label').nextElementSibling, "123456");
 
-        userEvent.click(screen.getByText(/Crear cuenta*/i));
+        userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
         // Utiliza una expresión regular que permite saltos de línea y otros elementos
         const errorMessage = await screen.findByText((content, element) =>
