@@ -73,7 +73,11 @@ i18n
                     "user-ranking": "Ranking de usuarios",
                     "username": "Nombre de usuario*",
                     "wrongAnswers": "Respuestas incorrectas",
-                    "addUserError": "Error al añadir usuario"
+                    "addUserError": "Error al añadir usuario",
+                    "emptyEmail": "Por favor, introduce un correo electrónico",
+                    "emptyUsername": "Por favor, introduce un nombre de usuario",
+                    "emptyPassword": "Por favor, introduce una contraseña",
+                    "emptyPasswordConfirm": "Por favor, confirma tu contraseña"
                 },
             },
             en: {
@@ -143,7 +147,11 @@ i18n
                     "user-ranking": "User ranking",
                     "username": "Username*",
                     "wrongAnswers": "Wrong answers",
-                    "addUserError": "Error adding user"
+                    "addUserError": "Error adding user",
+                    "emptyEmail": "Please enter an email",
+                    "emptyUsername": "Please enter a username",
+                    "emptyPassword": "Please enter a password",
+                    "emptyPasswordConfirm": "Please confirm your password"
                 },
             },
         },
