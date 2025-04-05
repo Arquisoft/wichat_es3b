@@ -56,24 +56,24 @@ const AddUser = ({ handleToggleView }) => {
           <h1>{t("createAccount")}</h1>
           <h2>{t("introduceData")}</h2>
           <div className="formField">
-            <label>{t("email")}</label>
-            <WiChatTextField value={email} onChange={(e) => setEmail(e.target.value)} />
+            <label htmlFor="email">{t("email")}</label>
+            <WiChatTextField id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="formField">
-            <label>{t("username")}</label>
-            <WiChatTextField value={username} onChange={(e) => setUsername(e.target.value)} />
+            <label htmlFor="username">{t("username")}</label>
+            <WiChatTextField id="username" value={username} onChange={(e) => setUsername(e.target.value)} />
           </div>
           <div className="formField">
-            <label>{t("password")}</label>
+            <label htmlFor="password">{t("password")}</label>
             <div className="passwordContainer">
-              <WiChatTextField value={password} type={showPassword ? "text" : "password"} onChange={(e) => setPassword(e.target.value)} />
+              <WiChatTextField id="password" value={password} type={showPassword ? "text" : "password"} onChange={(e) => setPassword(e.target.value)} />
               <span onClick={toggleShowPassword}>👁️‍🗨️</span>
             </div>
           </div>
           <div className="formField">
-            <label>{t("confirmPassword")}</label>
+            <label id="confirmPassword">{t("confirmPassword")}</label>
             <div className="passwordContainer">
-              <WiChatTextField value={passwordConfirm} type={showPasswordConfirm ? "text" : "password"} onChange={(e) => setPasswordConfirm(e.target.value)} />
+              <WiChatTextField id="confirmPassword" value={passwordConfirm} type={showPasswordConfirm ? "text" : "password"} onChange={(e) => setPasswordConfirm(e.target.value)} />
               <span onClick={toggleShowPasswordConfirm}>👁️‍🗨️</span>
             </div>
           </div>

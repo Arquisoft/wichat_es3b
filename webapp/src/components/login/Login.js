@@ -78,13 +78,13 @@ const Login = ({ handleToggleView }) => {
                 <h1>{t("identify")}</h1>
                 <h2>{t("introduceData")}</h2>
                 <div className="formField">
-                  <label>{t("username")}</label>
-                  <WiChatTextField value={username} onChange={(e) => setUsername(e.target.value)} />
+                  <label htmlFor="username">{t("username")}</label>
+                  <WiChatTextField id="username" value={username} onChange={(e) => setUsername(e.target.value)} />
                 </div>
                 <div className="formField">
-                  <label>{t("password")}</label>
+                  <label htmlFor="password">{t("password")}</label>
                   <div className="passwordContainer">
-                    <WiChatTextField value={password} type={showPassword ? "text" : "password"} onChange={(e) => setPassword(e.target.value)} />
+                    <WiChatTextField id="password" value={password} type={showPassword ? "text" : "password"} onChange={(e) => setPassword(e.target.value)} />
                     <span onClick={toggleShowPassword}>👁️‍🗨️</span>
                   </div>
                 </div>
