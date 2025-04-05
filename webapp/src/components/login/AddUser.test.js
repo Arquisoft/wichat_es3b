@@ -17,7 +17,7 @@ describe("AddUser component", () => {
         );
 
         // Verificaciones con textos internacionalizados desde i18n
-        expect(screen.queryAllByText("Crear cuenta")).toBeInTheDocument();
+        expect(screen.queryAllByText("Crear cuenta").length).toBeGreaterThan(0);
         expect(screen.getByText("Introduce tus datos y únete a WiChat ya mismo.")).toBeInTheDocument();
         expect(screen.getByText("Correo electrónico*")).toBeInTheDocument();
         expect(screen.getByText("Nombre de usuario*")).toBeInTheDocument();
