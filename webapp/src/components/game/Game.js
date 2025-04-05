@@ -35,6 +35,7 @@ const Game = () => {
   const [showRules, setShowRules] = useState(false)
   const [hintsLeft, setHintsLeft] = useState(5)
   const [questionAnimationComplete, setQuestionAnimationComplete] = useState(false)
+  const [shuffledAnswers, setShuffledAnswers] = useState([]);
 
   const URL = "http://localhost:8004/"
   const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000"
@@ -45,8 +46,15 @@ const Game = () => {
     const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
     if (storedConfig) {
       console.log("Configuración cargada desde localStorage:", storedConfig);
-      setConfig(storedConfig);
-      setHintsLeft(storedConfig.limitePistas || 5);
+      const finalConfig = {
+        numPreguntas: storedConfig.numPreguntas ?? 10,
+        tiempoPregunta: storedConfig.tiempoPregunta ?? 30,
+        limitePistas: storedConfig.limitePistas ?? 3,
+        modoJuego: storedConfig.modoJuego ?? "Jugador vs IA",
+        categories: storedConfig.categories?.length ? storedConfig.categories : ["all"]
+      };
+      setConfig(finalConfig);
+      setHintsLeft(finalConfig.limitePistas || 5);
     }else{
       console.warn("No se encontró configuración en localStorage");
       setConfig({
@@ -76,6 +84,7 @@ const Game = () => {
         try {
           console.log("Solicitando preguntas con categorías:", config.categories);
           const categories = config.categories.includes("all") ? ["all"] : config.categories;
+          const numPreguntas = config.numPreguntas ?? 10;
           const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
           const response = await fetch(`${GATEWAY_URL}/${queryString}`);
           if (!response.ok) {
@@ -206,6 +215,18 @@ useEffect(() => {
     setIsChatBoxVisible(!isChatBoxVisible)
   }
 
+  useEffect(() => {
+    if (currentQuestion) {
+      const allAnswers = [
+        ...currentQuestion.respuestas[currentLanguage], 
+        currentQuestion.respuestaCorrecta[currentLanguage],
+      ];
+
+      const shuffled = allAnswers.sort(() => Math.random() - 0.5);
+      setShuffledAnswers(shuffled);
+    }
+  }, [currentQuestion, currentLanguage]);
+
   if (isLoading) {
     return <div className="loading-div"><h1>{t('loading')}</h1></div>
   }
@@ -274,8 +295,7 @@ useEffect(() => {
             )}
 
             <div className="answerPanel">
-              {currentQuestion.respuestas &&
-                currentQuestion.respuestas[currentLanguage].map((respuesta, index) => (
+              {shuffledAnswers.map((respuesta, index) => (
                   <BaseButton
                     key={index}
                     text={respuesta}
