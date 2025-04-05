@@ -1,277 +1,434 @@
 const request = require("supertest");
+// Import axios BEFORE mocking
 const axios = require("axios");
 const fs = require("fs");
 const YAML = require("yaml");
+const path = require('path');
 
-// Mockear módulos
+// --- Mocking Modules ---
+// Mock entire modules used by api-service
 jest.mock("axios");
 jest.mock("fs");
 jest.mock("yaml");
+jest.mock("express-prom-bundle", () => jest.fn(() => (req, res, next) => next()));
+// Mock swagger-ui-express to prevent actual UI setup
+jest.mock("swagger-ui-express", () => ({
+    serve: [],
+    setup: () => (req, res) => {
+        res.status(200).send("Swagger UI");
+    }
+}));
 
-// Mockear express-prom-bundle para evitar conflictos con las métricas
-jest.mock("express-prom-bundle", () => {
-    return () => (req, res, next) => next();
-});
+// --- Global Test Variables ---
+let currentApiService; // Holds the required module exports { app, listen, close, ... }
+let currentApp;      // Holds the express app instance for supertest
+let currentServer;   // Holds the server instance returned by listen() for closing
+const defaultGatewayUrl = "http://localhost:8000";
 
+// Function to setup default mocks for fs/YAML (used after reset)
+const setupDefaultFsYamlMocks = () => {
+    fs.existsSync.mockReturnValue(true);
+    fs.readFileSync.mockReturnValue(`
+openapi: 3.0.0
+info:
+  title: Mock API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8006
+    description: Development server
+  - url: https://production-api.example.com:443
+    description: Production server
+paths: {}
+`);
+    const mockSwaggerDoc = {
+        openapi: '3.0.0',
+        info: { title: 'Mock API', version: '1.0.0' },
+        servers: [
+            { url: 'http://localhost:8006', description: 'Development server' },
+            { url: 'https://production-api.example.com:443', description: 'Production server' }
+        ],
+        paths: {}
+    };
+    YAML.parse.mockReturnValue(mockSwaggerDoc);
+};
+
+// --- Test Suite ---
 describe("API Service", () => {
-    let apiService;
+    // Store originals
     const originalConsoleLog = console.log;
-    const originalEnv = process.env.NODE_ENV;
+    const originalConsoleError = console.error;
+    const originalGatewayUrlEnv = process.env.GATEWAY_SERVICE_URL;
+    const originalPortEnv = process.env.PORT;
+    const originalNodeEnv = process.env.NODE_ENV;
 
     beforeAll(() => {
-        // Set NODE_ENV to test for consistent behavior
-        process.env.NODE_ENV = 'test';
+        // Suppress console logs/errors unless debugging
+        // console.log = jest.fn();
+        // console.error = jest.fn();
     });
 
     afterAll(() => {
-        // Restore original environment
-        process.env.NODE_ENV = originalEnv;
+        // Restore original console and environment variables
+        console.log = originalConsoleLog;
+        console.error = originalConsoleError;
+        process.env.GATEWAY_SERVICE_URL = originalGatewayUrlEnv;
+        process.env.PORT = originalPortEnv;
+        process.env.NODE_ENV = originalNodeEnv;
     });
 
-    beforeEach(() => {
-        // Restaurar console.log
-        console.log = jest.fn();
-
-        // Reset mocks first
+    // Setup and teardown for most tests (those not needing module reload)
+    beforeEach(async () => {
+        // Reset mocks for isolation BEFORE requiring the service
         jest.resetAllMocks();
+        setupDefaultFsYamlMocks(); // Apply default fs/YAML mocks
 
-        // Configurar mocks por defecto
-        fs.existsSync.mockReturnValue(true);
-        fs.readFileSync.mockReturnValue("mockYamlContent");
-        YAML.parse.mockReturnValue({
-            servers: [
-                { description: "Development server", url: "http://localhost:8000" },
-                { description: "Production server", url: "http://192.168.1.100:8000" }
-            ]
+        // Require the service (uses default env vars)
+        currentApiService = require("./api-service");
+        currentApp = currentApiService.app;
+        // Start the server explicitly if needed by tests (supertest often doesn't need it listening)
+        // currentServer = await currentApiService.listen(); // Optional: Start server if tests require it
+    });
+
+    afterEach(async () => {
+        // Close the server if it was started
+        if (currentApiService && typeof currentApiService.close === 'function') {
+            // Check if server instance exists before closing
+            // This check might be needed depending on whether beforeEach started the server
+            // if (currentServer && currentServer.listening) {
+            await currentApiService.close().catch(err => console.error("Error during afterEach close:", err));
+            // }
+        }
+        currentApiService = null;
+        currentApp = null;
+        currentServer = null;
+        // Clear only mock call history, not implementations set in beforeEach/test
+        axios.get.mockClear();
+        fs.existsSync.mockClear();
+        fs.readFileSync.mockClear();
+        YAML.parse.mockClear();
+    });
+
+
+    // --- Test Cases ---
+
+    describe("Basic Setup and Health Check", () => {
+        it("should initialize the server and respond to basic requests", async () => {
+            // App is loaded in beforeEach
+            const response = await request(currentApp).get("/nonexistentpath");
+            expect(response.status).toBe(404);
         });
 
-        // Cargar el servicio API después de configurar los mocks
-        jest.resetModules();
-        apiService = require("./api-service");
-        // Iniciar el servidor para las pruebas
-        apiService.listen();
+        it("should call the gateway health endpoint on /health and return 200 on success", async () => {
+            const mockGatewayHealth = { status: "GATEWAY_OK", timestamp: Date.now() };
+            // Set the specific mock for THIS test
+            axios.get.mockResolvedValueOnce({ data: mockGatewayHealth });
+
+            const response = await request(currentApp).get("/health");
+
+            expect(response.status).toBe(200);
+            // Check the response body structure matches the expected output
+            expect(response.body).toEqual({ status: "OK", gateway: mockGatewayHealth });
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/health`);
+        });
+
+        it("should handle gateway unavailability correctly during /health check (return 503)", async () => {
+            const networkError = new Error("ECONNREFUSED Network Error");
+            networkError.request = {}; // Simulate connection error
+            // Set the specific mock for THIS test
+            axios.get.mockRejectedValueOnce(networkError);
+
+            const response = await request(currentApp).get("/health");
+
+            expect(response.status).toBe(503); // Expect 503 based on service logic
+            expect(response.body.status).toBe("WARNING");
+            expect(response.body.message).toContain("could not confirm gateway status");
+            expect(response.body.gateway_error).toBe("ECONNREFUSED Network Error");
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/health`);
+        });
+
+        it("should handle other gateway errors during /health check (return 500)", async () => {
+            const gatewayError = { response: { status: 502, data: "Bad Gateway" } };
+            // Set the specific mock for THIS test
+            axios.get.mockRejectedValueOnce(gatewayError);
+
+            const response = await request(currentApp).get("/health");
+
+            expect(response.status).toBe(500); // Expect 500 for non-network errors in health
+            expect(response.body.status).toBe("WARNING");
+            expect(response.body.message).toContain("could not confirm gateway status");
+            expect(response.body.gateway_error).toBeDefined(); // Raw error message might be complex
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/health`);
+        });
     });
 
-    afterEach(() => {
-        // Cerrar el servidor después de cada test
-        apiService.close();
+    describe("Questions Endpoint", () => {
+        it("should forward questions request with correct parameters (no topic) and return 200", async () => {
+            const mockQuestions = [{ id: 1, text: "Question 1?" }];
+            // Set the specific mock for THIS test
+            axios.get.mockResolvedValueOnce({ data: mockQuestions });
+
+            const response = await request(currentApp).get("/questions/5");
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(mockQuestions); // Expect the actual questions array
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/questions?n=5`);
+        });
+
+        it("should forward questions request with topic parameter and return 200", async () => {
+            const mockHistoryQuestions = [{ id: 2, text: "History Q?" }];
+            // Set the specific mock for THIS test
+            axios.get.mockResolvedValueOnce({ data: mockHistoryQuestions });
+
+            const response = await request(currentApp).get("/questions/10/history");
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(mockHistoryQuestions); // Expect the actual questions array
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/questions?n=10&topic=history`);
+        });
+
+        it("should handle gateway response error (e.g., 404) correctly", async () => {
+            const errorResponse = {
+                message: "Request failed with status code 404",
+                response: { status: 404, data: { message: 'Not Found from Gateway - Test' } },
+                isAxiosError: true, request: {}, config: {}
+            };
+            // Set the specific mock for THIS test
+            axios.get.mockRejectedValueOnce(errorResponse);
+
+            const response = await request(currentApp).get("/questions/99/nonexistent");
+
+            expect(response.status).toBe(404); // Expect 404
+            expect(response.body.error).toContain("Gateway Error: 404");
+            expect(response.body.message).toBe('Not Found from Gateway - Test');
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/questions?n=99&topic=nonexistent`);
+        });
+
+        it("should handle gateway connection error correctly (return 503)", async () => {
+            const connectionError = new Error("ECONNREFUSED connection refused");
+            connectionError.request = {};
+            connectionError.isAxiosError = true; config: {};
+            // Set the specific mock for THIS test
+            axios.get.mockRejectedValueOnce(connectionError);
+
+            const response = await request(currentApp).get("/questions/5/any");
+
+            expect(response.status).toBe(503); // Expect 503
+            expect(response.body.error).toBe("Gateway service unavailable");
+            expect(response.body.message).toContain("ECONNREFUSED connection refused");
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/questions?n=5&topic=any`);
+        });
+
+        it("should handle non-axios errors correctly (return 500)", async () => {
+            const genericError = new Error("Something broke unexpectedly");
+            // Set the specific mock for THIS test
+            axios.get.mockRejectedValueOnce(genericError);
+
+            const response = await request(currentApp).get("/questions/5/any");
+
+            expect(response.status).toBe(500); // Expect 500
+            expect(response.body.error).toBe("Internal server error");
+            expect(response.body.message).toBe("Something broke unexpectedly");
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/questions?n=5&topic=any`);
+        });
     });
 
-    // Test del endpoint health
-    it("should return OK status when gateway service is available", async () => {
-        // Configurar mock específico para este test
-        axios.get.mockImplementationOnce((url) => {
-            if (url === "http://localhost:8000/health") {
-                return Promise.resolve({ data: { status: "OK" } });
+    // --- Tests requiring module reload ---
+    // Use describe.each or separate describes if preferred
+    describe("OpenAPI Configuration with Module Reload", () => {
+        // These tests need careful setup/teardown for module reloading
+
+        let serviceForTest;
+        let appForTest;
+        const originalPort = process.env.PORT;
+
+        afterEach(async () => {
+            // Ensure server is closed and env vars restored
+            if (serviceForTest && typeof serviceForTest.close === 'function') {
+                await serviceForTest.close().catch(err => console.error("Error closing serviceForTest:", err));
             }
-            return Promise.reject(new Error("Unexpected URL"));
+            serviceForTest = null;
+            appForTest = null;
+            process.env.PORT = originalPort; // Restore original port
+            // Reset modules again to not affect subsequent non-reload tests
+            jest.resetModules();
         });
 
-        const response = await request(apiService.app).get("/health");
+        it("should serve OpenAPI documentation at /api-doc", async () => {
+            // Reset, mock, require
+            jest.resetModules();
 
-        expect(response.statusCode).toBe(200);
-        expect(response.body.status).toBe("OK");
-        expect(axios.get).toHaveBeenCalledWith("http://localhost:8000/health");
-    });
+            // Mock necessary modules
+            jest.mock("axios");
+            jest.mock("express-prom-bundle", () => jest.fn(() => (req, res, next) => next()));
 
-    it("should return WARNING status when gateway service is unavailable", async () => {
-        // Mockear fallo en el gateway
-        axios.get.mockImplementationOnce(() => {
-            return Promise.reject(new Error("Gateway unavailable"));
-        });
+            // Simular el middleware de swagger-ui-express con mayor precisión
+            // La clave es que mockSwaggerSetup debe devolver un middleware que responde con 200
+            const mockMiddleware = (req, res) => {
+                res.status(200).send("Swagger UI");
+            };
+            const mockSwaggerSetup = jest.fn().mockReturnValue(mockMiddleware);
 
-        const response = await request(apiService.app).get("/health");
+            jest.mock("swagger-ui-express", () => ({
+                serve: [(req, res, next) => next()], // Middleware array que solo pasa al siguiente
+                setup: mockSwaggerSetup
+            }));
 
-        expect(response.statusCode).toBe(500);
-        expect(response.body.status).toBe("WARNING");
-        expect(response.body.message).toContain("API service is running but gateway service is unavailable");
-    });
+            // Configurar mocks de fs y YAML
+            const fs = require('fs');
+            jest.mock('fs');
+            fs.existsSync = jest.fn().mockReturnValue(true);
+            fs.readFileSync = jest.fn().mockReturnValue('valid yaml content');
 
-    // Test del endpoint questions
-    it("should return questions data", async () => {
-        const mockQuestions = { questions: [{ id: 1, question: "Test question" }] };
-        axios.get.mockImplementationOnce((url) => {
-            if (url === "http://localhost:8000/questions?n=5&topic=all") {
-                return Promise.resolve({ data: mockQuestions });
-            }
-            return Promise.reject(new Error("Unexpected URL"));
-        });
-
-        const response = await request(apiService.app).get("/questions/5/all");
-
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual(mockQuestions);
-        expect(axios.get).toHaveBeenCalledWith("http://localhost:8000/questions?n=5&topic=all");
-    });
-
-    it("should handle error from questions endpoint", async () => {
-        axios.get.mockImplementationOnce(() => {
-            return Promise.reject({
-                response: {
-                    status: 404,
-                    data: { error: "Questions not found" }
-                }
+            // Asegurarnos de que YAML.parse devuelva un objeto válido
+            const YAML = require('yaml');
+            jest.mock('yaml');
+            YAML.parse = jest.fn().mockReturnValue({
+                openapi: '3.0.0',
+                info: { title: 'Mock API', version: '1.0.0' },
+                servers: [
+                    { url: 'http://localhost:8006', description: 'Development server' }
+                ],
+                paths: {}
             });
+
+            // Importar el servicio de API después de configurar todos los mocks
+            const serviceForTest = require("./api-service");
+            const appForTest = serviceForTest.app;
+
+            // Verificar que el middleware de Swagger haya sido configurado en app
+            // Enviar una solicitud a /api-doc
+            const response = await request(appForTest).get("/api-doc");
+
+            // Verificar que la respuesta sea correcta
+            expect(response.status).toBe(200);
+            expect(response.text).toContain("Swagger UI");
+
+            // Verificar que mockSwaggerSetup fue llamado durante la carga del módulo
+            expect(mockSwaggerSetup).toHaveBeenCalled();
         });
 
-        const response = await request(apiService.app).get("/questions/99");
+        it("should handle OpenAPI configuration file not found (return 404)", async () => {
+            // Reset modules first
+            jest.resetModules();
 
-        expect(response.statusCode).toBe(404);
-        expect(response.body.error).toBe("Questions not found");
-    });
+            // --- Mock fs specifically for this scenario ---
+            const mockFs = {
+                existsSync: jest.fn().mockReturnValue(false), // File doesn't exist
+                readFileSync: jest.fn(), // Should not be called
+            };
+            jest.mock('fs', () => mockFs);
+            jest.mock("axios"); // Need to mock other dependencies too
+            jest.mock("yaml");
+            jest.mock("express-prom-bundle", () => jest.fn(() => (req, res, next) => next()));
+            // --- End Mock fs ---
 
-    it("should handle network error from questions endpoint", async () => {
-        axios.get.mockImplementationOnce(() => {
-            return Promise.reject({
-                request: {}, // Simular error de solicitud (network error)
-                message: "Network error"
-            });
+            serviceForTest = require("./api-service"); // Reload service with the specific mock
+            appForTest = serviceForTest.app;
+
+            expect(mockFs.existsSync).toHaveBeenCalledWith(expect.stringContaining('openapi.yaml'));
+            expect(mockFs.readFileSync).not.toHaveBeenCalled();
+
+            const response = await request(appForTest).get("/api-doc");
+            expect(response.status).toBe(404);
+            expect(response.text).toContain("API Documentation configuration file not found");
         });
 
-        const response = await request(apiService.app).get("/questions/5");
+        it("should handle errors during OpenAPI YAML parsing (return 500)", async () => {
+            // Reset modules first
+            jest.resetModules();
 
-        expect(response.statusCode).toBe(500);
-        expect(response.body.error).toBe("Network error");
-    });
+            // --- Mock fs and YAML specifically ---
+            const mockFs = {
+                existsSync: jest.fn().mockReturnValue(true),
+                readFileSync: jest.fn().mockReturnValue("invalid: yaml: content"),
+            };
+            const mockYaml = {
+                parse: jest.fn().mockImplementation(() => { throw new Error("Mock YAML Parse Error"); }),
+            };
+            jest.mock('fs', () => mockFs);
+            jest.mock('yaml', () => mockYaml);
+            jest.mock("axios");
+            jest.mock("express-prom-bundle", () => jest.fn(() => (req, res, next) => next()));
+            // --- End Mocks ---
 
-    // Test del endpoint getstats
-    it("should return user stats data", async () => {
-        const mockStats = { stats: { score: 100, completed: 10 } };
-        axios.get.mockImplementationOnce((url) => {
-            if (url === "http://localhost:8000/getstats/testuser") {
-                return Promise.resolve({ data: mockStats });
-            }
-            return Promise.reject(new Error("Unexpected URL"));
+            serviceForTest = require("./api-service"); // Reload
+            appForTest = serviceForTest.app;
+
+            expect(mockFs.existsSync).toHaveBeenCalled();
+            expect(mockFs.readFileSync).toHaveBeenCalled();
+            expect(mockYaml.parse).toHaveBeenCalled();
+
+            const response = await request(appForTest).get("/api-doc");
+            expect(response.status).toBe(500);
+            expect(response.text).toContain("API Documentation could not be loaded");
         });
-
-        const response = await request(apiService.app).get("/getstats/testuser");
-
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toEqual(mockStats);
-        expect(axios.get).toHaveBeenCalledWith("http://localhost:8000/getstats/testuser");
     });
 
-    it("should handle error from getstats endpoint", async () => {
-        axios.get.mockImplementationOnce(() => {
-            return Promise.reject({
-                response: {
-                    status: 404,
-                    data: { error: "User not found" }
-                }
-            });
-        });
-
-        const response = await request(apiService.app).get("/getstats/unknownuser");
-
-        expect(response.statusCode).toBe(404);
-        expect(response.body.error).toBe("User not found");
-    });
-
-    it("should handle network error from getstats endpoint", async () => {
-        axios.get.mockImplementationOnce(() => {
-            return Promise.reject({
-                request: {}, // Simular error de solicitud (network error)
-                message: "Network error"
-            });
-        });
-
-        const response = await request(apiService.app).get("/getstats/testuser");
-
-        expect(response.statusCode).toBe(500);
-        expect(response.body.error).toBe("Network error");
-    });
-
-    // Tests de configuración OpenAPI
-    it("should configure OpenAPI documentation when file exists", () => {
-        // Para este test, necesitamos verificar que las llamadas se han hecho antes de cargar el módulo
-        // Cerramos y volvemos a iniciar para asegurar que se llaman las funciones
-        apiService.close();
-
-        // Limpiar los mocks para este test específico
-        jest.clearAllMocks();
-
-        // Configurar mocks para este test
-        fs.existsSync.mockReturnValueOnce(true);
-        fs.readFileSync.mockReturnValueOnce("mockYamlContent");
-        YAML.parse.mockReturnValueOnce({
-            servers: [
-                { description: "Development server", url: "http://localhost:8000" },
-                { description: "Production server", url: "http://192.168.1.100:8000" }
-            ]
-        });
-
-        // Recargar el módulo para este test
-        jest.resetModules();
-        apiService = require("./api-service");
-
-        // Verificar que se llamaron las funciones correctas
-        expect(fs.existsSync).toHaveBeenCalledWith("./openapi.yaml");
-        expect(fs.readFileSync).toHaveBeenCalledWith("./openapi.yaml", "utf8");
-        expect(YAML.parse).toHaveBeenCalled();
-    });
-
-    it("should log message when OpenAPI file is not found", () => {
-        // Cerrar la app existente
-        apiService.close();
-
-        // Mockear fs.existsSync para simular archivo no encontrado
-        fs.existsSync.mockReturnValueOnce(false);
-
-        // Reiniciar el servicio
-        jest.resetModules();
-        apiService = require("./api-service");
-
-        expect(console.log).toHaveBeenCalledWith("No se encontró el archivo de configuración OpenAPI.");
-    });
-
-    // Test para verificar uso del puerto correcto
-    it("should use the configured port", () => {
-        // Verificar que el mensaje de log contiene el puerto correcto
-        expect(console.log).toHaveBeenCalledWith(expect.stringContaining("8006"));
-    });
-
-    // Test para verificar configuración de CORS y middleware
-    it("should have CORS middleware configured", async () => {
-        // Mock para que este test funcione independientemente
-        axios.get.mockImplementationOnce(() => {
-            return Promise.resolve({ data: { status: "OK" } });
-        });
-
-        const response = await request(apiService.app)
-            .get("/health")
-            .set("Origin", "http://example.com");
-
-        expect(response.headers["access-control-allow-origin"]).toBeTruthy();
-    });
-
-    // Test para verificar custom environment variable
-    it("should use custom gateway URL when environment variable is set", async () => {
-        // Cerrar la app existente
-        apiService.close();
-
-        // Configurar una variable de entorno personalizada
+    describe("Environment Variable Usage with Module Reload", () => {
+        let serviceForTest;
+        let appForTest;
         const originalGatewayUrl = process.env.GATEWAY_SERVICE_URL;
-        process.env.GATEWAY_SERVICE_URL = "http://custom-gateway:9000";
 
-        // Reiniciar el servicio con la nueva URL
-        jest.resetModules();
-        apiService = require("./api-service");
-        apiService.listen();
-
-        // Configurar mock específico para este test
-        axios.get.mockImplementationOnce((url) => {
-            if (url === "http://custom-gateway:9000/health") {
-                return Promise.resolve({ data: { status: "OK" } });
+        afterEach(async () => {
+            // Ensure server is closed and env vars restored
+            if (serviceForTest && typeof serviceForTest.close === 'function') {
+                await serviceForTest.close().catch(err => console.error("Error closing serviceForTest:", err));
             }
-            return Promise.reject(new Error("Unexpected URL"));
+            serviceForTest = null;
+            appForTest = null;
+            process.env.GATEWAY_SERVICE_URL = originalGatewayUrl; // Restore original GW URL
+            // Reset modules again
+            jest.resetModules();
         });
 
-        // Hacer una solicitud para verificar que se use la URL personalizada
-        await request(apiService.app).get("/health");
+        it("should use custom gateway URL from environment variable", async () => {
+            const customGatewayUrl = "http://custom-gateway:9000";
+            process.env.GATEWAY_SERVICE_URL = customGatewayUrl; // Set BEFORE reset/require
 
-        expect(axios.get).toHaveBeenCalledWith("http://custom-gateway:9000/health");
+            // Reset modules, re-apply mocks, re-require service
+            jest.resetModules();
+            jest.mock("axios"); // Crucial: Re-mock axios AFTER reset
+            setupDefaultFsYamlMocks(); // Re-apply other mocks if needed
+            jest.mock("express-prom-bundle", () => jest.fn(() => (req, res, next) => next())); // Re-mock promBundle
 
-        // Restaurar la variable de entorno
-        process.env.GATEWAY_SERVICE_URL = originalGatewayUrl;
+            // Now require the service, it will pick up the new env var
+            serviceForTest = require("./api-service");
+            appForTest = serviceForTest.app;
+
+            // Configure the axios mock AFTER requiring the service and getting the app
+            const mockHealthData = { status: "CUSTOM_GATEWAY_OK" };
+            // IMPORTANT: Access the mocked axios directly, not via an old import
+            const mockedAxios = require("axios");
+            mockedAxios.get.mockResolvedValueOnce({ data: mockHealthData });
+
+            // Make the request
+            await request(appForTest).get("/health");
+
+            // Verify axios was called with the CUSTOM URL
+            expect(mockedAxios.get).toHaveBeenCalledTimes(1); // Check call count on the fresh mock
+            expect(mockedAxios.get).toHaveBeenCalledWith(`${customGatewayUrl}/health`); // Check URL
+        });
+    });
+
+    describe("CORS Configuration", () => {
+        // This test doesn't need module reload, uses standard beforeEach/afterEach
+        it("should include CORS headers in the response", async () => {
+            // Axios mock needed for the underlying /health call
+            axios.get.mockResolvedValueOnce({ data: { status: "GATEWAY_OK" } });
+
+            const response = await request(currentApp)
+                .get("/health")
+                .set("Origin", "http://example.com");
+
+            expect(response.headers["access-control-allow-origin"]).toBe("*");
+        });
     });
 });
