@@ -36,8 +36,9 @@ describe("AddUser component", () => {
 
         userEvent.type(screen.getByLabelText(/Correo electrónico*o/i), "test@example.com");
         userEvent.type(screen.getByLabelText(/Nombre de usuario*/i), "testuser");
-        userEvent.type(screen.getByLabelText(/Contraseña*/i), "123456");
-        userEvent.type(screen.getByLabelText(/Confirmar contraseña*/i), "654321");
+        // Utiliza `getByLabelText` para los campos de contraseña con el texto exacto
+        userEvent.type(screen.getByLabelText(/Contraseña*/i, { exact: false }), "123456");
+        userEvent.type(screen.getByLabelText(/Confirmar contraseña*/i, { exact: false }), "654321");
 
         userEvent.click(screen.getByText(/Crear cuenta*/i));
 
