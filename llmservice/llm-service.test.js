@@ -6,7 +6,7 @@ let server;
 
 // Iniciar el servidor antes de todas las pruebas con un puerto diferente para tests
 beforeAll(async () => {
-  // Usar un puerto diferente para las pruebas (8004 en lugar de 8003)
+  // Usar un puerto diferente para las pruebas
   server = startServer(8090);
 });
 
