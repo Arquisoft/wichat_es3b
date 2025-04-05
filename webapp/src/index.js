@@ -4,13 +4,15 @@ import { BrowserRouter as Router } from "react-router-dom"; // Importa el Router
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "./i18n";
+import { I18nextProvider } from "react-i18next";
+import i18n from "./i18n"; // Asegúrate de importar la instancia
 
 ReactDOM.render(
-  <Router>
-    {" "}
-    {/* Envuelve tu App con Router */}
-    <App />
-  </Router>,
+  <I18nextProvider i18n={i18n}>
+    <Router>
+      <App />
+    </Router>
+  </I18nextProvider>,
   document.getElementById("root")
 );
 

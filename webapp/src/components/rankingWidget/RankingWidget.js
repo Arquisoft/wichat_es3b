@@ -5,7 +5,7 @@ import axios from "axios";
 import { Medal } from "lucide-react";
 
 const RankingWidget = () => {
-  const { t } = useTranslation();
+  const { t, ready } = useTranslation();
   const [users, setUsers] = useState([]);
 
   const GATEWAY_URL = "http://localhost:8000";
@@ -35,7 +35,7 @@ const RankingWidget = () => {
     }
   };
 
-  useEffect(() => fetchRanking(), []);
+  useEffect(() => {if (ready)fetchRanking()}, [ready]);
 
   const podiumColors = ["#FFD700", "#C0C0C0", "#CD7F32"];
 
@@ -64,6 +64,7 @@ const RankingWidget = () => {
     );
   };
 
+  if(!ready) return <div>Cargando...</div>
   return (
     <div className="ranking-container">
       <div className="ranking-header">
