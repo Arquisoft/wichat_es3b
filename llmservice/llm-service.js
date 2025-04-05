@@ -4,7 +4,7 @@ const express = require('express');
 require("dotenv").config();
 
 const app = express();
-const port = 8003;
+const port = process.env.PORT || 8003;
 
 // Middleware to parse JSON in request body
 app.use(express.json());
@@ -93,7 +93,8 @@ async function sendQuestionToLLM(systemPrompt, userQuestion, apiKey, model = 'ge
         if (error.response) {
             console.error(`LLM respondió con estado ${error.response.status}:`, error.response.data);
         }
-        throw new Error(`Error al obtener respuesta de ${model}`);
+        // Propagamos el error original en lugar de crear uno nuevo
+        throw error;
     }
 }
 
@@ -186,9 +187,43 @@ app.post('/ask', async (req, res) => {
     }
 });
 
-const server = app.listen(port, () => {
-    console.log(`LLM Service listening at http://localhost:${port}`);
-});
+// Variable para almacenar la instancia del servidor
+let server;
 
-module.exports = server;
+// Función para iniciar el servidor con un puerto específico (útil para tests)
+function startServer(testPort) {
+    // Si ya hay un servidor en ejecución, no iniciar otro
+    if (server) {
+        return server;
+    }
 
+    // Usar el puerto de prueba si se proporciona, de lo contrario usar el puerto configurado
+    const serverPort = testPort || port;
+    server = app.listen(serverPort);
+    console.log(`LLM Service listening at http://localhost:${serverPort}`);
+    return server;
+}
+
+// Función para cerrar el servidor
+function closeServer() {
+    if (server) {
+        return new Promise((resolve) => {
+            server.close(() => {
+                server = null;
+                resolve();
+            });
+        });
+    }
+    return Promise.resolve();
+}
+
+// Si este archivo se ejecuta directamente, inicia el servidor
+if (require.main === module) {
+    startServer();
+}
+
+module.exports = {
+    app,
+    startServer,
+    closeServer
+};

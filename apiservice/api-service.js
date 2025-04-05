@@ -35,16 +35,21 @@ app.get("/health", async (req, res) => {
 });
 
 // Questions endpoint
-app.get('/questions/:n/:topic', async (req, res) => {
+app.get('/questions/:n/:topic?', async (req, res) => {
     try {
         const { n, topic } = req.params;
-        const queryString = `questions?n=${n}&topic=${encodeURIComponent(topic)}`;
+        let queryString = `questions?n=${n}`;
+        if (topic) {
+            queryString += `&topic=${encodeURIComponent(topic)}`;
+        }
         // Redirigir la solicitud al gateway service
         const response = await axios.get(`${gatewayServiceUrl}/${queryString}`);
         res.json(response.data);
     } catch (error) {
-        res.status(error.response ? error.response.status : 500).json({
-            error: error.response ? error.response.data.error : error.message
+        const statusCode = error.response?.status || 500;
+        const errorMessage = error.response?.data?.error || error.message;
+        res.status(statusCode).json({
+            error: errorMessage
         });
     }
 });
@@ -57,28 +62,33 @@ app.get('/getstats/:username', async (req, res) => {
         const response = await axios.get(`${gatewayServiceUrl}/getstats/${username}`);
         res.json(response.data);
     } catch (error) {
-        res.status(error.response ? error.response.status : 500).json({
-            error: error.response ? error.response.data.error : error.message
+        const statusCode = error.response?.status || 500;
+        const errorMessage = error.response?.data?.error || error.message;
+        res.status(statusCode).json({
+            error: errorMessage
         });
     }
 });
 
 // Cargar y configurar la documentación OpenAPI
+let swaggerDocument;
 const openapiPath = "./openapi.yaml";
 if (fs.existsSync(openapiPath)) {
     const file = fs.readFileSync(openapiPath, "utf8");
-    const swaggerDocument = YAML.parse(file);
+    swaggerDocument = YAML.parse(file);
 
     // Actualizar la URL del servidor a la del API service
-    swaggerDocument.servers.forEach((server, index) => {
-        if (server.description === "Development server") {
-            swaggerDocument.servers[index].url = `http://localhost:${port}`;
-        } else if (server.description === "Production server") {
-            // Mantener la IP pero cambiar el puerto
-            const url = server.url.split(':');
-            swaggerDocument.servers[index].url = `${url[0]}:${url[1]}:${port}`;
-        }
-    });
+    if (swaggerDocument && swaggerDocument.servers) {
+        swaggerDocument.servers.forEach((server, index) => {
+            if (server.description === "Development server") {
+                swaggerDocument.servers[index].url = `http://localhost:${port}`;
+            } else if (server.description === "Production server") {
+                // Mantener la IP pero cambiar el puerto
+                const url = server.url.split(':');
+                swaggerDocument.servers[index].url = `${url[0]}:${url[1]}:${port}`;
+            }
+        });
+    }
 
     // Servir la documentación en la ruta /api-doc
     app.use("/api-doc", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -87,9 +97,30 @@ if (fs.existsSync(openapiPath)) {
 }
 
 // Iniciar el servicio API
-const server = app.listen(port, () => {
-    console.log(`API Service listening at http://localhost:${port}`);
-    console.log(`API Documentation available at http://localhost:${port}/api-doc`);
-});
+let server;
+if (process.env.NODE_ENV !== 'test') {
+    server = app.listen(port, () => {
+        console.log(`API Service listening at http://localhost:${port}`);
+        console.log(`API Documentation available at http://localhost:${port}/api-doc`);
+    });
+}
 
-module.exports = server;
+// Exportar un objeto con métodos para el servidor y la app
+module.exports = {
+    app,
+    close: () => {
+        if (server) {
+            return server.close();
+        }
+        return null;
+    },
+    // Metodo para iniciar el servidor explícitamente en pruebas
+    listen: () => {
+        if (!server && process.env.NODE_ENV === 'test') {
+            server = app.listen(port, () => {
+                console.log(`API Service listening at http://localhost:${port}`);
+            });
+        }
+        return server;
+    }
+};
