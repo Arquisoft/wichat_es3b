@@ -7,6 +7,7 @@ import { Route, Routes } from "react-router-dom";
 import Game from "./pages/game/Game.js";
 import PrivateRoute from "./components/routes/PrivateRoute.js";
 import Settings from "./pages/settings/Settings.js";
+import Ranking from './pages/ranking/Ranking.js'
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
         }
       />
       <Route path="/home" element={<Home />} />
+      <Route path="/ranking" element={<Ranking/>} />
     </Routes>
   );
 }
