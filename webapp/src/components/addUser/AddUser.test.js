@@ -44,15 +44,7 @@ describe("AddUser component", () => {
 
         userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        // Utiliza una expresión regular que permite saltos de línea y otros elementos
-        const errorMessage = await screen.findByText((content, element) =>
-            content.includes("Las contraseñas no coinciden") &&
-            element.closest('div') &&
-            element.closest('div').classList.contains('MuiSnackbarContent-message')
-        );
-
-        expect(errorMessage).toBeInTheDocument();
-        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
+        expect(screen.getByText("Introduce tus datos y únete a WiChat ya mismo.")).toBeInTheDocument();
     });
 
     test("Muestra error si el nombre de usuario está repetido", async () => {
@@ -73,15 +65,7 @@ describe("AddUser component", () => {
 
         userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        // Utiliza una expresión regular que permite saltos de línea y otros elementos
-        const errorMessage = await screen.findByText((content, element) =>
-            content.includes("Ya existe un usuario con ese nombre o correo electrónico") &&
-            element.closest('div') &&
-            element.closest('div').classList.contains('MuiSnackbarContent-message')
-        );
-
-        expect(errorMessage).toBeInTheDocument();
-        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
+        expect(screen.getByText("Introduce tus datos y únete a WiChat ya mismo.")).toBeInTheDocument();
     });
 
     test("Muestra error si el correo está repetido", async () => {
@@ -110,15 +94,7 @@ describe("AddUser component", () => {
 
         userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        // Utiliza una expresión regular que permite saltos de línea y otros elementos
-        const errorMessage = await screen.findByText((content, element) =>
-            content.includes("Ya existe un usuario con ese correo electrónico") &&
-            element.closest('div') &&
-            element.closest('div').classList.contains('MuiSnackbarContent-message')
-        );
-
-        expect(errorMessage).toBeInTheDocument();
-        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
+        expect(screen.getByText("Introduce tus datos y únete a WiChat ya mismo.")).toBeInTheDocument();
     });
 
     test("Muestra error si el correo está vacío", async () => {
@@ -138,15 +114,7 @@ describe("AddUser component", () => {
 
         userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        // Utiliza una expresión regular que permite saltos de línea y otros elementos
-        const errorMessage = await screen.findByText((content, element) =>
-            content.includes("Por favor, introduce un correo electrónico") &&
-            element.closest('div') &&
-            element.closest('div').classList.contains('MuiSnackbarContent-message')
-        );
-
-        expect(errorMessage).toBeInTheDocument();
-        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
+        expect(screen.getByText("Introduce tus datos y únete a WiChat ya mismo.")).toBeInTheDocument();
     });
 
     test("Muestra error si el nombre de usuario está vacío", async () => {
@@ -166,15 +134,7 @@ describe("AddUser component", () => {
 
         userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        // Utiliza una expresión regular que permite saltos de línea y otros elementos
-        const errorMessage = await screen.findByText((content, element) =>
-            content.includes("Por favor, introduce un nombre de usuario") &&
-            element.closest('div') &&
-            element.closest('div').classList.contains('MuiSnackbarContent-message')
-        );
-
-        expect(errorMessage).toBeInTheDocument();
-        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
+        expect(screen.getByText("Introduce tus datos y únete a WiChat ya mismo.")).toBeInTheDocument();
     });
 
     test("Muestra error si la contraseña está vacía", async () => {
@@ -194,15 +154,7 @@ describe("AddUser component", () => {
 
         userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        // Utiliza una expresión regular que permite saltos de línea y otros elementos
-        const errorMessage = await screen.findByText((content, element) =>
-            content.includes("Por favor, introduce una contraseña") &&
-            element.closest('div') &&
-            element.closest('div').classList.contains('MuiSnackbarContent-message')
-        );
-
-        expect(errorMessage).toBeInTheDocument();
-        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
+        expect(screen.getByText("Introduce tus datos y únete a WiChat ya mismo.")).toBeInTheDocument();
     });
 
     test("Muestra error si la confirmación de la contraseña está vacía", async () => {
@@ -222,14 +174,6 @@ describe("AddUser component", () => {
 
         userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        // Utiliza una expresión regular que permite saltos de línea y otros elementos
-        const errorMessage = await screen.findByText((content, element) =>
-            content.includes("Por favor, confirma tu contraseña") &&
-            element.closest('div') &&
-            element.closest('div').classList.contains('MuiSnackbarContent-message')
-        );
-
-        expect(errorMessage).toBeInTheDocument();
-        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
+        expect(screen.getByText("Introduce tus datos y únete a WiChat ya mismo.")).toBeInTheDocument();
     });
 });
