@@ -23,23 +23,20 @@ const AddUser = ({ handleToggleView }) => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const { t } = useTranslation();
 
-  if (!email) {
-    setError(t("emptyEmail")); // Añadir esta clave en tus traducciones
-    return;
-  } else if(!username) {
-    setError(t("emptyUsername")); // Añadir esta clave en tus traducciones
-    return;
-  } else if(!password) {
-    setError(t("emptyPassword")); // Añadir esta clave en tus traducciones
-    return;
-  } else if(!passwordConfirm) {
-    setError(t("emptyPasswordConfirm")); // Añadir esta clave en tus traducciones
-    return;
-  }
-
-
-
   const addUser = async () => {
+    if (!email) {
+      setError(t("emptyEmail")); // Añadir esta clave en tus traducciones
+      return;
+    } else if(!username) {
+      setError(t("emptyUsername")); // Añadir esta clave en tus traducciones
+      return;
+    } else if(!password) {
+      setError(t("emptyPassword")); // Añadir esta clave en tus traducciones
+      return;
+    } else if(!passwordConfirm) {
+      setError(t("emptyPasswordConfirm")); // Añadir esta clave en tus traducciones
+      return;
+    }
     if (password !== passwordConfirm) {
       setError(t("passwordsDoNotMatch")); // Añade esta clave a tu archivo de traducciones
       return;
