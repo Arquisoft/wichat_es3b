@@ -425,11 +425,17 @@ describe('Wikidata Service', () => {
         });
     });
     afterAll(async () => {
-        // Asegurarse de que el servidor se cierra correctamente
-        await server.close();  // Usar await para asegurarse de que el servidor se cierre completamente
+        try {
+            await server.close();  // Asegúrate de que el servidor se cierra correctamente.
+        } catch (error) {
+            console.error('Error cerrando el servidor', error);
+        }
     });
 });
 afterAll(async () => {
-    // Asegurarse de que el servidor se cierra correctamente
-    await server.close();  // Usar await para asegurarse de que el servidor se cierre completamente
+    try {
+        await server.close();  // Asegúrate de que el servidor se cierra correctamente.
+    } catch (error) {
+        console.error('Error cerrando el servidor', error);
+    }
 });
