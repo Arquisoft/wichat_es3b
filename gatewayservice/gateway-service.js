@@ -171,7 +171,10 @@ app.get("/ratios-per-month/:username", async (req, res) => {
 // Question endpoints
 app.get('/questions', async (req, res) => {
   try {
-    const { n = 10, topic = "all" } = req.query;
+    let { n, topic = "all" } = req.query;
+
+    n = parseInt(n);
+    if (isNaN(n)) n = 10;
 
     const fullURL = `${wikiQuestionServiceUrl}/questions?n=${n}&topic=${encodeURIComponent(topic)}`;
     console.log("Redirigiendo a:", fullURL);
