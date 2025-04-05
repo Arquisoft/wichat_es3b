@@ -18,7 +18,6 @@ describe("AddUser component", () => {
             </I18nextProvider>
         );
 
-        // Verificaciones con textos internacionalizados desde i18n
         expect(screen.queryAllByText("Crear cuenta").length).toBeGreaterThan(0);
         expect(screen.getByText("Introduce tus datos y únete a WiChat ya mismo.")).toBeInTheDocument();
         expect(screen.getByText("Correo electrónico*")).toBeInTheDocument();
@@ -40,15 +39,15 @@ describe("AddUser component", () => {
         userEvent.type(screen.getByLabelText(/Nombre de usuario*/i), "testuser");
 
         const passwordFields = screen.queryAllByText(/Contraseña*/i);
-
-        // Asumimos que el primer campo corresponde a la "Contraseña" y el segundo a "Confirmar contraseña"
         userEvent.type(passwordFields[0].closest('label').nextElementSibling, "123456");
         userEvent.type(passwordFields[1].closest('label').nextElementSibling, "654321");
 
-        userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
+        userEvent.click(screen.getByText(/Crear cuenta*/i));
 
-        // Verifica que el mensaje de error aparezca si las contraseñas no coinciden
-        expect(await screen.findByText(/Error: Las contraseñas no coinciden/i)).toBeInTheDocument();
+        // Verifica que el mensaje de error con la clase correcta aparezca si las contraseñas no coinciden
+        const errorMessage = await screen.findByText(/Error: Las contraseñas no coinciden/i);
+        expect(errorMessage).toBeInTheDocument();
+        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
     });
 
     test("Muestra error si el nombre de usuario está repetido", async () => {
@@ -64,14 +63,15 @@ describe("AddUser component", () => {
         userEvent.type(screen.getByLabelText(/Nombre de usuario*/i), "enol");
 
         const passwordFields = screen.queryAllByText(/Contraseña*/i);
-
         userEvent.type(passwordFields[0].closest('label').nextElementSibling, "123456");
         userEvent.type(passwordFields[1].closest('label').nextElementSibling, "123456");
 
-        userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
+        userEvent.click(screen.getByText(/Crear cuenta*/i));
 
         // Verifica que el mensaje de error aparezca si el nombre de usuario ya existe
-        expect(await screen.findByText(/Error: Ya existe un usuario con ese nombre o correo electrónico/i)).toBeInTheDocument();
+        const errorMessage = await screen.findByText(/Error: Ya existe un usuario con ese nombre o correo electrónico/i);
+        expect(errorMessage).toBeInTheDocument();
+        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
     });
 
     test("Muestra error si el correo está repetido", async () => {
@@ -95,14 +95,14 @@ describe("AddUser component", () => {
         userEvent.type(screen.getByLabelText(/Nombre de usuario*/i), "nolindhdhhd");
 
         const passwordFields = screen.queryAllByText(/Contraseña*/i);
-
         userEvent.type(passwordFields[0].closest('label').nextElementSibling, "123456");
         userEvent.type(passwordFields[1].closest('label').nextElementSibling, "123456");
 
         userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        // Verifica que el mensaje de error aparezca si el correo ya está registrado
-        expect(await screen.findByText(/Error: Ya existe un usuario con ese correo electrónico/i)).toBeInTheDocument();
+        const errorMessage = await screen.findByText(/Error: Ya existe un usuario con ese correo electrónico/i);
+        expect(errorMessage).toBeInTheDocument();
+        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
     });
 
     test("Muestra error si el correo está vacío", async () => {
@@ -117,14 +117,14 @@ describe("AddUser component", () => {
         userEvent.type(screen.getByLabelText(/Nombre de usuario*/i), "testuser");
 
         const passwordFields = screen.queryAllByText(/Contraseña*/i);
-
         userEvent.type(passwordFields[0].closest('label').nextElementSibling, "123456");
         userEvent.type(passwordFields[1].closest('label').nextElementSibling, "123456");
 
         userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        // Verificamos que aparece el error por correo vacío
-        expect(await screen.findByText(/Error: Por favor, introduce un correo electrónico/i)).toBeInTheDocument();
+        const errorMessage = await screen.findByText(/Error: Por favor, introduce un correo electrónico/i);
+        expect(errorMessage).toBeInTheDocument();
+        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
     });
 
     test("Muestra error si el nombre de usuario está vacío", async () => {
@@ -139,14 +139,14 @@ describe("AddUser component", () => {
         userEvent.type(screen.getByLabelText(/Correo electrónico*/i), "testuser");
 
         const passwordFields = screen.queryAllByText(/Contraseña*/i);
-
         userEvent.type(passwordFields[0].closest('label').nextElementSibling, "123456");
         userEvent.type(passwordFields[1].closest('label').nextElementSibling, "123456");
 
         userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        // Verificamos que aparece el error por nombre de usuario vacío
-        expect(await screen.findByText(/Error: Por favor, introduce un nombre de usuario/i)).toBeInTheDocument();
+        const errorMessage = await screen.findByText(/Error: Por favor, introduce un nombre de usuario/i);
+        expect(errorMessage).toBeInTheDocument();
+        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
     });
 
     test("Muestra error si la contraseña está vacía", async () => {
@@ -162,13 +162,13 @@ describe("AddUser component", () => {
         userEvent.type(screen.getByLabelText(/Nombre de usuario*/i), "testuser");
 
         const passwordFields = screen.queryAllByText(/Contraseña*/i);
-
         userEvent.type(passwordFields[1].closest('label').nextElementSibling, "123456");
 
         userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        // Verificamos que aparece el error por contraseña vacía
-        expect(await screen.findByText(/Error: Por favor, introduce una contraseña/i)).toBeInTheDocument();
+        const errorMessage = await screen.findByText(/Error: Por favor, introduce una contraseña/i);
+        expect(errorMessage).toBeInTheDocument();
+        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
     });
 
     test("Muestra error si la confirmación de la contraseña está vacía", async () => {
@@ -184,12 +184,12 @@ describe("AddUser component", () => {
         userEvent.type(screen.getByLabelText(/Nombre de usuario*/i), "testuser");
 
         const passwordFields = screen.queryAllByText(/Contraseña*/i);
-
         userEvent.type(passwordFields[0].closest('label').nextElementSibling, "123456");
 
         userEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        // Verificamos que aparece el error por confirmación de contraseña vacía
-        expect(await screen.findByText(/Error: Por favor, confirma tu contraseña/i)).toBeInTheDocument();
+        const errorMessage = await screen.findByText(/Error: Por favor, confirma tu contraseña/i);
+        expect(errorMessage).toBeInTheDocument();
+        expect(errorMessage.closest('div')).toHaveClass('MuiSnackbarContent-message');
     });
 });
