@@ -1,8 +1,8 @@
 {
   "name": "wikiquestionservice",
   "version": "1.0.0",
-  "description": "[![Actions Status](https://github.com/arquisoft/wichat_es3b/workflows/CI%20for%20wichat_es3b/badge.svg)](https://github.com/arquisoft/wichat_es3b/actions)\r [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_wichat_es3b&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Arquisoft_wichat_es3b)\r [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_wichat_es3b&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Arquisoft_wichat_es3b)",
-  "main": "wikiQuestionService.js.js",
+  "description": "Wikidata service, encharged to get questions from wikidata API",
+  "main": "wikiQuestion-service.js",
   "directories": {
     "doc": "docs"
   },
@@ -14,12 +14,12 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^1.8.2",
-    "express": "^4.18.2",
     "cors": "^2.8.5",
+    "express": "^4.18.2",
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "supertest": "^7.0.0"
+    "supertest": "^7.1.0"
   }
 }

@@ -18,7 +18,7 @@ app.get("/questions", async (req, res) => {
   const numQuestions = parseInt(n, 10);
 
   if (numQuestions > 30) {
-    return res.status(400).json({ error: "El límite de preguntas es 25" });
+    return res.status(400).json({ error: "El límite de preguntas es 30" });
   }
 
   const validCategories = ["paises", "cine", "clubes", "literatura", "arte", "all"];
