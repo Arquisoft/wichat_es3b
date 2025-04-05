@@ -35,11 +35,12 @@ app.get("/health", async (req, res) => {
 });
 
 // Questions endpoint
-app.get('/questions/:n', async (req, res) => {
+app.get('/questions/:n/:topic', async (req, res) => {
     try {
-        const { n } = req.params;
+        const { n, topic } = req.params;
+        const queryString = `questions?n=${n}&topic=${encodeURIComponent(topic)}`;
         // Redirigir la solicitud al gateway service
-        const response = await axios.get(`${gatewayServiceUrl}/questions/${n}`);
+        const response = await axios.get(`${gatewayServiceUrl}/${queryString}`);
         res.json(response.data);
     } catch (error) {
         res.status(error.response ? error.response.status : 500).json({
