@@ -3,6 +3,7 @@ const server = require("./wikiQuestion-service");
 const CategoryLoader = require("./questiongenerator/categoryLoader");
 const Question = require("./questiongenerator/question");
 const WikidataQueryService = require('./questiongenerator/questionGen');
+/* TEST FUNCIONANDO */
 describe('Wikidata Service', () => {
     /*
     /* Test para combrobar que todo va bien
