@@ -1,13 +1,11 @@
 "use client"
 
-import { useEffect, useState, useCallback, useRef } from "react"
+import { useEffect, useState, useRef } from "react"
 import "./Game.css"
-import Nav from "../../components/nav/Nav"
-import Footer from "../../components/Footer"
-import HintButton from "../../components/hintButton/HintButton"
-import BaseButton from "../../components/button/BaseButton"
-import ChatBox from "../../components/chatBox/ChatBox"
-import InfoDialog from "../../components/infoDialog/InfoDialog"
+import HintButton from "../hintButton/HintButton"
+import BaseButton from "../button/BaseButton"
+import ChatBox from "../chatBox/ChatBox"
+import InfoDialog from "../infoDialog/InfoDialog"
 import { LinearProgress, Box } from "@mui/material"
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
 import { motion } from "framer-motion"
@@ -209,12 +207,11 @@ useEffect(() => {
   }
 
   if (isLoading) {
-    return <div>Cargando...</div>
+    return <div className="loading-div"><h1>Cargando...</h1></div>
   }
 
   return (
     <div className="gameContainer">
-      <Nav />
       <main className={showRules ? "blurred" : ""}>
         <div className="game-layout">
           <div className="left-column">
@@ -364,7 +361,6 @@ useEffect(() => {
           </div>
         </div>
       )}
-      <Footer />
     </div>
   )
 }
