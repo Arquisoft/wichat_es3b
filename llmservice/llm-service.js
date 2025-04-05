@@ -6,6 +6,9 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 8003;
 
+let backupModel = 'mistral'; // Modelo de respaldo
+let currentModel = 'empathy'; // Modelo actual
+
 // Middleware to parse JSON in request body
 app.use(express.json());
 
@@ -43,6 +46,21 @@ const llmConfigs = {
             Authorization: `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
         })
+    },
+    mistral: {
+        url: () => 'https://empathyai.prod.empathy.co/v1/chat/completions',
+        transformRequest: (systemPrompt, userQuestion) => ({
+            model: "mistralai/Mistral-7B-Instruct-v0.3",
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userQuestion }
+            ]
+        }),
+        transformResponse: (response) => response.data.choices[0]?.message?.content,
+        headers: (apiKey) => ({
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        })
     }
 };
 
@@ -65,7 +83,7 @@ function validateRequiredFields(req) {
 }
 
 // Generic function to send questions to LLM
-async function sendQuestionToLLM(systemPrompt, userQuestion, apiKey, model = 'gemini') {
+async function sendQuestionToLLM(systemPrompt, userQuestion, apiKey, model = currentModel) {
     try {
         console.log(`Sending request to ${model} LLM...`);
 
@@ -93,6 +111,18 @@ async function sendQuestionToLLM(systemPrompt, userQuestion, apiKey, model = 'ge
         if (error.response) {
             console.error(`LLM respondió con estado ${error.response.status}:`, error.response.data);
         }
+
+        if (error.response && error.response.status >= 500) {
+            console.log(`Error 500 o similar con el modelo ${model}, intentando con el modelo ` + backupModel + `...`);
+            currentModel = backupModel;
+            backupModel = model;
+            return await sendQuestionToLLM(systemPrompt, userQuestion, apiKey, currentModel);
+        }
+        console.error(`Error al enviar pregunta a ${model}:`, error.message || error);
+        if (error.response) {
+            console.error(`LLM respondió con estado ${error.response.status}:`, error.response.data);
+        }
+
         // Propagamos el error original en lugar de crear uno nuevo
         throw error;
     }
@@ -166,7 +196,7 @@ app.post('/ask', async (req, res) => {
 
         validateRequiredFields(req);
 
-        const { userQuestion, question, idioma, model = 'empathy' } = req.body;
+        const { userQuestion, question, idioma, model = currentModel } = req.body;
 
         // Verificar que tenemos la API key
         if (!process.env.LLM_API_KEY) {

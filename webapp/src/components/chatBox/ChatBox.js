@@ -32,8 +32,7 @@ const ChatBox = ({
       const requestData = {
         userQuestion: input,
         question: question,
-        idioma: "es",
-        model: "empathy",
+        idioma: "es"
       };
 
       // Llamar al servicio LLM
