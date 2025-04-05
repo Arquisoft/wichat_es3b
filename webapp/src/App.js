@@ -5,14 +5,15 @@ import Home from "./pages/home/Home.js";
 import PerfilPage from "./pages/profilePage/PerfilPage.js";
 import { Route, Routes } from "react-router-dom";
 import Game from "./pages/game/Game.js";
-import PrivateRoute from "./components/routes/PrivateRoute.js"; // Importar el componente
+import PrivateRoute from "./components/routes/PrivateRoute.js";
+import Settings from "./pages/settings/Settings.js";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} /> {/* Página principal */}
+      <Route path="/" element={<Home />} />
       <Route path="/auth" element={<AuthForm />} />
-      {/* Ruta protegida para Play */}
+
       <Route
         path="/play"
         element={
@@ -21,7 +22,22 @@ function App() {
           </PrivateRoute>
         }
       />
-      <Route path="/profile" element={<PerfilPage />} />
+      <Route
+        path="/profile"
+        element={
+          <PrivateRoute>
+            <PerfilPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <PrivateRoute>
+            <Settings />
+          </PrivateRoute>
+        }
+      />
       <Route path="/home" element={<Home />} />
     </Routes>
   );

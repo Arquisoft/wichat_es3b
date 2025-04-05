@@ -1,0 +1,115 @@
+.mainSettingsPageContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+}
+
+.gameCategoriesPanel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1em;
+  gap: 2em;
+}
+
+.gameSettingsContentWrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.mainGameSettingsContainer {
+  margin: 2em 0;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5em;
+  transition: all 0.3s ease;
+  width: 100%;
+  overflow: hidden;
+}
+
+.mainGameSettingsContainer.gameSidebar-open {
+  width: 85%;
+  margin-left: 15%;
+}
+
+.gameCategoriesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2em;
+  justify-content: center;
+  align-items: center;
+  width: 40%;
+  margin: 0 auto;
+}
+
+.gameButtonPanel {
+  width: 15%;
+  min-height: 50px;
+}
+
+.gameButtonPanel button {
+  width: 100%;
+  height: 100%;
+  font-size: var(--font-size-lg);
+}
+
+.content-toggle-container {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 200;
+}
+
+.gameCategoriesGrid {
+  will-change: transform, opacity;
+}
+
+.gameCategoriesGrid > div {
+  position: relative;
+  z-index: 1;
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+  .mainGameSettingsContainer.gameSidebar-open {
+    width: 60%;
+    margin-left: 40%;
+  }
+
+  .gameCategoriesGrid {
+    grid-template-columns: repeat(2, 1fr);
+    width: 90%;
+  }
+
+  .gameButtonPanel {
+    width: 30%;
+  }
+
+  .content-toggle-container {
+    left: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mainGameSettingsContainer.gameSidebar-open {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .gameCategoriesGrid {
+    grid-template-columns: 1fr;
+    max-width: 300px;
+  }
+
+  .gameButtonPanel {
+    width: 50%;
+  }
+}

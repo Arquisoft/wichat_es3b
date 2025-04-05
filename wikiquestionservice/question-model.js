@@ -10,12 +10,14 @@ const QuestionSchema = new mongoose.Schema({
   },
 
   correctAnswer: {
-     type: String 
+    es: { type: String }, 
+    en: { type: String } 
   },
 
-  incorrectAnswers: [{
-    type: String 
-  }],
+  incorrectAnswers: {
+    es: [{ type: String }], 
+    en: [{ type: String }] 
+  },
 
   description: [
     {

@@ -7,7 +7,10 @@ import WiChatTextField from "../textField/WiChatTextField";
 import PhotoPanel from "../photoPanel/PhotoPanel";
 import "./Login.css";
 import "../../assets/global.css";
-import logo from "../../assets/img/logo_base.png";
+import { useTranslation } from "react-i18next";
+import AuthHeader from "../authHeader/AuthHeader";
+
+
 
 const Login = ({ handleToggleView }) => {
   const [username, setUsername] = useState("");
@@ -16,8 +19,11 @@ const Login = ({ handleToggleView }) => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Verificar si hay un token guardado
@@ -27,6 +33,10 @@ const Login = ({ handleToggleView }) => {
     }
   }, []);
 
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+  
   // Iniciar sesión
   const loginUser = async () => {
     try {
@@ -68,29 +78,32 @@ const Login = ({ handleToggleView }) => {
         ) : (
             <div className="mainDiv">
               <div className="form">
-                <img className="logoAuth" src={logo} alt="Logo de WiChat" />
-                <h1>Identifícate</h1>
-                <h2>Introduce tus datos y únete a WiChat ya mismo.</h2>
+                <AuthHeader></AuthHeader>
+                <h1>{t("identify")}</h1>
+                <h2>{t("introduceData")}</h2>
                 <div className="formField">
-                  <label>Nombre de usuario</label>
+                  <label>{t("username")}</label>
                   <WiChatTextField
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                   />
                 </div>
                 <div className="formField">
-                  <label>Contraseña</label>
-                  <WiChatTextField
-                      type="password"
+                  <label>{t("password")}</label>
+                  <div className="passwordContainer">
+                    <WiChatTextField
                       value={password}
+                      type={showPassword ? "text" : "password"}
                       onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
+                    />
+                  <span onClick={toggleShowPassword}>👁️‍🗨️</span>
+                </div>    
+              </div>
                 <div className="buttonPanel">
-                  <BaseButton text="Iniciar Sesión" onClick={loginUser} />
+                  <BaseButton text={t("login")} onClick={loginUser} />
                   <span> o </span>
                   <BaseButton
-                      text="Crear cuenta"
+                      text={t("signup")}
                       onClick={handleToggleView}
                       buttonType="buttonSecondary"
                   />
@@ -98,12 +111,12 @@ const Login = ({ handleToggleView }) => {
                 <Snackbar
                     open={openSnackbar}
                     autoHideDuration={6000}
-                    message="Login exitoso"
+                    message={t("loginSuccessful")}
                     onClose={() => setOpenSnackbar(false)}
                 />
                 {error && <p className="error">{error}</p>}
               </div>
-              <PhotoPanel text="¡Bienvenido a WiChat!" />
+              <PhotoPanel text={t("loginMessageInPanel")} />
             </div>
         )}
       </div>
