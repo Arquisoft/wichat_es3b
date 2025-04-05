@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const cron = require("node-cron");
 const QuestionManager = require("./questiongenerator/questionManager");
 
 const app = express();
@@ -29,7 +28,7 @@ app.get("/questions", async (req, res) => {
   }
 
   try {
-    if (topics.includes("all")|| topics.length === 0) {
+    if (topics.includes("all") || topics.length === 0) {
       topics = ["all"];
     }
 
@@ -49,17 +48,10 @@ app.get("/questions", async (req, res) => {
   }
 });
 
-const server = app.listen(port, () => {
-  console.log(`🚀 Question Service listening at http://localhost:${port}`);
-});
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`🚀 Question Service listening at http://localhost:${port}`);
+  });
+}
 
-cron.schedule("0 3 * * *", async () => {
-  try {
-    await questionManager.loadAllQuestions();
-    console.log("🔄 Generadores de preguntas recargados automáticamente.");
-  } catch (error) {
-    console.error("❌ Error al recargar los generadores de preguntas:", error);
-  }
-});
-
-module.exports = server;
+module.exports = app;

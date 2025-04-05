@@ -1,9 +1,10 @@
-const server = require("./wikiQuestion-service");
 const request = require("supertest");
+const server = require("./wikiQuestion-service");
 const CategoryLoader = require("./questiongenerator/categoryLoader");
 const Question = require("./questiongenerator/question");
 const WikidataQueryService = require('./questiongenerator/questionGen');
 describe('Wikidata Service', () => {
+    /*
     /* Test para combrobar que todo va bien
      */
     it('should always pass', async () => {
@@ -22,7 +23,7 @@ describe('Wikidata Service', () => {
         expect(services).toHaveProperty('paises');
         expect(services).toHaveProperty('clubes');
         expect(services).toHaveProperty('arte');
-        expect(Object.keys(services).length).toBe(5);  // Solo categorías válidas deben estar
+        expect(Object.keys(services).length).toBe(5);
     });
 
     /* Test para combrobar que poniendo all y otra nos cargan todas las categorías igualmente
@@ -37,7 +38,7 @@ describe('Wikidata Service', () => {
         expect(services).toHaveProperty('paises');
         expect(services).toHaveProperty('clubes');
         expect(services).toHaveProperty('arte');
-        expect(Object.keys(services).length).toBe(5); // Debería incluir todas las categorías
+        expect(Object.keys(services).length).toBe(5);
     });
 
     /* Test para combrobar que poniendo categorías individuales y no están las demás
@@ -424,18 +425,5 @@ describe('Wikidata Service', () => {
             expect(questionString).toContain('📸 **Imagen:** img1.jpg');
         });
     });
-    afterAll(async () => {
-        try {
-            await server.close();  // Asegúrate de que el servidor se cierra correctamente.
-        } catch (error) {
-            console.error('Error cerrando el servidor', error);
-        }
-    });
-});
-afterAll(async () => {
-    try {
-        await server.close();  // Asegúrate de que el servidor se cierra correctamente.
-    } catch (error) {
-        console.error('Error cerrando el servidor', error);
-    }
+
 });
