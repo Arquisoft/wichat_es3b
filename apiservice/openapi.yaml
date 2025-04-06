@@ -22,7 +22,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthStatus'
-  /questions/{n}:
+  /questions/{n}/{topic}:
     get:
       summary: Get n questions
       operationId: getQuestions
@@ -35,6 +35,12 @@ paths:
           schema:
             type: integer
           description: Number of questions to retrieve
+        - name: topic
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Topic of the questions (e.g., "all", "history", "history,geography")
       responses:
         '200':
           description: Questions retrieved successfully
