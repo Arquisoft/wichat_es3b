@@ -1,12 +1,10 @@
 import { React, useState, useMemo, useEffect } from "react";
-import Nav from "../../components/nav/Nav";
-import Footer from "../../components/Footer";
-import "./Settings.css";
-import BaseButton from "../../components/button/BaseButton";
+import "./GameSettings.css";
+import BaseButton from "../button/BaseButton";
 import { useTranslation } from "react-i18next";
-import CategoryCard from "../../components/categoryCard/CategoryCard";
-import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarToggleButton";
-import GameSettingsSidebar from "../../components/gameSettingsSidebar/GameSettingsSidebar";
+import CategoryCard from "../categoryCard/CategoryCard";
+import SidebarToggleButton from "../sidebarToggleButton/SidebarToggleButton";
+import GameSettingsSidebar from "../gameSettingsSidebar/GameSettingsSidebar";
 import { motion } from "framer-motion";
 
 import footballCategory from "../../assets/img/categories/footballCategory.jpg";
@@ -15,11 +13,9 @@ import literatureCategory from "../../assets/img/categories/literatureCategory.j
 import countriesCategory from "../../assets/img/categories/countriesCategory.jpg";
 import artCategory from "../../assets/img/categories/artCategory.jpg";
 import allCategory from "../../assets/img/categories/allCategory.jpg";
-import {useNavigate} from "react-router-dom";
 
-const Settings = () => {
+const GameSettings = ({onStartGame}) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const categories = useMemo(
     () => [
       { id: "football", name: t("football"), imageSrc: footballCategory, value: "clubes" },
@@ -116,7 +112,6 @@ const Settings = () => {
 
   return (
     <div className="mainSettingsPageContainer">
-      <Nav />
       <div className="gameSettingsContentWrapper">
         <GameSettingsSidebar
           isOpen={sidebarOpen}
@@ -152,14 +147,13 @@ const Settings = () => {
 
             <div className="gameButtonPanel">
               <BaseButton text={t("play")}
-                          onClick={() => navigate("/play")}/>
+                          onClick={onStartGame}/>
             </div>
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };
 
-export default Settings;
+export default GameSettings;
