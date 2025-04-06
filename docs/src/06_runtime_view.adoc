@@ -165,7 +165,7 @@ GW -> WA: Record Details
 ----
 
 === API Access - Ask for questions
-A user wants to check the record of a game session. The system loads all records and the user selects one to see the details. The system loads the details of the record and shows them to the user.
+The user wants to document an API access scenario where a user asks for questions. The system processes the request  and returns the questions to the user.
 [plantuml,"API Access - Questions",svg]
 ----
 actor User
@@ -184,8 +184,8 @@ GW -> IG: Questions
 IG -> User: Questions
 ----
 
-=== API Access - Ask for user record
-A user wants to check the record of a game session. The system loads all records and the user selects one to see the details. The system loads the details of the record and shows them to the user.
+=== API Access - Ask for user records
+A user wants to check the stats of a user. The system loads the stats of the user asked for.
 [plantuml,"API Access - Records",svg]
 ----
 actor User
