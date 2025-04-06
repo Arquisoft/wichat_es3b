@@ -12,7 +12,7 @@ services:
 
   authservice:
     container_name: authservice-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/authservice:latest
+    image: ghcr.io/arquisoft/wichat_es3b/authservice:deployment_branch
     profiles: ["dev", "prod"]
     build: ./users/authservice
     depends_on:
@@ -26,7 +26,7 @@ services:
 
   userservice:
     container_name: userservice-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/userservice:latest
+    image: ghcr.io/arquisoft/wichat_es3b/userservice:deployment_branch
     profiles: ["dev", "prod"]
     build: ./users/userservice
     depends_on:
@@ -40,7 +40,7 @@ services:
 
   statsservice:
     container_name: statsservice-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/statsservice:latest
+    image: ghcr.io/arquisoft/wichat_es3b/statsservice:deployment_branch
     profiles: ["dev", "prod"]
     build: ./users/statsservice
     depends_on:
@@ -54,7 +54,7 @@ services:
 
   llmservice:
     container_name: llmservice-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/llmservice:latest
+    image: ghcr.io/arquisoft/wichat_es3b/llmservice:deployment_branch
     profiles: ["dev", "prod"]
     build: ./llmservice
     ports:
@@ -66,7 +66,7 @@ services:
 
   gatewayservice:
     container_name: gatewayservice-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/gatewayservice:latest
+    image: ghcr.io/arquisoft/wichat_es3b/gatewayservice:deployment_branch
     profiles: ["dev", "prod"]
     build: ./gatewayservice
     depends_on:
@@ -89,7 +89,7 @@ services:
 
   apiservice:
     container_name: apiservice-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/apiservice:latest
+    image: ghcr.io/arquisoft/wichat_es3b/apiservice:deployment_branch
     profiles: [ "dev", "prod" ]
     build:
       context: ./apiservice
@@ -106,7 +106,7 @@ services:
 
   webapp:
     container_name: webapp-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/webapp:latest
+    image: ghcr.io/arquisoft/wichat_es3b/webapp:deployment_branch
     profiles: ["dev", "prod"]
     build:
       context: ./webapp
@@ -122,8 +122,8 @@ services:
   wikiquestionservice:
     container_name: wikiquestionservice-wichat_es3b
     build: ./wikiquestionservice
-    image: ghcr.io/arquisoft/wichat_es3b/wikiquestionservice:latest
-    profiles: [ "dev", "prod" ]
+    image: ghcr.io/arquisoft/wichat_es3b/wikiquestionservice:deployment_branch
+    profiles: ["dev", "prod"]
     depends_on:
       - mongodb
     ports:
