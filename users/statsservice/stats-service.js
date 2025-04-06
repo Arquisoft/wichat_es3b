@@ -65,8 +65,14 @@ app.post("/savestats", async (req, res) => {
 
     await stats.save();
 
+    const lastGame = await Game.findOne({ username }).sort({ gameId: -1 });
+
+    let gameId = lastGame ? lastGame.gameId + 1 : 1;
+
     let game = new Game({
-      username,
+      username, 
+      gameId,
+
       rightAnswers,
       wrongAnswers,
       ratio:
@@ -95,31 +101,45 @@ app.get("/getstats/:username", async (req, res) => {
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }*/
+        const stats = await Stats.findOne({ username });
 
-    const stats = await Stats.findOne({ username });
-
-    if (!stats) {
-      return res.status(404).json({ error: "Stats not found for this user" });
-    }
-
-    res.json({
-      username: stats.username,
-      games: stats.games,
-      rightAnswers: stats.rightAnswers,
-      wrongAnswers: stats.wrongAnswers,
-      ratio: stats.ratio,
-      averageTime: stats.averageTime,
-      maxScore: stats.maxScore,
+        if (!stats) {
+          return res.status(404).json({ error: "Stats not found for this user" });
+        }
+    
+        res.json({
+          username: stats.username,
+          games: stats.games,
+          rightAnswers: stats.rightAnswers,
+          wrongAnswers: stats.wrongAnswers,
+          ratio: stats.ratio,
+          averageTime: stats.averageTime,
+          maxScore: stats.maxScore,
+        });
+      } catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+      }
     });
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
+
+  app.get('/getTop3', async (req, res) => {
+    try {
+      const ranking = await Stats.find()
+        .sort({ maxScore: -1 })  
+        .select('username maxScore') 
+        .limit(3);
+  
+      res.json(ranking);
+    } catch (error) {
+      console.error("Error al obtener el ranking:", error);
+      res.status(500).json({ error: 'Error al obtener el ranking' });
+    }
+  });
+    
 
 app.get("/getranking", async (req, res) => {
   try {
     const ranking = await Stats.find()
-      .sort({ maxScore: -1, ratio: -1 }) // -1 indica orden descendente
+      .sort({ maxScore: -1, ratio: -1 }) 
       .select(
         "username games rightAnswers wrongAnswers ratio averageTime maxScore"
       )
@@ -132,19 +152,6 @@ app.get("/getranking", async (req, res) => {
   }
 });
 
-app.get("/getTop3", async (req, res) => {
-  try {
-    const ranking = await Stats.find()
-      .sort({ maxScore: -1 }) // -1 indica orden descendente
-      .select("username maxScore")
-      .limit(3);
-
-    res.json(ranking);
-  } catch (error) {
-    console.error("Error al obtener el ranking:", error);
-    res.status(500).json({ error: "Error al obtener el ranking" });
-  }
-});
 
 app.get("/games/:username", async (req, res) => {
   try {
