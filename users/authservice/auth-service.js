@@ -29,7 +29,7 @@ app.post('/login',  [
   check('password').isLength({ min: 3 }).trim().escape()
 ],async (req, res) => {
   try {
-    // Check if required fields are present in the request body
+    // Checks if required fields are present in the request body
   
   validateRequiredFields(req, ['username', 'password']);
   
