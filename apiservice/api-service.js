@@ -8,7 +8,7 @@ const promBundle = require("express-prom-bundle");
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 8006;
+const port = 8006;
 const gatewayServiceUrl = process.env.GATEWAY_SERVICE_URL || "http://localhost:8000";
 
 app.use(cors());

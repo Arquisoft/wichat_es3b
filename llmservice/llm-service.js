@@ -4,7 +4,7 @@ const express = require('express');
 require("dotenv").config();
 
 const app = express();
-const port = process.env.PORT || 8003;
+const port = 8003;
 
 let backupModel = 'mistral'; // Modelo de respaldo
 let currentModel = 'empathy'; // Modelo actual
