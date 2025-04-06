@@ -1,8 +1,9 @@
 import React from "react";
 import "./WiChatTextField.css";
-const WiChatTextField = ({ value, onChange, type = "text" }) => {
+const WiChatTextField = ({ id, value, onChange, type = "text" }) => {
   return (
     <input
+        id={id}
       type={type}
       onChange={onChange}
       value={value}

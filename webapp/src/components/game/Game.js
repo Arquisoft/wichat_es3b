@@ -37,7 +37,6 @@ const Game = () => {
   const [questionAnimationComplete, setQuestionAnimationComplete] = useState(false)
   const [shuffledAnswers, setShuffledAnswers] = useState([]);
 
-  const URL = "http://localhost:8004/"
   const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000"
   const loggedUsername = localStorage.getItem("username")
   const [config, setConfig] = useState(null);
@@ -86,6 +85,7 @@ const Game = () => {
           const categories = config.categories.includes("all") ? ["all"] : config.categories;
           const numPreguntas = config.numPreguntas ?? 10;
           const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
+          console.log("URL de la solicitud al gateway:", `${GATEWAY_URL}/${queryString}`);
           const response = await fetch(`${GATEWAY_URL}/${queryString}`);
           if (!response.ok) {
             throw new Error("No se pudieron obtener las preguntas.");
