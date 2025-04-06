@@ -124,7 +124,7 @@ collections WA as "Web App"
 collections GW as "GatewayService"
 collections QU as "GameService"
 collections LLMS as "LLMService"
-entity LLM as "MistralAPI"
+entity LLM as "EmpathyAPI"
 
 User -> WA: Asks for a question
 WA -> GW: userAsksForNewClue(userText)
@@ -162,4 +162,44 @@ US -> DB: getRecordDetails(RecordID)
 DB -> US: Record Details
 US -> GW: Record Details
 GW -> WA: Record Details
+----
+
+=== API Access - Ask for questions
+The user wants to document an API access scenario where a user asks for questions. The system processes the request  and returns the questions to the user.
+[plantuml,"API Access - Questions",svg]
+----
+actor User
+collections IG as "API Information Gateway"
+collections GW as "GatewayService"
+collections WS as "WikiquestionService"
+database DB as "MongoDB"
+
+User -> IG: /questions/:n/:topic
+IG -> GW: questions()
+GW -> WS: loadQuestions()
+WS -> DB: loadQuestions()
+DB -> WS: Questions
+WS -> GW: Questions
+GW -> IG: Questions
+IG -> User: Questions
+----
+
+=== API Access - Ask for user records
+A user wants to check the stats of a user. The system loads the stats of the user asked for.
+[plantuml,"API Access - Records",svg]
+----
+actor User
+collections IG as "API Information Gateway"
+collections GW as "GatewayService"
+collections SS as "StatsService"
+database DB as "MongoDB"
+
+User -> IG: /getstats/:username
+IG -> GW: getStats()
+GW -> SS: getStats()
+SS -> DB: getStats()
+DB -> SS: UserStats
+SS -> GW: UserStats
+GW -> IG: UserStats
+IG -> User: UserStats
 ----
