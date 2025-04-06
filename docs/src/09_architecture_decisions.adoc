@@ -8,8 +8,8 @@ the user's turn.
 
 *_Decision:_* +
 It was decided to integrate Large Language Models (LLMs) through external APIs to generate real-time responses and hints. +
-The selected models are Gemini-1.5-Flash (Google) and Qwen2.5-Coder-7B-Instruct (Empathy AI)
-because they are the ones integrated into the base project software.
+The selected models are Mistral-7B-Instruct-v0.3 and Qwen2.5-Coder-7B-Instruct, both from Empathy AI
+because it is the API key that has been provided to us and allows us to access both easily with the same API key, improving our resilience in case of external failure by any of the models .
 
 *Consequences* +
 Consequently, we need a structured knowledge source, in our case Wikidata,
