@@ -18,11 +18,13 @@ jobs:
     - run: npm --prefix llmservice ci
     - run: npm --prefix gatewayservice ci
     - run: npm --prefix webapp ci
+    - run: npm --prefix apiservice ci
     - run: npm --prefix users/authservice test -- --coverage
     - run: npm --prefix users/userservice test -- --coverage
     - run: npm --prefix llmservice test -- --coverage
     - run: npm --prefix gatewayservice test -- --coverage
     - run: npm --prefix webapp test -- --coverage
+    - run: npm --prefix apiservice test -- --coverage
     - name: Analyze with SonarQube
       uses: SonarSource/sonarqube-scan-action@master
       env:
