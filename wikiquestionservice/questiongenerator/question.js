@@ -4,13 +4,15 @@ class Question {
         preguntas,
         respuestasIncorrectas,
         descripcion,
-        img
+        img,
+        categoryName
     ) {
         this.respuestaCorrecta = respuestaCorrecta;
         this.preguntas = preguntas;
         this.respuestasIncorrectas = respuestasIncorrectas;
         this.descripcion = descripcion;
         this.img = img;
+        this.categoryName=categoryName;
     }
 
     obtenerPreguntaPorIdioma() {
