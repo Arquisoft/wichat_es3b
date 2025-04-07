@@ -2,22 +2,52 @@ ifndef::imagesdir[:imagesdir: ../images]
 
 [[section-introduction-and-goals]]
 == Introduction and Goals
+This project was created and developed by a development team composed of students from the Software Architecture course
+at the School of Computer Engineering of the University of Oviedo.
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Describes the relevant requirements and the driving forces that software architects and development team must consider. 
-These include
+Last year, the company HappySw launched a project aimed at updating an experimental online version of a quiz
+competition similar to "Saber y Ganar" for the RTVE network.
 
-* underlying business goals, 
-* essential features, 
-* essential functional requirements, 
-* quality goals for the architecture and
-* relevant stakeholders and their expectations
-****
-endif::arc42help[]
+This year, the company ChattySw wants to expand its functionality so that contestants can interact with the application by
+receiving hints about the answers.
+
+This is the development team:
+
+* **Enol Rodríguez Hevia**: _UO287935_
+* **Alberto Fernández Azcoaga**: _UO179637_
+* **David González González**: _UO291047_
+* **Zinedine Álvarez Sais**: _UO294258_
+* **Alejandro Vega García**: _UO294615_
+* **Ignacio Llaneza Aller**: _UO294914_
+* **Daniel Uría Edroso**: _UO282813_
 
 === Requirements Overview
+* The system will include at least a web frontend that will display images and answers, as well as a hint system
+that will allow users to receive clues about the images.
+
+* Users will be able to register in the system and consult the history of their participation in the system: number
+of games, number of correct/failed questions, times, etc.
+
+* The website must be deployed and accessible via the web.
+
+* The question data will be automatically generated from Wikidata API.
+
+* Users will be able to interact with the application for each question to obtain hints. This will be achieved through
+a language model (LLM) accessed via a provided API.
+
+* There will be a time limit to answer each question.
+
+* The system will provide API access to user information, which must be properly documented.
+
+* The system will also provide API access to the generated questions.
+
+* Each question will have one correct answer and several incorrect (distracting) answers. All answers will be genereated
+automatically.
+
+* A technique must be implemented to generate hints from Wikidata data while mitigating incorrect
+answers and hallucinations during interactions.
+
+
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -46,6 +76,20 @@ See https://docs.arc42.org/section-1/[Introduction and Goals] in the arc42 docum
 endif::arc42help[]
 
 === Quality Goals
+
+[options="header",cols="1,2,2"]
+|===
+|Priority|Quality Goal|Expectations
+| _1_ | _Usability_ | _All people should be able to enjoy and finish with success the application within a reasonable
+limit of time_
+| _2_ | _Maintainability_ | _The application should be easy to maintain, with clear, well-documented code and modular
+design that allows for future updates._
+| _3_ | _Accessibility_ | _The application should be usable by people with various disabilities, meeting common
+accessibility standards_
+| _4_ | _Availability_ | _The application should be available with minimal downtime, aiming for 99.9% uptime or better,
+and should be scalable to handle user demand_
+| _5_ | _Reliability_ | _The application should operate consistently and recover quickly from failures_
+|===
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -96,6 +140,13 @@ endif::arc42help[]
 [options="header",cols="1,2,2"]
 |===
 |Role/Name|Contact|Expectations
-| _<Role-1>_ | _<Contact-1>_ | _<Expectation-1>_
-| _<Role-2>_ | _<Contact-2>_ | _<Expectation-2>_
+| _Teachers_ | _Jose Emilio Labra, Pablo González, Irene Cid, Diego Martín_ | The teachers are the supervisors of the
+team and will help the team and should be accessible if the team needs them.
+| _Students_ | _Enol Rodríguez, Alberto Fernández, David González, Zinedine Álvarez, Alejandro Vega
+Ignacio Llaneza, Daniel Uría_ | _They are the development team. They should develop the application with success and
+learn through the process of the subject_
+| _Users_ | _Anyone who interacts with the application_ | They should be able to use the application without any
+problems and enjoy the experience.
+| _RTVE_ | _RTVE_ | They are the primary stakeholders in the application, as they commissioned it to allow their
+viewers to use it.
 |===

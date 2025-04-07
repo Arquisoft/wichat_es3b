@@ -1,6 +1,6 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
-= Architectural decisions
+== Architectural decisions
 
 === Use of Large Language Models (LLMs) in the System
 We will use LLM in our question-and-answer application to generate hints during
@@ -49,7 +49,7 @@ As a consequence, most part of the team will require React training because it i
 
 To learn basic concepts about React link:https://github.com/Arquisoft/wichat_es3b/issues/7[Issue #7].
 
-===  Using Node.js for Backend Development
+=== Using Node.js for Backend Development
 We require an efficient and scalable technology for the backend so we will
 utilize Node.js to solve this problem. +
 Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
