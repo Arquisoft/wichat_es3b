@@ -2,7 +2,7 @@ ifndef::imagesdir[:imagesdir: ../images]
 
 = Architectural decisions
 
-== 9.1 Use of Large Language Models (LLMs) in the System
+=== Use of Large Language Models (LLMs) in the System
 We will use LLM in our question-and-answer application to generate hints during
 the user's turn.
 
@@ -17,7 +17,7 @@ from which we will extract and process the information to provide it to the user
 
 To know more about Prompt Engineering link:https://github.com/Arquisoft/wichat_es3b/issues/4[Issue #4].
 
-== 9.2 Using Wikidata as the main knowledge base
+=== Using Wikidata as the main knowledge base
 We require a structured and up-to-date knowledge base, so we decided to utilize Wikidata
 as the primary information source. +
 Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
@@ -35,7 +35,7 @@ Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%8
 To learn basic concepts about Wikidata and SPARQL link:https://github.com/Arquisoft/wichat_es3b/issues/6[Issue #6].
 
 
-== 9.3 Choosing React for the Frontend
+=== Choosing React for the Frontend
 We require an efficient framework for frontend development so we decided to utilize
 React for the user interface. +
 Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
@@ -49,7 +49,7 @@ As a consequence, most part of the team will require React training because it i
 
 To learn basic concepts about React link:https://github.com/Arquisoft/wichat_es3b/issues/7[Issue #7].
 
-== 9.4  Using Node.js for Backend Development
+===  Using Node.js for Backend Development
 We require an efficient and scalable technology for the backend so we will
 utilize Node.js to solve this problem. +
 Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
@@ -61,7 +61,7 @@ Furthermore, it is a great opportunity for many of us to learn how to use this i
 
 New knowledge about Node.js link:https://github.com/Arquisoft/wichat_es3b/issues/3[Issue #3]
 
-== 9.5 Selecting MongoDB for the Database
+=== Selecting MongoDB for the Database
 Due to the requirement for flexible storage of structured and unstructured data,
 we have chosen a NoSQL database over SQL.  +
 Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
@@ -78,7 +78,7 @@ have had some exposure to NoSQL databases, further training and development in t
 
 To learn basic concepts about MongoDb and practice examples link:https://github.com/Arquisoft/wichat_es3b/issues/9[Issue #9].
 
-== 9.6 Selecting Docker for the Deployment
+=== Selecting Docker for the Deployment
 Considering the need for a dependable, scalable, and efficient deployment process, we chose Docker to containerize
 our services. Docker allows us to define and package all the components of our application in a consistent and
 repeatable manner, making it easy to deploy across various environments without issues. +
@@ -95,7 +95,7 @@ the application as needed.
 
 - To make sure we’re deploying and troubleshooting containers effectively, we'll need a solid understanding of Docker-specific tools (like Docker Compose) and networking.
 
-== 9.7 Selecting JavaScript (Node.js) for the Backend
+=== Selecting JavaScript (Node.js) for the Backend
 We chose JavaScript (Node.js) for the backend because using the same language on both
 the frontend and backend simplifies development and improves team collaboration. +
 Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
