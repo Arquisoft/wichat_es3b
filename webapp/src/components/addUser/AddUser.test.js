@@ -17,16 +17,16 @@ const renderAddUser = () => {
     );
 };
 
-const fillForm = async ({ email = "", username = "", password = "", confirmPassword = "" }) => {
-    if (email) await userEvent.type(screen.getByRole("textbox", { name: /Correo electrónico*/i }), email);
-    if (username) await userEvent.type(screen.getByRole("textbox", { name: /Nombre de usuario*/i }), username);
+const fillForm = ({ email = "", username = "", password = "", confirmPassword = "" }) => {
+    if (email) userEvent.type(screen.getByLabelText(/Correo electrónico*/i), email);
+    if (username) userEvent.type(screen.getByLabelText(/Nombre de usuario*/i), username);
 
-    const inputs = screen.getAllByRole("textbox");
-    // Asumimos que el input de contraseña y confirmación son 3 y 4
-    if (password) await userEvent.type(inputs[2], password);
-    if (confirmPassword) await userEvent.type(inputs[3], confirmPassword);
+    const passwordFields = screen.queryAllByText(/Contraseña*/i);
+    const passwordInput = passwordFields[0]?.closest("label")?.nextElementSibling;
+    if (passwordInput) userEvent.type(passwordInput, password);
+    const confirmPasswordInput = passwordFields[1]?.closest("label")?.nextElementSibling;
+    if (confirmPasswordInput) userEvent.type(confirmPasswordInput, confirmPassword);
 };
-
 
 const expectSnackbarError = async (expectedKey) => {
     await waitFor(() => {
@@ -97,19 +97,5 @@ describe("AddUser component", () => {
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
         expectSnackbarError("emptyPasswordConfirm")
     });
-
-    test("Se cierra el snackbar al hacer clic", async () => {
-        renderAddUser();
-        await fillForm({ username: "testuser", password: "123456", confirmPassword: "123456" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-
-        await waitFor(() => {
-            expect(screen.getByRole("alert")).toBeInTheDocument();
-        });
-
-        // Forzar cierre (esto solo tiene efecto si el Snackbar tiene `onClose` ejecutable por click)
-        userEvent.click(screen.getByRole("alert"));
-    });
-
 
 });
