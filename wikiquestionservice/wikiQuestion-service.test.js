@@ -425,6 +425,72 @@ describe('Wikidata Service', () => {
             expect(questionString).toContain('📝 **Descripción:** Capital: París');
             expect(questionString).toContain('📸 **Imagen:** img1.jpg');
         });
+
+        it('should handle empty descriptions and images', () => {
+            const respuestaCorrecta = { es: 'Respuesta correcta' };
+            const preguntas = { es: '¿Cuál es la capital de Francia?' };
+            const respuestasIncorrectas = { es: ['Madrid', 'Roma', 'Londres'] };
+            const descripcion = [];
+            const img = [];
+
+            const question = new Question(respuestaCorrecta, preguntas, respuestasIncorrectas, descripcion, img);
+            const questionString = question.toString();
+
+            // Test that the string contains default messages for empty description and images
+            expect(questionString).toContain('📝 **Descripción:** No hay descripción disponible.');
+            expect(questionString).toContain('📸 **Imagen:** No hay imagen disponible.');
+        });
+
+        // New test case: should handle missing languages
+        it('should handle missing languages gracefully', () => {
+            const respuestaCorrecta = { es: 'Respuesta correcta' };
+            const preguntas = { es: '¿Cuál es la capital de Francia?' };
+            const respuestasIncorrectas = { es: ['Madrid', 'Roma', 'Londres'] };
+            const descripcion = [{ propiedad: 'Capital', valor: 'París' }];
+            const img = ['img1.jpg'];
+
+            const question = new Question(respuestaCorrecta, preguntas, respuestasIncorrectas, descripcion, img);
+
+            // Test that missing languages do not break the code (e.g., querying for 'en' should return null/undefined)
+            const questionTextInEnglish = question.obtenerPreguntaPorIdioma()['en'];
+            expect(questionTextInEnglish).toBeUndefined();  // Expecting undefined since 'en' isn't provided
+        });
+
+        // New test case: should handle multiple languages correctly
+        it('should handle multiple languages correctly', () => {
+            const respuestaCorrecta = { es: 'Respuesta correcta', en: 'Correct answer' };
+            const preguntas = { es: '¿Cuál es la capital de Francia?', en: 'What is the capital of France?' };
+            const respuestasIncorrectas = { es: ['Madrid', 'Roma', 'Londres'], en: ['Madrid', 'Rome', 'London'] };
+            const descripcion = [{ propiedad: 'Capital', valor: 'París' }];
+            const img = ['img1.jpg'];
+
+            const question = new Question(respuestaCorrecta, preguntas, respuestasIncorrectas, descripcion, img);
+
+            // Test for both Spanish and English
+            const questionTextEs = question.obtenerPreguntaPorIdioma()['es'];
+            const questionTextEn = question.obtenerPreguntaPorIdioma()['en'];
+
+            expect(questionTextEs).toBe('¿Cuál es la capital de Francia?');
+            expect(questionTextEn).toBe('What is the capital of France?');
+        });
+
+        // New test case: should handle empty question and answer arrays
+        it('should handle empty question and answer arrays', () => {
+            const respuestaCorrecta = { es: '', en: '' };
+            const preguntas = { es: '', en: '' };
+            const respuestasIncorrectas = { es: [], en: [] };
+            const descripcion = [];
+            const img = [];
+
+            const question = new Question(respuestaCorrecta, preguntas, respuestasIncorrectas, descripcion, img);
+
+            // Test that empty questions and answers are handled correctly
+            const questionTextEs = question.obtenerPreguntaPorIdioma()['es'];
+            const questionTextEn = question.obtenerPreguntaPorIdioma()['en'];
+
+            expect(questionTextEs).toBe('');
+            expect(questionTextEn).toBe('');
+        });
     });
 
 });
