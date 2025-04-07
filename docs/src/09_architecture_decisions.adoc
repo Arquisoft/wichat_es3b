@@ -82,7 +82,6 @@ To learn basic concepts about MongoDb and practice examples link:https://github.
 Considering the need for a dependable, scalable, and efficient deployment process, we chose Docker to containerize
 our services. Docker allows us to define and package all the components of our application in a consistent and
 repeatable manner, making it easy to deploy across various environments without issues. +
-Task made in link: https://github.com/Arquisoft/wichat_es3b/issues/24[Issue #24]
 
 *Justification*
 
