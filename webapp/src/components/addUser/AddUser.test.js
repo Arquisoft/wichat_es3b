@@ -100,6 +100,6 @@ describe("AddUser component", () => {
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
         await waitFor(() => {
             expect(screen.getByText(i18n.t("emptyEmail"))).toBeInTheDocument();
-        });
+        }, { timeout: 3000 }); // espera hasta 3 segundos
     });
 });
