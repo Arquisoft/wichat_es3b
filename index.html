@@ -485,6 +485,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_new_question">6.3. New Question</a></li>
 <li><a href="#_new_clue">6.4. New Clue</a></li>
 <li><a href="#_check_record">6.5. Check Record</a></li>
+<li><a href="#_api_access_ask_for_questions">6.6. API Access - Ask for questions</a></li>
+<li><a href="#_api_access_ask_for_user_records">6.7. API Access - Ask for user records</a></li>
 </ul>
 </li>
 <li><a href="#section-deployment-view">7. Deployment View</a>
@@ -510,18 +512,20 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_selecting_mongodb_for_the_database">9.5. Selecting MongoDB for the Database</a></li>
 </ul>
 </li>
-<li><a href="#section-quality-scenarios">10. Quality Requirements</a>
+<li><a href="#_9_6_selecting_docker_for_the_deployment">10. 9.6 Selecting Docker for the Deployment</a></li>
+<li><a href="#_9_7_selecting_javascript_node_js_for_the_backend">11. 9.7 Selecting JavaScript (Node.js) for the Backend</a></li>
+<li><a href="#section-quality-scenarios">12. Quality Requirements</a>
 <ul class="sectlevel2">
-<li><a href="#_quality_tree">10.1. Quality Tree</a></li>
-<li><a href="#_quality_scenarios">10.2. Quality Scenarios</a></li>
+<li><a href="#_quality_tree">12.1. Quality Tree</a></li>
+<li><a href="#_quality_scenarios">12.2. Quality Scenarios</a></li>
 </ul>
 </li>
-<li><a href="#section-technical-risks">11. Risks and Technical Debts</a>
+<li><a href="#section-technical-risks">13. Risks and Technical Debts</a>
 <ul class="sectlevel2">
-<li><a href="#_technical_debts">11.1. Technical Debts</a></li>
+<li><a href="#_technical_debts">13.1. Technical Debts</a></li>
 </ul>
 </li>
-<li><a href="#section-glossary">12. Glossary</a></li>
+<li><a href="#section-glossary">14. Glossary</a></li>
 </ul>
 </div>
 </div>
@@ -1667,7 +1671,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/SignIn%20diagram.svg" alt="SignIn diagram" width="734" height="514">
+<img src="./images/SignIn%20diagram.svg" alt="SignIn diagram" width="772" height="501">
 </div>
 </div>
 </div>
@@ -1678,7 +1682,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/LogIn%20diagram.svg" alt="LogIn diagram" width="600" height="514">
+<img src="./images/LogIn%20diagram.svg" alt="LogIn diagram" width="626" height="501">
 </div>
 </div>
 </div>
@@ -1689,7 +1693,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/New%20question.svg" alt="New question" width="878" height="757">
+<img src="./images/New%20question.svg" alt="New question" width="921" height="736">
 </div>
 </div>
 </div>
@@ -1700,7 +1704,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/New%20clue.svg" alt="New clue" width="909" height="501">
+<img src="./images/New%20clue.svg" alt="New clue" width="972" height="488">
 </div>
 </div>
 </div>
@@ -1711,7 +1715,29 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Question%20record.svg" alt="Question record" width="758" height="609">
+<img src="./images/Question%20record.svg" alt="Question record" width="795" height="592">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_api_access_ask_for_questions">6.6. API Access - Ask for questions</h3>
+<div class="paragraph">
+<p>The user wants to document an API access scenario where a user asks for questions. The system processes the request  and returns the questions to the user.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/API%20Access%20-%20Questions.svg" alt="API Access   Questions" width="646" height="416">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_api_access_ask_for_user_records">6.7. API Access - Ask for user records</h3>
+<div class="paragraph">
+<p>A user wants to check the stats of a user. The system loads the stats of the user asked for.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/API%20Access%20-%20Records.svg" alt="API Access   Records" width="591" height="416">
 </div>
 </div>
 <div style="page-break-after: always;"></div>
@@ -2113,8 +2139,8 @@ the user&#8217;s turn.</p>
 <div class="paragraph">
 <p><strong><em>Decision:</em></strong><br>
 It was decided to integrate Large Language Models (LLMs) through external APIs to generate real-time responses and hints.<br>
-The selected models are Gemini-1.5-Flash (Google) and Qwen2.5-Coder-7B-Instruct (Empathy AI)
-because they are the ones integrated into the base project software.</p>
+The selected models are Mistral-7B-Instruct-v0.3 and Qwen2.5-Coder-7B-Instruct, both from Empathy AI
+because it is the API key that has been provided to us and allows us to access both easily with the same API key, improving our resilience in case of external failure by any of the models .</p>
 </div>
 <div class="paragraph">
 <p><strong>Consequences</strong><br>
@@ -2233,6 +2259,79 @@ have had some exposure to NoSQL databases, further training and development in t
 <div class="paragraph">
 <p>To learn basic concepts about MongoDb and practice examples <a href="https://github.com/Arquisoft/wichat_es3b/issues/9">Issue #9</a>.</p>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_9_6_selecting_docker_for_the_deployment">10. 9.6 Selecting Docker for the Deployment</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Considering the need for a dependable, scalable, and efficient deployment process, we chose Docker to containerize
+our services. Docker allows us to define and package all the components of our application in a consistent and
+repeatable manner, making it easy to deploy across various environments without issues.<br>
+Task made in link: <a href="https://github.com/Arquisoft/wichat_es3b/issues/24">Issue #24</a></p>
+</div>
+<div class="paragraph">
+<p><strong>Justification</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Docker ensures a consistent environment for all our services, making sure they run the same way in both
+development and production. This greatly reduces potential problems that might arise due to configuration differences.</p>
+</li>
+<li>
+<p>By using Docker Compose, we can define all the services in a single file, making it simpler to orchestrate and scale
+the application as needed.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Consequences</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>To make sure we’re deploying and troubleshooting containers effectively, we&#8217;ll need a solid understanding of Docker-specific tools (like Docker Compose) and networking.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_9_7_selecting_javascript_node_js_for_the_backend">11. 9.7 Selecting JavaScript (Node.js) for the Backend</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We chose JavaScript (Node.js) for the backend because using the same language on both
+the frontend and backend simplifies development and improves team collaboration.<br>
+Decision made in <a href="https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025">Acta 2 ‐ 10 02 2025</a>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Justification</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Unified Language: Using JavaScript across the stack makes development smoother and faster.</p>
+</li>
+<li>
+<p>Rich Ecosystem: With npm, we have access to a vast library of packages that speed up development.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Consequences</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Learning Curve: Developers will need to get comfortable with asynchronous programming and patterns like Promises or async/await.</p>
+</li>
+<li>
+<p>Maintenance: While efficient, Node.js requires ongoing monitoring to maintain performance, especially as the app scales.</p>
+</li>
+</ul>
+</div>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -2280,9 +2379,8 @@ There you will find links and examples about ADR.</p>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
-</div>
 <div class="sect1">
-<h2 id="section-quality-scenarios">10. Quality Requirements</h2>
+<h2 id="section-quality-scenarios">12. Quality Requirements</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>In order to make Wichat a satisfactory final product, we find it crucial to set some quality requirements to live up with. These aspects are to influence architectural decisions and hence include some measurable features:</p>
@@ -2323,7 +2421,7 @@ There you will find links and examples about ADR.</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_quality_tree">10.1. Quality Tree</h3>
+<h3 id="_quality_tree">12.1. Quality Tree</h3>
 <div class="imageblock">
 <div class="content">
 <img src="./images/diagrama_escenarios_calidad.jpg" alt="Diagrama de escenarios de calidad" width="primera versión">
@@ -2331,7 +2429,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_quality_scenarios">10.2. Quality Scenarios</h3>
+<h3 id="_quality_scenarios">12.2. Quality Scenarios</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 23.0769%;">
@@ -2437,7 +2535,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-technical-risks">11. Risks and Technical Debts</h2>
+<h2 id="section-technical-risks">13. Risks and Technical Debts</h2>
 <div class="sectionbody">
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -2481,7 +2579,7 @@ There you will find links and examples about ADR.</p>
 </tbody>
 </table>
 <div class="sect2">
-<h3 id="_technical_debts">11.1. Technical Debts</h3>
+<h3 id="_technical_debts">13.1. Technical Debts</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2499,7 +2597,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-glossary">12. Glossary</h2>
+<h2 id="section-glossary">14. Glossary</h2>
 <div class="sectionbody">
 <div class="sidebarblock arc42help">
 <div class="content">
@@ -2581,7 +2679,7 @@ There you will find links and examples about ADR.</p>
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2025-02-03 23:34:41 +0100
+Last updated 2025-03-03 09:35:08 +0100
 </div>
 </div>
 </body>
