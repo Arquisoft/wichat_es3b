@@ -99,7 +99,9 @@ describe("AddUser component", () => {
         fillForm({ username: "testuser", password: "123456", confirmPassword: "123456" });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
         await waitFor(() => {
-            expect(screen.getByText(i18n.t("emptyEmail"))).toBeInTheDocument();
-        }, { timeout: 3000 }); // espera hasta 3 segundos
+            const alerts = screen.getAllByRole("alert");
+            const hasError = alerts.some(alert => alert.textContent.includes(i18n.t("emptyEmail")));
+            expect(hasError).toBe(true);
+        });
     });
 });
