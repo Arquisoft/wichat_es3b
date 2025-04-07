@@ -7,6 +7,8 @@ import userEvent from "@testing-library/user-event";
 
 jest.mock("axios");
 
+const generateRandomPassword = () => Math.random().toString(36).slice(-8);
+
 const renderAddUser = () => {
     render(
         <I18nextProvider i18n={i18n}>
@@ -49,53 +51,63 @@ describe("AddUser component", () => {
     });
 
     test("Muestra error si las contraseñas no coinciden", async () => {
+        const password = generateRandomPassword();
+        const confirmPassword = generateRandomPassword(); // Different password for the mismatch
+
         renderAddUser();
-        fillForm({ email: "test@example.com", username: "testuser", password: "123456", confirmPassword: "654321" });
+        fillForm({ email: "test@example.com", username: "testuser", password, confirmPassword });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
         expect(screen.getByText("Introduce tus datos y únete a WiChat ya mismo.")).toBeInTheDocument();
-        expectSnackbarError("passwordsDoNotMatch")
+        expectSnackbarError("passwordsDoNotMatch");
     });
 
     test("Muestra error si el nombre de usuario está repetido", async () => {
+        const password = generateRandomPassword();
+
         renderAddUser();
-        fillForm({ email: "enol@gmail.com", username: "enol", password: "123456", confirmPassword: "123456" });
+        fillForm({ email: "enol@gmail.com", username: "enol", password, confirmPassword: password });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        expectSnackbarError("addUserError")
+        expectSnackbarError("addUserError");
     });
 
     test("Muestra error si el correo está repetido", async () => {
+        const password = generateRandomPassword();
+
         renderAddUser();
-        fillForm({ email: "enol@gmail.com", username: "nolindhdhhd", password: "123456", confirmPassword: "123456" });
+        fillForm({ email: "enol@gmail.com", username: "nolindhdhhd", password, confirmPassword: password });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        expectSnackbarError("addUserError")
+        expectSnackbarError("addUserError");
     });
 
     test("Muestra error si el correo está vacío", async () => {
+        const password = generateRandomPassword();
+
         renderAddUser();
-        fillForm({ username: "testuser", password: "123456", confirmPassword: "123456" });
+        fillForm({ username: "testuser", password, confirmPassword: password });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        expectSnackbarError("emptyEmail")
+        expectSnackbarError("emptyEmail");
     });
 
     test("Muestra error si el nombre de usuario está vacío", async () => {
+        const password = generateRandomPassword();
+
         renderAddUser();
-        fillForm({ email: "testuser", password: "123456", confirmPassword: "123456" });
+        fillForm({ email: "testuser", password, confirmPassword: password });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        expectSnackbarError("emptyUsername")
+        expectSnackbarError("emptyUsername");
     });
 
     test("Muestra error si la contraseña está vacía", async () => {
         renderAddUser();
         fillForm({ email: "testuser", username: "testuser", confirmPassword: "123456" });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        expectSnackbarError("emptyPassword")
+        expectSnackbarError("emptyPassword");
     });
 
     test("Muestra error si la confirmación de la contraseña está vacía", async () => {
         renderAddUser();
         fillForm({ email: "testuser", username: "testuser", password: "123456" });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        expectSnackbarError("emptyPasswordConfirm")
+        expectSnackbarError("emptyPasswordConfirm");
     });
-
 });
