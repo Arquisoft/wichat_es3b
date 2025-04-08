@@ -1,90 +1,135 @@
 .gameSettingsSidebar {
   position: absolute;
   top: 0;
-  left: -25%;
-  width: 25%;
+  /* Start off-screen to the left */
+  left: -25%; /* Adjust if sidebar width changes */
+  width: 25%; /* Or your desired width */
   height: 100%;
-  background-color: #f8f9fa;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  z-index: 100;
-  overflow-y: auto;
+  background-color: #f8f9fa; /* Light background */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: transform 0.3s ease; /* Smooth transition for opening/closing */
+  z-index: 100; /* Ensure it's above other content */
+  overflow-y: auto; /* Allow scrolling if content exceeds height */
 }
 
 .sidebar-toggle-top-right {
   position: absolute;
   top: 10px;
-  right: 50px;
+  /* Adjust right positioning as needed */
+  right: 15px; /* Closer to the edge */
 }
 
+/* State when the sidebar is open */
 .gameSettingsSidebar.open {
-  transform: translateX(100%);
+  transform: translateX(100%); /* Slide in from the left */
 }
 
 .gameSettingsSidebar-content {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  height: calc(100% - 2rem);
+  gap: 1.5rem; /* Space between sections */
+  /* Calculate height considering padding */
+  height: calc(100% - 3rem); /* Adjusted for padding top/bottom */
   box-sizing: border-box;
-  overflow-y: auto; 
+  overflow-y: auto; /* Enable vertical scroll if needed */
 }
 
 .sidebar-header {
-  position: relative;
+  position: relative; /* For positioning the toggle button inside */
+  text-align: center; /* Center the header text */
+  margin-bottom: 1rem; /* Space below header */
 }
 
 .gameSettingsSidebar h2 {
-  margin-bottom: 1.5rem;
-  color: var(--color-primario);
-  font-size: var(--font-size-xl);
-  text-align: center;
-  font-style: normal;
+  margin-bottom: 0; /* Remove default margin */
+  color: var(--color-primario); /* Use primary color from global.css */
+  font-size: var(--font-size-xl); /* Use font size from global.css */
   font-weight: bold;
 }
 
 .gameSettingsSidebar-section {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.5rem; /* Space between label and select */
 }
+
+/* Styling for the new difficulty section */
+.difficulty-section {
+  background-color: rgba(56, 182, 255, 0.08); /* Slight background highlight using --color-primario with alpha */
+  padding: 0.8rem;
+  border-radius: 4px; /* Standard border radius */
+  border: 1px dashed var(--color-primario); /* Dashed border using primary color */
+  margin-top: 0.5rem; /* Optional: Add some space above */
+}
+
 
 .gameSettingsSidebar-section label {
   font-weight: bold;
-  color: #333;
+  color: #333; /* Darker text for labels */
+  margin-bottom: 0.25rem; /* Small space below label */
 }
 
 .sidebar-select {
-  padding: 0.5rem;
+  padding: 0.6rem; /* Slightly more padding */
   border-radius: 4px;
-  border: 1px solid #ddd;
+  border: 1px solid #ccc; /* Lighter border */
   background-color: white;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-md); /* Use standard font size */
+  cursor: pointer;
+  transition: border-color 0.2s ease;
 }
 
+.sidebar-select:hover {
+  border-color: #aaa; /* Darker border on hover */
+}
+
+.sidebar-select:focus {
+  outline: none;
+  border-color: var(--color-primario); /* Highlight border on focus */
+  box-shadow: 0 0 0 2px rgba(56, 182, 255, 0.2); /* Subtle focus ring */
+}
+
+
 .sidebar-button-container {
-  margin: 1rem 0;
+  margin-top: auto; /* Push button to the bottom */
+  padding-top: 1rem; /* Add space above the button */
   display: flex;
   justify-content: center;
 }
 
 .sidebar-button-container button {
-  width: 50%;
+  width: 60%; /* Adjust button width as needed */
+  padding: 0.7rem 1rem; /* Adjust button padding */
 }
 
-/* Para pantallas pequeñas */
+/* Responsive adjustments */
 @media (max-height: 700px) {
   .gameSettingsSidebar-content {
-    gap: 1rem; /* Reducir espacio entre elementos */
+    gap: 1rem; /* Reduce gap on smaller heights */
     padding: 1rem;
   }
-  
-  .gameSettingsSidebar-section {
-    margin-bottom: 0.5rem;
+
+  .gameSettingsSidebar h2 {
+    font-size: var(--font-size-lg); /* Slightly smaller title */
   }
-  
+
   .sidebar-button-container {
-    margin: 0.5rem 0;
+    margin-top: 1rem; /* Ensure some space even when pushed down */
   }
 }
+
+@media (max-width: 768px) {
+  /* Example: Make sidebar wider on smaller screens if needed */
+  .gameSettingsSidebar {
+    width: 40%;
+    left: -40%;
+  }
+  .gameSettingsSidebar.open {
+    transform: translateX(100%);
+  }
+  .sidebar-toggle-top-right {
+    right: 10px;
+  }
+}
+
