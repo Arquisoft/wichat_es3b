@@ -217,6 +217,224 @@ app.post('/ask', async (req, res) => {
     }
 });
 
+// Template para que el LLM responda preguntas del juego
+const gameQuestionPromptTemplate = `Eres un asistente inteligente que ayuda a responder preguntas de trivia.
+
+PREGUNTA ACTUAL:
+{pregunta}
+
+OPCIONES DISPONIBLES:
+{opciones}
+
+RESPUESTA CORRECTA (NO LA MUESTRES EN TU RESPUESTA):
+{respuestaCorrecta}
+
+Tu tarea es analizar la pregunta y las opciones, y elegir la que consideres correcta basándote en tu conocimiento. 
+NO REPITAS la pregunta ni las opciones en tu respuesta. NO EXPLIQUES tu razonamiento.
+
+Responde ÚNICAMENTE con un JSON en este formato exacto:
+{
+  "selectedAnswer": "la opción que eliges",
+  "isCorrect": true/false (si tu respuesta coincide con la respuesta correcta)
+}
+
+Responde en: {idioma}`;
+
+// Modificación del endpoint ai-answer para manejar la dificultad
+app.post('/ai-answer', async (req, res) => {
+    try {
+        console.log("Received /ai-answer request");
+
+        // Validar campos requeridos
+        const { question, options, idioma, difficulty = "medium" } = req.body;
+
+        if (!question || !question.pregunta || !question.respuestaCorrecta || !options || !idioma) {
+            throw new Error("Faltan campos requeridos para la consulta");
+        }
+
+        // Verificar que tenemos la API key
+        if (!process.env.LLM_API_KEY) {
+            throw new Error("LLM_API_KEY no está configurada en las variables de entorno");
+        }
+
+        // Obtener la pregunta en el idioma correcto
+        const questionText = question.pregunta[idioma];
+        const correctAnswer = question.respuestaCorrecta[idioma];
+
+        // Si estamos en modo simulado (para pruebas o si el LLM falla)
+        // la dificultad afecta a la probabilidad de acierto
+        let isCorrect = false;
+        let selectedAnswer = "";
+        let useSimulation = Math.random() > 0.95; // 5% de probabilidad de usar simulación para pruebas
+
+        // Aplicar dificultad en modo simulado
+        if (useSimulation) {
+            let aiAccuracy;
+            switch(difficulty) {
+                case "easy":
+                    aiAccuracy = 0.5; // 50% de probabilidad en fácil
+                    break;
+                case "hard":
+                    aiAccuracy = 0.9; // 90% de probabilidad en difícil
+                    break;
+                case "medium":
+                default:
+                    aiAccuracy = 0.75; // 75% de probabilidad en medio (predeterminado)
+            }
+
+            isCorrect = Math.random() < aiAccuracy;
+            selectedAnswer = isCorrect ? correctAnswer : options.find(opt => opt !== correctAnswer);
+
+            // Generar mensaje personalizado
+            const message = await generateAIMessage(isCorrect, questionText, idioma);
+
+            return res.json({
+                selectedAnswer,
+                isCorrect,
+                message
+            });
+        }
+
+        // Ajustar el prompt para incluir la dificultad
+        const promptWithDifficulty = gameQuestionPromptTemplate
+                .replace('{pregunta}', questionText)
+                .replace('{opciones}', options.join('\n- '))
+                .replace('{respuestaCorrecta}', correctAnswer)
+                .replace('{idioma}', idioma)
+            + `\n\nDIFICULTAD: ${difficulty}. Ten en cuenta que:
+               - Si la dificultad es "easy", deberías fallar aproximadamente el 50% de las veces.
+               - Si la dificultad es "medium", deberías fallar aproximadamente el 25% de las veces.
+               - Si la dificultad es "hard", deberías fallar aproximadamente el 10% de las veces.`;
+
+        // Enviar al LLM
+        const rawAnswer = await sendQuestionToLLM(promptWithDifficulty, "¿Cuál es tu respuesta?", process.env.LLM_API_KEY);
+
+        console.log("LLM Raw Answer:", rawAnswer);
+
+        // Intentar parsear la respuesta como JSON
+        let parsedAnswer;
+        try {
+            // Buscar y extraer el JSON de la respuesta
+            const jsonMatch = rawAnswer.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                parsedAnswer = JSON.parse(jsonMatch[0]);
+            } else {
+                throw new Error("No se encontró un JSON en la respuesta");
+            }
+        } catch (parseError) {
+            console.error("Error al parsear la respuesta del LLM:", parseError);
+            // Si falla el parseo, crear una respuesta simulada con la dificultad
+            let aiAccuracy;
+            switch(difficulty) {
+                case "easy": aiAccuracy = 0.5; break;
+                case "hard": aiAccuracy = 0.9; break;
+                default: aiAccuracy = 0.75;
+            }
+            isCorrect = Math.random() < aiAccuracy;
+            parsedAnswer = {
+                selectedAnswer: isCorrect ? correctAnswer : options.find(opt => opt !== correctAnswer),
+                isCorrect: isCorrect
+            };
+        }
+
+        // Validar la respuesta
+        if (!parsedAnswer.selectedAnswer) {
+            throw new Error("Respuesta del LLM inválida, falta selectedAnswer");
+        }
+
+        // Generar un mensaje personalizado basado en la respuesta
+        const message = await generateAIMessage(parsedAnswer.isCorrect, questionText, idioma);
+
+        res.json({
+            selectedAnswer: parsedAnswer.selectedAnswer,
+            isCorrect: parsedAnswer.selectedAnswer === correctAnswer,
+            message
+        });
+    } catch (error) {
+        console.error('Error al procesar respuesta de la IA:', error.message);
+        res.status(400).json({ error: error.message || "Error desconocido" });
+    }
+});
+
+// Nueva función para generar mensajes personalizados para el robot
+async function generateAIMessage(isCorrect, question, idioma) {
+    try {
+        const result = isCorrect ? "correct" : "incorrect";
+
+        // Template para el prompt de mensajes
+        const messagePromptTemplate = `Eres un asistente de IA en un juego de trivia que acaba de responder una pregunta.
+
+RESULTADO: Has respondido ${result === "correct" ? "CORRECTAMENTE" : "INCORRECTAMENTE"} a la pregunta.
+PREGUNTA: ${question}
+IDIOMA: ${idioma}
+
+Genera una frase corta y natural (máximo 10 palabras) que expreses como te sientes sobre tu resultado.
+Si acertaste, puedes mostrar satisfacción, alegría o confianza.
+Si fallaste, puedes mostrar decepción, sorpresa o determinación para mejorar.
+
+El tono debe ser amigable, conversacional y adecuado para todos los públicos.
+NO empieces con "Yo" o "He" - habla en primera persona directamente.
+
+EJEMPLOS SI ACERTASTE:
+✓ "¡Excelente! Sabía esta respuesta."
+✓ "¡Bingo! Estaba seguro de esta."
+✓ "¡Perfecto! Mi memoria no falla."
+
+EJEMPLOS SI FALLASTE:
+✓ "¡Vaya! Esta era complicada."
+✓ "¡Ups! Me equivoqué totalmente."
+✓ "La próxima lo haré mejor."
+
+RESPONDE ÚNICAMENTE CON LA FRASE, sin ningún texto adicional.`;
+
+        // Enviar al LLM
+        const response = await sendQuestionToLLM(messagePromptTemplate, "Genera una respuesta", process.env.LLM_API_KEY);
+
+        // Limpiar la respuesta (eliminar comillas, espacios extras, etc.)
+        const cleanedResponse = response.replace(/^["'\s]+|["'\s]+$/g, '');
+
+        return cleanedResponse || getDefaultMessage(isCorrect, idioma);
+    } catch (error) {
+        console.error("Error al generar mensaje de IA:", error);
+        return getDefaultMessage(isCorrect, idioma);
+    }
+}
+
+// Mensajes por defecto en caso de error
+function getDefaultMessage(isCorrect, idioma) {
+    if (idioma === "es") {
+        return isCorrect ? "¡Excelente! He acertado esta." : "¡Vaya! Me he equivocado.";
+    } else if (idioma === "en") {
+        return isCorrect ? "Excellent! I got this one right." : "Oops! I got that wrong.";
+    } else {
+        return isCorrect ? "✓" : "✗";
+    }
+}
+
+// Añadir endpoint para generar mensajes de la IA
+app.post('/ai-message', async (req, res) => {
+    try {
+        console.log("Received /ai-message request");
+
+        const { result, question, idioma } = req.body;
+
+        if (!result || !question || !idioma) {
+            throw new Error("Faltan campos requeridos para generar el mensaje");
+        }
+
+        const isCorrect = result === "correct";
+        const message = await generateAIMessage(isCorrect, question, idioma);
+
+        res.json({ message });
+    } catch (error) {
+        console.error('Error al generar mensaje de la IA:', error.message);
+        res.status(400).json({
+            error: error.message || "Error desconocido",
+            message: error.result === "correct" ? "¡Lo logré!" : "¡Vaya! Me equivoqué."
+        });
+    }
+});
+
 // Variable para almacenar la instancia del servidor
 let server;
 
