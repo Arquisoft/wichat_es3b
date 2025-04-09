@@ -121,20 +121,6 @@ app.get("/getstats/:username", async (req, res) => {
       }
     });
 
-  app.get('/getranking', async (req, res) => {
-    try {
-      const ranking = await Stats.find()
-        .sort({ maxScore: -1 })  
-        .select('username maxScore') 
-        .limit(10);
-  
-      res.json(ranking);
-    } catch (error) {
-      console.error("Error al obtener el ranking:", error);
-      res.status(500).json({ error: 'Error al obtener el ranking' });
-    }
-  });
-
   app.get('/getTop3', async (req, res) => {
     try {
       const ranking = await Stats.find()
