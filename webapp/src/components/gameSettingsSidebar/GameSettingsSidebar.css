@@ -16,7 +16,7 @@
   position: absolute;
   top: 10px;
   /* Adjust right positioning as needed */
-  right: 15px; /* Closer to the edge */
+  right: 50px; /* Closer to the edge */
 }
 
 /* State when the sidebar is open */
