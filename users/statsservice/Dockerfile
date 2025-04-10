@@ -14,6 +14,9 @@ RUN npm install
 # Copy the app source code to the working directory
 COPY . .
 
+ARG MONGODB_URI
+ENV MONGODB_URI=$MONGODB_URI
+
 # Expose the port the app runs on
 EXPOSE 8004
 

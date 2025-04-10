@@ -15,7 +15,7 @@ const isAuthenticated = () => {
 const Home = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const gatewayUrl = "http://localhost:8000";
+  const gatewayUrl = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
   const [ranking, setRanking] = useState([]);
 
   useEffect(() => {

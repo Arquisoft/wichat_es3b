@@ -30,16 +30,15 @@ const ChatBox = ({
     setLoadingMessage("...");
 
     try {
-      const URL = process.env.GATEWAY_URL || "http://localhost:8000/";
+      const URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
       const requestData = {
         userQuestion: input,
         question: question,
-        idioma: "es",
-        model: "empathy",
+        idioma: "es"
       };
 
       // Llamar al servicio LLM
-      const response = await axios.post(`${URL}askllm`, requestData);
+      const response = await axios.post(`${URL}/askllm`, requestData);
 
       // Obtener la respuesta
       const answer = response.data.answer;

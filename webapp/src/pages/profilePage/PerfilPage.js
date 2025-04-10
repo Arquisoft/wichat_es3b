@@ -67,7 +67,7 @@ export default function PerfilPage() {
     }
   };
 
-  const gatewayUrl = process.env.GATEWAY_URL || "http://localhost:8000";
+  const gatewayUrl = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
 
   const loadUserStats = async (username) => {
     try {
