@@ -30,6 +30,7 @@ jobs:
           npm --prefix gatewayservice ci
           npm --prefix webapp ci
           npm --prefix wikiquestionservice ci
+          npm --prefix apiservice ci
       - name: Run Unit Tests
         run: |
           npm --prefix users/authservice test -- --coverage
@@ -39,6 +40,7 @@ jobs:
           npm --prefix gatewayservice test -- --coverage
           npm --prefix webapp test -- --coverage
           npm --prefix wikiquestionservice test -- --coverage
+          npm --prefix apiservice test -- --coverage
       - name: Analyze with SonarCloud
         uses: SonarSource/sonarqube-scan-action@master
         env:
