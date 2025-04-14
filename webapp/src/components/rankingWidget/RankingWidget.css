@@ -41,15 +41,14 @@
     padding: 0.75em;
     border-radius: 8px;
     background-color: #f5f9ff;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease;
     animation: fadeInOpacity 0.6s ease forwards;
     opacity: 0;
-    will-change: transform;
 }
 
 .ranking-item:hover{
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 4px 8px rgba(56, 182, 255, 0.2);
+    transform: scale(1.02) translateY(-2px);
+    border: 2px solid var(--color-hover-boton);
     cursor: pointer;
 }
 
