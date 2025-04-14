@@ -462,7 +462,7 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
                     <div className="left-column">
                         <div className="ai-character-container">
                             <div className="ai-robot">
-                                <img src={ROBOT_IMAGE_PATH} alt="AI Robot" className="robot-image" onError={(e) => e.target.src='/placeholder.svg'}/>
+                                <img src={ROBOT_IMAGE_PATH} alt="AI Robot" className="robot-image" />
                                 {showAIThinking && (
                                     <div className="ai-thinking-bubble">
                                         <span>{t('thinking')}</span>
