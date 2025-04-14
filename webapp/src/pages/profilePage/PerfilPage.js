@@ -9,8 +9,13 @@ import "../../assets/global.css";
 import Footer from "../../components/Footer";
 import "./PerfilPage.css";
 import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarToggleButton";
+import { useParams } from "react-router-dom";
 
 export default function PerfilPage() {
+
+  const {username: paramUsername} = useParams();
+  const username = paramUsername || localStorage.getItem("username");
+
   const [userData, setUserData] = useState({
     username: "",
     level: 1, // TODO: no está en el servicio de estadísticas
@@ -35,14 +40,13 @@ export default function PerfilPage() {
 
   // Cargar el nombre de usuario desde localStorage al montar el componente
   useEffect(() => {
-    const storedUsername = localStorage.getItem("username");
-    if (storedUsername) {
+    if (username) {
       setUserData((prevUserData) => ({
         ...prevUserData,
-        username: storedUsername,
+        username: username,
       }));
     }
-  }, []);
+  }, [username]);
 
   // Estado para controlar la visibilidad del menú lateral en móviles
   const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -186,17 +190,6 @@ export default function PerfilPage() {
       console.error("Error al cargar estadísticas mensuales: ", error);
     }
   };
-
-  // Cargar el nombre de usuario desde localStorage al montar el componente
-  useEffect(() => {
-    const storedUsername = localStorage.getItem("username");
-    if (storedUsername) {
-      setUserData((prevUserData) => ({
-        ...prevUserData,
-        username: storedUsername,
-      }));
-    }
-  }, []);
 
   // Cargar estadísticas de usuario
   useEffect(() => {
