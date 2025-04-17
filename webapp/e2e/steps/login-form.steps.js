@@ -20,7 +20,7 @@ defineFeature(feature, test => {
         });
     });
 
-    test('The user is able to log in successfully and sees "Cerrar sesión" in the navbar after being redirected to home', ({ given, when, then }) => {
+    test('The user is able to log in successfully', ({ given, when, then }) => {
         let username;
         let password;
 
