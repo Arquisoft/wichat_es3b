@@ -33,6 +33,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
+function filterValidTopics(rawTopic) {
+  const validCategories = ["paises", "cine", "clubes", "literatura", "arte", "all"];
+  return rawTopic.split(",").filter(t => validCategories.includes(t));
+}
+
 app.get("/questions", async (req, res) => {
   const { n = 25, topic = "all" } = req.query;
   const numQuestions = parseInt(n, 10);
@@ -41,8 +46,7 @@ app.get("/questions", async (req, res) => {
     return res.status(400).json({ error: "El límite de preguntas es 30" });
   }
 
-  const validCategories = ["paises", "cine", "clubes", "literatura", "arte", "all"];
-  let topics = topic.split(",").filter(t => validCategories.includes(t));
+  let topics = filterValidTopics(topic);
 
   if (topics.length === 0) {
     return res.status(400).json({ error: "No se proporcionaron categorías válidas." });
@@ -78,8 +82,7 @@ app.get("/questionsDB", async (req, res) => {
     return res.status(400).json({ error: "El límite de preguntas es 30" });
   }
 
-  const validCategories = ["paises", "cine", "clubes", "literatura", "arte", "all"];
-  let topics = topic.split(",").filter(t => validCategories.includes(t));
+  let topics = filterValidTopics(topic);
 
   if (topics.length === 0) {
     return res.status(400).json({ error: "No se proporcionaron categorías válidas." });
