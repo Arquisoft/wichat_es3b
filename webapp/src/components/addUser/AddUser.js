@@ -95,7 +95,7 @@ const AddUser = ({ handleToggleView }) => {
             <span>{t("or")}</span>
             <BaseButton text={t("login")} onClick={handleToggleView} buttonType="buttonSecondary" ></BaseButton>
           </div>
-          <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar} message={t("loginSuccessful")} />
+          <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar} message={t("addUserSuccessful")} />
           {error && (
               <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError("")} message={`Error: ${error}`} />
           )}

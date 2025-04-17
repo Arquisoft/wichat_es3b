@@ -1,52 +1,62 @@
 const puppeteer = require('puppeteer');
-const { defineFeature, loadFeature }=require('jest-cucumber');
-const setDefaultOptions = require('expect-puppeteer').setDefaultOptions
+const { defineFeature, loadFeature } = require('jest-cucumber');
+const setDefaultOptions = require('expect-puppeteer').setDefaultOptions;
 const feature = loadFeature('./features/register-form.feature');
 
 let page;
 let browser;
 
 defineFeature(feature, test => {
-  
   beforeAll(async () => {
     browser = process.env.GITHUB_ACTIONS
-      ? await puppeteer.launch({headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox']})
-      : await puppeteer.launch({ headless: false, slowMo: 100 });
-    page = await browser.newPage();
-    //Way of setting up the timeout
-    setDefaultOptions({ timeout: 10000 })
+        ? await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox'] })
+        : await puppeteer.launch({ headless: false, slowMo: 100 });
 
-    await page
-      .goto("http://localhost:3000", {
-        waitUntil: "networkidle0",
-      })
-      .catch(() => {});
+    page = await browser.newPage();
+    setDefaultOptions({ timeout: 10000 });
+
+    await page.goto("http://localhost:3000", {
+      waitUntil: "networkidle0",
+    });
   });
 
-  test('The user is not registered in the site', ({given,when,then}) => {
-    
+  test('The user is not registered in the site', ({ given, when, then }) => {
+    let email;
     let username;
     let password;
+    let passwordConfirm;
 
     given('An unregistered user', async () => {
-      username = "pablo"
-      password = "pabloasw"
-      await expect(page).toClick("button", { text: "Don't have an account? Register here." });
+      email = `testuser${Date.now()}@example.com`;
+      username = `testuser${Date.now()}`;
+      password = "testpassword";
+      passwordConfirm = "testpassword";
+
+      // Clicar en "Iniciar sesión" desde el navbar
+      await expect(page).toClick('a', { text: 'Iniciar sesión' });
+
+      // Esperar a que aparezca el botón para cambiar a la vista de registro
+      await expect(page).toClick('button', { text: 'Crear cuenta' });
     });
 
     when('I fill the data in the form and press submit', async () => {
-      await expect(page).toFill('input[name="username"]', username);
-      await expect(page).toFill('input[name="password"]', password);
-      await expect(page).toClick('button', { text: 'Add User' })
+      await expect(page).toFill('input#email', email);
+      await expect(page).toFill('input#username', username);
+      await expect(page).toFill('input#password', password);
+      await expect(page).toFill('input#confirmPassword', passwordConfirm);
+      await expect(page).toClick('button', { text: 'Crear cuenta' });
     });
 
     then('A confirmation message should be shown in the screen', async () => {
-        await expect(page).toMatchElement("div", { text: "User added successfully" });
+      await page.waitForSelector('.MuiSnackbar-root', { visible: true, timeout: 5000 });
+      const snackbarText = await page.$eval('.MuiSnackbar-root', el => el.textContent.trim());
+      console.log('Snackbar Text:', snackbarText);  // Esto te ayudará a depurar
+      expect(snackbarText).toMatch('Usuario añadido correctamente');
     });
-  })
 
-  afterAll(async ()=>{
-    browser.close()
-  })
+  });
 
+  afterAll(async () => {
+    await browser.close();
+  });
 });

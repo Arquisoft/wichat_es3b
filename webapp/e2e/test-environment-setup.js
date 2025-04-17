@@ -7,6 +7,7 @@ let llmservice;
 let gatewayservice;
 let statservice;
 let wikiquestionservice;
+let apiservice;
 
 async function startServer() {
     console.log('Starting MongoDB memory server...');
@@ -19,6 +20,7 @@ async function startServer() {
     gatewayservice = await require("../../gatewayservice/gateway-service");
     statservice = await require("../../users/statsservice/stats-service");
     wikiquestionservice = await require("../../wikiquestionservice/wikiQuestion-service");
+    apiservice = await require("../../apiservice/api-service");
 }
 
 startServer();
