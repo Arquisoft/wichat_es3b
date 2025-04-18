@@ -1,21 +1,22 @@
 "use client"
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import "./PlayerVsAIGame.css";
-import BaseButton from "../button/BaseButton";
-import InfoDialog from "../infoDialog/InfoDialog";
+import "./PlayerVsAIGame.css"; // Ensure CSS path is correct
+import BaseButton from "../button/BaseButton"; // Adjust path if needed
+import InfoDialog from "../infoDialog/InfoDialog"; // Adjust path if needed
 import { LinearProgress, Box } from "@mui/material";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
-// Assuming the robot image path is correct relative to the public folder or build output
+// Assuming the robot image path is correct
+// Remember to update this image to one without a background when you have it!
 const ROBOT_IMAGE_PATH = "/webapp/src/assets/img/FriendlyRobotThinking.png"; // Adjust if necessary
 
-// Added onGameEnd prop
+// Player vs AI Game Component
 const PlayerVsAIGame = ({ onGameEnd }) => {
     const { i18n, t } = useTranslation();
-    const currentLanguage = i18n.language || "es"; // Default to Spanish if language is not set
+    const currentLanguage = i18n.language || "es";
 
     // --- State Variables ---
     const [questionNumber, setQuestionNumber] = useState(0);
@@ -26,10 +27,10 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
     const [aiScore, setAiScore] = useState(0);
     const [playerAnswered, setPlayerAnswered] = useState(false);
     const [aiAnswered, setAiAnswered] = useState(false);
-    const [playerCorrect, setPlayerCorrect] = useState(null); // null, true, or false
-    const [aiCorrect, setAiCorrect] = useState(null); // null, true, or false
+    const [playerCorrect, setPlayerCorrect] = useState(null);
+    const [aiCorrect, setAiCorrect] = useState(null);
     const [showRules, setShowRules] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(30); // Initial time, will be updated by config
+    const [timeLeft, setTimeLeft] = useState(30);
     const [progress, setProgress] = useState(100);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [shuffledAnswers, setShuffledAnswers] = useState([]);
@@ -37,33 +38,32 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
     const [showAIThinking, setShowAIThinking] = useState(false);
     const [aiMessage, setAiMessage] = useState("");
     const [showAiMessage, setShowAiMessage] = useState(false);
-    const [questionAnimationComplete, setQuestionAnimationComplete] = useState(false);
-    const [difficulty, setDifficulty] = useState("medium"); // Default difficulty
-    const [config, setConfig] = useState(null); // Game configuration
+    const [questionAnimationComplete, setQuestionAnimationComplete] = useState(false); // Can be used for staggered animations
+    const [difficulty, setDifficulty] = useState("medium");
+    const [config, setConfig] = useState(null);
 
     // --- Refs ---
     const timerRef = useRef(null);
-    const isMounted = useRef(true); // Track component mount state
-    const hasSavedStats = useRef(false); // Prevent saving stats multiple times
+    const isMounted = useRef(true);
+    const hasSavedStats = useRef(false);
 
     // --- Constants ---
     const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
-    const loggedUsername = localStorage.getItem("username") || t("player"); // Use translation for default player name
+    const loggedUsername = localStorage.getItem("username") || t("player");
 
-    // --- Functions defined with useCallback ---
+    // --- Functions (Callbacks for performance) ---
 
-    // Handle player running out of time (using useCallback)
+    // Handle player running out of time
     const handleTimeOut = useCallback(() => {
-        // Ensure this only runs if the player hasn't already answered
         if (!playerAnswered && isMounted.current) {
             setPlayerAnswered(true);
-            setPlayerCorrect(false); // Mark as incorrect due to timeout
-            setSelectedAnswer(null); // Indicate no answer was selected
-            // AI answer will be triggered by the useEffect watching playerAnswered
+            setPlayerCorrect(false);
+            setSelectedAnswer(null);
+            // AI answer triggered by useEffect
         }
-    }, [playerAnswered]); // Dependency
+    }, [playerAnswered]);
 
-    // Fallback AI answer simulation (using useCallback)
+    // Fallback AI answer simulation
     const simulateAIAnswer = useCallback(() => {
         let aiAccuracy;
         switch(difficulty) {
@@ -71,130 +71,112 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
             case "hard": aiAccuracy = 0.9; break;
             default: aiAccuracy = 0.75;
         }
-
         const isCorrect = Math.random() < aiAccuracy;
-
         if (isMounted.current) {
             setAiCorrect(isCorrect);
             if (isCorrect) setAiScore(prev => prev + 10);
-
             setAiMessage(isCorrect ? t('aiCorrectMessageDefault') : t('aiIncorrectMessageDefault'));
             setAiAnswered(true);
             setShowAIThinking(false);
             setShowAiMessage(true);
-
-            setTimeout(() => {
-                if (isMounted.current) setShowAiMessage(false);
-            }, 5000);
+            setTimeout(() => { if (isMounted.current) setShowAiMessage(false); }, 5000);
         }
-    }, [difficulty, t]); // Dependencies
+    }, [difficulty, t]);
 
-
-    // Function to get AI's answer from the LLM service (using useCallback)
+    // Get AI's answer from the LLM service
     const getAIAnswer = useCallback(async () => {
         if (!currentQuestion || !shuffledAnswers.length) {
-            console.error("Cannot get AI answer: Missing current question or options.");
-            if (isMounted.current) simulateAIAnswer(); // Fallback if data is missing
+            console.error("Cannot get AI answer: Missing data.");
+            if (isMounted.current) simulateAIAnswer();
             return;
         }
-
+        setShowAIThinking(true);
+        // Optional: Log start time
+        // const startTime = performance.now();
         try {
             const aiAnswerData = {
-                question: { // Ensure the structure matches llm-service expectations
+                question: {
                     pregunta: currentQuestion.pregunta,
                     respuestaCorrecta: currentQuestion.respuestaCorrecta,
                     respuestas: currentQuestion.respuestas,
-                    descripcion: currentQuestion.descripcion || [], // Ensure description is an array
-                    img: currentQuestion.img || [] // Ensure img is an array
+                    descripcion: currentQuestion.descripcion || [],
+                    img: currentQuestion.img || []
                 },
                 options: shuffledAnswers,
                 idioma: currentLanguage,
                 difficulty: difficulty
             };
-
             const response = await fetch(`${GATEWAY_URL}/ai-answer`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(aiAnswerData),
             });
 
-            if (!response.ok) {
-                throw new Error(`AI service error: ${response.statusText}`);
-            }
+            // Optional: Log end time and duration
+            // const endTime = performance.now();
+            // console.log(`AI answer fetch took ${endTime - startTime} milliseconds.`);
 
+            if (!response.ok) throw new Error(`AI service error: ${response.statusText}`);
             const data = await response.json();
 
             if (isMounted.current) {
                 const isCorrect = data.isCorrect;
                 setAiCorrect(isCorrect);
-                if (isCorrect) setAiScore(prev => prev + 10); // Award points only if correct
-
-                // Use message from API if available, otherwise generate/fallback
+                if (isCorrect) setAiScore(prev => prev + 10);
                 setAiMessage(data.message || (isCorrect ? t('aiCorrectMessageDefault') : t('aiIncorrectMessageDefault')));
-
                 setAiAnswered(true);
                 setShowAIThinking(false);
                 setShowAiMessage(true);
-
-                // Hide message after a delay
-                setTimeout(() => {
-                    if (isMounted.current) setShowAiMessage(false);
-                }, 5000); // 5 seconds delay
+                setTimeout(() => { if (isMounted.current) setShowAiMessage(false); }, 5000); // Hide message after 5s
             }
-
         } catch (error) {
             console.error("Error getting AI answer:", error);
             if (isMounted.current) simulateAIAnswer(); // Fallback on error
         }
-    }, [currentQuestion, shuffledAnswers, currentLanguage, difficulty, GATEWAY_URL, t, simulateAIAnswer]); // Added simulateAIAnswer dependency
+        // No artificial delay added here
+    }, [currentQuestion, shuffledAnswers, currentLanguage, difficulty, GATEWAY_URL, t, simulateAIAnswer]);
 
-    // Save game statistics (using useCallback)
+    // Save game statistics
     const saveStats = useCallback(async () => {
-        if (!loggedUsername || config === null) return; // Ensure username and config are available
-
+        if (!loggedUsername || config === null || hasSavedStats.current) return;
         const playerWins = playerScore > aiScore;
-
+        hasSavedStats.current = true;
         try {
             const statsData = {
                 username: loggedUsername,
-                // For PlayerVsAI, we might need more detailed stats if required
-                rightAnswers: Math.round(playerScore / 10), // Approximation based on score
-                wrongAnswers: config.numPreguntas - Math.round(playerScore / 10), // Approximation
-                // time: /* Needs calculation if tracked per question */,
+                rightAnswers: Math.round(playerScore / 10),
+                wrongAnswers: config.numPreguntas - Math.round(playerScore / 10),
                 score: playerScore,
                 date: new Date().toISOString(),
-                win: playerWins, // Indicate if player won against AI
-                gameMode: "PlayerVsIA", // Add game mode context
-                difficulty: difficulty // Add difficulty context
+                win: playerWins,
+                gameMode: "PlayerVsIA",
+                difficulty: difficulty
             };
             const response = await fetch(`${GATEWAY_URL}/savestats`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(statsData),
             });
-
-            if (!response.ok) {
-                throw new Error(`Failed to save stats: ${response.statusText}`);
-            }
+            if (!response.ok) throw new Error(`Failed to save stats: ${response.statusText}`);
             console.log("Player vs AI statistics saved successfully.");
         } catch (error) {
             console.error("Error saving Player vs AI statistics:", error);
+            hasSavedStats.current = false; // Allow retry?
         }
-    }, [loggedUsername, playerScore, aiScore, config, GATEWAY_URL, difficulty]); // Dependencies
-
+    }, [loggedUsername, playerScore, aiScore, config, GATEWAY_URL, difficulty]);
 
     // --- Effects ---
 
-    // Set mounted ref to false on unmount
+    // Component mount/unmount cleanup
     useEffect(() => {
         isMounted.current = true;
         return () => {
             isMounted.current = false;
-            clearInterval(timerRef.current); // Clear timer on unmount
+            clearInterval(timerRef.current);
         };
     }, []);
 
-    // Load configuration from localStorage
+    // Load configuration
     useEffect(() => {
         let storedConfig = {};
         try {
@@ -203,196 +185,131 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
         } catch (error) {
             console.error("Error reading quizConfig from localStorage:", error);
         }
-
-        const defaultConfig = {
-            numPreguntas: 10,
-            tiempoPregunta: 30,
-            limitePistas: 3,
-            modoJuego: "playerVsIA", // Ensure correct mode for this component
-            categories: ["all"],
-            dificultad: "medium"
-        };
-        // Merge stored config with defaults, ensuring all keys exist
+        const defaultConfig = { numPreguntas: 10, tiempoPregunta: 30, limitePistas: 3, modoJuego: "playerVsIA", categories: ["all"], dificultad: "medium" };
         const finalConfig = { ...defaultConfig, ...storedConfig };
-
         if (isMounted.current) {
             setConfig(finalConfig);
             setTimeLeft(finalConfig.tiempoPregunta);
-            setDifficulty(finalConfig.dificultad); // Set difficulty from config
+            setDifficulty(finalConfig.dificultad);
         }
-    }, [t]); // Add t to dependencies if used in default username
+    }, [t]); // t dependency for default username
 
-    // Fetch questions when config is loaded
+    // Fetch questions
     useEffect(() => {
         if (config) {
             const fetchQuestions = async () => {
                 if (!config.categories || config.categories.length === 0) {
-                    console.warn("No categories selected, cannot fetch questions.");
-                    if (isMounted.current) setIsLoading(false);
-                    return;
+                    console.warn("No categories selected.");
+                    if (isMounted.current) setIsLoading(false); return;
                 }
+                setIsLoading(true);
                 try {
-                    setIsLoading(true); // Set loading true before fetch
                     const categories = config.categories.includes("all") ? ["all"] : config.categories;
                     const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
                     const response = await fetch(`${GATEWAY_URL}/${queryString}`);
-
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch questions: ${response.statusText}`);
-                    }
+                    if (!response.ok) throw new Error(`Failed to fetch questions: ${response.statusText}`);
                     const data = await response.json();
-
                     if (isMounted.current) {
                         if (data && data.length > 0) {
                             setQuestions(data);
-                            setCurrentQuestion(data[0]); // Set initial question
+                            setCurrentQuestion(data[0]);
                         } else {
-                            console.error("No questions received from API.");
-                            setQuestions([]); // Set empty questions if none received
-                            setCurrentQuestion(null);
+                            console.error("No questions received."); setQuestions([]); setCurrentQuestion(null);
                         }
                     }
                 } catch (error) {
                     console.error("Error fetching questions:", error);
-                    if (isMounted.current) {
-                        setQuestions([]); // Set empty questions on error
-                        setCurrentQuestion(null);
-                    }
+                    if (isMounted.current) { setQuestions([]); setCurrentQuestion(null); }
                 } finally {
-                    if (isMounted.current) setIsLoading(false); // Set loading false after fetch/error
+                    if (isMounted.current) setIsLoading(false);
                 }
             };
             fetchQuestions();
         }
-    }, [config, GATEWAY_URL]); // Depend on config and GATEWAY_URL
+    }, [config, GATEWAY_URL]);
 
-    // Timer effect
+    // Timer effect (stops on player answer)
     useEffect(() => {
-        // Guard conditions: don't run if loading, no question, summary shown, or config not loaded
-        if (isLoading || !currentQuestion || showSummary || !config) {
-            clearInterval(timerRef.current); // Ensure timer is cleared if guards fail
-            return;
-        }
-
-        const TOTAL_TIME = config.tiempoPregunta;
-
-        // Handle timeout if time runs out before player answers
-        if (timeLeft <= 0 && !playerAnswered) {
-            clearInterval(timerRef.current);
-            handleTimeOut(); // Player ran out of time
-            return;
-        }
-
-        // Stop timer once both player and AI have answered
-        if (playerAnswered && aiAnswered) {
+        if (isLoading || !currentQuestion || showSummary || !config || playerAnswered) {
             clearInterval(timerRef.current);
             return;
         }
-
-        // Start or continue the timer
-        // Clear previous interval before setting a new one
-        clearInterval(timerRef.current);
+        if (timeLeft <= 0) {
+            clearInterval(timerRef.current);
+            handleTimeOut();
+            return;
+        }
+        clearInterval(timerRef.current); // Clear previous interval
         timerRef.current = setInterval(() => {
             setTimeLeft((prev) => {
                 const newTime = Math.max(prev - 1, 0);
-                // Update progress bar based on the new time
-                setProgress((newTime / TOTAL_TIME) * 100);
+                setProgress((newTime / config.tiempoPregunta) * 100);
                 return newTime;
             });
         }, 1000);
-
-        // Cleanup interval on effect change or unmount
         return () => clearInterval(timerRef.current);
+    }, [timeLeft, playerAnswered, isLoading, currentQuestion, config, showSummary, handleTimeOut]);
 
-        // *** REMOVED handleTimeOut from dependencies ***
-    }, [timeLeft, playerAnswered, aiAnswered, isLoading, currentQuestion, config, showSummary]);
-
-
-    // Shuffle answers when current question changes
+    // Shuffle answers
     useEffect(() => {
         if (currentQuestion) {
             const correctAnswer = currentQuestion.respuestaCorrecta?.[currentLanguage];
             const incorrectAnswers = currentQuestion.respuestas?.[currentLanguage] || [];
-
             if (correctAnswer) {
                 const allAnswers = [...incorrectAnswers, correctAnswer];
-                // Simple shuffle algorithm
                 for (let i = allAnswers.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [allAnswers[i], allAnswers[j]] = [allAnswers[j], allAnswers[i]];
                 }
                 if (isMounted.current) setShuffledAnswers(allAnswers);
             } else {
-                if (isMounted.current) setShuffledAnswers([]); // Handle missing correct answer
+                if (isMounted.current) setShuffledAnswers([]);
             }
         } else {
-            if (isMounted.current) setShuffledAnswers([]); // Clear if no current question
+            if (isMounted.current) setShuffledAnswers([]);
         }
     }, [currentQuestion, currentLanguage]);
 
-    // Trigger AI answer after player answers
+    // Trigger AI answer
     useEffect(() => {
-        // Ensure component is mounted and AI hasn't answered yet
         if (playerAnswered && !aiAnswered && currentQuestion && isMounted.current) {
-            setShowAIThinking(true);
-            getAIAnswer(); // Call AI answer logic
+            getAIAnswer();
         }
-    }, [playerAnswered, aiAnswered, currentQuestion, getAIAnswer]); // Added getAIAnswer dependency
+    }, [playerAnswered, aiAnswered, currentQuestion, getAIAnswer]);
 
-
-    // Check if game ended to save stats and show summary
+    // Check game end state
     useEffect(() => {
-        // Ensure config, questions are loaded, and it's the last question
         if (config && questions.length > 0 && questionNumber >= config.numPreguntas - 1) {
-            // Trigger only once when both player and AI have answered on the last question
-            if (playerAnswered && aiAnswered && !hasSavedStats.current) {
-                saveStats(); // Save stats
-                if (isMounted.current) setShowSummary(true); // Show summary dialog
-                hasSavedStats.current = true; // Mark as saved
+            if (playerAnswered && aiAnswered && !hasSavedStats.current && !showSummary) {
+                saveStats();
+                if (isMounted.current) setShowSummary(true);
             }
         }
-    }, [playerAnswered, aiAnswered, questionNumber, questions.length, config, saveStats]); // Added saveStats dependency
+    }, [playerAnswered, aiAnswered, questionNumber, questions.length, config, saveStats, showSummary]);
 
-    // --- Functions ---
+    // --- Event Handlers ---
 
-    // Handle player's answer selection (using useCallback)
+    // Handle player's answer selection
     const handlePlayerAnswer = useCallback((answer) => {
-        if (playerAnswered || !currentQuestion || !config) return; // Prevent answering multiple times & guard
-
-        clearInterval(timerRef.current); // Stop timer immediately
+        if (playerAnswered || !currentQuestion || !config) return;
+        clearInterval(timerRef.current); // Stop timer
         if (isMounted.current) {
             setSelectedAnswer(answer);
             setPlayerAnswered(true);
-
             const isCorrect = answer === currentQuestion.respuestaCorrecta?.[currentLanguage];
             setPlayerCorrect(isCorrect);
-
-            if (isCorrect) {
-                // Simple scoring: 10 points for correct answer
-                setPlayerScore(prev => prev + 10);
-            }
-            // AI answer is triggered by useEffect watching playerAnswered
+            if (isCorrect) setPlayerScore(prev => prev + 10);
+            // AI answer triggered by useEffect
         }
-    }, [playerAnswered, currentQuestion, config, currentLanguage]); // Dependencies
+    }, [playerAnswered, currentQuestion, config, currentLanguage]);
 
-
-    // Move to the next question or show summary (using useCallback)
+    // Move to the next question or show summary
     const handleNextQuestion = useCallback(() => {
-        // Guard against missing config or questions, or if not finished with current
         if (!config || !questions.length || !(playerAnswered && aiAnswered)) return;
-
         const nextQuestionIndex = questionNumber + 1;
+        if (nextQuestionIndex >= config.numPreguntas) return; // Summary handled by effect
 
-        // Check if it was the last question
-        if (nextQuestionIndex >= config.numPreguntas) {
-            // Summary is shown by the useEffect checking game end state
-            // No need to explicitly call setShowSummary here
-            return;
-        }
-
-        // Proceed to the next question
         if (isMounted.current && questions[nextQuestionIndex]) {
-            // Reset state for the next question
             setQuestionNumber(nextQuestionIndex);
             setCurrentQuestion(questions[nextQuestionIndex]);
             setPlayerAnswered(false);
@@ -400,22 +317,19 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
             setPlayerCorrect(null);
             setAiCorrect(null);
             setSelectedAnswer(null);
-            setTimeLeft(config.tiempoPregunta); // Reset timer
+            setTimeLeft(config.tiempoPregunta);
             setProgress(100);
             setShowAIThinking(false);
             setShowAiMessage(false);
-            setQuestionAnimationComplete(false); // Reset animation flag
-            // Don't reset hasSavedStats here
+            setQuestionAnimationComplete(false);
         } else {
-            console.error("Next question data is missing.");
-            // Fallback to summary if next question data is missing unexpectedly
-            if (isMounted.current && !hasSavedStats.current) {
+            console.error("Next question data missing or component unmounted.");
+            if (isMounted.current && !hasSavedStats.current && !showSummary) {
                 saveStats();
                 setShowSummary(true);
-                hasSavedStats.current = true;
             }
         }
-    }, [questionNumber, config, questions, playerAnswered, aiAnswered, saveStats]); // Added saveStats dependency
+    }, [questionNumber, config, questions, playerAnswered, aiAnswered, saveStats, showSummary]);
 
     // Format time remaining
     const formatTime = (time) => {
@@ -424,45 +338,52 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
         return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     };
 
-
     // --- Render Logic ---
 
-    if (isLoading) {
-        return <div className="loading-div"><h1>{t('loading')}</h1></div>;
-    }
+    if (isLoading) return <div className="loading-div"><h1>{t('loading')}</h1></div>;
+    if (!isLoading && (!questions || questions.length === 0)) return <div className="loading-div"><h1>{t('errorNoQuestions', 'Error: No se cargaron preguntas.')}</h1></div>;
+    if (!currentQuestion || !config) return <div className="loading-div"><h1>{t('loading')}</h1></div>; // Should be brief
 
-    // Added check for empty questions array after loading
-    if (!isLoading && (!questions || questions.length === 0)) {
-        return <div className="loading-div"><h1>Error: No questions loaded. Please check categories or API.</h1></div>;
-    }
-
-    if (!currentQuestion) {
-        // This might happen briefly between loading and setting the first question
-        return <div className="loading-div"><h1>{t('loading')}</h1></div>;
-    }
-
-
-    // Determine summary message based on scores
+    // Determine summary message
     let summaryTitle = t('finalResult');
     let summaryMessage;
-    if (playerScore > aiScore) {
-        summaryMessage = t('youWon');
-    } else if (playerScore < aiScore) {
-        summaryMessage = t('youLost');
-    } else {
-        summaryMessage = t('tie');
-    }
+    if (playerScore > aiScore) summaryMessage = t('youWon');
+    else if (playerScore < aiScore) summaryMessage = t('youLost');
+    else summaryMessage = t('tie');
 
     return (
-        <div className="gameContainer">
-            {/* Main Game Area */}
+        <div className="gameContainer player-vs-ai">
             <main className={showRules || showSummary ? "blurred" : ""}>
                 <div className="game-layout">
-                    {/* Left Column (AI) */}
+                    {/* Left Column: Scoreboard & AI Robot */}
                     <div className="left-column">
+                        {/* Combined Scoreboard */}
+                        <div className="combined-scoreboard-left">
+                            <div className="scoreboard-line">
+                                <span className="ai-name">WI</span>
+                                <span className="score">{aiScore}</span>
+                                {aiAnswered && aiCorrect !== null && (
+                                    <span className={`answer-indicator ${aiCorrect ? "correct" : "incorrect"}`}>
+                                        {aiCorrect ? "✓" : "✗"}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="scoreboard-line separator">-</div>
+                            <div className="scoreboard-line player-line">
+                                <span className="player-name">{loggedUsername}</span>
+                                <span className="score">{playerScore}</span>
+                                {playerAnswered && playerCorrect !== null && (
+                                    <span className={`answer-indicator ${playerCorrect ? "correct" : "incorrect"}`}>
+                                        {playerCorrect ? "✓" : "✗"}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* AI Character Area */}
                         <div className="ai-character-container">
                             <div className="ai-robot">
-                                <img src={ROBOT_IMAGE_PATH} alt="AI Robot" className="robot-image" />
+                                <img src={ROBOT_IMAGE_PATH} alt={t('aiRobotAlt', 'AI Robot')} className="robot-image" />
                                 {showAIThinking && (
                                     <div className="ai-thinking-bubble">
                                         <span>{t('thinking')}</span>
@@ -480,91 +401,68 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
                                     </motion.div>
                                 )}
                             </div>
-                            <div className="ai-score-display">
-                                <h3>{t('ai', 'AI')}</h3> {/* Translate 'AI' */}
-                                <div className="score-value">{aiScore}</div>
-                                {aiAnswered && aiCorrect !== null && ( // Check aiCorrect is not null
-                                    <div className={`answer-indicator ${aiCorrect ? "correct" : "incorrect"}`}>
-                                        {aiCorrect ? "✓" : "✗"}
-                                    </div>
-                                )}
-                            </div>
                         </div>
                     </div>
 
-                    {/* Center Column (Question & Answers) */}
+                    {/* Center Column: Question, Image, Answers, Timer */}
                     <motion.div
                         className="center-column"
-                        key={questionNumber} // Animate when question changes
-                        initial={{ scale: 0.8, opacity: 0 }}
+                        key={questionNumber}
+                        initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+                        transition={{ duration: 0.4, type: "spring", stiffness: 120 }}
                         onAnimationComplete={() => setQuestionAnimationComplete(true)}
                     >
                         <div className="question-section">
                             <div className="questionNumber">
-                                <h2>{`${t('question')} ${questionNumber + 1}/${config?.numPreguntas || 10}`}</h2>
-                                {/* Enable next button only after both have answered and if not last question */}
-                                {questionNumber < (config?.numPreguntas || 10) - 1 && (
+                                <h2>{`${t('question')} ${questionNumber + 1}/${config.numPreguntas}`}</h2>
+                                {questionNumber < config.numPreguntas - 1 && playerAnswered && aiAnswered && (
                                     <ArrowForwardIcon
-                                        titleAccess={t("nextQuestion")} // Translate title
-                                        fontSize="medium" // Adjusted size
+                                        titleAccess={t("nextQuestion")}
+                                        fontSize="medium"
                                         id="nextArrow"
-                                        onClick={(playerAnswered && aiAnswered) ? handleNextQuestion : undefined}
-                                        style={{
-                                            backgroundColor: (playerAnswered && aiAnswered) ? 'var(--color-primario)' : '#ccc', // Use CSS variables or defaults
-                                            color: 'white',
-                                            borderRadius: '50%',
-                                            padding: '0.3em',
-                                            cursor: (playerAnswered && aiAnswered) ? "pointer" : "not-allowed",
-                                            opacity: (playerAnswered && aiAnswered) ? 1 : 0.5,
-                                            transition: 'background-color 0.3s ease, opacity 0.3s ease',
-                                        }}
+                                        onClick={handleNextQuestion}
+                                        className="next-arrow-button"
                                     />
                                 )}
                             </div>
-                            {/* Ensure currentQuestion and pregunta exist */}
-                            <h1>{currentQuestion?.pregunta?.[currentLanguage] || t('loading')}</h1>
+                            <h1>{currentQuestion.pregunta?.[currentLanguage] || t('loading')}</h1>
                         </div>
 
-                        {/* Optional Image */}
-                        {currentQuestion?.img?.[0] && (
+                        {currentQuestion.img?.[0] && (
                             <div className="question-image">
                                 <img
                                     src={currentQuestion.img[0]}
-                                    alt={t('questionImageAlt', { question: currentQuestion?.pregunta?.[currentLanguage] })} // Translate alt text
-                                    onError={(e) => e.target.style.display='none'} // Hide if image fails to load
+                                    alt={t('questionImageAlt', { question: currentQuestion.pregunta?.[currentLanguage] })}
+                                    onError={(e) => e.target.style.display='none'}
                                 />
                             </div>
                         )}
 
-                        {/* Answer Buttons */}
                         <div className="answerPanel">
                             {shuffledAnswers.map((respuesta, index) => (
                                 <BaseButton
                                     key={index}
                                     text={respuesta}
                                     onClick={() => handlePlayerAnswer(respuesta)}
-                                    // Determine button style based on answer state
                                     buttonType={
                                         playerAnswered
-                                            ? respuesta === currentQuestion?.respuestaCorrecta?.[currentLanguage]
-                                                ? "buttonCorrect" // Correct answer style
+                                            ? respuesta === currentQuestion.respuestaCorrecta?.[currentLanguage]
+                                                ? "buttonCorrect"
                                                 : selectedAnswer === respuesta
-                                                    ? "buttonIncorrect" // Player's incorrect choice
-                                                    : "buttonDisabled" // Other incorrect options
-                                            : "buttonPrimary" // Default state
+                                                    ? "buttonIncorrect"
+                                                    : "buttonDisabled"
+                                            : "buttonPrimary"
                                     }
-                                    disabled={playerAnswered} // Disable after player answers
+                                    disabled={playerAnswered}
                                 />
                             ))}
                         </div>
 
-                        {/* Timer */}
                         <div className="timer-section">
                             <Box display="flex" alignItems="center" width="100%" gap={1}>
                                 <span>{t('time')}</span>
-                                <Box width="100%" sx={{ mx: 1 }}> {/* Add margin */}
+                                <Box width="100%" sx={{ mx: 1 }}>
                                     <LinearProgress id="progressBar" variant="determinate" value={progress} />
                                 </Box>
                                 <span>{formatTime(timeLeft)}</span>
@@ -572,22 +470,14 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
                         </div>
                     </motion.div>
 
-                    {/* Right Column (Player Score & Rules) */}
+                    {/* Right Column: Rules Button */}
                     <div className="right-column">
-                        <div className="player-score-container">
-                            <div className="player-score">
-                                <h3>{loggedUsername}</h3>
-                                <div className="score-value">{playerScore}</div>
-                                {playerAnswered && playerCorrect !== null && ( // Check playerCorrect is not null
-                                    <div className={`answer-indicator ${playerCorrect ? "correct" : "incorrect"}`}>
-                                        {playerCorrect ? "✓" : "✗"}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
                         <div className="rules-points-section">
-                            <BaseButton text={t('rules')} buttonType="buttonSecondary" onClick={() => setShowRules(true)} />
+                            <BaseButton
+                                text={t('rules')}
+                                buttonType="buttonSecondary"
+                                onClick={() => setShowRules(true)}
+                            />
                         </div>
                     </div>
                 </div>
@@ -626,14 +516,11 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
                                 </div>
                             }
                             onClose={() => {
-                                // Don't save stats again, already saved by useEffect
-                                setShowSummary(false); // Hide summary first
-                                if (onGameEnd) {
-                                    onGameEnd(); // Call the callback passed from PlayView
-                                } else {
-                                    // Fallback if prop is not passed
-                                    console.warn("onGameEnd prop not provided to PlayerVsAIGame. Reloading page.");
-                                    window.location.reload();
+                                setShowSummary(false);
+                                if (onGameEnd) onGameEnd();
+                                else {
+                                    console.warn("onGameEnd prop not provided. Reloading.");
+                                    window.location.reload(); // Consider redirecting instead
                                 }
                             }}
                         />
