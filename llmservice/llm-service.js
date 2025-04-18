@@ -428,23 +428,34 @@ app.post('/ai-answer', async (req, res) => {
 
         isCorrectForMessage = parsedAnswer.selectedAnswer === correctAnswer;
 
-        let message;
+        let messageContent; // Usar un nombre de variable diferente
         try {
-            message = await generateAIMessage(isCorrectForMessage, questionText, idioma);
-            if (!message) {
+            // Intenta generar el mensaje llamando al LLM
+            messageContent = await generateAIMessage(isCorrectForMessage, questionText, idioma);
+            // Si generateAIMessage devuelve null o vacío (porque el LLM respondió vacío)
+            if (!messageContent) {
                 console.warn("generateAIMessage (normal) devolvió vacío/null, usando mensaje por defecto.");
-                message = getDefaultMessage(isCorrectForMessage, idioma);
+                messageContent = getDefaultMessage(isCorrectForMessage, idioma);
             }
+            console.log("Mensaje generado por LLM (o por defecto si vacío):", messageContent); // Log añadido
+
         } catch (msgError) {
+            // Si generateAIMessage lanza un error (porque la llamada al LLM falló)
             console.error("Error al generar mensaje (normal), usando default:", msgError.message);
-            message = getDefaultMessage(isCorrectForMessage, idioma);
+            // Asigna explícitamente el mensaje por defecto en caso de error
+            messageContent = getDefaultMessage(isCorrectForMessage, idioma);
+            console.log("Mensaje asignado por defecto en catch block:", messageContent); // Log añadido
         }
 
+        console.log("Valor final de messageContent antes de res.json:", messageContent); // Log añadido
+
+        // Construye y envía la respuesta final
         res.json({
             selectedAnswer: parsedAnswer.selectedAnswer,
             isCorrect: isCorrectForMessage,
-            message
+            message: messageContent // Usa la variable actualizada
         });
+
     } catch (error) {
         console.error('Error al procesar respuesta de la IA:', error.message);
         const finalIdioma = requestedIdioma || 'es';
