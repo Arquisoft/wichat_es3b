@@ -615,5 +615,7 @@ describe("LLM Service", () => {
     expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z - GET \/$/));
   });
 
+  // Prueba
+
 });
 
