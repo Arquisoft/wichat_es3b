@@ -159,8 +159,12 @@ describe("Game Component", () => {
     fireEvent.click(screen.getByText("Amazonas"));
 
     await waitFor(() => {
-      expect(screen.getByText(/Resumen de la partida/)).toBeInTheDocument();
-      expect(screen.getByText(/Respuestas correctas:/)).toBeInTheDocument();
+      expect(screen.getByText(/respuestas correctas:/i)).toBeInTheDocument()
+      expect(screen.getByText(/respuestas incorrectas:/i)).toBeInTheDocument()
+      expect(screen.getByText(/ratio de aciertos:/i)).toBeInTheDocument()
+      expect(screen.getByText(/tiempo promedio por pregunta:/i)).toBeInTheDocument()
+      expect(screen.getByText(/puntuación máxima:/i)).toBeInTheDocument()
+
     });
   });
 
