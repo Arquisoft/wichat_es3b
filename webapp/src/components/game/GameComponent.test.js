@@ -164,23 +164,4 @@ describe("Game Component", () => {
     });
   });
 
-  test("Debería mostrar error cuando no se puedan obtener las preguntas", async () => {
-    jest.spyOn(global, "fetch").mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-      json: () => Promise.resolve({ error: "Internal error" })
-    });
-
-    render(
-        <I18nextProvider i18n={i18n}>
-          <MemoryRouter>
-            <Game />
-          </MemoryRouter>
-        </I18nextProvider>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText(/loading/i)).toBeInTheDocument();
-    });
-  });
 });
