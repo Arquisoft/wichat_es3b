@@ -251,7 +251,7 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
                 try {
                     // Determine categories for query string
                     const categories = config.categories.includes("all") ? ["all"] : config.categories;
-                    const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
+                    const queryString = `questionsDB?n=${config.numPreguntas}&topic=${categories.join(",")}`;
                     // Fetch questions from gateway
                     const response = await fetch(`${GATEWAY_URL}/${queryString}`);
                     if (!response.ok) throw new Error(`Failed to fetch questions: ${response.statusText}`);
