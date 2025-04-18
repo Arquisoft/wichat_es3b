@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 // Assuming the robot image path is correct relative to the public folder or build output
+// ¡Recuerda actualizar esta imagen a una sin fondo cuando la tengas!
 const ROBOT_IMAGE_PATH = "/webapp/src/assets/img/FriendlyRobotThinking.png"; // Adjust if necessary
 
 // Player vs AI Game Component
@@ -370,7 +371,7 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
                 }
             }
         }
-    }, [playerAnswered, aiAnswered, questionNumber, questions.length, config, saveStats, showSummary]); // Dependencies
+    }, [playerAnswered, aiAnswered, questionNumber, questions.length, config, saveStats, showSummary]); // Dependencies: Keep aiAnswered
 
     // --- Event Handlers ---
 
@@ -558,8 +559,30 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
                                         id="nextArrow" // ID for potential specific styling
                                         // onClick enabled only when both have answered
                                         onClick={(playerAnswered && aiAnswered) ? handleNextQuestion : undefined}
-                                        // className based on enabled state (both answered)
-                                        className={`next-arrow-button ${(playerAnswered && aiAnswered) ? 'enabled' : 'disabled'}`}
+                                        // --- Apply inline style for dynamic background/state ---
+                                        style={{
+                                            // Use #ccc when disabled (playerAnswered && aiAnswered is false)
+                                            backgroundColor: (playerAnswered && aiAnswered) ? 'var(--color-primario)' : '#ccc',
+                                            color: 'white', // Icon color is always white
+                                            borderRadius: '50%',
+                                            padding: '0.4em', // Adjusted padding slightly
+                                            // Cursor and opacity depend on enabled state
+                                            cursor: (playerAnswered && aiAnswered) ? "pointer" : "not-allowed",
+                                            opacity: (playerAnswered && aiAnswered) ? 1 : 0.6, // Use 0.6 for disabled opacity
+                                            // Transition for smooth color/opacity change
+                                            transition: 'background-color 0.3s ease, opacity 0.3s ease, transform 0.2s ease', // Added transform transition
+                                            // Ensure flex alignment if needed by parent (though parent handles centering)
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            // Add hover effect directly here (will apply regardless of disabled state, but visually less obvious when disabled)
+                                            // A better approach for conditional hover is CSS classes, but sticking to inline as requested
+                                            // Consider adding a simple scale on hover for enabled state if desired
+                                            transform: (playerAnswered && aiAnswered) ? 'scale(1)' : 'scale(1)', // Base scale
+                                        }}
+                                        // Add mouseEnter/Leave for dynamic hover effect if needed (more complex)
+                                        // onMouseEnter={(e) => { if (playerAnswered && aiAnswered) e.currentTarget.style.transform = 'scale(1.1)'; }}
+                                        // onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
                                     />
                                 )}
                             </div>
