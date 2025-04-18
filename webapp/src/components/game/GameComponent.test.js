@@ -1,9 +1,8 @@
-import React from "react"
-import { render, screen, waitFor, fireEvent, act } from "@testing-library/react"
-import Game from "../Game"
-import { I18nextProvider } from "react-i18next"
-import i18n from "../../../i18n"
-import '@testing-library/jest-dom'
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import { I18nextProvider } from "react-i18next";
+import i18n from "../../i18n";
+import Game from "./Game";
 
 // Mock del gateway URL
 jest.mock("../../../config", () => ({
