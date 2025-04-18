@@ -82,8 +82,9 @@ describe("Game Component", () => {
       expect(screen.getByText(/¿Cuál es la capital de Francia\?/)).toBeInTheDocument();
     });
 
-    const botonParis = screen.getByRole('button', { name: 'París' });
-    fireEvent.click(botonParis);
+    const parisButton = await screen.findAllByText("París")
+    expect(parisButton.length).toBeGreaterThan(0)
+    fireEvent.click(parisButton[0])
 
 
     await waitFor(() => {
@@ -142,8 +143,9 @@ describe("Game Component", () => {
       expect(screen.getByText(/¿Cuál es la capital de Francia\?/)).toBeInTheDocument();
     });
 
-    const botonParis = screen.getByRole('button', { name: 'París' });
-    fireEvent.click(botonParis);
+    const parisButton = await screen.findAllByText("París")
+    expect(parisButton.length).toBeGreaterThan(0)
+    fireEvent.click(parisButton[0])
 
     await waitFor(() => {
       var botonSiguiente = screen.getByTitle("Siguiente pregunta");
