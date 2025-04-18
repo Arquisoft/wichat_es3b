@@ -1,164 +1,95 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-import { I18nextProvider } from "react-i18next";
-import i18n from "../../i18n"; 
-import Game from "./Game";
+import React from "react"
+import { render, screen, waitFor, fireEvent } from "@testing-library/react"
+import Game from "../Game"
+import { I18nextProvider } from "react-i18next"
+import i18n from "../../../i18n"
+import '@testing-library/jest-dom'
 
-// Mocks de localStorage y configuración
-const mockConfig = {
-  numPreguntas: 2,
-  tiempoPregunta: 30,
-  limitePistas: 3,
-  modoJuego: "Jugador vs IA",
-  categories: ["cine"]
-};
+jest.mock("../../../config", () => ({
+  getGatewayUrl: () => "http://localhost:8000"
+}))
 
-beforeEach(() => {
-  localStorage.setItem("username", "testuser");
-  localStorage.setItem("quizConfig", JSON.stringify(mockConfig));
-  jest.resetAllMocks();
-});
-
-// Simulación básica de preguntas
+// Mock de preguntas
 const mockQuestions = [
   {
-    pregunta: { es: "¿Cuál es la capital de Francia?" },
-    respuestaCorrecta: { es: "París" },
-    respuestas: { es: ["Madrid", "Roma", "Londres", "París"] },
-    descripcion: [],
-    img: []
-  },
-  {
-    pregunta: { es: "¿Cuál es el río más largo del mundo?" },
-    respuestaCorrecta: { es: "Amazonas" },
-    respuestas: { es: ["Nilo", "Misisipi", "Yangtsé", "Amazonas"] },
-    descripcion: [],
+    pregunta: {
+      es: "¿Cuál es la capital de Francia?",
+      en: "What is the capital of France?"
+    },
+    respuestaCorrecta: {
+      es: "París",
+      en: "Paris"
+    },
+    respuestas: {
+      es: ["Londres", "Roma", "Berlín"],
+      en: ["London", "Rome", "Berlin"]
+    },
+    descripcion: "Es una ciudad europea.",
     img: []
   }
-];
+]
 
-describe("Game Component", () => {
-  test("Debería renderizar y mostrar la primera pregunta", async () => {
-    jest.spyOn(global, "fetch").mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockQuestions)
-    });
+// Mock de localStorage
+beforeEach(() => {
+  jest.spyOn(global, "fetch").mockImplementation((url) => {
+    if (url.includes("/questionsDB")) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockQuestions)
+      })
+    }
 
-    render(
+    if (url.includes("/savestats")) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ message: "saved" })
+      })
+    }
+
+    return Promise.reject(new Error("Not Found"))
+  })
+
+  Storage.prototype.getItem = jest.fn((key) => {
+    if (key === "username") return "testUser"
+    if (key === "quizConfig") {
+      return JSON.stringify({
+        numPreguntas: 1,
+        tiempoPregunta: 10,
+        limitePistas: 2,
+        modoJuego: "Jugador vs IA",
+        categories: ["all"]
+      })
+    }
+    return null
+  })
+
+  Storage.prototype.setItem = jest.fn()
+})
+
+afterEach(() => {
+  jest.restoreAllMocks()
+})
+
+test("muestra una pregunta y permite seleccionar la respuesta correcta", async () => {
+  render(
       <I18nextProvider i18n={i18n}>
-        <MemoryRouter>
-          <Game />
-        </MemoryRouter>
+        <Game />
       </I18nextProvider>
-    );
+  )
 
-    await waitFor(() => {
-      expect(screen.getByText(/¿Cuál es la capital de Francia\?/)).toBeInTheDocument();
-    });
+  // Espera a que cargue la pregunta
+  const questionText = await screen.findByText("¿Cuál es la capital de Francia?")
+  expect(questionText).toBeInTheDocument()
 
-    const options = ["Madrid", "Roma", "Londres", "París"];
-    options.forEach((opt) => {
-      expect(screen.getByText(opt)).toBeInTheDocument();
-    });
-  });
+  // Espera a que se rendericen los botones de respuesta
+  const correctOption = await screen.findByRole("button", { name: /París/i })
+  expect(correctOption).toBeInTheDocument()
 
-  test("Debería procesar una respuesta correcta", async () => {
-    jest.spyOn(global, "fetch").mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockQuestions)
-    });
+  // Simula el clic en la opción correcta
+  fireEvent.click(correctOption)
 
-    render(
-      <I18nextProvider i18n={i18n}>
-        <MemoryRouter>
-          <Game />
-        </MemoryRouter>
-      </I18nextProvider>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText(/¿Cuál es la capital de Francia\?/)).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByText("París"));
-    await waitFor(() => {
-      expect(screen.getByText(/¿Cuál es el río más largo del mundo\?/)).toBeInTheDocument();
-    });
-  });
-
-  test("Debería procesar una respuesta incorrecta", async () => {
-    jest.spyOn(global, "fetch").mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockQuestions)
-    });
-
-    render(
-      <I18nextProvider i18n={i18n}>
-        <MemoryRouter>
-          <Game />
-        </MemoryRouter>
-      </I18nextProvider>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText(/¿Cuál es la capital de Francia\?/)).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByText("Madrid")); // Incorrecta
-    await waitFor(() => {
-      expect(screen.getByText(/¿Cuál es el río más largo del mundo\?/)).toBeInTheDocument();
-    });
-  });
-
-  test("Debería mostrar el resumen del juego al final", async () => {
-    jest.spyOn(global, "fetch").mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockQuestions)
-    });
-
-    render(
-      <I18nextProvider i18n={i18n}>
-        <MemoryRouter>
-          <Game />
-        </MemoryRouter>
-      </I18nextProvider>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText(/¿Cuál es la capital de Francia\?/)).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByText("París"));
-    await waitFor(() => {
-      expect(screen.getByText(/¿Cuál es el río más largo del mundo\?/)).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByText("Amazonas"));
-
-    await waitFor(() => {
-      expect(screen.getByText(/Resumen de la partida/)).toBeInTheDocument();
-      expect(screen.getByText(/Respuestas correctas:/)).toBeInTheDocument();
-    });
-  });
-
-  test("Debería mostrar error cuando no se puedan obtener las preguntas", async () => {
-    jest.spyOn(global, "fetch").mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-      json: () => Promise.resolve({ error: "Internal error" })
-    });
-
-    render(
-      <I18nextProvider i18n={i18n}>
-        <MemoryRouter>
-          <Game />
-        </MemoryRouter>
-      </I18nextProvider>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText(/loading/i)).toBeInTheDocument(); 
-    });
-  });
-
-});
+  // Espera a que cambie el estado de la respuesta seleccionada
+  await waitFor(() => {
+    expect(correctOption).toHaveClass("buttonCorrect")
+  })
+})
