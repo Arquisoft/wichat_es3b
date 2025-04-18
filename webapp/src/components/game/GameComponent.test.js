@@ -58,7 +58,7 @@ describe("Game Component", () => {
 
     const options = ["Madrid", "Roma", "Londres", "París"];
     options.forEach((opt) => {
-      expect(screen.getByText(opt)).toBeInTheDocument();
+      expect(screen.getAllByText(opt)).toBeInTheDocument();
     });
   });
 
@@ -80,7 +80,13 @@ describe("Game Component", () => {
       expect(screen.getByText(/¿Cuál es la capital de Francia\?/)).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText("París"));
+    fireEvent.click(screen.getByText("París"))
+
+    await waitFor(() => {
+      var botonSiguiente = screen.getByText("Siguiente pregunta");
+      fireEvent.click(botonSiguiente);
+    });
+
     await waitFor(() => {
       expect(screen.getByText(/¿Cuál es el río más largo del mundo\?/)).toBeInTheDocument();
     });
@@ -105,8 +111,14 @@ describe("Game Component", () => {
     });
 
     fireEvent.click(screen.getByText("Madrid")); // Incorrecta
+
     await waitFor(() => {
-      expect(screen.getByText(/¿Cuál es el río más largo del mundo\?/)).toBeInTheDocument();
+      var botonSiguiente = screen.getByText("Siguiente pregunta");
+      fireEvent.click(botonSiguiente);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/¿Cuál es la capital de Francia\?/)).toBeInTheDocument();
     });
   });
 
@@ -129,6 +141,12 @@ describe("Game Component", () => {
     });
 
     fireEvent.click(screen.getByText("París"));
+
+    await waitFor(() => {
+      var botonSiguiente = screen.getByText("Siguiente pregunta");
+      fireEvent.click(botonSiguiente);
+    });
+
     await waitFor(() => {
       expect(screen.getByText(/¿Cuál es el río más largo del mundo\?/)).toBeInTheDocument();
     });
