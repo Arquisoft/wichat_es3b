@@ -88,7 +88,9 @@ const Game = ({ onGameEnd }) => {
         }
         try {
           const categories = config.categories.includes("all") ? ["all"] : config.categories;
-          const queryString = `questions?n=${config.numPreguntas}&topic=${categories.join(",")}`;
+          const numPreguntas = config.numPreguntas ?? 10;
+          const queryString = `questionsDB?n=${config.numPreguntas}&topic=${categories.join(",")}`;
+          console.log("URL de la solicitud al gateway:", `${GATEWAY_URL}/${queryString}`);
           const response = await fetch(`${GATEWAY_URL}/${queryString}`);
 
           if (!response.ok) {
