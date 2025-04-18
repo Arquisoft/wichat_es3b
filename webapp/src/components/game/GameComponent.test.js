@@ -156,7 +156,10 @@ describe("Game Component", () => {
       expect(screen.getByText(/¿Cuál es el río más largo del mundo\?/)).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.findAllByText("Amazonas")[0]);
+    const amazonasButton = await screen.findAllByText("Amazonas")
+    expect(amazonasButton.length).toBeGreaterThan(0)
+    fireEvent.click(amazonasButton[0])
+
 
     await waitFor(() => {
       expect(screen.getByText(/respuestas correctas:/i)).toBeInTheDocument()
