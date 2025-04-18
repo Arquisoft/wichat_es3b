@@ -160,4 +160,5 @@ describe("Game Component", () => {
       expect(screen.getByText(/loading/i)).toBeInTheDocument(); 
     });
   });
+
 });
