@@ -4,11 +4,13 @@ import { initReactI18next } from "react-i18next";
 i18n
     .use(initReactI18next)
     .init({
-        // Si puede ser implementar en orden alfabético cada mensaje(con la primera letra vale), para poder acceder a ellos más fácil
         resources: {
             es: {
                 translation: {
                     "aiHintLimit": "Límite de pistas de IA",
+                    "aiCorrectMessageDefault": "¡Bien! He acertado esta.",
+                    "aiIncorrectMessageDefault": "¡Vaya! Me he equivocado.",
+                    "aiScoreLabel": "Puntuación IA:", // New/Corrected Key
                     "all": "Todo",
                     "answer": "⏳ Responde en el menor tiempo posible.",
                     "art": "Arte",
@@ -20,8 +22,17 @@ i18n
                     "correctAnswers": "Respuestas correctas",
                     "countries": "Países",
                     "createAccount": "Crear cuenta",
+                    "difficulty": "Dificultad",
+                    "easy": "Fácil",
+                    "medium": "Media",
+                    "hard": "Difícil",
                     "email": "Correo electrónico*",
+                    "emptyEmail": "Por favor, introduce un correo electrónico",
+                    "emptyPassword": "Por favor, introduce una contraseña",
+                    "emptyPasswordConfirm": "Por favor, confirma tu contraseña",
+                    "emptyUsername": "Por favor, introduce un nombre de usuario",
                     "failedLogin": "Error al iniciar sesión",
+                    "finalResult": "Resultado Final",
                     "football": "Fútbol",
                     "footer_text": "© 2025 WIChat. Todos los derechos reservados.",
                     "gameMode": "Modo de juego",
@@ -43,6 +54,7 @@ i18n
                     "addUserSuccessful": "Usuario añadido correctamente",
                     "logout": "Cerrar sesión",
                     "matches": "Partidas",
+                    "nextQuestion": "Siguiente pregunta", // New
                     "noHintsLeft": "No hay más pistas disponibles.",
                     "numQuestions": "Número de preguntas",
                     "observe": "👁️ Observa la imagen.",
@@ -50,14 +62,17 @@ i18n
                     "panel_text": "“ Cada pregunta es un reto, cada acierto un paso más hacia el triunfo.“",
                     "password": "Contraseña*",
                     "passwordsDoNotMatch": "Las contraseñas no coinciden",
+                    "player": "Jugador", // New
                     "player_score": "Nombre del jugador - Puntuación",
                     "play": "Jugar",
                     "playerVsAI": "Jugador vs IA",
                     "profile": "Perfil",
                     "question": "Pregunta",
+                    "questionImageAlt": "Imagen para la pregunta: {{question}}", // New
                     "questions": "preguntas",
                     "rankingInfo": "Este es el ranking de usuarios cuyo récord de puntos es mayor. ¡Compite para entrar en el top!",
                     "reset": "Reiniciar",
+                    "resetSettings": "Reiniciar configuración",
                     "rules": "Reglas",
                     "score": "Puntuación",
                     "seconds": "segundos",
@@ -66,23 +81,36 @@ i18n
                     "signup": "Crear cuenta",
                     "singlePlayer": "Un jugador",
                     "subtitle": "¡Pon a prueba tus conocimientos con imágenes y pistas interactivas!",
+                    "summaryAvgTime": "Tiempo promedio por pregunta:", // New
+                    "summaryCorrect": "Respuestas correctas:", // New
+                    "summaryIncorrect": "Respuestas incorrectas:", // New
+                    "summaryMaxScore": "Puntuación máxima:", // New
+                    "summaryRatio": "Ratio de aciertos:", // New
+                    "summaryTitle": "Resumen de la partida", // New
+                    "thinking": "Pensando",
+                    "tie": "¡Empate!",
                     "time": "Tiempo",
                     "timePerQuestion": "Tiempo por pregunta",
                     "title": "WIChat",
                     "top_players": "Top 3 jugadores",
                     "user-ranking": "Ranking de usuarios",
                     "username": "Nombre de usuario*",
+                    "vsAIRule1": "Compite contra la IA para responder correctamente.",
+                    "vsAIRule2": "Gana puntos por cada respuesta correcta.",
+                    "vsAIRule3": "El jugador con más puntos al final gana.",
                     "wrongAnswers": "Respuestas incorrectas",
                     "addUserError": "Error al añadir usuario",
-                    "emptyEmail": "Por favor, introduce un correo electrónico",
-                    "emptyUsername": "Por favor, introduce un nombre de usuario",
-                    "emptyPassword": "Por favor, introduce una contraseña",
-                    "emptyPasswordConfirm": "Por favor, confirma tu contraseña"
+                    "youLost": "¡Has perdido!",
+                    "youWon": "¡Has ganado!",
+                    "yourScore": "Tu puntuación:",
                 },
             },
             en: {
                 translation: {
                     "aiHintLimit": "AI hint limit",
+                    "aiCorrectMessageDefault": "Great! I got this one right.",
+                    "aiIncorrectMessageDefault": "Oops! I got that wrong.",
+                    "aiScoreLabel": "AI score:", // New/Corrected Key
                     "all": "All",
                     "answer": "⏳ Answer as quickly as possible.",
                     "art": "Art",
@@ -94,8 +122,17 @@ i18n
                     "correctAnswers": "Correct answers",
                     "countries": "Countries",
                     "createAccount": "Create account",
+                    "difficulty": "Difficulty",
+                    "easy": "Easy",
+                    "medium": "Medium",
+                    "hard": "Hard",
                     "email": "Email*",
+                    "emptyEmail": "Please enter an email",
+                    "emptyPassword": "Please enter a password",
+                    "emptyPasswordConfirm": "Please confirm your password",
+                    "emptyUsername": "Please enter a username",
                     "failedLogin": "Failed to login",
+                    "finalResult": "Final Result",
                     "football": "Football",
                     "footer_text": "© 2025 WIChat. All rights reserved.",
                     "gameMode": "Game mode",
@@ -117,6 +154,7 @@ i18n
                     "addUserSuccessful": "User added successfully",
                     "logout": "Logout",
                     "matches": "Matches",
+                    "nextQuestion": "Next question", // New
                     "noHintsLeft": "There are no hints left.",
                     "numQuestions": "Number of questions",
                     "observe": "👁️ Observe the image.",
@@ -124,14 +162,17 @@ i18n
                     "panel_text": "“ Each question is a challenge, each correct answer a step closer to victory.“",
                     "password": "Password*",
                     "passwordsDoNotMatch": "Passwords do not match",
+                    "player": "Player", // New
                     "player_score": "Player Name - Score",
                     "play": "Play",
                     "playerVsAI": "Player VS AI",
                     "profile": "Profile",
                     "question": "Question",
+                    "questionImageAlt": "Image for question: {{question}}", // New
                     "questions": "questions",
                     "rankingInfo": "This is the ranking of users with the highest score records. Compete to make it into the top!",
                     "reset": "Reset",
+                    "resetSettings": "Reset settings",
                     "rules": "Rules",
                     "score": "Score",
                     "seconds": "seconds",
@@ -140,25 +181,35 @@ i18n
                     "signup": "Sign Up",
                     "singlePlayer": "Singleplayer",
                     "subtitle": "Test your knowledge with images and interactive clues!",
+                    "summaryAvgTime": "Average time per question:", // New
+                    "summaryCorrect": "Correct answers:", // New
+                    "summaryIncorrect": "Incorrect answers:", // New
+                    "summaryMaxScore": "Maximum score:", // New
+                    "summaryRatio": "Accuracy ratio:", // New
+                    "summaryTitle": "Game Summary", // New
+                    "thinking": "Thinking",
+                    "tie": "It's a tie!",
                     "time": "Time",
                     "timePerQuestion": "Time per question",
                     "title": "WIChat",
                     "top_players": "Top 3 players",
                     "user-ranking": "User ranking",
                     "username": "Username*",
+                    "vsAIRule1": "Compete against the AI to answer correctly.",
+                    "vsAIRule2": "Earn points for each correct answer.",
+                    "vsAIRule3": "The player with the most points at the end wins.",
                     "wrongAnswers": "Wrong answers",
                     "addUserError": "Error adding user",
-                    "emptyEmail": "Please enter an email",
-                    "emptyUsername": "Please enter a username",
-                    "emptyPassword": "Please enter a password",
-                    "emptyPasswordConfirm": "Please confirm your password"
+                    "youLost": "You lost!",
+                    "youWon": "You won!",
+                    "yourScore": "Your score:",
                 },
             },
         },
-        lng: "es", // Idioma por defecto
+        lng: "es", // Default language
         fallbackLng: "es",
         interpolation: {
-            escapeValue: false,
+            escapeValue: false, // React already safes from xss
         },
     });
 

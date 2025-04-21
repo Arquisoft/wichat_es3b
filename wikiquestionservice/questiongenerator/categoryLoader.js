@@ -14,11 +14,17 @@ class CategoryLoader {
         }
 
         const questionsPerCategory = Math.floor(numQuestions / selectedCategories.length);
-
+        let remainingQuestions = numQuestions % selectedCategories.length;
         for (const categoryName of selectedCategories) {
             const categoryData = CATEGORIES[categoryName];
 
             if (categoryData.entity && categoryData.properties && categoryData.preguntas) {
+                let categoryQuestions = questionsPerCategory;
+
+                if (remainingQuestions > 0) {
+                    categoryQuestions += 1;
+                    remainingQuestions -= 1;
+                }
                 this.services[categoryName] = new WikidataQueryService(
                     categoryName,
                     categoryData.entity,
@@ -26,7 +32,7 @@ class CategoryLoader {
                     categoryData.preguntas,
                     categoryData.types,
                     categoryData.img,
-                    questionsPerCategory
+                    categoryQuestions
                 );
             } else {
                 console.warn(`⚠️ La categoría '${categoryName}' está incompleta y no se cargará.`);

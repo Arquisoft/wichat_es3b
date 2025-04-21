@@ -65,6 +65,27 @@ app.post("/askllm", async (req, res) => {
   }
 });
 
+app.post("/ai-answer", async (req, res) => {
+  try {
+    const llmResponse = await axios.post(llmServiceUrl + "/ai-answer", req.body);
+    res.json(llmResponse.data);
+  } catch (error) {
+    console.error("Error en el gateway al procesar la respuesta de la IA:", error.message);
+
+    if (error.response) {
+      res
+          .status(error.response.status)
+          .json({ error: error.response.data.error });
+    } else if (error.request) {
+      res
+          .status(500)
+          .json({ error: "El servicio LLM no está disponible" });
+    } else {
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  }
+});
+
 app.post("/savestats", async (req, res) => {
   try {
     const statsResponse = await axios.post(
@@ -184,6 +205,21 @@ app.get('/questions', async (req, res) => {
   }
 });
 
+
+app.get('/questionsDB', async (req, res) => {
+  try {
+    const { n = 10, topic = "all" } = req.query;
+
+    const fullURL = `${wikiQuestionServiceUrl}/questionsDB?n=${n}&topic=${encodeURIComponent(topic)}`;
+    console.log("Redirigiendo a:", fullURL);
+
+    const response = await axios.get(fullURL);
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error al obtener preguntas:", error.message);
+    res.status(error.response?.status || 500).json({ error: error.message });
+  }
+});
 // Start the gateway service
 const server = app.listen(port, () => {
   console.log(`Gateway Service listening at http://localhost:${port}`);
