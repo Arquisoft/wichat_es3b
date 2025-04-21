@@ -83,7 +83,7 @@ jobs:
           npm --prefix gatewayservice start &
           npm --prefix webapp start &
 
-      - name: Wait for Frontend
+      - name: Wait for Frontend init
         run: wait-on http://localhost:3000
 
       - name: Run E2E Tests
