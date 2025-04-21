@@ -21,7 +21,7 @@ npm --prefix gatewayservice install
 echo "📦 Reinstalando dependencias del frontend (por si acaso)..."
 npm --prefix webapp install
 
-echo "🔨 Construyendo frontend..."
+echo "🔨 Construyendo frontend"
 npm --prefix webapp run build
 
 echo "🚀 Ejecutando tests E2E..."
