@@ -90,15 +90,19 @@ defineFeature(feature, test => {
         await page.waitForSelector('#email', { visible: true, timeout: 5000 });
         await expect(page).toFill('input#email', email);
         console.log('Completamos email');
+        await page.waitForTimeout(500);
         await page.waitForSelector('#username', { visible: true, timeout: 5000 });
         await expect(page).toFill('input#username', username);
         console.log('Completamos username');
+        await page.waitForTimeout(500);
         await page.waitForSelector('#password', { visible: true, timeout: 5000 });
         await expect(page).toFill('input#password', password);
         console.log('Completamos password');
+        await page.waitForTimeout(500);
         await page.waitForSelector('#confirmPassword', { visible: true, timeout: 5000 });
         await expect(page).toFill('input#confirmPassword', passwordConfirm);
         console.log('Completamos confirm password');
+        await page.waitForTimeout(500);
 
         await page.waitForSelector('#create-button', { visible: true, timeout: 5000 });
         await expect(page).toClick('button', { text: 'Crear cuenta' });
