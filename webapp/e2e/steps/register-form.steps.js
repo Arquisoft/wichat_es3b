@@ -44,9 +44,10 @@ defineFeature(feature, test => {
           fs.mkdirSync(screenshotsDir, { recursive: true });
         }
         
-        console.log('Guardando captura en:', path.join(screenshotsDir, `register-given-${Date.now()}.png`));
+        let photopath = path.join(screenshotsDir, `register-given-${Date.now()}.png`);
+        console.log(`Guardando captura en: ${photopath}`);
         // Capturar la pantalla en caso de error
-        await page.screenshot({ path: `/screenshots/register-given-${Date.now()}.png`, fullPage: true });
+        await page.screenshot({ path: photopath, fullPage: true });
         throw error; // Re-lanzar el error para que falle el test
       }
 
