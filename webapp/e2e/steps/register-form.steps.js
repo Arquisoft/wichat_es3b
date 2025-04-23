@@ -27,11 +27,6 @@ defineFeature(feature, test => {
     let passwordConfirm;
 
     given('An unregistered user', async () => {
-      email = `testuser${Date.now()}@example.com`;
-      username = `testuser${Date.now()}`;
-      password = "testpassword";
-      passwordConfirm = "testpassword";
-
       // Clicar en "Iniciar sesión" desde el navbar
       await expect(page).toClick('a', { text: 'Iniciar sesión' });
 
@@ -40,6 +35,11 @@ defineFeature(feature, test => {
     });
 
     when('I fill the data in the form and press submit', async () => {
+      email = `testuser${Date.now()}@example.com`;
+      username = `testuser${Date.now()}`;
+      password = "testpassword";
+      passwordConfirm = "testpassword";
+
       await expect(page).toFill('input#email', email);
       await expect(page).toFill('input#username', username);
       await expect(page).toFill('input#password', password);
