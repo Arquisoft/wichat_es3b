@@ -9,8 +9,8 @@ let browser;
 defineFeature(feature, test => {
   beforeAll(async () => {
     browser = process.env.GITHUB_ACTIONS
-        ? await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox'] })
-        : await puppeteer.launch({ headless: false, slowMo: 100 });
+      ? await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox'] })
+      : await puppeteer.launch({ headless: false, slowMo: 100 });
 
     page = await browser.newPage();
     setDefaultOptions({ timeout: 10000 });
@@ -29,7 +29,7 @@ defineFeature(feature, test => {
     given('An unregistered user', async () => {
 
       // Esperar a que aparezca el botón para cambiar a la vista de registro
-      await page.waitForSelector('#create-button', { visible: true, timeout: 5000 }); 
+      await page.waitForSelector('#create-button', { visible: true, timeout: 5000 });
       await expect(page).toClick('button', { text: 'Crear cuenta' });
 
     });
@@ -40,17 +40,25 @@ defineFeature(feature, test => {
       password = "testpassword";
       passwordConfirm = "testpassword";
 
-      await page.waitForSelector('#email', { visible: true, timeout: 5000 }); 
-      await expect(page).toFill('input#email', email);
-      await page.waitForSelector('#username', { visible: true, timeout: 5000 }); 
-      await expect(page).toFill('input#username', username);
-      await page.waitForSelector('#password', { visible: true, timeout: 5000 }); 
-      await expect(page).toFill('input#password', password);
-      await page.waitForSelector('#confirmPassword', { visible: true, timeout: 5000 });
-      await expect(page).toFill('input#confirmPassword', passwordConfirm); 
+      try {
+        await page.waitForSelector('#email', { visible: true, timeout: 5000 });
+        await expect(page).toFill('input#email', email);
+        await page.waitForSelector('#username', { visible: true, timeout: 5000 });
+        await expect(page).toFill('input#username', username);
+        await page.waitForSelector('#password', { visible: true, timeout: 5000 });
+        await expect(page).toFill('input#password', password);
+        await page.waitForSelector('#confirmPassword', { visible: true, timeout: 5000 });
+        await expect(page).toFill('input#confirmPassword', passwordConfirm);
 
-      await page.waitForSelector('#create-button', { visible: true, timeout: 5000 }); 
-      await expect(page).toClick('button', { text: 'Crear cuenta' });
+        await page.waitForSelector('#create-button', { visible: true, timeout: 5000 });
+        await expect(page).toClick('button', { text: 'Crear cuenta' });
+      } catch (error) {
+        console.error('Error esperando el selector o haciendo clic:', error);
+
+        // Capturar la pantalla en caso de error
+        await page.screenshot({ path: `screenshots/register--${Date.now()}.png`, fullPage: true });
+        throw error; // Re-lanzar el error para que falle el test
+      }
     });
 
     then('A confirmation message should be shown in the screen', async () => {
