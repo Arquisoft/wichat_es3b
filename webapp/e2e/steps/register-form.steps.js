@@ -28,9 +28,11 @@ defineFeature(feature, test => {
 
     given('An unregistered user', async () => {
       // Clicar en "Iniciar sesión" desde el navbar
+      await page.waitForSelector('a', { text: 'Iniciar sesión', visible: true, timeout: 5000 }); 
       await expect(page).toClick('a', { text: 'Iniciar sesión' });
 
       // Esperar a que aparezca el botón para cambiar a la vista de registro
+      await page.waitForSelector('button', { text: 'Crear cuenta', visible: true, timeout: 5000 }); 
       await expect(page).toClick('button', { text: 'Crear cuenta' });
     });
 
@@ -44,6 +46,8 @@ defineFeature(feature, test => {
       await expect(page).toFill('input#username', username);
       await expect(page).toFill('input#password', password);
       await expect(page).toFill('input#confirmPassword', passwordConfirm);
+
+      await page.waitForSelector('button', { text: 'Crear cuenta', visible: true, timeout: 5000 }); 
       await expect(page).toClick('button', { text: 'Crear cuenta' });
     });
 
