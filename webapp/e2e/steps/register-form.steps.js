@@ -15,7 +15,7 @@ defineFeature(feature, test => {
     page = await browser.newPage();
     setDefaultOptions({ timeout: 10000 });
 
-    await page.goto("http://localhost:3000", {
+    await page.goto("http://localhost:3000/auth", {
       waitUntil: "networkidle0",
     });
   });
@@ -27,13 +27,11 @@ defineFeature(feature, test => {
     let passwordConfirm;
 
     given('An unregistered user', async () => {
-      // Clicar en "Iniciar sesión" desde el navbar
-      await page.waitForSelector('a', { text: 'Iniciar sesión', visible: true, timeout: 5000 }); 
-      await expect(page).toClick('a', { text: 'Iniciar sesión' });
 
       // Esperar a que aparezca el botón para cambiar a la vista de registro
-      await page.waitForSelector('button', { text: 'Crear cuenta', visible: true, timeout: 5000 }); 
+      await page.waitForSelector('#create-button', { visible: true, timeout: 5000 }); 
       await expect(page).toClick('button', { text: 'Crear cuenta' });
+
     });
 
     when('I fill the data in the form and press submit', async () => {
@@ -42,12 +40,16 @@ defineFeature(feature, test => {
       password = "testpassword";
       passwordConfirm = "testpassword";
 
+      await page.waitForSelector('#email', { visible: true, timeout: 5000 }); 
       await expect(page).toFill('input#email', email);
+      await page.waitForSelector('#username', { visible: true, timeout: 5000 }); 
       await expect(page).toFill('input#username', username);
+      await page.waitForSelector('#password', { visible: true, timeout: 5000 }); 
       await expect(page).toFill('input#password', password);
-      await expect(page).toFill('input#confirmPassword', passwordConfirm);
+      await page.waitForSelector('#confirmPassword', { visible: true, timeout: 5000 });
+      await expect(page).toFill('input#confirmPassword', passwordConfirm); 
 
-      await page.waitForSelector('button', { text: 'Crear cuenta', visible: true, timeout: 5000 }); 
+      await page.waitForSelector('#create-button', { visible: true, timeout: 5000 }); 
       await expect(page).toClick('button', { text: 'Crear cuenta' });
     });
 
