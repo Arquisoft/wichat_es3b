@@ -31,6 +31,18 @@ defineFeature(feature, test => {
     given('An unregistered user', async () => {
 
       try {
+
+        const buttonExists = await page.evaluate(() => {
+          const button = document.querySelector('#create-button');
+          return button !== null;
+        });
+        
+        console.log('¿El botón existe en el DOM?', buttonExists);
+        
+        if (!buttonExists) {
+          throw new Error('El botón #create-button no está presente en el DOM');
+        }
+        
         // Esperar a que aparezca el botón para cambiar a la vista de registro
         await page.waitForSelector('#create-button', { visible: true, timeout: 5000 });
         await expect(page).toClick('button', { text: 'Crear cuenta' });
