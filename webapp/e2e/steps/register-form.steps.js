@@ -46,9 +46,9 @@ defineFeature(feature, test => {
           if (!fs.existsSync(screenshotsDir)) {
             fs.mkdirSync(screenshotsDir, { recursive: true });
           }
-          
+
           // Guardar el HTML de la página
-          const htmlPath = path.join(screenshotsDir, `page-dump-${Date.now()}.html`);
+          const htmlPath = path.join(screenshotsDir, `page-dump-given-${Date.now()}.html`);
           const pageContent = await page.content();
 
           fs.writeFileSync(htmlPath, pageContent);
@@ -87,20 +87,38 @@ defineFeature(feature, test => {
       try {
         await page.waitForSelector('#email', { visible: true, timeout: 5000 });
         await expect(page).toFill('input#email', email);
+        console.log('Completamos email');
         await page.waitForSelector('#username', { visible: true, timeout: 5000 });
         await expect(page).toFill('input#username', username);
+        console.log('Completamos username');
         await page.waitForSelector('#password', { visible: true, timeout: 5000 });
         await expect(page).toFill('input#password', password);
+        console.log('Completamos password');
         await page.waitForSelector('#confirmPassword', { visible: true, timeout: 5000 });
         await expect(page).toFill('input#confirmPassword', passwordConfirm);
+        console.log('Completamos confirm password');
 
         await page.waitForSelector('#create-button', { visible: true, timeout: 5000 });
         await expect(page).toClick('button', { text: 'Crear cuenta' });
       } catch (error) {
         console.error('Error esperando el selector o haciendo clic:', error);
 
+        // Crear el directorio screenshots si no existe
+        if (!fs.existsSync(screenshotsDir)) {
+          fs.mkdirSync(screenshotsDir, { recursive: true });
+        }
+
+        // Guardar el HTML de la página
+        const htmlPath = path.join(screenshotsDir, `page-dump-when-${Date.now()}.html`);
+        const pageContent = await page.content();
+
+        fs.writeFileSync(htmlPath, pageContent);
+        console.log(`Guardando HTML de la página en: ${htmlPath}`);
+
+        let photopath = path.join(screenshotsDir, `register-when-${Date.now()}.png`);
+        console.log(`Guardando captura en: ${photopath}`);
         // Capturar la pantalla en caso de error
-        await page.screenshot({ path: `screenshots/register-when-${Date.now()}.png`, fullPage: true });
+        await page.screenshot({ path: photopath, fullPage: true });
         throw error; // Re-lanzar el error para que falle el test
       }
     });
