@@ -85,5 +85,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: screenshots
-          path: /home/runner/work/wichat_es3b/wichat_es3b/webapp/e2e/steps/screenshots/*.png
+          path: /home/runner/work/wichat_es3b/wichat_es3b/webapp/e2e/steps/screenshots/*
 
