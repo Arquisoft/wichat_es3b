@@ -79,6 +79,8 @@ defineFeature(feature, test => {
     });
 
     when('I fill the data in the form and press submit', async () => {
+      const screenshotsDir = path.resolve(__dirname, 'screenshots');
+      
       email = `testuser${Date.now()}@example.com`;
       username = `testuser${Date.now()}`;
       password = "testpassword";
@@ -100,7 +102,9 @@ defineFeature(feature, test => {
 
         await page.waitForSelector('#create-button', { visible: true, timeout: 5000 });
         await expect(page).toClick('button', { text: 'Crear cuenta' });
+
       } catch (error) {
+
         console.error('Error esperando el selector o haciendo clic:', error);
 
         // Crear el directorio screenshots si no existe
