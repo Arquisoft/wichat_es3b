@@ -73,6 +73,12 @@ jobs:
 
       - name: Run E2E Tests
         run: npm --prefix webapp run test:e2e
+      
+      - name: Limpiar carpeta de capturas de pantalla
+        run: rm -rf screenshots
+
+      - name: Crear carpeta para capturas de pantalla
+        run: mkdir -p screenshots
 
       - name: Guardar capturas de pantalla
         uses: actions/upload-artifact@v4
