@@ -71,21 +71,6 @@ jobs:
       - name: Build Frontend
         run: npm --prefix webapp run build
 
-      - name: Start Services
-        run: |
-          # Lanza todos los servicios y el frontend (ajusta si usas otro puerto)
-          npm --prefix users/authservice start &
-          npm --prefix users/userservice start &
-          npm --prefix users/statsservice start &
-          npm --prefix wikiquestionservice start &
-          npm --prefix apiservice start &
-          npm --prefix llmservice start &
-          npm --prefix gatewayservice start &
-          npm --prefix webapp start &
-
-      - name: Wait for Frontend init
-        run: wait-on http://localhost:3000
-
       - name: Run E2E Tests
         run: npm --prefix webapp run test:e2e
 
