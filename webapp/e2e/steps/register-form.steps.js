@@ -41,10 +41,16 @@ defineFeature(feature, test => {
         console.log('¿El botón existe en el DOM?', buttonExists);
 
         if (!buttonExists) {
+
+          // Crear el directorio screenshots si no existe
+          if (!fs.existsSync(screenshotsDir)) {
+            fs.mkdirSync(screenshotsDir, { recursive: true });
+          }
+          
           // Guardar el HTML de la página
           const htmlPath = path.join(screenshotsDir, `page-dump-${Date.now()}.html`);
           const pageContent = await page.content();
-          
+
           fs.writeFileSync(htmlPath, pageContent);
           console.log(`Guardando HTML de la página en: ${htmlPath}`);
 
