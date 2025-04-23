@@ -91,7 +91,7 @@ const Login = ({ handleToggleView }) => {
                 <div className="buttonPanel">
                   <BaseButton text={t("login")} onClick={loginUser} />
                   <span> o </span>
-                  <BaseButton id="create-button" text={t("signup")} onClick={handleToggleView} buttonType="buttonSecondary" />
+                  <BaseButton buttonid="create-button" text={t("signup")} onClick={handleToggleView} buttonType="buttonSecondary" />
                 </div>
                 <Snackbar open={openSnackbar} autoHideDuration={6000} message={t("loginSuccessful")} onClose={() => setOpenSnackbar(false)} />
                 {error && <p className="error">{error}</p>}

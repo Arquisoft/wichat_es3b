@@ -91,7 +91,7 @@ const AddUser = ({ handleToggleView }) => {
             </div>
           </div>
           <div className="buttonPanel">
-            <BaseButton id="create-button" text={t("createAccount")} onClick={addUser}></BaseButton>
+            <BaseButton buttonid="create-button" text={t("createAccount")} onClick={addUser}></BaseButton>
             <span>{t("or")}</span>
             <BaseButton text={t("login")} onClick={handleToggleView} buttonType="buttonSecondary" ></BaseButton>
           </div>
