@@ -30,7 +30,7 @@ i18n
                     "emptyEmail": "Por favor, introduce un correo electrónico",
                     "emptyPassword": "Por favor, introduce una contraseña",
                     "emptyPasswordConfirm": "Por favor, confirma tu contraseña",
-                    "emptyUsername": "Por favor, introduce un nombre de usuario",
+                    "emptyUsername": "Por favor, introduce un nombre de usuario, no puede estar vacío",
                     "failedLogin": "Error al iniciar sesión",
                     "finalResult": "Resultado Final",
                     "football": "Fútbol",
