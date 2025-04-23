@@ -3,6 +3,8 @@ const { defineFeature, loadFeature } = require('jest-cucumber');
 const setDefaultOptions = require('expect-puppeteer').setDefaultOptions;
 const feature = loadFeature('./features/register-form.feature');
 
+const fs = require('fs');
+const path = require('path');
 let page;
 let browser;
 
@@ -14,6 +16,13 @@ defineFeature(feature, test => {
 
     page = await browser.newPage();
     setDefaultOptions({ timeout: 10000 });
+
+
+    // Crear el directorio screenshots si no existe
+    const screenshotsDir = path.resolve(__dirname, 'screenshots');
+    if (!fs.existsSync(screenshotsDir)) {
+      fs.mkdirSync(screenshotsDir);
+    }
 
     await page.goto("http://localhost:3000/auth", {
       waitUntil: "networkidle0",
@@ -35,7 +44,12 @@ defineFeature(feature, test => {
 
       } catch (error) {
         console.error('Error esperando el selector o haciendo clic:', error);
-
+        
+        // Crear el directorio screenshots si no existe
+        const screenshotsDir = path.resolve(__dirname, 'screenshots');
+        if (!fs.existsSync(screenshotsDir)) {
+          fs.mkdirSync(screenshotsDir);
+        }
         // Capturar la pantalla en caso de error
         await page.screenshot({ path: `screenshots/register-given-${Date.now()}.png`, fullPage: true });
         throw error; // Re-lanzar el error para que falle el test
