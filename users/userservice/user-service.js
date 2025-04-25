@@ -60,22 +60,30 @@ app.post('/adduser', async (req, res) => {
 // Endpoint para generar y guardar una API key
 app.post('/generate-apikey', async (req, res) => {
     try {
+        console.log(req.body);
         const { email } = req.body;
+
+        // Validar que el campo email esté presente
         if (!email) {
             return res.status(400).json({ error: 'El campo email es obligatorio' });
         }
 
         // Verificar si ya existe una API key para este correo
-        let apiKeyEntry = await ApiKey.findOne({ email });
-        if (!apiKeyEntry) {
-            // Generar una nueva API key
-            const apiKey = crypto.randomBytes(32).toString('hex');
-            apiKeyEntry = new ApiKey({ email, apiKey });
-            await apiKeyEntry.save();
+        const existingApiKey = await ApiKey.findOne({ email });
+        if (existingApiKey) {
+            // Si ya existe, devolver un error
+            return res.status(400).json({ error: 'Ya existe una API key para este correo' });
         }
 
-        res.json({ apiKey: apiKeyEntry.apiKey });
+        // Generar una nueva API key
+        const apiKey = crypto.randomBytes(32).toString('hex');
+        const newApiKeyEntry = new ApiKey({ email, apiKey });
+        await newApiKeyEntry.save();
+
+        // Devolver la API key generada
+        res.json({ apiKey: newApiKeyEntry.apiKey });
     } catch (error) {
+        console.error('Error al generar la API key:', error.message);
         res.status(500).json({ error: 'Error al generar la API key' });
     }
 });
