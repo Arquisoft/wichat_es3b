@@ -184,6 +184,29 @@ app.get('/questions', async (req, res) => {
   }
 });
 
+// Endpoint para redirigir la generación de API key
+app.post('/generate-apikey', async (req, res) => {
+  try {
+    const response = await axios.post(`${userServiceUrl}/generate-apikey`, req.body);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error en /generate-apikey:', error.message);
+    res.status(error.response?.status || 500).json({ error: error.response?.data?.error || 'Error interno del servidor' });
+  }
+});
+
+// Endpoint para redirigir la validación de API key
+app.get('/validate-apikey/:apikey', async (req, res) => {
+  try {
+    const { apikey } = req.params;
+    const response = await axios.get(`${userServiceUrl}/validate-apikey/${apikey}`);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error en /validate-apikey:', error.message);
+    res.status(error.response?.status || 500).json({ error: error.response?.data?.error || 'Error interno del servidor' });
+  }
+});
+
 // Start the gateway service
 const server = app.listen(port, () => {
   console.log(`Gateway Service listening at http://localhost:${port}`);

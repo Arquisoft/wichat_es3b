@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const User = require('./user-model')
 
+const ApiKey = require('./apikey-model');
+const crypto = require('crypto'); // Para generar la API key
+
 const app = express();
 const port = 8001;
 
@@ -53,6 +56,45 @@ app.post('/adduser', async (req, res) => {
     } catch (error) {
         res.status(400).json({ error: error.message }); 
     }});
+
+// Endpoint para generar y guardar una API key
+app.post('/generate-apikey', async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ error: 'El campo email es obligatorio' });
+        }
+
+        // Verificar si ya existe una API key para este correo
+        let apiKeyEntry = await ApiKey.findOne({ email });
+        if (!apiKeyEntry) {
+            // Generar una nueva API key
+            const apiKey = crypto.randomBytes(32).toString('hex');
+            apiKeyEntry = new ApiKey({ email, apiKey });
+            await apiKeyEntry.save();
+        }
+
+        res.json({ apiKey: apiKeyEntry.apiKey });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al generar la API key' });
+    }
+});
+
+// Endpoint para validar una API key
+app.get('/validate-apikey/:apikey', async (req, res) => {
+    try {
+        const { apikey } = req.params;
+        if (!apikey) {
+            return res.status(400).json({ error: 'El campo apikey es obligatorio' });
+        }
+
+        // Verificar si la API key existe
+        const apiKeyEntry = await ApiKey.findOne({ apiKey: apikey });
+        res.json({ isValid: !!apiKeyEntry });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al validar la API key' });
+    }
+});
 
 const server = app.listen(port, () => {
   console.log(`User Service listening at http://localhost:${port}`);
