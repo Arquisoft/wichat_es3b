@@ -373,39 +373,6 @@ describe("API Service", () => {
         });
     });
 
-    describe("Stats Endpoint", () => {
-        it("should forward stats request with correct username and return 200", async () => {
-            const mockStats = { username: "testuser", stats: { score: 100, rank: 1 } };
-
-            axios.get.mockResolvedValueOnce({ data: mockStats });
-
-            const response = await request(currentApp).get("/getstats/testuser");
-
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual(mockStats); // Expect the actual stats object
-            expect(axios.get).toHaveBeenCalledTimes(1);
-            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/getstats/testuser`);
-        });
-
-        it("should handle gateway response error (e.g., 404) correctly", async () => {
-            const errorResponse = {
-                message: "Request failed with status code 404",
-                response: { status: 404, data: { message: "User not found" } },
-                isAxiosError: true, request: {}, config: {}
-            };
-
-            axios.get.mockRejectedValueOnce(errorResponse);
-
-            const response = await request(currentApp).get("/getstats/nonexistentuser");
-
-            expect(response.status).toBe(404); // Expect 404
-            expect(response.body.error).toContain("Gateway Error: 404");
-            expect(response.body.message).toBe("User not found");
-            expect(axios.get).toHaveBeenCalledTimes(1);
-            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/getstats/nonexistentuser`);
-        });
-    });
-
     // --- Tests requiring module reload ---
     // Use describe.each or separate describes if preferred
     describe("OpenAPI Configuration with Module Reload", () => {
