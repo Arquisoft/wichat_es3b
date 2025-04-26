@@ -31,6 +31,7 @@ const Nav = () => {
         {isAuthenticated && <Link to="/play">{t("play")}</Link>}
         {isAuthenticated && <Link to="/profile">{t("profile")}</Link>}
         <Link to="/ranking">Ranking</Link>
+        <Link to="/apiKeyGenerator">API</Link>
       </div>
       <div className="nav-right">
         {isAuthenticated ? (
