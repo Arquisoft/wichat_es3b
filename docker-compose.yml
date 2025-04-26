@@ -61,6 +61,8 @@ services:
       - "8003:8003"
     networks:
       - mynetwork
+    environment:
+      LLM_API_KEY: ${LLM_API_KEY}
 
   gatewayservice:
     container_name: gatewayservice-wichat_es3b
@@ -89,7 +91,10 @@ services:
     container_name: apiservice-wichat_es3b
     image: ghcr.io/arquisoft/wichat_es3b/apiservice:latest
     profiles: [ "dev", "prod" ]
-    build: ./apiservice
+    build:
+      context: ./apiservice
+      args:
+        API_URI: ${API_URI}
     depends_on:
       - gatewayservice
     ports:
@@ -120,7 +125,7 @@ services:
     image: ghcr.io/arquisoft/wichat_es3b/wikiquestionservice:latest
     profiles: [ "dev", "prod" ]
     depends_on:
-      - mongodb 
+      - mongodb
     ports:
       - "8004:8004"
     networks:

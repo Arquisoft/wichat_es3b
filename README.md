@@ -17,7 +17,7 @@ This is a base project for the Software Architecture course in 2024/2025. It is 
 - **Gateway service**. Express service that is exposed to the public and serves as a proxy to the two previous ones.
 - **Webapp**. React web application that uses the gateway service to allow basic login and new user features.
 
-Both the user and auth service share a Mongo database that is accessed with mongoose.
+Both the user and auth service share a Mongo database that is accessed with mongoose. 
 
 ## Quick start guide
 
@@ -91,7 +91,7 @@ Once we have our machine ready, we could deploy by hand the application, taking 
 
 As you can see, unitary tests of each module and e2e tests are executed before pushing the docker images and deploying them. Using this approach we avoid deploying versions that do not pass the tests.
 
-The deploy action is the following:
+The deploy action is the following: 
 
 ```yml
 deploy:

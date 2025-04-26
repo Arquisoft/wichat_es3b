@@ -229,6 +229,7 @@ describe("API Service", () => {
         it("should forward questions request with correct parameters (no topic) and return 200", async () => {
             const mockQuestions = [{ id: 1, text: "Question 1?" }];
             // Set the specific mock for THIS test (second axios call)
+
             axios.get.mockResolvedValueOnce({ data: mockQuestions });
 
             const response = await request(currentApp)
@@ -369,6 +370,39 @@ describe("API Service", () => {
             expect(response.body.message).toContain("ECONNREFUSED connection refused");
             expect(axios.get).toHaveBeenCalledTimes(2); // API key validation + getstats
             expect(axios.get.mock.calls[1][0]).toBe(`${defaultGatewayUrl}/getstats/anyuser`);
+        });
+    });
+
+    describe("Stats Endpoint", () => {
+        it("should forward stats request with correct username and return 200", async () => {
+            const mockStats = { username: "testuser", stats: { score: 100, rank: 1 } };
+
+            axios.get.mockResolvedValueOnce({ data: mockStats });
+
+            const response = await request(currentApp).get("/getstats/testuser");
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(mockStats); // Expect the actual stats object
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/getstats/testuser`);
+        });
+
+        it("should handle gateway response error (e.g., 404) correctly", async () => {
+            const errorResponse = {
+                message: "Request failed with status code 404",
+                response: { status: 404, data: { message: "User not found" } },
+                isAxiosError: true, request: {}, config: {}
+            };
+
+            axios.get.mockRejectedValueOnce(errorResponse);
+
+            const response = await request(currentApp).get("/getstats/nonexistentuser");
+
+            expect(response.status).toBe(404); // Expect 404
+            expect(response.body.error).toContain("Gateway Error: 404");
+            expect(response.body.message).toBe("User not found");
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/getstats/nonexistentuser`);
         });
     });
 
@@ -586,6 +620,66 @@ describe("API Service", () => {
                 .set("Origin", "http://example.com");
 
             expect(response.headers["access-control-allow-origin"]).toBe("*");
+        });
+    });
+
+
+
+    describe("Server Lifecycle Tests", () => {
+        let server;
+
+        afterEach(async () => {
+            // Asegurarse de cerrar el servidor después de cada prueba
+            if (server) {
+                await close();
+                server = null;
+            }
+        });
+
+        beforeEach(async () => {
+            currentApiService = require("./api-service");
+            app = currentApiService.app;
+            close = currentApiService.close;
+            listen = currentApiService.listen;
+        });
+
+        it("should start the server and listen on the specified port", async () => {
+            // Iniciar el servidor
+            server = listen();
+
+            // Verificar que el servidor está escuchando
+            const response = await request(app).get("/health");
+            expect(response.status).toBe(200); // Suponiendo que el endpoint /health está configurado
+        });
+
+        it("should not start a new server if one is already running", async () => {
+            // Iniciar el servidor por primera vez
+            server = listen();
+
+            // Intentar iniciar el servidor nuevamente
+            const secondServer = listen();
+
+            // Verificar que el mismo servidor fue devuelto
+            expect(secondServer).toBe(server);
+        });
+
+        it("should close the server gracefully", async () => {
+            // Iniciar el servidor
+            server = listen();
+
+            // Verify server is listening before closing
+            expect(server.listening).toBe(true);
+
+            // Cerrar el servidor
+            await close();
+
+            // Verify server is no longer listening
+            expect(server.listening).toBe(false);
+        });
+
+        it("should handle errors when closing a non-running server", async () => {
+            // Intentar cerrar el servidor sin haberlo iniciado
+            await expect(close()).resolves.not.toThrow();
         });
     });
 });

@@ -3,29 +3,55 @@ on:
   push:
     branches:
       - master
+      - dev
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 22
-    - run: npm --prefix users/authservice ci
-    - run: npm --prefix users/userservice ci
-    - run: npm --prefix llmservice ci
-    - run: npm --prefix gatewayservice ci
-    - run: npm --prefix webapp ci
-    - run: npm --prefix apiservice ci
-    - run: npm --prefix users/authservice test -- --coverage
-    - run: npm --prefix users/userservice test -- --coverage
-    - run: npm --prefix llmservice test -- --coverage
-    - run: npm --prefix gatewayservice test -- --coverage
-    - run: npm --prefix webapp test -- --coverage
-    - run: npm --prefix apiservice test -- --coverage
-    - name: Analyze with SonarQube
-      uses: SonarSource/sonarqube-scan-action@master
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Set CI to false
+        run: echo "CI=false" >> $GITHUB_ENV
+      - name: Install Dependencies
+        run: |
+          npm --prefix users/authservice ci
+          npm --prefix users/userservice ci
+          npm --prefix users/statsservice ci
+          npm --prefix llmservice ci
+          npm --prefix gatewayservice ci
+          npm --prefix webapp ci
+          npm --prefix wikiquestionservice ci
+          npm --prefix apiservice ci
+      - name: Run Unit Tests
+        run: |
+          npm --prefix users/authservice test -- --coverage
+          npm --prefix users/userservice test -- --coverage
+          npm --prefix users/statsservice test -- --coverage
+          npm --prefix llmservice test -- --coverage
+          npm --prefix gatewayservice test -- --coverage
+          npm --prefix webapp test -- --coverage
+          npm --prefix wikiquestionservice test -- --coverage
+          npm --prefix apiservice test -- --coverage
+      - name: Analyze with SonarCloud
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  e2e-tests:
+    needs: [unit-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Dependencies for E2E
+        run: |
+          npm --prefix webapp install
+      - name: Set CI to false
+        run: echo "CI=false" >> $GITHUB_ENV
+      - run: npm --prefix webapp run build
