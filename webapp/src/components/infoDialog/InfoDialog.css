@@ -17,12 +17,25 @@
   box-sizing: border-box;
 }
 
+.dialogContainer.error h1 {
+  color: #ff4444;
+}
+
+.dialogContainer.error button {
+  background-color: #ff4444;
+}
+
+.dialogContainer.error button:hover {
+  background-color: #ed2e2e;
+}
+
 .dialogMessageContainer {
   display: flex;
   justify-content: center;
   padding: 1em;
   align-items: center;
   height: 80%;
+  font-size: var(--font-size-md);
 }
 
 .dialogButtonContainer {
