@@ -83,14 +83,14 @@ describe("AddUser component", () => {
     test("Alterna visibilidad de contraseña principal", async () => {
         renderAddUser();
 
-        const togglePasswordButton = screen.getAllByText("👁️‍🗨️")[0];
+        const togglePasswordButton = container.querySelector("#togglePass");
         userEvent.click(togglePasswordButton);
     });
 
     test("Alterna visibilidad de confirmación de contraseña", async () => {
         renderAddUser();
 
-        const toggleConfirmPasswordButton = screen.getAllByText("👁️‍🗨️")[1];
+        const toggleConfirmPasswordButton = container.querySelector("#togglePassConfirm");
         userEvent.click(toggleConfirmPasswordButton);
     });
 

@@ -80,14 +80,14 @@ const AddUser = ({ handleToggleView }) => {
             <label htmlFor="password">{t("password")}</label>
             <div className="passwordContainer">
               <WiChatTextField id="password" value={password} type={showPassword ? "text" : "password"} onChange={(e) => setPassword(e.target.value)} />
-              <span onClick={toggleShowPassword}>👁️‍🗨️</span>
+              <span id="togglePass" onClick={toggleShowPassword}>👁️‍🗨️</span>
             </div>
           </div>
           <div className="formField">
             <label htmlFor="confirmPassword">{t("confirmPassword")}</label>
             <div className="passwordContainer">
               <WiChatTextField id="confirmPassword" value={passwordConfirm} type={showPasswordConfirm ? "text" : "password"} onChange={(e) => setPasswordConfirm(e.target.value)} />
-              <span onClick={toggleShowPasswordConfirm}>👁️‍🗨️</span>
+              <span id="togglePassConfirm"  onClick={toggleShowPasswordConfirm}>👁️‍🗨️</span>
             </div>
           </div>
           <div className="buttonPanel">
