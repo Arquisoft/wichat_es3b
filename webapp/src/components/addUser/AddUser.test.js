@@ -100,54 +100,5 @@ describe("AddUser component", () => {
         await expectSnackbarError("emptyEmail");
     });
 
-    test("Muestra error con email vacío", async () => {
-        renderAddUser();
-        fillForm({ username: "test", password: "pass", confirmPassword: "pass" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        await expectSnackbarError("emptyEmail");
-    });
-
-    test("Muestra error con username vacío", async () => {
-        renderAddUser();
-        fillForm({ email: "test@test.com", password: "pass", confirmPassword: "pass" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        await expectSnackbarError("emptyUsername");
-    });
-
-    test("Muestra error con contraseña vacía", async () => {
-        renderAddUser();
-        fillForm({ email: "test@test.com", username: "test", confirmPassword: "pass" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        await expectSnackbarError("emptyPassword");
-    });
-
-    test("Muestra error con confirmación de contraseña vacía", async () => {
-        renderAddUser();
-        fillForm({ email: "test@test.com", username: "test", password: "pass" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        await expectSnackbarError("emptyPasswordConfirm");
-    });
-
-
-
-    test("Alterna visibilidad de contraseña actualizando el tipo de input", async () => {
-        renderAddUser();
-        const passwordInput = screen.getByLabelText(/Contraseña*/i).closest("div").querySelector("input");
-        const toggleButton = screen.getByTestId("togglePass");
-
-        expect(passwordInput).toHaveAttribute("type", "password");
-        userEvent.click(toggleButton);
-        expect(passwordInput).toHaveAttribute("type", "text");
-    });
-
-
-
-
-
-
-
-
-
-
 
 });
