@@ -70,12 +70,12 @@ defineFeature(feature, test => {
             const screenshotsDir = path.resolve(__dirname, 'screenshots');
 
             try {
-                await page.waitForSelector('input#username', { visible: true, timeout: 5000 });
+                await page.waitForSelector('#username', { visible: true, timeout: 5000 });
                 await expect(page).toFill('input#username', username);
                 console.log('Completamos username');
                 await page.waitForTimeout(500);
 
-                await page.waitForSelector('input#password', { visible: true, timeout: 5000 });
+                await page.waitForSelector('#password', { visible: true, timeout: 5000 });
                 await expect(page).toFill('input#password', password);
                 console.log('Completamos password');
                 await page.waitForTimeout(500);
