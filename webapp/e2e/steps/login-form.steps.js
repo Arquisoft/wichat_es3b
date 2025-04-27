@@ -119,6 +119,9 @@ defineFeature(feature, test => {
                 const photoPath = path.join(screenshotsDir, `login-then-${Date.now()}.png`);
                 console.log(`Guardando captura en: ${photoPath}`);
                 await page.screenshot({ path: photoPath, fullPage: true });
+                const htmlPath = path.join(screenshotsDir, `page-dump-given-${Date.now()}.html`);
+                fs.writeFileSync(htmlPath, await page.content());
+                console.log(`Guardando HTML de la página en: ${htmlPath}`);
                 throw error;
             }
         });
