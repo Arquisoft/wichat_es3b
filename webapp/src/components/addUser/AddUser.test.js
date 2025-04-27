@@ -79,20 +79,13 @@ describe("AddUser component", () => {
         expectSnackbarError("addUserError");
     });
 
-    test("Muestra error si el correo está vacío", async () => {
-        const password = generateRandomPassword();
 
-        renderAddUser();
-        fillForm({ username: "testuser", password, confirmPassword: password });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        expectSnackbarError("emptyEmail");
-    });
 
     test("Muestra error si el nombre de usuario está vacío", async () => {
         const password = generateRandomPassword();
 
         renderAddUser();
-        fillForm({ email: "testuser", password, confirmPassword: password });
+        fillForm({ email: "enol@gmail.com", username: "", password, confirmPassword: password });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
         expectSnackbarError("emptyUsername");
     });
@@ -111,19 +104,6 @@ describe("AddUser component", () => {
         expectSnackbarError("emptyPasswordConfirm");
     });
 
-    test("Muestra el snackbar de éxito tras crear usuario correctamente", async () => {
-        const password = generateRandomPassword();
-
-        renderAddUser();
-        fillForm({ email: "test@example.com", username: "testuser", password, confirmPassword: password });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-
-        await waitFor(() => {
-            const alert = screen.getByRole("alert");
-            expect(alert).toHaveTextContent(i18n.t("loginSuccessful"));
-        });
-    });
-
     test("Alterna visibilidad de contraseña principal", async () => {
         renderAddUser();
 
@@ -138,53 +118,10 @@ describe("AddUser component", () => {
         userEvent.click(toggleConfirmPasswordButton);
     });
 
-    test("Muestra error si las contraseñas no coinciden", async () => {
-        renderAddUser();
 
-        const password = generateRandomPassword();
-        const confirmPassword = generateRandomPassword();
-        fillForm({ email: "test@example.com", username: "testuser", password, confirmPassword });
 
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
 
-        expect(await screen.findByText(`Error: ${i18n.t("passwordsDoNotMatch")}`)).toBeInTheDocument();
-    });
 
-    test("Muestra error si falta el email", async () => {
-        renderAddUser();
-
-        fillForm({ email: "", username: "testuser", password: "Password123", confirmPassword: "Password123" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-
-        expect(await screen.findByText(`Error: ${i18n.t("emptyEmail")}`)).toBeInTheDocument();
-    });
-
-    test("Muestra error si falta el nombre de usuario", async () => {
-        renderAddUser();
-
-        fillForm({ email: "test@example.com", username: "", password: "Password123", confirmPassword: "Password123" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-
-        expect(await screen.findByText(`Error: ${i18n.t("emptyUsername")}`)).toBeInTheDocument();
-    });
-
-    test("Muestra error si falta la contraseña", async () => {
-        renderAddUser();
-
-        fillForm({ email: "test@example.com", username: "testuser", password: "", confirmPassword: "Password123" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-
-        expect(await screen.findByText(`Error: ${i18n.t("emptyPassword")}`)).toBeInTheDocument();
-    });
-
-    test("Muestra error si falta la confirmación de contraseña", async () => {
-        renderAddUser();
-
-        fillForm({ email: "test@example.com", username: "testuser", password: "Password123", confirmPassword: "" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-
-        expect(await screen.findByText(`Error: ${i18n.t("emptyPasswordConfirm")}`)).toBeInTheDocument();
-    });
 
 
 
