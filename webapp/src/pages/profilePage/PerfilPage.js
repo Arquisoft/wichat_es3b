@@ -10,10 +10,11 @@ import Footer from "../../components/Footer";
 import "./PerfilPage.css";
 import SidebarToggleButton from "../../components/sidebarToggleButton/SidebarToggleButton";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function PerfilPage() {
-
-  const {username: paramUsername} = useParams();
+  const { t } = useTranslation();
+  const { username: paramUsername } = useParams();
   const username = paramUsername || localStorage.getItem("username");
 
   const [userData, setUserData] = useState({
@@ -71,7 +72,8 @@ export default function PerfilPage() {
     }
   };
 
-  const gatewayUrl = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
+  const gatewayUrl =
+    process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
 
   const loadUserStats = async (username) => {
     try {
@@ -93,14 +95,24 @@ export default function PerfilPage() {
           bestScore: stats.maxScore,
         },
         pieData: [
-          { name: "Aciertos", value: roundedRatio * 100 },
-          { name: "Fallos", value: (1 - roundedRatio) * 100 },
+          { name: t("right"), value: roundedRatio * 100 },
+          { name: t("wrong"), value: (1 - roundedRatio) * 100 },
         ],
       }));
     } catch (error) {
       console.error("Error al cargar las estadísticas: ", error);
     }
   };
+
+  useEffect(() => {
+    setUserData((prevData) => ({
+      ...prevData,
+      pieData: [
+        { name: t("right"), value: prevData.stats.ratio * 100 },
+        { name: t("wrong"), value: (1 - prevData.stats.ratio) * 100 },
+      ],
+    }));
+  }, [t]);
 
   const loadGameHistory = async (username) => {
     try {
