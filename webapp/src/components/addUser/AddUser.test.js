@@ -139,4 +139,69 @@ describe("AddUser component", () => {
         userEvent.click(toggleConfirmPasswordButton);
     });
 
+    test("Muestra error si falta el email", async () => {
+        renderAddUser();
+        fillForm({ email: "", username: "testuser", password: "Password123", confirmPassword: "Password123" });
+        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+
+        expect(await screen.findByRole("alert")).toHaveTextContent(i18n.t("emptyEmail"));
+    });
+
+    test("Muestra error si falta el username", async () => {
+        renderAddUser();
+        fillForm({ email: "test@example.com", username: "", password: "Password123", confirmPassword: "Password123" });
+        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+
+        expect(await screen.findByRole("alert")).toHaveTextContent(i18n.t("emptyUsername"));
+    });
+
+    test("Muestra error si falta la contraseña", async () => {
+        renderAddUser();
+        fillForm({ email: "test@example.com", username: "testuser", password: "", confirmPassword: "Password123" });
+        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+
+        expect(await screen.findByRole("alert")).toHaveTextContent(i18n.t("emptyPassword"));
+    });
+
+    test("Muestra error si falta la confirmación de contraseña", async () => {
+        renderAddUser();
+        fillForm({ email: "test@example.com", username: "testuser", password: "Password123", confirmPassword: "" });
+        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+
+        expect(await screen.findByRole("alert")).toHaveTextContent(i18n.t("emptyPasswordConfirm"));
+    });
+
+    test("No hace llamada axios si las contraseñas no coinciden", async () => {
+        axios.post.mockClear(); // Asegura que esté limpio
+        renderAddUser();
+        fillForm({ email: "test@example.com", username: "testuser", password: "Password123", confirmPassword: "AnotherPassword123" });
+        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+
+        await waitFor(() => {
+            expect(axios.post).not.toHaveBeenCalled();
+        });
+    });
+
+    test("Muestra error genérico si axios.post falla", async () => {
+        axios.post.mockRejectedValueOnce({ response: { data: { error: "Usuario ya existe" } } });
+        renderAddUser();
+        fillForm({ email: "test@example.com", username: "testuser", password: "Password123", confirmPassword: "Password123" });
+        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+
+        expect(await screen.findByRole("alert")).toHaveTextContent("Usuario ya existe");
+    });
+
+    test("Cierra automáticamente el snackbar de éxito", async () => {
+        axios.post.mockResolvedValueOnce({});
+        const password = generateRandomPassword();
+
+        renderAddUser();
+        fillForm({ email: "test@example.com", username: "testuser", password, confirmPassword: password });
+        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+
+        await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
+        await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument(), { timeout: 7000 });
+    });
+
+
 });
