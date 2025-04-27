@@ -52,7 +52,7 @@ const Login = ({ handleToggleView }) => {
       setMessage(`Bienvenido, ${username}!`);
       navigate("/home");
     } catch (error) {
-      setError(error.response?.data?.error || t("failedLogin"));
+      setError(t("failedLogin"));
     }
   };
 
