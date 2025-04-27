@@ -79,13 +79,20 @@ describe("AddUser component", () => {
         expectSnackbarError("addUserError");
     });
 
+    test("Muestra error si el correo está vacío", async () => {
+        const password = generateRandomPassword();
 
+        renderAddUser();
+        fillForm({ username: "testuser", password, confirmPassword: password });
+        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+        expectSnackbarError("emptyEmail");
+    });
 
     test("Muestra error si el nombre de usuario está vacío", async () => {
         const password = generateRandomPassword();
 
         renderAddUser();
-        fillForm({ email: "enol@gmail.com", username: "", password, confirmPassword: password });
+        fillForm({ email: "testuser", password, confirmPassword: password });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
         expectSnackbarError("emptyUsername");
     });
