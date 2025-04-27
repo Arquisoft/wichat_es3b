@@ -255,6 +255,11 @@ const Game = () => {
     if (!config || !config.categories || config.categories.length === 0)
       return "";
 
+    if (config.categories.length > 1) {
+      return t("various") + " 🧩";
+    }
+  
+
     const category = config.categories[0];
     switch (category) {
       case "clubes":
