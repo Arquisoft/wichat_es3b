@@ -110,4 +110,32 @@ describe("AddUser component", () => {
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
         expectSnackbarError("emptyPasswordConfirm");
     });
+
+    test("Muestra el snackbar de éxito tras crear usuario correctamente", async () => {
+        const password = generateRandomPassword();
+        axios.post.mockResolvedValueOnce({});
+
+        renderAddUser();
+        fillForm({ email: "test@example.com", username: "testuser", password, confirmPassword: password });
+        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+
+        await waitFor(() => {
+            const alert = screen.getByRole("alert");
+            expect(alert).toHaveTextContent(i18n.t("loginSuccessful"));
+        });
+    });
+
+    test("Alterna visibilidad de contraseña principal", async () => {
+        renderAddUser();
+
+        const togglePasswordButton = screen.getAllByText("👁️‍🗨️")[0];
+        userEvent.click(togglePasswordButton);
+    });
+
+    test("Alterna visibilidad de confirmación de contraseña", async () => {
+        renderAddUser();
+
+        const toggleConfirmPasswordButton = screen.getAllByText("👁️‍🗨️")[1];
+        userEvent.click(toggleConfirmPasswordButton);
+    });
 });
