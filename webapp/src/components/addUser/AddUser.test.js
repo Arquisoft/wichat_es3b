@@ -80,6 +80,7 @@ describe("AddUser component", () => {
     });
 
 
+
     test("Alterna visibilidad de contraseña principal", async () => {
         renderAddUser();
         const togglePasswordButton = screen.getByTestId('togglePass');
