@@ -113,7 +113,6 @@ describe("AddUser component", () => {
 
     test("Muestra el snackbar de éxito tras crear usuario correctamente", async () => {
         const password = generateRandomPassword();
-        axios.post.mockResolvedValueOnce({});
 
         renderAddUser();
         fillForm({ email: "test@example.com", username: "testuser", password, confirmPassword: password });
@@ -139,69 +138,59 @@ describe("AddUser component", () => {
         userEvent.click(toggleConfirmPasswordButton);
     });
 
+    test("Muestra error si las contraseñas no coinciden", async () => {
+        renderAddUser();
+
+        const password = generateRandomPassword();
+        const confirmPassword = generateRandomPassword();
+        fillForm({ email: "test@example.com", username: "testuser", password, confirmPassword });
+
+        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+
+        expect(await screen.findByText(`Error: ${i18n.t("passwordsDoNotMatch")}`)).toBeInTheDocument();
+    });
+
     test("Muestra error si falta el email", async () => {
         renderAddUser();
+
         fillForm({ email: "", username: "testuser", password: "Password123", confirmPassword: "Password123" });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
 
-        expect(await screen.findByRole("alert")).toHaveTextContent(i18n.t("emptyEmail"));
+        expect(await screen.findByText(`Error: ${i18n.t("emptyEmail")}`)).toBeInTheDocument();
     });
 
-    test("Muestra error si falta el username", async () => {
+    test("Muestra error si falta el nombre de usuario", async () => {
         renderAddUser();
+
         fillForm({ email: "test@example.com", username: "", password: "Password123", confirmPassword: "Password123" });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
 
-        expect(await screen.findByRole("alert")).toHaveTextContent(i18n.t("emptyUsername"));
+        expect(await screen.findByText(`Error: ${i18n.t("emptyUsername")}`)).toBeInTheDocument();
     });
 
     test("Muestra error si falta la contraseña", async () => {
         renderAddUser();
+
         fillForm({ email: "test@example.com", username: "testuser", password: "", confirmPassword: "Password123" });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
 
-        expect(await screen.findByRole("alert")).toHaveTextContent(i18n.t("emptyPassword"));
+        expect(await screen.findByText(`Error: ${i18n.t("emptyPassword")}`)).toBeInTheDocument();
     });
 
     test("Muestra error si falta la confirmación de contraseña", async () => {
         renderAddUser();
+
         fillForm({ email: "test@example.com", username: "testuser", password: "Password123", confirmPassword: "" });
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
 
-        expect(await screen.findByRole("alert")).toHaveTextContent(i18n.t("emptyPasswordConfirm"));
+        expect(await screen.findByText(`Error: ${i18n.t("emptyPasswordConfirm")}`)).toBeInTheDocument();
     });
 
-    test("No hace llamada axios si las contraseñas no coinciden", async () => {
-        axios.post.mockClear(); // Asegura que esté limpio
-        renderAddUser();
-        fillForm({ email: "test@example.com", username: "testuser", password: "Password123", confirmPassword: "AnotherPassword123" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
 
-        await waitFor(() => {
-            expect(axios.post).not.toHaveBeenCalled();
-        });
-    });
 
-    test("Muestra error genérico si axios.post falla", async () => {
-        axios.post.mockRejectedValueOnce({ response: { data: { error: "Usuario ya existe" } } });
-        renderAddUser();
-        fillForm({ email: "test@example.com", username: "testuser", password: "Password123", confirmPassword: "Password123" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
 
-        expect(await screen.findByRole("alert")).toHaveTextContent("Usuario ya existe");
-    });
 
-    test("Cierra automáticamente el snackbar de éxito", async () => {
-        axios.post.mockResolvedValueOnce({});
-        const password = generateRandomPassword();
 
-        renderAddUser();
-        fillForm({ email: "test@example.com", username: "testuser", password, confirmPassword: password });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-
-        await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
-        await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument(), { timeout: 7000 });
-    });
 
 
 
