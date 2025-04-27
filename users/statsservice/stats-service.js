@@ -28,7 +28,9 @@ app.post("/savestats", async (req, res) => {
       return res.status(400).json({ error: "Faltan datos requeridos" });
     }
 
-    let stats = await Stats.findOne({ username });
+    const safeUsername = username.toString();
+
+    let stats = await Stats.findOne({ username: safeUsername });
 
     if (!stats) {
       stats = new Stats({
@@ -65,7 +67,7 @@ app.post("/savestats", async (req, res) => {
 
     await stats.save();
 
-    const lastGame = await Game.findOne({ username }).sort({ gameId: -1 });
+    const lastGame = await Game.findOne({ username: safeUsername }).sort({ gameId: -1 });
 
     let gameId = lastGame ? lastGame.gameId + 1 : 1;
 

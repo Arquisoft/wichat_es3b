@@ -79,9 +79,29 @@ app.get("/health", async (req, res) => {
         }
     }
 });
+// Middleware to validate API key
+const validateApiKey = async (req, res, next) => {
+    try {
+        const apiKey = req.headers['x-api-key'];
+        if (!apiKey) {
+            return res.status(401).json({ error: 'API key is required' });
+        }
 
-// Questions endpoint
-app.get('/questions/:n/:topic?', async (req, res) => {
+        // Call the gateway to validate the API key
+        const response = await axios.get(`${gatewayServiceUrl}/validate-apikey/${apiKey}`);
+        if (response.data.isValid) {
+            next(); // Proceed if the API key is valid
+        } else {
+            res.status(401).json({ error: 'Invalid API key' });
+        }
+    } catch (error) {
+        console.error('Error validating API key:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Apply middleware to the two endpoints
+app.get('/questions/:n/:topic?', validateApiKey, async (req, res) => {
     try {
         const { n, topic } = req.params;
         let queryString = `questions?n=${n}`;
@@ -89,15 +109,13 @@ app.get('/questions/:n/:topic?', async (req, res) => {
             queryString += `&topic=${encodeURIComponent(topic)}`;
         }
         const response = await axios.get(`${gatewayServiceUrl}/${queryString}`);
-        // Ensure response.data exists before sending
         res.json(response?.data || {});
     } catch (error) {
         handleAxiosError(error, res);
     }
 });
 
-// Stats endpoint
-app.get('/getstats/:username', async (req, res) => {
+app.get('/getstats/:username', validateApiKey, async (req, res) => {
     try {
         const { username } = req.params;
         const requestUrl = `${gatewayServiceUrl}/getstats/${username}`;

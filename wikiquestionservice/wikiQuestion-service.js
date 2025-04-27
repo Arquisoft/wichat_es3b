@@ -10,18 +10,71 @@ const app = express();
 const port = 8004;
 
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/questiondb';
-mongoose.connect(mongoUri);
+async function connectDB() {
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(mongoUri);
+  }
+}
+
+async function disconnectDB() {
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect();
+  }
+}
+
 
 const questionManager = new QuestionManager();
 
 const defaultTopics = ["all"];
 const defaultNumQuestions = 25;
 
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
+function filterValidTopics(rawTopic) {
+  const validCategories = ["paises", "cine", "clubes", "literatura", "arte", "all"];
+  return rawTopic.split(",").filter(t => validCategories.includes(t));
+}
+
 app.get("/questions", async (req, res) => {
+  const { n = 25, topic = "all" } = req.query;
+  const numQuestions = parseInt(n, 10);
+
+  if (numQuestions > 30) {
+    return res.status(400).json({ error: "El límite de preguntas es 30" });
+  }
+
+  let topics = filterValidTopics(topic);
+
+  if (topics.length === 0) {
+    return res.status(400).json({ error: "No se proporcionaron categorías válidas." });
+  }
+
+  try {
+    if (topics.includes("all") || topics.length === 0) {
+      topics = ["all"];
+    }
+
+    const selectedQuestions = await questionManager.loadAllQuestions(topics, numQuestions);
+
+    const formattedQuestions = selectedQuestions.map((q) => ({
+      pregunta: q.obtenerPreguntaPorIdioma(),
+      respuestaCorrecta: q.respuestaCorrecta,
+      respuestas: q.obtenerRespuestas(),
+      descripcion: q.descripcion,
+      img: q.obtenerImg(),
+    }));
+
+    res.json(formattedQuestions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/questionsDB", async (req, res) => {
+  await connectDB();
   const numQuestions = parseInt(req.query.n ?? defaultNumQuestions, 10);
   const topic = (req.query.topic && req.query.topic !== "undefined") ? req.query.topic : defaultTopics;
 
@@ -29,8 +82,7 @@ app.get("/questions", async (req, res) => {
     return res.status(400).json({ error: "El límite de preguntas es 30" });
   }
 
-  const validCategories = ["paises", "cine", "clubes", "literatura", "arte", "all"];
-  let topics = topic.split(",").filter(t => validCategories.includes(t));
+  let topics = filterValidTopics(topic);
 
   if (topics.length === 0) {
     return res.status(400).json({ error: "No se proporcionaron categorías válidas." });
@@ -49,7 +101,7 @@ app.get("/questions", async (req, res) => {
     for (let i = 0; i < topics.length; i++) {
       const topic = topics[i];
       let numToFetch = questionsPerCategory;
-      if (i < extra) numToFetch++; 
+      if (i < extra) numToFetch++;
 
       let categoryQuestions = [];
       while (categoryQuestions.length < numToFetch) {
@@ -71,7 +123,7 @@ app.get("/questions", async (req, res) => {
 
       selectedQuestions.push(...categoryQuestions);
     }
-  
+
     const formattedQuestions = selectedQuestions.map(q => ({
       pregunta: q.question,
       respuestaCorrecta: q.correctAnswer,
@@ -83,6 +135,8 @@ app.get("/questions", async (req, res) => {
     res.json(formattedQuestions);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  } finally {
+    await disconnectDB();
   }
 });
 
@@ -93,7 +147,7 @@ async function saveQuestionsToDB(questions) {
         category: q.categoria,
         question: q.preguntas,
         correctAnswer: q.respuestaCorrecta,
-        incorrectAnswers: q.respuestasIncorrectas,  
+        incorrectAnswers: q.respuestasIncorrectas,
         description: q.descripcion,
         img: q.img
       });
@@ -108,11 +162,11 @@ async function saveQuestionsToDB(questions) {
 
 async function generateQuestions() {
   try {
-    const allCategories = ["paises", "cine", "clubes", "literatura", "arte"]; 
+    const allCategories = ["paises", "cine", "clubes", "literatura", "arte"];
 
     for (const category of allCategories) {
       const currentQuestions = await Question.find({
-          category: category 
+        category: category
       });
 
       if (currentQuestions.length < 100) {
@@ -131,28 +185,11 @@ async function generateQuestions() {
   }
 }
 
-const server = app.listen(port, async () => {
-  console.log(`Question Service listening at http://localhost:${port}`);
-  try {
-    //const questions =await questionManager.loadAllQuestions(defaultTopics,defaultNumQuestions);
-    //await saveQuestionsToDB(questions);
-    generateQuestions();
-    questionsLoaded = true;
-    console.log("Generadores de preguntas cargados con éxito!");
-  } catch (error) {
-    console.error("Error al cargar los generadores de preguntas:", error);
-  }
-});
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`🚀 Question Service listening at http://localhost:${port}`);
+  });
+}
 
-cron.schedule("0 3 * * *", async () => {
-  try {
-    //const questions = await questionManager.loadAllQuestions(defaultTopics,defaultNumQuestions);
-    //await saveQuestionsToDB(questions);
-    generateQuestions();
-    console.log("🔄 Generadores de preguntas recargados automáticamente.");
-  } catch (error) {
-    console.error("❌ Error al recargar los generadores de preguntas:", error);
-  }
-});
 
-module.exports = server;
+module.exports = app;

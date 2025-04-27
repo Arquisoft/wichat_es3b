@@ -24,6 +24,7 @@ let currentApiService; // Holds the required module exports { app, listen, close
 let currentApp;      // Holds the express app instance for supertest
 let currentServer;   // Holds the server instance returned by listen() for closing
 const defaultGatewayUrl = "http://localhost:8000";
+const validApiKey = process.env.TEST_OWN_API_KEY || "default-test-key-for-local-dev";
 
 // Function to setup default mocks for fs/YAML (used after reset)
 const setupDefaultFsYamlMocks = () => {
@@ -164,31 +165,96 @@ describe("API Service", () => {
         });
     });
 
+    describe("API Key Validation Middleware", () => {
+        it("should return 401 when API key is missing", async () => {
+            const response = await request(currentApp).get("/questions/5");
+
+            expect(response.status).toBe(401);
+            expect(response.body.error).toBe("API key is required");
+            expect(axios.get).not.toHaveBeenCalled(); // No call to gateway should happen
+        });
+
+        it("should return 401 when API key is invalid", async () => {
+            // Mock validate-apikey gateway response for invalid key
+            axios.get.mockResolvedValueOnce({ data: { isValid: false } });
+
+            const response = await request(currentApp)
+                .get("/questions/5")
+                .set("x-api-key", "invalid-key");
+
+            expect(response.status).toBe(401);
+            expect(response.body.error).toBe("Invalid API key");
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/validate-apikey/invalid-key`);
+        });
+
+        it("should return 500 when API key validation fails due to gateway error", async () => {
+            // Mock validate-apikey gateway error
+            axios.get.mockRejectedValueOnce(new Error("Gateway error"));
+
+            const response = await request(currentApp)
+                .get("/questions/5")
+                .set("x-api-key", validApiKey);
+
+            expect(response.status).toBe(500);
+            expect(response.body.error).toBe("Internal server error");
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/validate-apikey/${validApiKey}`);
+        });
+
+        it("should proceed when API key is valid", async () => {
+            // Mock validate-apikey gateway response for valid key
+            axios.get.mockResolvedValueOnce({ data: { isValid: true } });
+            // Mock the actual questions endpoint response
+            axios.get.mockResolvedValueOnce({ data: [{ id: 1, text: "Question 1?" }] });
+
+            const response = await request(currentApp)
+                .get("/questions/5")
+                .set("x-api-key", validApiKey);
+
+            expect(response.status).toBe(200);
+            expect(axios.get).toHaveBeenCalledTimes(2);
+            expect(axios.get.mock.calls[0][0]).toBe(`${defaultGatewayUrl}/validate-apikey/${validApiKey}`);
+            expect(axios.get.mock.calls[1][0]).toBe(`${defaultGatewayUrl}/questions?n=5`);
+        });
+    });
+
     describe("Questions Endpoint", () => {
+        // Set up the valid API key mock before each test in this group
+        beforeEach(() => {
+            // First axios call will be for API key validation
+            axios.get.mockResolvedValueOnce({ data: { isValid: true } });
+        });
+
         it("should forward questions request with correct parameters (no topic) and return 200", async () => {
             const mockQuestions = [{ id: 1, text: "Question 1?" }];
-            // Set the specific mock for THIS test
+            // Set the specific mock for THIS test (second axios call)
+
             axios.get.mockResolvedValueOnce({ data: mockQuestions });
 
-            const response = await request(currentApp).get("/questions/5");
+            const response = await request(currentApp)
+                .get("/questions/5")
+                .set("x-api-key", validApiKey);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(mockQuestions); // Expect the actual questions array
-            expect(axios.get).toHaveBeenCalledTimes(1);
-            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/questions?n=5`);
+            expect(axios.get).toHaveBeenCalledTimes(2); // API key validation + questions
+            expect(axios.get.mock.calls[1][0]).toBe(`${defaultGatewayUrl}/questions?n=5`);
         });
 
         it("should forward questions request with topic parameter and return 200", async () => {
             const mockHistoryQuestions = [{ id: 2, text: "History Q?" }];
-            // Set the specific mock for THIS test
+            // Set the specific mock for THIS test (second axios call)
             axios.get.mockResolvedValueOnce({ data: mockHistoryQuestions });
 
-            const response = await request(currentApp).get("/questions/10/history");
+            const response = await request(currentApp)
+                .get("/questions/10/history")
+                .set("x-api-key", validApiKey);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(mockHistoryQuestions); // Expect the actual questions array
-            expect(axios.get).toHaveBeenCalledTimes(1);
-            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/questions?n=10&topic=history`);
+            expect(axios.get).toHaveBeenCalledTimes(2); // API key validation + questions
+            expect(axios.get.mock.calls[1][0]).toBe(`${defaultGatewayUrl}/questions?n=10&topic=history`);
         });
 
         it("should handle gateway response error (e.g., 404) correctly", async () => {
@@ -197,46 +263,113 @@ describe("API Service", () => {
                 response: { status: 404, data: { message: 'Not Found from Gateway - Test' } },
                 isAxiosError: true, request: {}, config: {}
             };
-            // Set the specific mock for THIS test
+            // Set the specific mock for THIS test (second axios call)
             axios.get.mockRejectedValueOnce(errorResponse);
 
-            const response = await request(currentApp).get("/questions/99/nonexistent");
+            const response = await request(currentApp)
+                .get("/questions/99/nonexistent")
+                .set("x-api-key", validApiKey);
 
             expect(response.status).toBe(404); // Expect 404
             expect(response.body.error).toContain("Gateway Error: 404");
             expect(response.body.message).toBe('Not Found from Gateway - Test');
-            expect(axios.get).toHaveBeenCalledTimes(1);
-            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/questions?n=99&topic=nonexistent`);
+            expect(axios.get).toHaveBeenCalledTimes(2); // API key validation + questions
+            expect(axios.get.mock.calls[1][0]).toBe(`${defaultGatewayUrl}/questions?n=99&topic=nonexistent`);
         });
 
         it("should handle gateway connection error correctly (return 503)", async () => {
             const connectionError = new Error("ECONNREFUSED connection refused");
             connectionError.request = {};
             connectionError.isAxiosError = true; config: {};
-            // Set the specific mock for THIS test
+            // Set the specific mock for THIS test (second axios call)
             axios.get.mockRejectedValueOnce(connectionError);
 
-            const response = await request(currentApp).get("/questions/5/any");
+            const response = await request(currentApp)
+                .get("/questions/5/any")
+                .set("x-api-key", validApiKey);
 
             expect(response.status).toBe(503); // Expect 503
             expect(response.body.error).toBe("Gateway service unavailable");
             expect(response.body.message).toContain("ECONNREFUSED connection refused");
-            expect(axios.get).toHaveBeenCalledTimes(1);
-            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/questions?n=5&topic=any`);
+            expect(axios.get).toHaveBeenCalledTimes(2); // API key validation + questions
+            expect(axios.get.mock.calls[1][0]).toBe(`${defaultGatewayUrl}/questions?n=5&topic=any`);
         });
 
         it("should handle non-axios errors correctly (return 500)", async () => {
             const genericError = new Error("Something broke unexpectedly");
-            // Set the specific mock for THIS test
+            // Set the specific mock for THIS test (second axios call)
             axios.get.mockRejectedValueOnce(genericError);
 
-            const response = await request(currentApp).get("/questions/5/any");
+            const response = await request(currentApp)
+                .get("/questions/5/any")
+                .set("x-api-key", validApiKey);
 
             expect(response.status).toBe(500); // Expect 500
             expect(response.body.error).toBe("Internal server error");
             expect(response.body.message).toBe("Something broke unexpectedly");
-            expect(axios.get).toHaveBeenCalledTimes(1);
-            expect(axios.get).toHaveBeenCalledWith(`${defaultGatewayUrl}/questions?n=5&topic=any`);
+            expect(axios.get).toHaveBeenCalledTimes(2); // API key validation + questions
+            expect(axios.get.mock.calls[1][0]).toBe(`${defaultGatewayUrl}/questions?n=5&topic=any`);
+        });
+    });
+
+    describe("Get Stats Endpoint", () => {
+        // Set up the valid API key mock before each test in this group
+        beforeEach(() => {
+            // First axios call will be for API key validation
+            axios.get.mockResolvedValueOnce({ data: { isValid: true } });
+        });
+
+        it("should forward getstats request with correct username and return 200", async () => {
+            const mockStats = { username: "testuser", score: 42, completed: 5 };
+            // Set the specific mock for THIS test (second axios call)
+            axios.get.mockResolvedValueOnce({ data: mockStats });
+
+            const response = await request(currentApp)
+                .get("/getstats/testuser")
+                .set("x-api-key", validApiKey);
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(mockStats); // Expect the actual stats object
+            expect(axios.get).toHaveBeenCalledTimes(2); // API key validation + getstats
+            expect(axios.get.mock.calls[1][0]).toBe(`${defaultGatewayUrl}/getstats/testuser`);
+        });
+
+        it("should handle gateway response error for getstats correctly", async () => {
+            const errorResponse = {
+                message: "Request failed with status code 404",
+                response: { status: 404, data: { message: 'User not found' } },
+                isAxiosError: true, request: {}, config: {}
+            };
+            // Set the specific mock for THIS test (second axios call)
+            axios.get.mockRejectedValueOnce(errorResponse);
+
+            const response = await request(currentApp)
+                .get("/getstats/nonexistentuser")
+                .set("x-api-key", validApiKey);
+
+            expect(response.status).toBe(404); // Expect 404
+            expect(response.body.error).toContain("Gateway Error: 404");
+            expect(response.body.message).toBe('User not found');
+            expect(axios.get).toHaveBeenCalledTimes(2); // API key validation + getstats
+            expect(axios.get.mock.calls[1][0]).toBe(`${defaultGatewayUrl}/getstats/nonexistentuser`);
+        });
+
+        it("should handle gateway connection error for getstats correctly", async () => {
+            const connectionError = new Error("ECONNREFUSED connection refused");
+            connectionError.request = {};
+            connectionError.isAxiosError = true; config: {};
+            // Set the specific mock for THIS test (second axios call)
+            axios.get.mockRejectedValueOnce(connectionError);
+
+            const response = await request(currentApp)
+                .get("/getstats/anyuser")
+                .set("x-api-key", validApiKey);
+
+            expect(response.status).toBe(503); // Expect 503
+            expect(response.body.error).toBe("Gateway service unavailable");
+            expect(response.body.message).toContain("ECONNREFUSED connection refused");
+            expect(axios.get).toHaveBeenCalledTimes(2); // API key validation + getstats
+            expect(axios.get.mock.calls[1][0]).toBe(`${defaultGatewayUrl}/getstats/anyuser`);
         });
     });
 
@@ -418,6 +551,31 @@ describe("API Service", () => {
         });
     });
 
+    describe("Server Management Functions", () => {
+        it("should properly start and close the server", async () => {
+            // Test explicit server start
+            const server = await currentApiService.listen();
+            expect(server).toBeDefined();
+            expect(server.listening).toBe(true);
+
+            // Test server close
+            await currentApiService.close();
+            expect(server.listening).toBe(false);
+        });
+
+        it("should handle multiple close calls gracefully", async () => {
+            // Start server
+            await currentApiService.listen();
+
+            // Close once
+            await currentApiService.close();
+
+            // Second close should not error
+            await currentApiService.close();
+            // If we got here without errors, the test passes
+        });
+    });
+
     describe("CORS Configuration", () => {
         // This test doesn't need module reload, uses standard beforeEach/afterEach
         it("should include CORS headers in the response", async () => {
@@ -429,6 +587,66 @@ describe("API Service", () => {
                 .set("Origin", "http://example.com");
 
             expect(response.headers["access-control-allow-origin"]).toBe("*");
+        });
+    });
+
+
+
+    describe("Server Lifecycle Tests", () => {
+        let server;
+
+        afterEach(async () => {
+            // Asegurarse de cerrar el servidor después de cada prueba
+            if (server) {
+                await close();
+                server = null;
+            }
+        });
+
+        beforeEach(async () => {
+            currentApiService = require("./api-service");
+            app = currentApiService.app;
+            close = currentApiService.close;
+            listen = currentApiService.listen;
+        });
+
+        it("should start the server and listen on the specified port", async () => {
+            // Iniciar el servidor
+            server = listen();
+
+            // Verificar que el servidor está escuchando
+            const response = await request(app).get("/health");
+            expect(response.status).toBe(200); // Suponiendo que el endpoint /health está configurado
+        });
+
+        it("should not start a new server if one is already running", async () => {
+            // Iniciar el servidor por primera vez
+            server = listen();
+
+            // Intentar iniciar el servidor nuevamente
+            const secondServer = listen();
+
+            // Verificar que el mismo servidor fue devuelto
+            expect(secondServer).toBe(server);
+        });
+
+        it("should close the server gracefully", async () => {
+            // Iniciar el servidor
+            server = listen();
+
+            // Verify server is listening before closing
+            expect(server.listening).toBe(true);
+
+            // Cerrar el servidor
+            await close();
+
+            // Verify server is no longer listening
+            expect(server.listening).toBe(false);
+        });
+
+        it("should handle errors when closing a non-running server", async () => {
+            // Intentar cerrar el servidor sin haberlo iniciado
+            await expect(close()).resolves.not.toThrow();
         });
     });
 });
