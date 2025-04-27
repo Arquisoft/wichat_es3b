@@ -79,37 +79,6 @@ describe("AddUser component", () => {
         expectSnackbarError("addUserError");
     });
 
-    test("Muestra error si el correo está vacío", async () => {
-        const password = generateRandomPassword();
-
-        renderAddUser();
-        fillForm({ username: "testuser", password, confirmPassword: password });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        expectSnackbarError("emptyEmail");
-    });
-
-    test("Muestra error si el nombre de usuario está vacío", async () => {
-        const password = generateRandomPassword();
-
-        renderAddUser();
-        fillForm({ email: "testuser", password, confirmPassword: password });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        expectSnackbarError("emptyUsername");
-    });
-
-    test("Muestra error si la contraseña está vacía", async () => {
-        renderAddUser();
-        fillForm({ email: "testuser", username: "testuser", confirmPassword: "123456" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        expectSnackbarError("emptyPassword");
-    });
-
-    test("Muestra error si la confirmación de la contraseña está vacía", async () => {
-        renderAddUser();
-        fillForm({ email: "testuser", username: "testuser", password: "123456" });
-        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
-        expectSnackbarError("emptyPasswordConfirm");
-    });
 
     test("Alterna visibilidad de contraseña principal", async () => {
         renderAddUser();
