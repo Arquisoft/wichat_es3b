@@ -138,4 +138,5 @@ describe("AddUser component", () => {
         const toggleConfirmPasswordButton = screen.getAllByText("👁️‍🗨️")[1];
         userEvent.click(toggleConfirmPasswordButton);
     });
+
 });
