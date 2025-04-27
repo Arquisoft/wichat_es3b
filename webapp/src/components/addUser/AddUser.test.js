@@ -100,5 +100,13 @@ describe("AddUser component", () => {
         await expectSnackbarError("emptyEmail");
     });
 
+    test("Muestra error al enviar formulario usuario vacio", async () => {
+        const password = generateRandomPassword();
+        renderAddUser();
+        fillForm({ email: "enol@gmail.com", username: "", password:password, confirmPassword: password });
+
+        userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+        await expectSnackbarError("emptyUsername");
+    });
 
 });
