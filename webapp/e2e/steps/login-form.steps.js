@@ -19,6 +19,7 @@ defineFeature(feature, test => {
 
         page = await browser.newPage();
         setDefaultOptions({ timeout: 10000 });
+        const screenshotsDir = path.resolve(__dirname, 'screenshots');
 
         // 1. Registro de usuario
         await page.goto("http://localhost:3000/auth", { waitUntil: "networkidle0" });
@@ -63,7 +64,6 @@ defineFeature(feature, test => {
 
         given('A user who wants to log in', async () => {
             const screenshotsDir = path.resolve(__dirname, 'screenshots');
-
             try {
                 await page.waitForSelector('a', { visible: true, timeout: 5000 });
                 const linkExists = await page.evaluate(() => {
@@ -90,7 +90,9 @@ defineFeature(feature, test => {
         });
 
         when('I enter valid credentials and click login', async () => {
+            const screenshotsDir = path.resolve(__dirname, 'screenshots');
             try {
+
                 await page.waitForSelector('#username', { visible: true, timeout: 5000 });
                 await expect(page).toFill('input#username', username);
 
@@ -111,6 +113,7 @@ defineFeature(feature, test => {
         });
 
         then('I should be redirected to the home page', async () => {
+            const screenshotsDir = path.resolve(__dirname, 'screenshots');
             try {
                 await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 5000 });
                 const url = await page.url();
