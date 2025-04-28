@@ -37,6 +37,7 @@ defineFeature(feature, test => {
             await expect(page).toFill('input#password', password);
             await expect(page).toFill('input#confirmPassword', password);
 
+            await page.waitForSelector('#create-button', { visible: true, timeout: 5000 });
             await expect(page).toClick('button', { text: 'Crear cuenta' });
 
             await page.waitForSelector('.MuiSnackbar-root', { visible: true, timeout: 5000 });
