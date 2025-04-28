@@ -50,6 +50,8 @@ defineFeature(feature, test => {
 
         } catch (error) {
             console.error('Error en el registro:', error);
+            const photopath = path.join(screenshotsDir, `login-before-${Date.now()}.png`);
+            await page.screenshot({ path: photopath, fullPage: true });
             throw error;
         }
 
@@ -81,6 +83,8 @@ defineFeature(feature, test => {
 
             } catch (error) {
                 console.error('Error al buscar o clicar en "Iniciar sesión":', error);
+                const photopath = path.join(screenshotsDir, `login-given-${Date.now()}.png`);
+                await page.screenshot({ path: photopath, fullPage: true });
                 throw error;
             }
         });
@@ -100,6 +104,8 @@ defineFeature(feature, test => {
 
             } catch (error) {
                 console.error('Error al rellenar formulario o hacer login:', error);
+                const photopath = path.join(screenshotsDir, `login-when-${Date.now()}.png`);
+                await page.screenshot({ path: photopath, fullPage: true });
                 throw error;
             }
         });
@@ -113,6 +119,8 @@ defineFeature(feature, test => {
 
             } catch (error) {
                 console.error('Error en la redirección tras login:', error);
+                const photopath = path.join(screenshotsDir, `login-then-${Date.now()}.png`);
+                await page.screenshot({ path: photopath, fullPage: true });
                 throw error;
             }
         });
