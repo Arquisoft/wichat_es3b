@@ -32,11 +32,19 @@ app.post("/login", async (req, res) => {
     const authResponse = await axios.post(authServiceUrl + "/login", req.body);
     res.json(authResponse.data);
   } catch (error) {
-    res
-      .status(error.response.status)
-      .json({ error: error.response.data.error });
+    if (error.response) {
+      // Si la respuesta de error tiene un status y un mensaje, devolvemos el error como tal
+      res.status(error.response.status).json({
+        errorCode: error.response.data.errorCode,
+        errorMessage: error.response.data.errorMessage
+      });
+    } else {
+      // En caso de un error interno
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
 });
+
 
 app.post("/adduser", async (req, res) => {
   try {
