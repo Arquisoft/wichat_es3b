@@ -1,13 +1,15 @@
 const puppeteer = require('puppeteer');
 const { defineFeature, loadFeature } = require('jest-cucumber');
 const setDefaultOptions = require('expect-puppeteer').setDefaultOptions;
+const fs = require('fs');
+const path = require('path');
 
 const feature = loadFeature('./features/profile.feature');
 
 let page;
 let browser;
 
-defineFeature(feature, test => {
+defineFeature(feature, (test) => {
     beforeAll(async () => {
         browser = process.env.GITHUB_ACTIONS
             ? await puppeteer.launch({ headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox'] })
@@ -26,29 +28,46 @@ defineFeature(feature, test => {
         let password = '1234';
 
         given('A user who is logged in', async () => {
-            // Click on "Iniciar sesión" in the navbar
-            await expect(page).toClick('a', { text: 'Iniciar sesión' });
+            const screenshotsDir = path.resolve(__dirname, 'screenshots');
+            try {
+                await expect(page).toClick('a', { text: 'Iniciar sesión' });
 
-            // Fill login form
-            await expect(page).toFill('input#username', username);
-            await expect(page).toFill('input#password', password);
-            await expect(page).toClick('button', { text: 'Iniciar sesión' });
+                await page.waitForSelector('input#username', { visible: true, timeout: 5000 });
+                await expect(page).toFill('input#username', username);
+                await expect(page).toFill('input#password', password);
+                await expect(page).toClick('button', { text: 'Iniciar sesión' });
 
-            // Wait until "Perfil" link is visible
-            await page.waitForXPath("//a[contains(text(), 'Perfil')]");
+                await page.waitForXPath("//a[contains(text(), 'Perfil')]", { visible: true, timeout: 5000 });
+            } catch (error) {
+                if (!fs.existsSync(screenshotsDir)) {
+                    fs.mkdirSync(screenshotsDir, { recursive: true });
+                }
+                const photopath = path.join(screenshotsDir, `profile-given-${Date.now()}.png`);
+                await page.screenshot({ path: photopath, fullPage: true });
+                throw error;
+            }
         });
 
         when('I click on the "Perfil" link in the navbar', async () => {
-            const [profileLink] = await page.$x("//a[contains(text(), 'Perfil')]");
-            await profileLink.click();
+            const screenshotsDir = path.resolve(__dirname, 'screenshots');
+            try {
+                const [profileLink] = await page.$x("//a[contains(text(), 'Perfil')]");
+                if (!profileLink) throw new Error('Perfil link not found');
+                await profileLink.click();
 
-            // Wait for route change
-            await page.waitForTimeout(1000);
+                await page.waitForTimeout(1000);
+            } catch (error) {
+                if (!fs.existsSync(screenshotsDir)) {
+                    fs.mkdirSync(screenshotsDir, { recursive: true });
+                }
+                const photopath = path.join(screenshotsDir, `profile-when-${Date.now()}.png`);
+                await page.screenshot({ path: photopath, fullPage: true });
+                throw error;
+            }
         });
 
         then('I should be redirected to the "/profile" page', async () => {
             const url = await page.url();
-
             expect(url).toContain('/profile');
         });
     });
