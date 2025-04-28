@@ -1,6 +1,5 @@
 const request = require("supertest");
 const server = require("./wikiQuestion-service");
-const CategoryLoader = require("./questiongenerator/categoryLoader");
 const Question = require("./questiongenerator/question");
 const WikidataQueryService = require('./questiongenerator/questionGen');
 /* TEST FUNCIONANDO cambio */
@@ -281,12 +280,10 @@ describe('Wikidata Service', () => {
             const question = new Question(respuestaCorrecta, preguntas, respuestasIncorrectas, descripcion, img);
             const questionString = question.toString();
 
-            // Test that the string contains default messages for empty description and images
             expect(questionString).toContain('📝 **Descripción:** No hay descripción disponible.');
             expect(questionString).toContain('📸 **Imagen:** No hay imagen disponible.');
         });
 
-        // New test case: should handle missing languages
         it('should handle missing languages gracefully', () => {
             const respuestaCorrecta = { es: 'Respuesta correcta' };
             const preguntas = { es: '¿Cuál es la capital de Francia?' };
@@ -296,12 +293,10 @@ describe('Wikidata Service', () => {
 
             const question = new Question(respuestaCorrecta, preguntas, respuestasIncorrectas, descripcion, img);
 
-            // Test that missing languages do not break the code (e.g., querying for 'en' should return null/undefined)
             const questionTextInEnglish = question.obtenerPreguntaPorIdioma()['en'];
-            expect(questionTextInEnglish).toBeUndefined();  // Expecting undefined since 'en' isn't provided
+            expect(questionTextInEnglish).toBeUndefined();
         });
 
-        // New test case: should handle multiple languages correctly
         it('should handle multiple languages correctly', () => {
             const respuestaCorrecta = { es: 'Respuesta correcta', en: 'Correct answer' };
             const preguntas = { es: '¿Cuál es la capital de Francia?', en: 'What is the capital of France?' };
@@ -311,7 +306,6 @@ describe('Wikidata Service', () => {
 
             const question = new Question(respuestaCorrecta, preguntas, respuestasIncorrectas, descripcion, img);
 
-            // Test for both Spanish and English
             const questionTextEs = question.obtenerPreguntaPorIdioma()['es'];
             const questionTextEn = question.obtenerPreguntaPorIdioma()['en'];
 
@@ -319,7 +313,6 @@ describe('Wikidata Service', () => {
             expect(questionTextEn).toBe('What is the capital of France?');
         });
 
-        // New test case: should handle empty question and answer arrays
         it('should handle empty question and answer arrays', () => {
             const respuestaCorrecta = { es: '', en: '' };
             const preguntas = { es: '', en: '' };
@@ -329,7 +322,6 @@ describe('Wikidata Service', () => {
 
             const question = new Question(respuestaCorrecta, preguntas, respuestasIncorrectas, descripcion, img);
 
-            // Test that empty questions and answers are handled correctly
             const questionTextEs = question.obtenerPreguntaPorIdioma()['es'];
             const questionTextEn = question.obtenerPreguntaPorIdioma()['en'];
 
