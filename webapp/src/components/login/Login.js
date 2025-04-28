@@ -55,11 +55,11 @@ const Login = ({ handleToggleView }) => {
       if (error.response) {
         const { errorCode, errorMessage } = error.response.data;
         if (errorCode === "USER_NOT_FOUND") {
-          setError("El nombre de usuario no existe.");
+          setError(t("usernameIncorrect"));
         } else if (errorCode === "INVALID_PASSWORD") {
-          setError("La contraseña es incorrecta.");
+          setError(t("passwordIncorrect"));
         } else {
-          setError("Error en el inicio de sesión.");
+          setError(t("failedLogin"));
         }
       } else {
         setError("Error de comunicación con el servidor.");
