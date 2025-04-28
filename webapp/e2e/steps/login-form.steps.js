@@ -29,7 +29,7 @@ defineFeature(feature, test => {
 
         given('A user who wants to log in', async () => {
             const screenshotsDir = path.resolve(__dirname, 'screenshots');
-            username = 'prueba5';
+            username = 'enol';
             password = 'prueba5';
 
             try {
