@@ -28,21 +28,29 @@ defineFeature(feature, test => {
         const email = `${username}@example.com`;
 
         try {
-            await page.waitForSelector('#create-button', { visible: true, timeout: 5000 });
-            await expect(page).toClick('button', { text: 'Crear cuenta' });
-
-            await page.waitForSelector('#email', { visible: true });
+            await page.waitForSelector('#email', { visible: true, timeout: 5000 });
             await expect(page).toFill('input#email', email);
+            console.log('Completamos email');
+            await page.waitForTimeout(500);
+            await page.waitForSelector('#username', { visible: true, timeout: 5000 });
             await expect(page).toFill('input#username', username);
+            console.log('Completamos username');
+            await page.waitForTimeout(500);
+            await page.waitForSelector('#password', { visible: true, timeout: 5000 });
             await expect(page).toFill('input#password', password);
-            await expect(page).toFill('input#confirmPassword', password);
+            console.log('Completamos password');
+            await page.waitForTimeout(500);
+            await page.waitForSelector('#confirmPassword', { visible: true, timeout: 5000 });
+            await expect(page).toFill('input#confirmPassword', passwordConfirm);
+            console.log('Completamos confirm password');
+            await page.waitForTimeout(500);
 
             await page.waitForSelector('#create-button', { visible: true, timeout: 5000 });
             await expect(page).toClick('button', { text: 'Crear cuenta' });
 
             await page.waitForSelector('.MuiSnackbar-root', { visible: true, timeout: 5000 });
             const snackbarText = await page.$eval('.MuiSnackbar-root', el => el.textContent.trim());
-            console.log('Snackbar tras registro:', snackbarText);
+            console.log('Snackbar Text:', snackbarText);  // Esto te ayudará a depurar
             expect(snackbarText).toMatch('Usuario añadido correctamente');
 
         } catch (error) {
