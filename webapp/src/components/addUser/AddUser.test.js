@@ -109,7 +109,6 @@ describe("AddUser component", () => {
 
         await expectSnackbarError("emptyUsername");
 
-        expect(true).toBe(false);
     });
 
 
