@@ -2,20 +2,11 @@ const request = require("supertest");
 const server = require("./wikiQuestion-service");
 const Question = require("./questiongenerator/question");
 const WikidataQueryService = require('./questiongenerator/questionGen');
+
+const CategoryLoader = require("./questiongenerator/categoryLoader");
+
 /* TEST FUNCIONANDO cambio */
 describe('Wikidata Service', () => {
-    /*
-    /* Test para combrobar que todo va bien
-     */
-    it('should always pass', async () => {
-        // No hace nada, simplemente pasa el test
-        expect(true).toBe(true);
-    });
-
-
-    const server = require("./wikiQuestion-service");
-    const request = require("supertest");
-    const CategoryLoader = require("./questiongenerator/categoryLoader");
 
 
     describe('Category Loader Tests', () => {
