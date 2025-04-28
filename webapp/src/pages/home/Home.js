@@ -55,7 +55,7 @@ const Home = () => {
         <div className="game-home-section">
           <h1>WIChat</h1>
           <h2>{t("subtitle")}</h2>
-          <BaseButton text={t("play")} buttonType="buttonSecondary" onClick={handleProtectedNavigation}></BaseButton>
+          <BaseButton text={t("play")} buttonType="buttonSecondary" onClick={()=>handleProtectedNavigation('/play')}></BaseButton>
         </div>
         <div className="features-section">
         {features.map((feature, index) => (
