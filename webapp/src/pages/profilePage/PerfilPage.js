@@ -200,9 +200,11 @@ export default function PerfilPage() {
 
   // Cargar estadísticas de usuario
   useEffect(() => {
-    loadUserStats(userData.username);
-    loadGameHistory(userData.username);
-    loadMonthlyStats(userData.username);
+    if(userData.username){
+      loadUserStats(userData.username);
+      loadGameHistory(userData.username);
+      loadMonthlyStats(userData.username);
+    }
   }, [userData.username]);
 
   return (
