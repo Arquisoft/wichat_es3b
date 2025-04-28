@@ -104,10 +104,14 @@ describe("AddUser component", () => {
         const password = generateRandomPassword();
         renderAddUser();
         fillForm({ email: "enol@gmail.com", username: "", password:password, confirmPassword: password });
-        userEvent.type(screen.getByLabelText(/email/i), "enol@gmail.com");
 
         userEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+
         await expectSnackbarError("emptyUsername");
+
+        expect(true).toBe(false);
     });
+
+
 
 });

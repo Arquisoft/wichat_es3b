@@ -2,12 +2,13 @@
   "name": "wikiquestionservice",
   "version": "1.0.0",
   "description": "Wikidata service, encharged to get questions from wikidata API",
-  "main": "wikiQuestion-service.js",
+  "main": "wikiQuestion-service",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start":"node wikiQuestion-service.js"
   },
   "keywords": [],
   "author": "",

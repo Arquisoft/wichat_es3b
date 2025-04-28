@@ -4,7 +4,7 @@
   "description": "API service for WIChat application, provides API documentation and endpoints",
   "main": "apiservice.js",
   "scripts": {
-    "start": "node apiservice.js",
+    "start": "node api-service.js",
     "test": "jest"
   },
   "repository": {
