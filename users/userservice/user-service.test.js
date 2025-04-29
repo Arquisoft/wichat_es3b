@@ -117,8 +117,8 @@ describe('User Service', () => {
       const response = await request(app).post('/generate-apikey').send({});
 
       expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('error');
-      expect(response.body.error).toContain('email es obligatorio');
+      expect(response.body).toHaveProperty('errorCode');
+      expect(response.body.errorCode).toContain('EMAIL_REQUIRED');
     });
 
     it('should return an error when generating an API key with invalid email format', async () => {
@@ -129,8 +129,8 @@ describe('User Service', () => {
       const response = await request(app).post('/generate-apikey').send(invalidEmailData);
 
       expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('error');
-      expect(response.body.error).toContain('formato del email no es válido');
+      expect(response.body).toHaveProperty('errorCode');
+      expect(response.body.errorCode).toContain('INVALID_EMAIL_FORMAT');
     });
 
     it('should return an error when trying to generate a duplicate API key', async () => {
@@ -145,8 +145,8 @@ describe('User Service', () => {
       const response = await request(app).post('/generate-apikey').send(emailData);
 
       expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('error');
-      expect(response.body.error).toContain('Ya existe una API key');
+      expect(response.body).toHaveProperty('errorCode');
+      expect(response.body.errorCode).toContain('EMAIL_ALREADY_EXISTS');
     });
 
     it('should validate an existing API key as valid', async () => {

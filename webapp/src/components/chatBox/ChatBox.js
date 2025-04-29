@@ -3,7 +3,8 @@ import "./ChatBox.css";
 import ChatBubble from "../chatBubble/ChatBubble";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import axios from "axios";
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next";
+import useSubmitOnEnter from "../../hooks/useSubmitOnEnter";
 
 const ChatBox = ({
   question,
@@ -12,7 +13,7 @@ const ChatBox = ({
   hintsLeft,
   setHintsLeft,
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [hint, setHint] = useState("");
   const [isLoadingHint, setIsLoadingHint] = useState(false);
@@ -30,11 +31,12 @@ const ChatBox = ({
     setLoadingMessage("...");
 
     try {
-      const URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
+      const URL =
+        process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
       const requestData = {
         userQuestion: input,
         question: question,
-        idioma: "es"
+        idioma: "es",
       };
 
       // Llamar al servicio LLM
@@ -55,11 +57,11 @@ const ChatBox = ({
       setHintsLeft((prev) => prev - 1);
     } catch (error) {
       console.error("Error al obtener pista:", error);
-      setHint(t('hintError'));
+      setHint(t("hintError"));
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          text: t('hintError'),
+          text: t("hintError"),
           isSender: false,
         },
       ]);
@@ -75,11 +77,7 @@ const ChatBox = ({
     getHint();
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSend();
-    }
-  };
+  const handleKeyDown = useSubmitOnEnter(handleSend);
 
   useEffect(() => {
     let interval;
@@ -100,7 +98,7 @@ const ChatBox = ({
   return (
     <div className="chat-box">
       <div className="chat-box-header">
-        <span>{`${t('hintsLeft')}: `} </span>
+        <span>{`${t("hintsLeft")}: `} </span>
         <span className={`hints-counter ${hintsLeft <= 0 ? "no-hints" : ""}`}>
           {hintsLeft}
         </span>
@@ -118,12 +116,8 @@ const ChatBox = ({
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={
-            hintsLeft > 0
-              ? t('askAIForHints')
-              : t('noHintsLeft')
-          }
-          onKeyDown={handleKeyPress}
+          placeholder={hintsLeft > 0 ? t("askAIForHints") : t("noHintsLeft")}
+          onKeyDown={handleKeyDown}
           disabled={hintsLeft <= 0}
         />
         <button
@@ -132,9 +126,7 @@ const ChatBox = ({
           disabled={hintsLeft <= 0 || input.trim() === ""}
         >
           <ArrowUpwardIcon
-            titleAccess={
-              hintsLeft > 0 ? t('askAIForHints') : t('noHintsLeft')
-            }
+            titleAccess={hintsLeft > 0 ? t("askAIForHints") : t("noHintsLeft")}
             fontSize="inherit"
             id="sendMessageToAIButton"
           />
