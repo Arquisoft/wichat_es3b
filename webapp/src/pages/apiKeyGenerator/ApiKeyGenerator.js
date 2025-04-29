@@ -8,6 +8,7 @@ import Footer from "../../components/Footer";
 import WiChatTextField from "../../components/textField/WiChatTextField";
 import axios from "axios";
 import useSubmitOnEnter from ".././../hooks/useSubmitOnEnter";
+import { useTranslation } from "react-i18next";
 
 const ApiKeyGenerator = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +16,7 @@ const ApiKeyGenerator = () => {
   const [apiKey, setApiKey] = useState("");
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
+  const { t } = useTranslation();
 
   const GATEWAY_URL =
     process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
@@ -29,7 +31,8 @@ const ApiKeyGenerator = () => {
       setShowDialog(true);
       setError("");
     } catch (error) {
-      setError(error.response?.data?.error || "Error al generar la API KEY");
+      const code = error.response?.data?.errorCode;
+      setError(t(`errors.${code}`) || t("errors.GENERIC"));
       setShowDialog(true);
     }
   };
@@ -56,10 +59,7 @@ const ApiKeyGenerator = () => {
         <p>{error}</p>
       ) : (
         <>
-          <p>
-            Esta es la API key que ha solicitado para utilizar nuestros
-            servicios. Asegúrese de almacenarla en un lugar seguro.
-          </p>
+          <p>{t("askForAPIKeySuccessfulResponse")}</p>
           <div className="api-key-display">
             <input
               type="text"
@@ -75,9 +75,7 @@ const ApiKeyGenerator = () => {
               <Copy size={20} />
             </button>
           </div>
-          {copied && (
-            <p className="copied-message">¡Copiado al portapapeles!</p>
-          )}
+          {copied && <p className="copied-message">{t("copiedToPortfolio")}</p>}
         </>
       )}
     </div>
@@ -87,14 +85,11 @@ const ApiKeyGenerator = () => {
     <div className="main-container">
       <Nav></Nav>
       <div className="api-key-container">
-        <h1>Solicitar API key</h1>
-        <p className="api-key-instructions">
-          Ingresa tu correo electrónico para generar una API key y acceder a
-          nuestros servicios.
-        </p>
+        <h1>{t("askForAPIKeyTitle")}</h1>
+        <p className="api-key-instructions">{t("askForAPIKeyInstructions")}</p>
 
         <div className="form-group">
-          <label htmlFor="api-key-email">Correo electrónico</label>
+          <label htmlFor="api-key-email">{t("email")}</label>
           <WiChatTextField
             type="email"
             value={email}
@@ -102,7 +97,10 @@ const ApiKeyGenerator = () => {
             onKeyDown={handleKeyDown}
           />
         </div>
-        <BaseButton text="Generar API Key" onClick={handleSubmit}></BaseButton>
+        <BaseButton
+          text={t("generateAPIKey")}
+          onClick={handleSubmit}
+        ></BaseButton>
         {showDialog && (
           <div className="dialog-overlay">
             <div className="dialog-wrapper">

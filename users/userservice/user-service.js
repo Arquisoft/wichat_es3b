@@ -64,25 +64,23 @@ app.post("/generate-apikey", async (req, res) => {
 
     // Validar que el campo email esté presente
     if (!email) {
-      return res.status(400).json({ error: "El campo email es obligatorio." });
+      return res.status(400).json({ errorCode: "EMAIL_REQUIRED" });
     }
 
     // Validar el formato del email usando una expresión regular
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || typeof email !== 'string' || !emailRegex.test(email)) {
-      return res
-          .status(400)
-          .json({ error: "El formato del email no es válido. Debe seguir la estructura \"nombre@dominio\"." });
+    if (!email || typeof email !== "string" || !emailRegex.test(email)) {
+      return res.status(400).json({ errorCode: "INVALID_EMAIL_FORMAT" });
     }
 
     // Usar una comparación estricta de string en lugar de pasar el objeto directamente
-    const existingApiKey = await ApiKey.findOne({ email: String(email).trim() });
+    const existingApiKey = await ApiKey.findOne({
+      email: String(email).trim(),
+    });
 
     if (existingApiKey) {
       // Si ya existe, devolver un error
-      return res
-          .status(400)
-          .json({ error: "Ya existe una API key para este correo." });
+      return res.status(400).json({ errorCode: "EMAIL_ALREADY_EXISTS" });
     }
 
     // Generar una nueva API key

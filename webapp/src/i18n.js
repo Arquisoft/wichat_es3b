@@ -7,6 +7,12 @@ i18n
         resources: {
             es: {
                 translation: {
+                  "errors": {
+                        "EMAIL_REQUIRED": "El campo email es obligatorio.",
+                        "INVALID_EMAIL_FORMAT": "El formato del email no es válido. Debe seguir la estructura \"nombre@dominio\".",
+                        "EMAIL_ALREADY_EXISTS": "Ya existe una API key para este correo.",
+                        "GENERIC": "Error al generar la API KEY"
+                    },
                     "aiHintLimit": "Límite de pistas de IA",
                     "aiCorrectMessageDefault": "¡Bien! He acertado esta.",
                     "aiIncorrectMessageDefault": "¡Vaya! Me he equivocado.",
@@ -18,12 +24,16 @@ i18n
                     "art": "Arte",
                     "askAIForHints": "Pídele una pista a la IA...",
                     "askForAPIKey": "Solicitar clave",
+                    "askForAPIKeyTitle": "Solicitar API key",
+                    "askForAPIKeyInstructions": "Ingresa tu correo electrónico para generar una API key y acceder a nuestros servicios.",
+                    "askForAPIKeySuccessfulResponse": "Esta es la API key que ha solicitado para utilizar nuestros servicios. Asegúrese de almacenarla en un lugar seguro.",
                     "averageTime": "Tiempo promedio",
                     "bestScore": "Mejor puntuación",
                     "cinema": "Cine",
                     "confirmPassword": "Confirmar contraseña*",
                     "correctAnswers": "Respuestas correctas",
                     "countries": "Países",
+                    "copiedToPortfolio": "¡Copiado al portapapeles!",
                     "createAccount": "Crear cuenta",
                     "difficulty": "Dificultad",
                     "easy": "Fácil",
@@ -42,6 +52,7 @@ i18n
                     "gameRules": "Reglas del juego",
                     "gamesPlayed": "Partidas jugadas",
                     "gameHistory": "Histórico de partidas",
+                    "generateAPIKey": "Generar API key",
                     "graphs": "Gráficas",
                     "hintError": "No se pudo obtener una pista en este momento.",
                     "hintInfo": "❓ Usa pistas generadas con IA si lo necesitas.",
@@ -126,6 +137,12 @@ i18n
             },
             en: {
                 translation: {
+                  "errors": {
+                      "EMAIL_REQUIRED": "The email field is required.",
+                      "INVALID_EMAIL_FORMAT": "Invalid email format. It must follow the structure \"name@domain\".",
+                      "EMAIL_ALREADY_EXISTS": "An API key already exists for this email.",
+                      "GENERIC": "Error generating the API key."
+                    },
                     "aiHintLimit": "AI hint limit",
                     "aiCorrectMessageDefault": "Great! I got this one right.",
                     "aiIncorrectMessageDefault": "Oops! I got that wrong.",
@@ -137,12 +154,16 @@ i18n
                     "art": "Art",
                     "askAIForHints": "Ask AI for a hint...",
                     "askForAPIKey": "Request key",
+                    "askForAPIKeyTitle": "Request API key",
+                    "askForAPIKeyInstructions": "Enter your email to generate an API key and integrate our services in your applications.",
+                    "askForAPIKeySuccessfulResponse": "This is the API key you requested to use our services. Please, make sure to store it in a safe place, as it will never appear again.",
                     "averageTime": "Average time",
                     "bestScore": "Best score",
                     "cinema": "Cinema",
                     "confirmPassword": "Confirm password*",
                     "correctAnswers": "Correct answers",
                     "countries": "Countries",
+                    "copiedToPortfolio": "Copied to portfolio!",
                     "createAccount": "Create account",
                     "difficulty": "Difficulty",
                     "easy": "Easy",
@@ -161,6 +182,7 @@ i18n
                     "gameRules": "Game rules",
                     "gamesPlayed": "Games played",
                     "gameHistory": "Game history",
+                    "generateAPIKey": "Generate API key",
                     "graphs": "Graphs",
                     "hintError": "Could not get a hint at the moment.",
                     "hintInfo": "❓ Use AI-generated hints if needed.",

@@ -212,7 +212,8 @@ app.post('/generate-apikey', async (req, res) => {
     res.json(response.data);
   } catch (error) {
     console.error('Error en /generate-apikey:', error.message);
-    res.status(error.response?.status || 500).json({ error: error.response?.data?.error || 'Error interno del servidor' });
+    const code = error.response?.data?.errorCode;
+    res.status(error.response?.status || 500).json({ errorCode: code || 'GENERIC' });
   }
 });
 
