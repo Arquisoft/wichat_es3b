@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 // Componente para mostrar el historial de partidas
 export default function GameHistory({ games, currentIndex, onNavigate }) {
-  const{t} = useTranslation();
+  const { t } = useTranslation();
   // Estado para controlar la animación
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -71,9 +71,13 @@ export default function GameHistory({ games, currentIndex, onNavigate }) {
               <div className="game-date">{game.date}</div>
               <div className="game-number">#{game.id}</div>
               <div className="game-score">{`${game.score} ${t("points")}`}</div>
-              <div className="game-correct">{`${game.correct} ${t("rightQuestions").toLowerCase()}`}</div>
+              <div className="game-correct">{`${game.correct} ${t(
+                "rightQuestions"
+              ).toLowerCase()}`}</div>
               <div className="game-ratio">
-                {`${t("rightAnswersRatio")}: ${parseFloat(game.ratio).toFixed(2)}`}
+                {`${t("rightAnswersRatio")}: ${parseFloat(game.ratio).toFixed(
+                  2
+                )}`}
               </div>
               <div className="game-time">{`${t("time")}: ${game.time}`}</div>
             </div>
