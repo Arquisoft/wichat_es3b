@@ -26,11 +26,15 @@ defineFeature(feature, (test) => {
     test('After logging out, the user is redirected to /auth when clicking "Jugar"', ({ given, when, then }) => {
         given('A user who is logged in', async () => {
             const screenshotsDir = path.resolve(__dirname, 'screenshots');
+
+            const username = 'testuser';
+            const password = 'testpassword';
+
             try {
                 await expect(page).toClick('a', { text: 'Iniciar sesión' });
                 await page.waitForSelector('input#username', { visible: true, timeout: 5000 });
-                await expect(page).toFill('input#username', 'enol');
-                await expect(page).toFill('input#password', '1234');
+                await expect(page).toFill('input#username', username);
+                await expect(page).toFill('input#password', password);
                 await expect(page).toClick('button', { text: 'Iniciar sesión' });
 
                 await page.waitForNavigation({ waitUntil: 'networkidle0' });

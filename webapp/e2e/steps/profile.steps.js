@@ -24,8 +24,8 @@ defineFeature(feature, (test) => {
     });
 
     test('The user is redirected to /profile after clicking the "Perfil" link', ({ given, when, then }) => {
-        let username = 'enol';
-        let password = '1234';
+        const username = 'testuser';
+        const password = 'testpassword';
 
         given('A user who is logged in', async () => {
             const screenshotsDir = path.resolve(__dirname, 'screenshots');

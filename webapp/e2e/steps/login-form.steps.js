@@ -106,7 +106,7 @@ defineFeature(feature, test => {
             const screenshotsDir = path.resolve(__dirname, 'screenshots');
 
             try {
-                await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 5000 });
+                //await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 5000 });
                 const url = await page.url();
                 console.log('URL tras login:', url);
                 expect(url).toContain('/home');

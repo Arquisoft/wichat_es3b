@@ -1,5 +1,5 @@
  const { MongoMemoryServer } = require('mongodb-memory-server');
-
+const axios = require('axios');
 let mongoserver;
 let userservice;
 let authservice;
@@ -21,6 +21,24 @@ async function startServer() {
     statservice = await require("../../users/statsservice/stats-service");
     wikiquestionservice = await require("../../wikiquestionservice/wikiQuestion-service");
     apiservice = await require("../../apiservice/api-service");
+
+    // Crear usuario de prueba
+    await createTestUser();
+}
+
+async function createTestUser() {
+    console.log('Creando usuario de prueba...');
+    try {
+        const response = await axios.post('http://localhost:8000/adduser', {
+            email: 'testuser@example.com',
+            username: 'testuser',
+            password: 'testpassword',
+        });
+        console.log("Respuesta: " + response)
+        console.log('Usuario de prueba creado:', response.data);
+    } catch (error) {
+        console.error('Error al crear el usuario de prueba:', error.response?.data || error.message);
+    }
 }
 
 startServer();

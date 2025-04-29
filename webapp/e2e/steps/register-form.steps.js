@@ -81,8 +81,8 @@ defineFeature(feature, test => {
     when('I fill the data in the form and press submit', async () => {
       const screenshotsDir = path.resolve(__dirname, 'screenshots');
       
-      email = `testuser@example.com`;
-      username = `testuser`;
+      email = `testuserlogin@example.com`;
+      username = `testuserlogin`;
       password = "testpassword";
       passwordConfirm = "testpassword";
 
