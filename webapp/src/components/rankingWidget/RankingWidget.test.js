@@ -1,11 +1,16 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import RankingWidget from "./RankingWidget";
 
-// Mock the dependencies
 jest.mock("axios");
 jest.mock("react-i18next", () => ({
   useTranslation: jest.fn(),
@@ -19,7 +24,6 @@ describe("RankingWidget Component", () => {
   const mockT = jest.fn((key) => key);
   const scrollToMock = jest.fn();
 
-  // Sample test data
   const mockUsers = [
     {
       _id: "1",
@@ -64,20 +68,13 @@ describe("RankingWidget Component", () => {
   ];
 
   beforeEach(() => {
-    // Reset mocks
     jest.clearAllMocks();
-    
-    // Mock window.scrollTo
     global.scrollTo = scrollToMock;
-    
-    // Setup mocks
     useNavigate.mockReturnValue(mockNavigate);
     useTranslation.mockReturnValue({
       t: mockT,
       ready: true,
     });
-    
-    // Mock successful axios response
     axios.get.mockResolvedValue({ data: mockUsers });
   });
 
@@ -93,11 +90,8 @@ describe("RankingWidget Component", () => {
 
   test("fetches and displays ranking data correctly", async () => {
     render(<RankingWidget />);
-
-    // Check that axios was called with the correct URL
     expect(axios.get).toHaveBeenCalled();
-    
-    // Wait for the ranking items to be displayed
+
     await waitFor(() => {
       expect(screen.getByText("user1")).toBeInTheDocument();
       expect(screen.getByText("user2")).toBeInTheDocument();
@@ -105,34 +99,29 @@ describe("RankingWidget Component", () => {
       expect(screen.getByText("user4")).toBeInTheDocument();
     });
 
-    // Get the first user's container to scope our queries
     const user1Container = screen.getByText("user1").closest(".ranking-item");
-    
-    // Use within to scope our queries to just the first user's container
     const { getByText } = within(user1Container);
-    
-    // Verify stats are displayed correctly for user1
-    expect(getByText("10")).toBeInTheDocument(); // gamesPlayed
-    expect(getByText("80")).toBeInTheDocument(); // correctAnswers
-    expect(getByText("20")).toBeInTheDocument(); // wrongAnswers
-    expect(getByText("0.80")).toBeInTheDocument(); // ratio
-    expect(getByText("5.50 s")).toBeInTheDocument(); // averageTime
-    expect(getByText("1000")).toBeInTheDocument(); // bestScore
+
+    expect(getByText("10")).toBeInTheDocument();
+    expect(getByText("80")).toBeInTheDocument();
+    expect(getByText("20")).toBeInTheDocument();
+    expect(getByText("0.80")).toBeInTheDocument();
+    expect(getByText("5.50 s")).toBeInTheDocument();
+    expect(getByText("1000")).toBeInTheDocument();
   });
 
   test("handles click on ranking item to navigate to user stats", async () => {
     render(<RankingWidget />);
 
-    // Wait for the ranking items to be rendered
     await waitFor(() => {
       expect(screen.getByText("user1")).toBeInTheDocument();
     });
 
-    // Find and click on the first ranking item
-    const firstRankingItem = screen.getAllByText("user1")[0].closest(".ranking-item");
+    const firstRankingItem = screen
+      .getAllByText("user1")[0]
+      .closest(".ranking-item");
     fireEvent.click(firstRankingItem);
 
-    // Check if scrollTo and navigate were called with the correct arguments
     expect(scrollToMock).toHaveBeenCalledWith({ top: 0, behavior: "smooth" });
     expect(mockNavigate).toHaveBeenCalledWith("/stats/user1");
   });
@@ -140,70 +129,61 @@ describe("RankingWidget Component", () => {
   test("displays medal icons for top 3 users", async () => {
     render(<RankingWidget />);
 
-    // Wait for the ranking items to be rendered
     await waitFor(() => {
       expect(screen.getByText("user1")).toBeInTheDocument();
     });
 
-    // Check for medal icons (via their parent divs with specific colors)
     const rankingPositions = screen.getAllByText(/^[1-3]$/);
-    
-    expect(rankingPositions[0]).toHaveStyle("background-color: #FFD700"); // Gold
-    expect(rankingPositions[1]).toHaveStyle("background-color: #C0C0C0"); // Silver
-    expect(rankingPositions[2]).toHaveStyle("background-color: #CD7F32"); // Bronze
-    
-    // Check that 4th position has default color
+
+    expect(rankingPositions[0]).toHaveStyle("background-color: #FFD700");
+    expect(rankingPositions[1]).toHaveStyle("background-color: #C0C0C0");
+    expect(rankingPositions[2]).toHaveStyle("background-color: #CD7F32");
+
     const fourthPosition = screen.getByText("4");
-    expect(fourthPosition).toHaveStyle("background-color: var(--color-primario)");
+    expect(fourthPosition).toHaveStyle(
+      "background-color: var(--color-primario)"
+    );
   });
 
   test("handles API error when fetching ranking data", async () => {
-    // Mock console.error to test error handling
     const originalConsoleError = console.error;
     console.error = jest.fn();
-    
-    // Mock axios to reject with an error
+
     axios.get.mockRejectedValueOnce(new Error("API error"));
 
     render(<RankingWidget />);
 
-    // Wait for the error to be logged
     await waitFor(() => {
       expect(console.error).toHaveBeenCalledWith(
-        "Error al obtener el ranking", 
+        "Error al obtener el ranking",
         expect.any(Error)
       );
     });
 
-    // Restore console.error
     console.error = originalConsoleError;
   });
 
   test("uses default gateway URL when environment variable is not set", async () => {
-    // Save original environment variable
     const originalEnv = process.env.REACT_APP_GATEWAY_SERVICE_URL;
     delete process.env.REACT_APP_GATEWAY_SERVICE_URL;
 
     render(<RankingWidget />);
 
-    // Check if axios was called with the default URL
     expect(axios.get).toHaveBeenCalledWith("http://localhost:8000/getranking");
 
-    // Restore environment variable
     process.env.REACT_APP_GATEWAY_SERVICE_URL = originalEnv;
   });
 
   test("uses environment variable for gateway URL when set", async () => {
-    // Save original environment variable and set a test value
     const originalEnv = process.env.REACT_APP_GATEWAY_SERVICE_URL;
     process.env.REACT_APP_GATEWAY_SERVICE_URL = "https://api.example.com";
 
     render(<RankingWidget />);
 
-    // Check if axios was called with the URL from environment variable
-    expect(axios.get).toHaveBeenCalledWith("https://api.example.com/getranking");
+    expect(axios.get).toHaveBeenCalledWith(
+      "https://api.example.com/getranking"
+    );
 
-    // Restore environment variable
     process.env.REACT_APP_GATEWAY_SERVICE_URL = originalEnv;
   });
 });
