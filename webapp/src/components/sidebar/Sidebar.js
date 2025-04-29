@@ -6,13 +6,11 @@ import { useTranslation } from "react-i18next";
 
 // Componente para la barra lateral con información del usuario
 export default function Sidebar({ userData, isVisible, onClose }) {
-
   useEffect(() => {
-    return () => {
-    };
+    return () => {};
   }, [isVisible]);
 
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <>
