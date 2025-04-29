@@ -29,8 +29,8 @@ defineFeature(feature, test => {
 
         given('A user who wants to log in', async () => {
             const screenshotsDir = path.resolve(__dirname, 'screenshots');
-            username = 'enol';
-            password = 'prueba5';
+            username = 'testuser';
+            password = 'testpassword';
 
             try {
                 // Esperamos que exista el enlace "Iniciar sesión"
