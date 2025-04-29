@@ -3,12 +3,15 @@ import "./RankingWidget.css";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { Medal } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const RankingWidget = () => {
   const { t, ready } = useTranslation();
   const [users, setUsers] = useState([]);
+  const navigate = useNavigate();
 
-  const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
+  const GATEWAY_URL =
+    process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
 
   const fetchRanking = async () => {
     try {
@@ -35,7 +38,9 @@ const RankingWidget = () => {
     }
   };
 
-  useEffect(() => {if (ready)fetchRanking()}, [ready]);
+  useEffect(() => {
+    if (ready) fetchRanking();
+  }, [ready]);
 
   const podiumColors = ["#FFD700", "#C0C0C0", "#CD7F32"];
 
@@ -58,13 +63,13 @@ const RankingWidget = () => {
       <Medal
         className="ml-2"
         size={24}
-        color='#000000'
+        color="#000000"
         fill={podiumColors[index]}
       />
     );
   };
 
-  if(!ready) return <div>Cargando...</div>
+  if (!ready) return <div>Cargando...</div>;
   return (
     <div className="ranking-container">
       <div className="ranking-header">
@@ -77,6 +82,10 @@ const RankingWidget = () => {
           <div
             className="ranking-item"
             style={{ animationDelay: `${index * 0.4}s` }}
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              navigate(`/stats/${user.name}`);
+            }}
           >
             <div
               className="ranking-position"
