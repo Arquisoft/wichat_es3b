@@ -7,6 +7,7 @@ import Nav from "../../components/nav/Nav";
 import Footer from "../../components/Footer";
 import WiChatTextField from "../../components/textField/WiChatTextField";
 import axios from "axios";
+import useSubmitOnEnter from ".././../hooks/useSubmitOnEnter";
 
 const ApiKeyGenerator = () => {
   const [email, setEmail] = useState("");
@@ -15,12 +16,15 @@ const ApiKeyGenerator = () => {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
 
-  const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000"
+  const GATEWAY_URL =
+    process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${GATEWAY_URL}/generate-apikey`, { email });
+      const response = await axios.post(`${GATEWAY_URL}/generate-apikey`, {
+        email,
+      });
       setApiKey(response.data.apiKey);
       setShowDialog(true);
       setError("");
@@ -43,6 +47,8 @@ const ApiKeyGenerator = () => {
     setShowDialog(false);
     setEmail("");
   };
+
+  const handleKeyDown = useSubmitOnEnter((e) => handleSubmit(e));
 
   const apiKeyDialogContent = (
     <div className="api-key-content">
@@ -93,6 +99,7 @@ const ApiKeyGenerator = () => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
         </div>
         <BaseButton text="Generar API Key" onClick={handleSubmit}></BaseButton>
