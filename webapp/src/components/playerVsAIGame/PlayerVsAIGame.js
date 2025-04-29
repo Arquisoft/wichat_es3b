@@ -12,6 +12,7 @@ const ROBOT_IMAGE_PATH = "/webapp/src/assets/img/FriendlyRobotThinking.png";
 const PlayerVsAIGame = ({ onGameEnd }) => {
   const { i18n, t } = useTranslation();
   const currentLanguage = i18n.language || "es";
+  const prevLanguageRef = useRef(currentLanguage);
 
   const [questionNumber, setQuestionNumber] = useState(0);
   const [questions, setQuestions] = useState([]);
@@ -40,6 +41,8 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
   const timerRef = useRef(null);
   const isMounted = useRef(true);
   const hasSavedStats = useRef(false);
+  const initializedRef = useRef(false);
+  const answersShuffledRef = useRef(false);
 
   const GATEWAY_URL =
     process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
@@ -195,6 +198,8 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
   }, []);
 
   useEffect(() => {
+    if (initializedRef.current) return;
+
     let storedConfig = {};
     try {
       const storedItem = localStorage.getItem("quizConfig");
@@ -216,55 +221,67 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
       setConfig(finalConfig);
       setTimeLeft(finalConfig.tiempoPregunta);
       setDifficulty(finalConfig.dificultad);
+      initializedRef.current = true;
     }
   }, [t]);
 
+  
   useEffect(() => {
-    if (config) {
-      const fetchQuestions = async () => {
-        if (!config.categories || config.categories.length === 0) {
-          console.warn("No categories selected, cannot fetch questions.");
-          if (isMounted.current) setIsLoading(false);
-          return;
-        }
-        setIsLoading(true);
-        try {
-          const categories = config.categories.includes("all")
-            ? ["all"]
-            : config.categories;
-          const queryString = `questionsDB?n=${
-            config.numPreguntas
-          }&topic=${categories.join(",")}`;
-          const response = await fetch(`${GATEWAY_URL}/${queryString}`);
-          if (!response.ok)
-            throw new Error(
-              `Failed to fetch questions: ${response.statusText}`
-            );
-          const data = await response.json();
+    if (!config || questions.length > 0) return;
 
-          if (isMounted.current) {
-            if (data && data.length > 0) {
-              setQuestions(data);
-              setCurrentQuestion(data[0]);
-            } else {
-              console.error("No questions received from API.");
-              setQuestions([]);
-              setCurrentQuestion(null);
-            }
-          }
-        } catch (error) {
-          console.error("Error fetching questions:", error);
-          if (isMounted.current) {
+    const fetchQuestions = async () => {
+      if (!config.categories || config.categories.length === 0) {
+        console.warn("No categories selected, cannot fetch questions.");
+        if (isMounted.current) setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const categories = config.categories.includes("all")
+          ? ["all"]
+          : config.categories;
+        const queryString = `questions?n=${
+          config.numPreguntas
+        }&topic=${categories.join(",")}`;
+        const response = await fetch(`${GATEWAY_URL}/${queryString}`);
+        if (!response.ok)
+          throw new Error(`Failed to fetch questions: ${response.statusText}`);
+        const data = await response.json();
+
+        if (isMounted.current) {
+          if (data && data.length > 0) {
+            setQuestions(data);
+            setCurrentQuestion(data[0]);
+          } else {
+            console.error("No questions received from API.");
             setQuestions([]);
             setCurrentQuestion(null);
           }
-        } finally {
-          if (isMounted.current) setIsLoading(false);
         }
-      };
-      fetchQuestions();
-    }
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+        if (isMounted.current) {
+          setQuestions([]);
+          setCurrentQuestion(null);
+        }
+      } finally {
+        if (isMounted.current) setIsLoading(false);
+      }
+    };
+    fetchQuestions();
   }, [config, GATEWAY_URL]);
+
+
+  useEffect(() => {
+    if (prevLanguageRef.current !== currentLanguage) {
+      prevLanguageRef.current = currentLanguage;
+
+      if (currentQuestion) {
+        answersShuffledRef.current = false;
+      }
+    }
+  }, [currentLanguage, currentQuestion]);
+
 
   useEffect(() => {
     if (
@@ -304,8 +321,9 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
     handleTimeOut,
   ]);
 
+
   useEffect(() => {
-    if (currentQuestion) {
+    if (currentQuestion && !answersShuffledRef.current) {
       const correctAnswer =
         currentQuestion.respuestaCorrecta?.[currentLanguage];
       const incorrectAnswers =
@@ -317,12 +335,13 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
           const j = Math.floor(Math.random() * (i + 1));
           [allAnswers[i], allAnswers[j]] = [allAnswers[j], allAnswers[i]];
         }
-        if (isMounted.current) setShuffledAnswers(allAnswers);
+        if (isMounted.current) {
+          setShuffledAnswers(allAnswers);
+          answersShuffledRef.current = true;
+        }
       } else {
         if (isMounted.current) setShuffledAnswers([]);
       }
-    } else {
-      if (isMounted.current) setShuffledAnswers([]);
     }
   }, [currentQuestion, currentLanguage]);
 
@@ -404,6 +423,7 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
       setShowAIThinking(false);
       setShowAiMessage(false);
       setQuestionAnimationComplete(false);
+      answersShuffledRef.current = false; // Resetear las respuestas mezcladas para la nueva pregunta
     } else {
       console.error("Next question data is missing or component unmounted.");
       if (isMounted.current && !hasSavedStats.current && !showSummary) {
@@ -543,7 +563,7 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
 
           <motion.div
             className="center-column"
-            key={questionNumber}
+            key={`question-${questionNumber}`}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.4, type: "spring", stiffness: 120 }}
@@ -591,7 +611,7 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
             <div className="answerPanel">
               {shuffledAnswers.map((respuesta, index) => (
                 <BaseButton
-                  key={index}
+                  key={`${respuesta}-${index}`}
                   text={respuesta}
                   onClick={() => handlePlayerAnswer(respuesta)}
                   buttonType={
