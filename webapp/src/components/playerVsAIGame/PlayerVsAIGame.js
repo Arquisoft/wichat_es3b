@@ -240,7 +240,7 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
         const categories = config.categories.includes("all")
           ? ["all"]
           : config.categories;
-        const queryString = `questions?n=${
+        const queryString = `questionsDB?n=${
           config.numPreguntas
         }&topic=${categories.join(",")}`;
         const response = await fetch(`${GATEWAY_URL}/${queryString}`);
