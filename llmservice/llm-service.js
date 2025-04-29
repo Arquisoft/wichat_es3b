@@ -7,47 +7,36 @@ const app = express();
 const port = 8003;
 
 // --- State Variables ---
-// Use objects to manage state, allowing easier reset for tests
 const modelState = {
-    current: 'empathy',
-    backup: 'mistral'
+    primary: 'empathy',
+    backup: 'mistral',
+    current: 'empathy'
 };
 
 // Function to reset state (useful for tests)
 function resetModelState() {
-    modelState.current = 'empathy';
-    modelState.backup = 'mistral';
-    console.log("Model state reset.");
+    modelState.current = modelState.primary;
+    console.log("Model state reset to primary:", modelState.primary);
 }
 
-
-// Middleware to parse JSON in request body
+// Middleware
 app.use(express.json());
-
-// Middleware para logging de solicitudes
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
     next();
 });
 
-// GET para verificación de estado
+// Health check endpoint
 app.get('/', (req, res) => {
-    res.status(200).send({ status: 'OK', message: 'LLM Service running' });
+    res.status(200).send({ status: 'OK', message: `LLM Service running. Current Model: ${modelState.current}` });
 });
 
-// Define configurations for different LLM APIs
+// LLM Configurations
 const llmConfigs = {
-    gemini: {
-        url: (apiKey) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-        transformRequest: (systemPrompt, userQuestion) => ({
-            contents: [{ parts: [{ text: systemPrompt + "\n\nUsuario: " + userQuestion }] }]
-        }),
-        transformResponse: (response) => response.data.candidates[0]?.content?.parts[0]?.text
-    },
     empathy: {
         url: () => 'https://empathyai.prod.empathy.co/v1/chat/completions',
         transformRequest: (systemPrompt, userQuestion) => ({
-            model: "qwen/Qwen2.5-Coder-7B-Instruct", // Specify model directly
+            model: "qwen/Qwen2.5-Coder-7B-Instruct",
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userQuestion }
@@ -62,7 +51,7 @@ const llmConfigs = {
     mistral: {
         url: () => 'https://empathyai.prod.empathy.co/v1/chat/completions',
         transformRequest: (systemPrompt, userQuestion) => ({
-            model: "mistralai/Mistral-7B-Instruct-v0.3", // Specify model directly
+            model: "mistralai/Mistral-7B-Instruct-v0.3",
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userQuestion }
@@ -76,7 +65,12 @@ const llmConfigs = {
     }
 };
 
-// Función simplificada para validar campos requeridos para /ask
+// --- Helper Functions ---
+
+/**
+ * Validates required fields for the /ask endpoint.
+ * @param {object} req - The Express request object.
+ */
 function validateAskRequiredFields(req) {
     const requiredFields = ['userQuestion', 'question', 'idioma'];
     for (const field of requiredFields) {
@@ -88,394 +82,143 @@ function validateAskRequiredFields(req) {
     if (!question || typeof question !== 'object' || !question.respuestaCorrecta || !question.pregunta || !question.descripcion) {
         throw new Error("Estructura de question inválida o faltante");
     }
-    if (!question.pregunta[req.body.idioma]) { // Check specific language existence
+    if (!question.pregunta[req.body.idioma]) {
         throw new Error(`Falta la pregunta en el idioma especificado: ${req.body.idioma}`);
     }
 }
 
-// Generic function to send questions to LLM
-async function sendQuestionToLLM(systemPrompt, userQuestion, apiKey, model = modelState.current) {
-    let currentAttemptModel = model;
-    try {
-        console.log(`Sending request to ${currentAttemptModel} LLM...`);
+/**
+ * Validates required fields for the /ai-answer endpoint.
+ * @param {object} req - The Express request object.
+ */
+function validateAiAnswerRequiredFields(req) {
+    const { question, options, idioma } = req.body;
+    if (!idioma) {
+        throw new Error("Campo 'idioma' faltante.");
+    }
+    if (!question || typeof question !== 'object' || !question.pregunta || !question.respuestaCorrecta || typeof question.pregunta !== 'object' || typeof question.respuestaCorrecta !== 'object') {
+        throw new Error("Campo 'question' inválido o incompleto.");
+    }
+    if (!question.pregunta[idioma]) {
+        throw new Error(`Falta la pregunta en el idioma especificado: ${idioma}`);
+    }
+    if (!question.respuestaCorrecta[idioma]) {
+        throw new Error(`Falta la respuesta correcta en el idioma especificado: ${idioma}`);
+    }
+    if (!options || !Array.isArray(options) || options.length === 0) {
+        throw new Error("Campo 'options' inválido o faltante.");
+    }
+}
 
-        const config = llmConfigs[currentAttemptModel];
+
+/**
+ * Sends a question to the configured LLM, handling fallback and state update.
+ * @param {string} systemPrompt - The system prompt for the LLM.
+ * @param {string} userQuestion - The user's question or input.
+ * @param {string} apiKey - The API key for the LLM service.
+ * @param {string} [requestedModel=modelState.current] - The model to attempt first. Defaults to the current global state.
+ * @returns {Promise<string|null>} The LLM's response text, or null if the response was empty.
+ * @throws {Error} If both primary and backup models fail, or if a non-fallback error occurs.
+ */
+async function sendQuestionToLLM(systemPrompt, userQuestion, apiKey, requestedModel = modelState.current) {
+    let modelToTry = requestedModel;
+    const isPrimaryAttempt = (modelToTry === modelState.primary);
+
+    try {
+        console.log(`Attempting request with ${modelToTry} LLM...`);
+        const config = llmConfigs[modelToTry];
         if (!config) {
-            throw new Error(`Modelo "${currentAttemptModel}" no soportado.`);
+            throw new Error(`Modelo "${modelToTry}" no soportado.`);
         }
 
         const url = config.url(apiKey);
         const requestData = config.transformRequest(systemPrompt, userQuestion);
-
         const headers = {
             'Content-Type': 'application/json',
             ...(config.headers ? config.headers(apiKey) : {})
         };
 
         const response = await axios.post(url, requestData, { headers });
-        console.log(`Response status from ${currentAttemptModel}: ${response.status}`);
+        console.log(`Response status from ${modelToTry}: ${response.status}`);
 
         const transformedResponse = config.transformResponse(response);
 
-        // *** MODIFICACIÓN: Devolver null si la respuesta está vacía ***
         if (transformedResponse === null || transformedResponse === undefined || String(transformedResponse).trim() === '') {
-            console.warn(`Respuesta vacía o nula recibida de ${currentAttemptModel}. Retornando null.`);
-            return null; // Devolver null explícitamente
+            console.warn(`Respuesta vacía o nula recibida de ${modelToTry}. Retornando null.`);
+            return null;
         }
         return transformedResponse;
 
     } catch (error) {
-        console.error(`Error al enviar pregunta a ${currentAttemptModel}:`, error.message || error);
-        if (error.response) {
-            console.error(`LLM ${currentAttemptModel} respondió con estado ${error.response.status}:`, error.response.data);
-            // Intentar reintento solo si es 5xx y el modelo actual NO es ya el de respaldo
-            if (error.response.status >= 500 && currentAttemptModel !== modelState.backup) {
-                console.log(`Error ${error.response.status} con el modelo ${currentAttemptModel}, intentando con el modelo de respaldo ${modelState.backup}...`);
-                // Intentar directamente con el modelo de respaldo
-                try {
-                    // No modificar el estado global aquí, solo intentar con el de respaldo
-                    return await sendQuestionToLLM(systemPrompt, userQuestion, apiKey, modelState.backup);
-                } catch (backupError) {
-                    console.error(`Fallo también con el modelo de respaldo ${modelState.backup}. Propagando error original.`);
-                    // Si el respaldo también falla, propagar el error ORIGINAL del primer intento
-                    throw error;
+        console.error(`Error sending request to ${modelToTry}:`, error.message || error);
+
+        if (error.response && error.response.status >= 500 && isPrimaryAttempt && modelState.current === modelState.primary) {
+            console.warn(`Error ${error.response.status} with primary model ${modelToTry}. Switching to backup model ${modelState.backup} permanently for this service instance.`);
+            modelState.current = modelState.backup; // Persist state change
+            let backupModel = modelState.backup;
+
+            try {
+                console.log(`Retrying request with backup model ${backupModel}...`);
+                const backupConfig = llmConfigs[backupModel];
+                if (!backupConfig) throw new Error(`Modelo de respaldo "${backupModel}" no soportado.`);
+
+                const backupUrl = backupConfig.url(apiKey);
+                const backupRequestData = backupConfig.transformRequest(systemPrompt, userQuestion);
+                const backupHeaders = {
+                    'Content-Type': 'application/json',
+                    ...(backupConfig.headers ? backupConfig.headers(apiKey) : {})
+                };
+
+                const backupResponse = await axios.post(backupUrl, backupRequestData, { headers: backupHeaders });
+                console.log(`Response status from backup ${backupModel}: ${backupResponse.status}`);
+                const transformedBackupResponse = backupConfig.transformResponse(backupResponse);
+
+                if (transformedBackupResponse === null || transformedBackupResponse === undefined || String(transformedBackupResponse).trim() === '') {
+                    console.warn(`Respuesta vacía o nula recibida del modelo de respaldo ${backupModel}. Retornando null.`);
+                    return null;
                 }
+                return transformedBackupResponse; // Backup success
+
+            } catch (backupError) {
+                console.error(`Backup model ${backupModel} also failed:`, backupError.message || backupError);
+                console.error("Both primary and backup models failed.");
+                throw error; // Throw original error if backup fails
             }
-        }
-        // Si no es 5xx, o si ya se intentó con el de respaldo, o si es otro tipo de error, propagar.
-        console.error(`Fallo definitivo al contactar LLM ${currentAttemptModel}. Propagando error.`);
-        throw error; // Propagate the original error
-    }
-}
-
-// Template para solicitar pistas al LLM (sin cambios)
-const hintPromptTemplate = `Eres un asistente virtual especializado en dar pistas sobre preguntas tipo quiz.
-Tu ÚNICA función es proporcionar UNA pista que guíe al usuario hacia la respuesta correcta, sin revelarla.
-
-### REGLAS ESTRICTAS (OBLIGATORIAS):
-1. Proporciona EXACTAMENTE UNA pista por respuesta.
-2. Utiliza MÁXIMO 2 datos de la lista proporcionada.
-3. La pista debe tener MÁXIMO 10 palabras.
-4. NUNCA niegues ni confirmes las suposiciones del usuario.
-5. NUNCA uses la palabra "No" ni ninguna forma de negación.
-6. NUNCA menciones directa o indirectamente la respuesta correcta.
-7. NUNCA uses palabras como "pista:", "respuesta:", etc. al inicio.
-8. NUNCA hagas referencia a características específicas del monumento/objeto.
-9. NUNCA inventes información que no esté en los datos proporcionados.
-10. NUNCA respondas directamente a la pregunta del usuario.
-
-### FORMATO OBLIGATORIO DE RESPUESTA:
-- Responde SÓLO con la pista, sin introducción ni conclusión.
-- Usa una frase simple, clara y directa.
-- Evita cualquier texto adicional o explicativo.
-
-### DATOS DISPONIBLES PARA PISTAS:
-{datos}
-
-### EJEMPLOS CORRECTOS:
-Pregunta: "¿Cuál es este monumento?"
-Usuario: "¿Es la torre Eiffel?"
-✅ "La capital del país es Londres."
-✅ "El idioma oficial es el inglés."
-
-Pregunta: "¿Cuál es este animal?"
-Usuario: "¿Es un león?"
-✅ "Habita en los océanos polares."
-✅ "Su pelaje es completamente blanco."
-
-### EJEMPLOS INCORRECTOS (NO HACER):
-❌ "No, no es la Torre Eiffel."
-❌ "Este monumento es un famoso reloj."
-❌ "Pista: La capital del país es Londres."
-❌ "No, fíjate en el país donde está ubicado."
-❌ "La capital es Londres y el idioma es inglés."
-❌ "Deberías pensar en monumentos británicos."
-
-### IDIOMA DE RESPUESTA:
-Responde en: {idioma}
-
-TU ÉXITO SE MIDE POR TU CAPACIDAD DE DAR UNA PISTA SUTIL QUE NO REVELE LA RESPUESTA NI NIEGUE DIRECTAMENTE LAS SUPOSICIONES DEL USUARIO.`;
-
-// Función para generar el prompt de pista (sin cambios)
-function generateHintPrompt(question, idioma) {
-    const dataText = question.descripcion
-        .map(item => `${item.propiedad}: ${item.valor}`)
-        .join('\n');
-    return hintPromptTemplate
-        .replace('{datos}', dataText)
-        .replace('{idioma}', idioma);
-}
-
-// Endpoint para procesar solicitudes de pistas
-app.post('/ask', async (req, res) => {
-    try {
-        console.log("Received /ask request");
-
-        validateAskRequiredFields(req); // Use specific validation
-
-        const { userQuestion, question, idioma, model = modelState.current } = req.body; // Usa el estado actual
-
-        if (!process.env.LLM_API_KEY) {
-            return res.status(500).json({ error: "Configuración del servidor incompleta: falta LLM_API_KEY" });
-        }
-
-        const systemPrompt = generateHintPrompt(question, idioma);
-        let answer = await sendQuestionToLLM(systemPrompt, userQuestion, process.env.LLM_API_KEY, model);
-
-        // *** MODIFICACIÓN: Manejar respuesta null de sendQuestionToLLM ***
-        if (answer === null) {
-            console.log("sendQuestionToLLM returned null for /ask, sending default empty response string.");
-            answer = "No se recibió respuesta del LLM"; // Devolver string específico
-        }
-
-        console.log("LLM Hint Answer:", answer);
-        res.json({ answer });
-
-    } catch (error) {
-        console.error('Error al procesar solicitud de pista:', error.message);
-        if (error.message.includes("requerido faltante") || error.message.includes("inválida") || error.message.includes("Falta la pregunta")) {
-            res.status(400).json({ error: error.message });
-        } else if (error.message.includes("no soportado")) {
-            res.status(400).json({ error: error.message });
         } else {
-            // Errores internos o de LLM (incluyendo fallos post-reintento) -> 500
-            res.status(500).json({ error: "Error interno al procesar la solicitud de pista.", details: error.message });
+            // No fallback triggered or already using backup
+            console.error(`No fallback triggered for ${modelToTry} or already using backup. Rethrowing error.`);
+            throw error;
         }
     }
-});
-
-// Template para que el LLM responda preguntas del juego (sin cambios)
-const gameQuestionPromptTemplate = `Eres un asistente inteligente que ayuda a responder preguntas de trivia.
-
-PREGUNTA ACTUAL:
-{pregunta}
-
-OPCIONES DISPONIBLES:
-{opciones}
-
-RESPUESTA CORRECTA (NO LA MUESTRES EN TU RESPUESTA):
-{respuestaCorrecta}
-
-Tu tarea es analizar la pregunta y las opciones, y elegir la que consideres correcta basándote en tu conocimiento.
-NO REPITAS la pregunta ni las opciones en tu respuesta. NO EXPLIQUES tu razonamiento.
-
-Responde ÚNICAMENTE con un JSON en este formato exacto:
-{
-  "selectedAnswer": "la opción que eliges",
-  "isCorrect": true/false (si tu respuesta coincide con la respuesta correcta)
 }
 
-Responde en: {idioma}`;
-
-// Endpoint /ai-answer (sin cambios funcionales significativos, solo validación idioma)
-app.post('/ai-answer', async (req, res) => {
-    let isCorrectForMessage = false;
-    const requestedIdioma = req.body.idioma;
-
-    try {
-        console.log("Received /ai-answer request");
-
-        const { question, options, difficulty = "medium" } = req.body;
-
-        if (!req.body.idioma) {
-            throw new Error("Campo 'idioma' faltante.");
-        }
-        const idioma = requestedIdioma;
-
-        if (!question || typeof question !== 'object' || !question.pregunta || !question.respuestaCorrecta || typeof question.pregunta !== 'object' || typeof question.respuestaCorrecta !== 'object') {
-            throw new Error("Campo 'question' inválido o incompleto.");
-        }
-        if (!question.pregunta[idioma]) {
-            throw new Error(`Falta la pregunta en el idioma especificado: ${idioma}`);
-        }
-        if (!question.respuestaCorrecta[idioma]) {
-            throw new Error(`Falta la respuesta correcta en el idioma especificado: ${idioma}`);
-        }
-        if (!options || !Array.isArray(options) || options.length === 0) {
-            throw new Error("Campo 'options' inválido o faltante.");
-        }
-
-        if (!process.env.LLM_API_KEY) {
-            return res.status(500).json({ error: "Configuración del servidor incompleta: falta LLM_API_KEY" });
-        }
-
-        const questionText = question.pregunta[idioma];
-        const correctAnswer = question.respuestaCorrecta[idioma];
-        let selectedAnswer = "";
-        const useSimulation = process.env.NODE_ENV === 'test' && Math.random() > 0.95;
-
-        if (useSimulation) {
-            console.log("Usando respuesta simulada para /ai-answer");
-            let aiAccuracy;
-            switch(difficulty) {
-                case "easy": aiAccuracy = 0.5; break;
-                case "hard": aiAccuracy = 0.9; break;
-                default: aiAccuracy = 0.75;
-            }
-            isCorrectForMessage = Math.random() < aiAccuracy;
-            selectedAnswer = isCorrectForMessage ? correctAnswer : options.find(opt => opt !== correctAnswer) || options[0];
-
-            let message;
-            try {
-                message = await generateAIMessage(isCorrectForMessage, questionText, idioma);
-                if (!message) { // Usar default si generateAIMessage devuelve vacío/null
-                    console.warn("generateAIMessage (simulación) devolvió vacío/null, usando mensaje por defecto.");
-                    message = getDefaultMessage(isCorrectForMessage, idioma);
-                }
-            } catch (msgError) {
-                console.error("Error al generar mensaje (simulación), usando default:", msgError.message);
-                message = getDefaultMessage(isCorrectForMessage, idioma);
-            }
-
-            return res.json({
-                selectedAnswer,
-                isCorrect: isCorrectForMessage,
-                message
-            });
-        }
-
-        // --- Flujo Normal (Llamada al LLM) ---
-        const promptWithDifficulty = gameQuestionPromptTemplate
-                .replace('{pregunta}', questionText)
-                .replace('{opciones}', options.join('\n- '))
-                .replace('{respuestaCorrecta}', correctAnswer)
-                .replace('{idioma}', idioma)
-            + `\n\nDIFICULTAD: ${difficulty}. Ten en cuenta que:
-               - Si la dificultad es "easy", deberías fallar aproximadamente el 50% de las veces.
-               - Si la dificultad es "medium", deberías fallar aproximadamente el 25% de las veces.
-               - Si la dificultad es "hard", deberías fallar aproximadamente el 10% de las veces.`;
-
-        const rawAnswer = await sendQuestionToLLM(promptWithDifficulty, "¿Cuál es tu respuesta?", process.env.LLM_API_KEY);
-        console.log("LLM Raw Answer:", rawAnswer);
-
-        // Si la respuesta es null (vacía), usar fallback de simulación
-        if (rawAnswer === null) {
-            console.warn("sendQuestionToLLM devolvió null, usando fallback de simulación.");
-            // Reutilizar lógica de simulación
-            let aiAccuracy;
-            switch(difficulty) {
-                case "easy": aiAccuracy = 0.5; break;
-                case "hard": aiAccuracy = 0.9; break;
-                default: aiAccuracy = 0.75;
-            }
-            isCorrectForMessage = Math.random() < aiAccuracy;
-            selectedAnswer = isCorrectForMessage ? correctAnswer : options.find(opt => opt !== correctAnswer) || options[0];
-            let message;
-            try {
-                message = await generateAIMessage(isCorrectForMessage, questionText, idioma);
-                if (!message) {
-                    console.warn("generateAIMessage (fallback por null) devolvió vacío/null, usando mensaje por defecto.");
-                    message = getDefaultMessage(isCorrectForMessage, idioma);
-                }
-            } catch (msgError) {
-                console.error("Error al generar mensaje (fallback por null), usando default:", msgError.message);
-                message = getDefaultMessage(isCorrectForMessage, idioma);
-            }
-            return res.json({ selectedAnswer, isCorrect: isCorrectForMessage, message });
-        }
-
-
-        let parsedAnswer;
-        try {
-            const jsonMatch = rawAnswer.match(/\{[\s\S]*\}/);
-            if (jsonMatch && jsonMatch[0]) {
-                parsedAnswer = JSON.parse(jsonMatch[0]);
-                if (!parsedAnswer || typeof parsedAnswer.selectedAnswer === 'undefined' || typeof parsedAnswer.isCorrect === 'undefined') {
-                    throw new Error("JSON parseado no tiene la estructura esperada (selectedAnswer, isCorrect).");
-                }
-            } else {
-                const directMatch = options.find(opt => rawAnswer.trim() === opt);
-                if (directMatch) {
-                    console.warn("LLM no devolvió JSON, pero la respuesta coincide con una opción.");
-                    parsedAnswer = {
-                        selectedAnswer: directMatch,
-                        isCorrect: directMatch === correctAnswer
-                    };
-                } else {
-                    throw new Error("No se encontró un JSON válido ni una respuesta directa coincidente en la respuesta del LLM.");
-                }
-            }
-        } catch (parseError) {
-            console.error("Error al parsear o validar la respuesta JSON del LLM:", parseError.message);
-            console.log("Usando respuesta simulada como fallback debido a error de parseo/validación.");
-            let aiAccuracy;
-            switch(difficulty) {
-                case "easy": aiAccuracy = 0.5; break;
-                case "hard": aiAccuracy = 0.9; break;
-                default: aiAccuracy = 0.75;
-            }
-            isCorrectForMessage = Math.random() < aiAccuracy;
-            selectedAnswer = isCorrectForMessage ? correctAnswer : options.find(opt => opt !== correctAnswer) || options[0];
-
-            let message;
-            try {
-                message = await generateAIMessage(isCorrectForMessage, questionText, idioma);
-                if (!message) {
-                    console.warn("generateAIMessage (fallback por parseo) devolvió vacío/null, usando mensaje por defecto.");
-                    message = getDefaultMessage(isCorrectForMessage, idioma);
-                }
-            } catch (msgError) {
-                console.error("Error al generar mensaje (fallback por parseo), usando default:", msgError.message);
-                message = getDefaultMessage(isCorrectForMessage, idioma);
-            }
-
-            return res.json({
-                selectedAnswer,
-                isCorrect: isCorrectForMessage,
-                message
-            });
-        }
-
-        isCorrectForMessage = parsedAnswer.selectedAnswer === correctAnswer;
-
-        let messageContent; // Usar un nombre de variable diferente
-        try {
-            // Intenta generar el mensaje llamando al LLM
-            messageContent = await generateAIMessage(isCorrectForMessage, questionText, idioma);
-            // Si generateAIMessage devuelve null o vacío (porque el LLM respondió vacío)
-            if (!messageContent) {
-                console.warn("generateAIMessage (normal) devolvió vacío/null, usando mensaje por defecto.");
-                messageContent = getDefaultMessage(isCorrectForMessage, idioma);
-            }
-            console.log("Mensaje generado por LLM (o por defecto si vacío):", messageContent); // Log añadido
-
-        } catch (msgError) {
-            // Si generateAIMessage lanza un error (porque la llamada al LLM falló)
-            console.error("Error al generar mensaje (normal), usando default:", msgError.message);
-            // Asigna explícitamente el mensaje por defecto en caso de error
-            messageContent = getDefaultMessage(isCorrectForMessage, idioma);
-            console.log("Mensaje asignado por defecto en catch block:", messageContent); // Log añadido
-        }
-
-        console.log("Valor final de messageContent antes de res.json:", messageContent); // Log añadido
-
-        // Construye y envía la respuesta final
-        res.json({
-            selectedAnswer: parsedAnswer.selectedAnswer,
-            isCorrect: isCorrectForMessage,
-            message: messageContent // Usa la variable actualizada
-        });
-
-    } catch (error) {
-        console.error('Error al procesar respuesta de la IA:', error.message);
-        const finalIdioma = requestedIdioma || 'es';
-        if (error.message.includes("inválido") || error.message.includes("faltante") || error.message.includes("Falta la pregunta") || error.message.includes("Falta la respuesta correcta")) {
-            res.status(400).json({
-                error: error.message,
-                message: getDefaultMessage(isCorrectForMessage, finalIdioma)
-            });
-        } else {
-            res.status(500).json({
-                error: "Error interno al procesar la respuesta de la IA.",
-                details: error.message,
-                message: getDefaultMessage(isCorrectForMessage, finalIdioma)
-            });
-        }
+/**
+ * Generates a default message based on correctness and language.
+ * @param {boolean} isCorrect - Whether the answer was correct.
+ * @param {string} idioma - The desired language ('es', 'en', etc.).
+ * @returns {string} The default message.
+ */
+function getDefaultMessage(isCorrect, idioma) {
+    const lang = idioma || 'es';
+    if (lang.toLowerCase() === "es") {
+        return isCorrect ? "¡Excelente! He acertado esta." : "¡Vaya! Me he equivocado.";
+    } else if (lang.toLowerCase() === "en") {
+        return isCorrect ? "Excellent! I got this one right." : "Oops! I got that wrong.";
+    } else {
+        return isCorrect ? "¡Correcto!" : "¡Incorrecto!"; // Generic fallback
     }
-});
+}
 
-// Función para generar mensajes personalizados (sin cambios)
-async function generateAIMessage(isCorrect, question, idioma) {
+/**
+ * Generates a personalized message from the AI based on correctness.
+ * Uses the current model state by default.
+ * @param {boolean} isCorrect - Whether the AI's answer was correct.
+ * @param {string} question - The text of the question asked.
+ * @param {string} idioma - The language for the message.
+ * @param {string} [model=modelState.current] - The specific model to use. Defaults to the current global state.
+ * @returns {Promise<string|null>} The generated message or null if the LLM response was empty or failed.
+ */
+async function generateAIMessage(isCorrect, question, idioma, model = modelState.current) {
     const result = isCorrect ? "correct" : "incorrect";
     const messagePromptTemplate = `Eres un asistente de IA en un juego de trivia que acaba de responder una pregunta.
 
@@ -503,86 +246,370 @@ EJEMPLOS SI FALLASTE:
 RESPONDE ÚNICAMENTE CON LA FRASE, sin ningún texto adicional.`;
 
     if (!process.env.LLM_API_KEY) {
-        throw new Error("generateAIMessage: LLM_API_KEY no encontrada.");
+        console.error("generateAIMessage: LLM_API_KEY no encontrada.");
+        return null; // Return null if API key is missing
     }
 
-    // Dejar que sendQuestionToLLM maneje errores y devuelva null si está vacío
-    const response = await sendQuestionToLLM(messagePromptTemplate, "Genera una respuesta", process.env.LLM_API_KEY);
-
-    // response será null si sendQuestionToLLM recibió vacío, o la respuesta limpia.
-    // No necesitamos limpiar aquí porque sendQuestionToLLM ya devuelve null para vacíos.
-    return response;
-}
-
-// Mensajes por defecto (sin cambios)
-function getDefaultMessage(isCorrect, idioma) {
-    const lang = idioma || 'es';
-    if (lang.toLowerCase() === "es") {
-        return isCorrect ? "¡Excelente! He acertado esta." : "¡Vaya! Me he equivocado.";
-    } else if (lang.toLowerCase() === "en") {
-        return isCorrect ? "Excellent! I got this one right." : "Oops! I got that wrong.";
-    } else {
-        return isCorrect ? "¡Correcto!" : "¡Incorrecto!";
+    try {
+        // Call sendQuestionToLLM, which handles fallback internally
+        const response = await sendQuestionToLLM(messagePromptTemplate, "Genera una respuesta", process.env.LLM_API_KEY, model);
+        return response; // Will be null if LLM response was empty or both models failed
+    } catch (error) {
+        console.error("Error dentro de generateAIMessage al llamar a sendQuestionToLLM:", error.message);
+        return null; // Return null if sendQuestionToLLM throws an error (e.g., both models failed)
     }
 }
 
-// Endpoint /ai-message (ajustado para usar default si generateAIMessage devuelve null)
+
+/**
+ * Handles fallback simulation when LLM fails or response is invalid.
+ * @param {string} difficulty - The game difficulty ('easy', 'medium', 'hard').
+ * @param {string} correctAnswer - The correct answer text.
+ * @param {string[]} options - The list of possible answer options.
+ * @param {string} questionText - The text of the question.
+ * @param {string} idioma - The language code.
+ * @param {string} reason - Short description of why fallback is triggered.
+ * @returns {Promise<object>} A promise resolving to { selectedAnswer, isCorrect, message }.
+ */
+async function handleSimulationFallback(difficulty, correctAnswer, options, questionText, idioma, reason) {
+    console.warn(`Fallback triggered (${reason}). Using simulation.`);
+    let aiAccuracy;
+    switch (difficulty.toLowerCase()) {
+        case "easy": aiAccuracy = 0.3; break; // Lowered accuracy for easy
+        case "hard": aiAccuracy = 0.9; break;
+        case "medium":
+        default: aiAccuracy = 0.75;
+    }
+    const isCorrectSimulated = Math.random() < aiAccuracy;
+    const selectedAnswerSimulated = isCorrectSimulated
+        ? correctAnswer
+        : options.find(opt => opt !== correctAnswer) || options[0]; // Find a wrong answer or default
+
+    let message;
+    try {
+        // Attempt to generate message even in fallback, using current model state
+        message = await generateAIMessage(isCorrectSimulated, questionText, idioma);
+        if (!message) { // If LLM message generation fails or is empty
+            console.warn(`generateAIMessage (fallback: ${reason}) devolvió vacío/null, usando mensaje por defecto.`);
+            message = getDefaultMessage(isCorrectSimulated, idioma);
+        }
+    } catch (msgError) {
+        // Catch errors during message generation in fallback
+        console.error(`Error al generar mensaje (fallback: ${reason}), usando default:`, msgError.message);
+        message = getDefaultMessage(isCorrectSimulated, idioma);
+    }
+
+    return {
+        selectedAnswer: selectedAnswerSimulated,
+        isCorrect: isCorrectSimulated,
+        message: message
+    };
+}
+
+
+// --- Hint Generation ---
+
+const hintPromptTemplate = `Eres un asistente virtual especializado en dar pistas sobre preguntas tipo quiz.
+Tu ÚNICA función es proporcionar UNA pista que guíe al usuario hacia la respuesta correcta, sin revelarla.
+
+### REGLAS ESTRICTAS (OBLIGATORIAS):
+1. Proporciona EXACTAMENTE UNA pista por respuesta.
+2. Utiliza MÁXIMO 2 datos de la lista proporcionada.
+3. La pista debe tener MÁXIMO 10 palabras.
+4. NUNCA niegues ni confirmes las suposiciones del usuario.
+5. NUNCA uses la palabra "No" ni ninguna forma de negación.
+6. NUNCA menciones directa o indirectamente la respuesta correcta.
+7. NUNCA uses palabras como "pista:", "respuesta:", etc. al inicio.
+8. NUNCA hagas referencia a características específicas del monumento/objeto.
+9. NUNCA inventes información que no esté en los datos proporcionados.
+10. NUNCA respondas directamente a la pregunta del usuario.
+
+### FORMATO OBLIGATORIO DE RESPUESTA:
+- Responde SÓLO con la pista, sin introducción ni conclusión.
+- Usa una frase simple, clara y directa.
+- Evita cualquier texto adicional o explicativo.
+
+### DATOS DISPONIBLES PARA PISTAS:
+{datos}
+
+### IDIOMA DE RESPUESTA:
+Responde en: {idioma}
+
+TU ÉXITO SE MIDE POR TU CAPACIDAD DE DAR UNA PISTA SUTIL QUE NO REVELE LA RESPUESTA NI NIEGUE DIRECTAMENTE LAS SUPOSICIONES DEL USUARIO.`;
+
+function generateHintPrompt(question, idioma) {
+    const dataText = question.descripcion
+        .map(item => `${item.propiedad}: ${item.valor}`)
+        .join('\n');
+    return hintPromptTemplate
+        .replace('{datos}', dataText)
+        .replace('{idioma}', idioma);
+}
+
+// --- AI Answer Generation ---
+
+const gameQuestionPromptTemplate = `Eres un asistente inteligente que participa en un juego de trivia. Tu personalidad varía según la dificultad.
+
+PERSONALIDAD (según dificultad):
+{personality_instruction}
+
+PREGUNTA ACTUAL:
+{pregunta}
+
+OPCIONES DISPONIBLES:
+{opciones}
+
+RESPUESTA CORRECTA (Contexto interno, NO REVELAR):
+{respuestaCorrecta}
+
+TU TAREA:
+1. Adopta la personalidad indicada por la dificultad. **¡ES MUY IMPORTANTE QUE SIGAS ESTA PERSONALIDAD!**
+2. Elige UNA de las opciones disponibles como tu respuesta.
+3. Basa tu elección en la pregunta, las opciones y tu personalidad asignada.
+4. Determina si tu elección coincide con la RESPUESTA CORRECTA proporcionada.
+
+FORMATO DE RESPUESTA OBLIGATORIO (JSON):
+Responde ÚNICAMENTE con un JSON válido siguiendo esta estructura exacta:
+{
+  "selectedAnswer": "la opción que elegiste",
+  "isCorrect": true/false (true si tu selectedAnswer == RESPUESTA CORRECTA, false si no)
+}
+
+REGLAS ADICIONALES:
+- NO incluyas ningún texto fuera del JSON.
+- NO expliques tu razonamiento.
+- NO repitas la pregunta ni las opciones.
+- Responde en el idioma: {idioma}`;
+
+function generateAiAnswerPrompt(questionText, options, correctAnswer, difficulty, idioma) {
+    let personalityInstruction = "";
+    switch (difficulty.toLowerCase()) {
+        case "easy":
+            // ** More direct instruction for easy difficulty **
+            personalityInstruction = "Actúa como un participante de trivia bastante distraído y olvidadizo. A menudo te equivocas o eliges una opción incorrecta porque no prestas mucha atención. Sin embargo, de vez en cuando, aciertas por casualidad o porque la pregunta es muy obvia. ¡Falla a propósito en la mayoría de las preguntas!";
+            break;
+        case "hard":
+            personalityInstruction = "Actúa como un experto en trivia. Analiza cuidadosamente y casi siempre eliges la respuesta correcta. Rara vez fallas.";
+            break;
+        case "medium":
+        default:
+            personalityInstruction = "Actúa como un participante de trivia con conocimientos generales. Intentas acertar, pero tu memoria a veces te falla o te confundes si las opciones son parecidas. Cometes errores de vez en cuando, pero no constantemente.";
+            break;
+    }
+
+    return gameQuestionPromptTemplate
+        .replace('{personality_instruction}', personalityInstruction)
+        .replace('{pregunta}', questionText)
+        .replace('{opciones}', options.join('\n '))
+        .replace('{respuestaCorrecta}', correctAnswer)
+        .replace('{idioma}', idioma);
+}
+
+// --- Endpoints ---
+
+// Endpoint /ask (Hint generation)
+app.post('/ask', async (req, res) => {
+    try {
+        console.log("Received /ask request");
+        validateAskRequiredFields(req);
+        const { userQuestion, question, idioma } = req.body;
+
+        if (!process.env.LLM_API_KEY) {
+            return res.status(500).json({ error: "Configuración del servidor incompleta: falta LLM_API_KEY" });
+        }
+
+        const systemPrompt = generateHintPrompt(question, idioma);
+        // sendQuestionToLLM handles model selection and fallback
+        let answer = await sendQuestionToLLM(systemPrompt, userQuestion, process.env.LLM_API_KEY);
+
+        if (answer === null) {
+            console.log("sendQuestionToLLM returned null for /ask, sending default error message.");
+            // Provide a more informative error message for hints
+            answer = (idioma === 'es') ? "Lo siento, no puedo dar una pista en este momento." : "Sorry, I cannot provide a hint right now.";
+        }
+
+        console.log("LLM Hint Answer:", answer);
+        res.json({ answer });
+
+    } catch (error) {
+        console.error('Error al procesar solicitud de pista:', error.message);
+        const errorStatus = (error.message.includes("requerido") || error.message.includes("inválida")) ? 400 : 500;
+        const errorMessage = (idioma === 'es') ? "Error al generar la pista." : "Error generating hint.";
+        res.status(errorStatus).json({ error: errorMessage, details: error.message });
+    }
+});
+
+// Endpoint /ai-answer (AI opponent's answer)
+app.post('/ai-answer', async (req, res) => {
+    let responsePayload; // To store the final payload
+
+    try {
+        console.log("Received /ai-answer request");
+
+        // --- Input Validation ---
+        validateAiAnswerRequiredFields(req); // Use dedicated validation function
+        const { question, options, difficulty = "medium", idioma } = req.body;
+        const questionText = question.pregunta[idioma];
+        const correctAnswer = question.respuestaCorrecta[idioma];
+
+        if (!process.env.LLM_API_KEY) {
+            throw new Error("Configuración del servidor incompleta: falta LLM_API_KEY");
+        }
+
+        // --- Simulation Check (for testing) ---
+        const useSimulation = process.env.NODE_ENV === 'test' && Math.random() > 0.95;
+        if (useSimulation) {
+            console.log("Usando respuesta simulada para /ai-answer (TEST)");
+            responsePayload = await handleSimulationFallback(difficulty, correctAnswer, options, questionText, idioma, "Test Simulation");
+            return res.json(responsePayload);
+        }
+
+        // --- Normal Flow: Get AI Answer ---
+        const systemPrompt = generateAiAnswerPrompt(questionText, options, correctAnswer, difficulty, idioma);
+        let rawAnswer;
+
+        try {
+            // Call LLM for the answer. sendQuestionToLLM handles fallback & state update.
+            rawAnswer = await sendQuestionToLLM(systemPrompt, "¿Cuál es tu respuesta JSON?", process.env.LLM_API_KEY);
+
+        } catch (llmError) {
+            // This catch block is reached ONLY if BOTH primary and backup models failed.
+            console.error("Both primary and backup models failed to get answer.");
+            responsePayload = await handleSimulationFallback(difficulty, correctAnswer, options, questionText, idioma, "LLM Double Failure");
+            return res.json(responsePayload);
+        }
+
+        // Handle case where LLM (potentially the backup) returned an empty response
+        if (rawAnswer === null) {
+            console.warn("sendQuestionToLLM devolvió null (respuesta vacía).");
+            responsePayload = await handleSimulationFallback(difficulty, correctAnswer, options, questionText, idioma, "LLM Empty Response");
+            return res.json(responsePayload);
+        }
+
+        // --- Parse and Validate LLM Answer ---
+        console.log("LLM Raw Answer:", rawAnswer);
+        let parsedAnswer;
+        try {
+            const jsonMatch = rawAnswer.match(/\{[\s\S]*?\}/); // Non-greedy JSON match
+            if (jsonMatch && jsonMatch[0]) {
+                parsedAnswer = JSON.parse(jsonMatch[0]);
+                if (!parsedAnswer || typeof parsedAnswer.selectedAnswer === 'undefined' || typeof parsedAnswer.isCorrect === 'undefined') {
+                    throw new Error("JSON parseado no tiene la estructura esperada (selectedAnswer, isCorrect).");
+                }
+                if (!options.includes(parsedAnswer.selectedAnswer)) {
+                    throw new Error(`La selectedAnswer ("${parsedAnswer.selectedAnswer}") del LLM no es una opción válida.`);
+                }
+
+                // Use the response directly from the LLM as it was instructed based on persona
+                const selectedAnswer = parsedAnswer.selectedAnswer;
+                const isCorrectFromLLM = parsedAnswer.isCorrect;
+
+                // Optional Sanity Check (Log difference but use LLM's value)
+                const actualCorrectness = (selectedAnswer === correctAnswer);
+                if (isCorrectFromLLM !== actualCorrectness) {
+                    console.warn(`Advertencia: El campo 'isCorrect' (${isCorrectFromLLM}) del LLM no coincide con la corrección real (${actualCorrectness}) para la respuesta seleccionada "${selectedAnswer}". Se usará el valor del LLM.`);
+                }
+
+                // --- Generate AI Message ---
+                let messageContent = await generateAIMessage(isCorrectFromLLM, questionText, idioma);
+                if (!messageContent) {
+                    console.warn("generateAIMessage (normal) devolvió vacío/null, usando mensaje por defecto.");
+                    messageContent = getDefaultMessage(isCorrectFromLLM, idioma);
+                }
+
+                // --- Prepare Final Successful Response ---
+                responsePayload = {
+                    selectedAnswer: selectedAnswer,
+                    isCorrect: isCorrectFromLLM, // Use correctness determined by LLM's persona
+                    message: messageContent
+                };
+                return res.json(responsePayload);
+
+            } else {
+                // Try direct match if no JSON found (less likely)
+                const directMatch = options.find(opt => rawAnswer.trim().toLowerCase() === opt.toLowerCase());
+                if (directMatch) {
+                    console.warn("LLM no devolvió JSON, pero la respuesta coincide directamente con una opción.");
+                    const selectedAnswer = directMatch;
+                    const isCorrectDirect = selectedAnswer === correctAnswer;
+                    let messageContent = await generateAIMessage(isCorrectDirect, questionText, idioma);
+                    if (!messageContent) messageContent = getDefaultMessage(isCorrectDirect, idioma);
+
+                    responsePayload = { selectedAnswer, isCorrect: isCorrectDirect, message: messageContent };
+                    return res.json(responsePayload);
+                } else {
+                    // No JSON and no direct match
+                    throw new Error("No se encontró un JSON válido ni una respuesta directa coincidente en la respuesta del LLM.");
+                }
+            }
+        } catch (parseError) {
+            // Handle JSON parsing errors or validation errors (e.g., selectedAnswer not in options)
+            console.error("Error al parsear o validar la respuesta JSON del LLM:", parseError.message);
+            responsePayload = await handleSimulationFallback(difficulty, correctAnswer, options, questionText, idioma, "Parsing/Validation Error");
+            return res.json(responsePayload);
+        }
+
+    } catch (error) {
+        // Catch unexpected errors or validation errors from the top level
+        console.error('Error general en /ai-answer:', error.message);
+        const finalIdioma = req.body.idioma || 'es'; // Get idioma if possible
+        const errorStatus = (error.message.includes("inválido") || error.message.includes("faltante")) ? 400 : 500;
+        // Send a generic error response, potentially using default message logic if needed
+        res.status(errorStatus).json({
+            error: "Error al procesar la respuesta de la IA.",
+            details: error.message,
+            // Provide a minimal fallback structure if possible
+            selectedAnswer: "Error",
+            isCorrect: false,
+            message: getDefaultMessage(false, finalIdioma)
+        });
+    }
+});
+
+
+// Endpoint /ai-message (Potentially deprecated by /ai-answer including message)
 app.post('/ai-message', async (req, res) => {
-    let isCorrect = false;
+    let isCorrect = false; // Default value
     const requestedIdioma = req.body.idioma;
 
     try {
         console.log("Received /ai-message request");
-
         const { result, question } = req.body;
 
-        if (!req.body.idioma) {
-            throw new Error("Campo 'idioma' faltante.");
-        }
-        const idioma = requestedIdioma;
+        // Validation
+        if (!requestedIdioma) { throw new Error("Campo 'idioma' faltante."); }
+        if (result !== "correct" && result !== "incorrect") { throw new Error("Campo 'result' inválido. Debe ser 'correct' o 'incorrect'."); }
+        if (!question || typeof question !== 'string' || question.trim() === '') { throw new Error("Campo 'question' inválido o faltante."); }
+        if (!process.env.LLM_API_KEY) { throw new Error("Configuración del servidor incompleta: falta LLM_API_KEY"); }
 
-        if (result !== "correct" && result !== "incorrect") {
-            throw new Error("Campo 'result' inválido. Debe ser 'correct' o 'incorrect'.");
-        }
-        if (!question || typeof question !== 'string' || question.trim() === '') {
-            throw new Error("Campo 'question' inválido o faltante.");
-        }
 
         isCorrect = result === "correct";
-        let message = await generateAIMessage(isCorrect, question, idioma);
+        // generateAIMessage uses modelState.current and handles fallback
+        let message = await generateAIMessage(isCorrect, question, requestedIdioma);
 
-        // *** MODIFICACIÓN: Usar default si generateAIMessage devuelve null ***
-        if (message === null) {
-            console.warn("generateAIMessage devolvió null, usando mensaje por defecto.");
-            message = getDefaultMessage(isCorrect, idioma);
+        if (message === null) { // Handle empty response or LLM failure
+            console.warn("generateAIMessage (for /ai-message) devolvió null, usando mensaje por defecto.");
+            message = getDefaultMessage(isCorrect, requestedIdioma);
         }
-
         res.json({ message });
 
     } catch (error) {
-        console.error('Error al generar mensaje de la IA en /ai-message:', error.message);
+        console.error('Error en /ai-message:', error.message);
         const finalIdioma = requestedIdioma || 'es';
-        const defaultMessage = getDefaultMessage(isCorrect, finalIdioma);
-
-        if (error.message.includes("inválido") || error.message.includes("faltante")) {
-            res.status(400).json({
-                error: error.message,
-                message: defaultMessage
-            });
-        } else {
-            res.status(500).json({
-                error: "Error interno al generar el mensaje de la IA.",
-                details: error.message,
-                message: defaultMessage
-            });
-        }
+        const defaultMessage = getDefaultMessage(isCorrect, finalIdioma); // Use potentially updated isCorrect
+        const statusCode = error.message.includes("LLM_API_KEY") ? 500 : (error.message.includes("inválido") || error.message.includes("faltante") ? 400 : 500);
+        res.status(statusCode).json({
+            error: error.message.includes("LLM_API_KEY") ? "Error interno del servidor." : error.message,
+            details: error.message,
+            message: defaultMessage // Provide default message on error
+        });
     }
 });
 
-// Variable para almacenar la instancia del servidor
+
+// --- Server Start/Stop ---
 let server;
 
-// Función para iniciar el servidor (sin cambios)
 function startServer(testPort) {
     if (server && server.listening) {
         console.warn("Server already running.");
@@ -593,6 +620,7 @@ function startServer(testPort) {
         server = app.listen(serverPort);
         server.on('listening', () => {
             console.log(`LLM Service listening at http://localhost:${serverPort}`);
+            console.log(`Initial model state: ${modelState.current}`);
         });
         server.on('error', (err) => {
             console.error(`Error starting server on port ${serverPort}:`, err);
@@ -609,11 +637,10 @@ function startServer(testPort) {
     }
 }
 
-// Función para cerrar el servidor (sin cambios)
 function closeServer() {
-    if (server && server.listening) {
-        console.log("Closing server...");
-        return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
+        if (server && server.listening) {
+            console.log("Closing server...");
             server.close((err) => {
                 if (err) {
                     console.error("Error closing server:", err);
@@ -624,20 +651,32 @@ function closeServer() {
                     resolve();
                 }
             });
-        });
-    }
-    console.log("Server not running or already closed.");
-    return Promise.resolve();
+        } else {
+            console.log("Server not running or already closed.");
+            resolve();
+        }
+    });
 }
 
-// Si este archivo se ejecuta directamente, inicia el servidor
+// Start server if run directly
 if (require.main === module) {
     startServer();
+    // Graceful shutdown handling
+    process.on('SIGINT', async () => {
+        console.log('SIGINT signal received: closing HTTP server');
+        await closeServer();
+        process.exit(0);
+    });
+    process.on('SIGTERM', async () => {
+        console.log('SIGTERM signal received: closing HTTP server');
+        await closeServer();
+        process.exit(0);
+    });
 }
 
 module.exports = {
     app,
     startServer,
     closeServer,
-    resetModelState // Exportar para tests si es necesario
+    resetModelState
 };
