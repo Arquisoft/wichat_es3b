@@ -1,11 +1,17 @@
 import React from "react";
 import "./CategoryCard.css";
+import useSubmitOnEnter from "../../hooks/useSubmitOnEnter";
 
 const CategoryCard = ({ name, imageSrc, isSelected, onClick }) => {
+  const handleKeyDown = useSubmitOnEnter(onClick);
   return (
     <div
       className={`category-card ${isSelected ? "selected" : ""}`}
-      onClick={ onClick }
+      onClick={onClick}
+      role="button"
+      aria-pressed={isSelected}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
     >
       <div className="category-card-container">
         <img

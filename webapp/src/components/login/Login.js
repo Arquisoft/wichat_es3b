@@ -100,7 +100,17 @@ const Login = ({ handleToggleView }) => {
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={handleKeyDown}
                 />
-                <span onClick={toggleShowPassword}>👁️‍🗨️</span>
+                <span
+                  tabIndex={0}
+                  onClick={toggleShowPassword}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      toggleShowPassword();
+                    }
+                  }}
+                >
+                  👁️‍🗨️
+                </span>
               </div>
             </div>
             <div className="buttonPanel">

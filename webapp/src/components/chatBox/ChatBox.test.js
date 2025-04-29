@@ -228,10 +228,8 @@ describe("ChatBox Component", () => {
     const instance = screen.getByText("Pistas restantes:").closest(".chat-box");
     const chatBoxInstance = {
       getHint: async () => {
-        if (0 <= 0) {
-          alert("No hay más pistas disponibles.");
-          return;
-        }
+        alert("No hay más pistas disponibles.");
+        return;
       },
     };
 
