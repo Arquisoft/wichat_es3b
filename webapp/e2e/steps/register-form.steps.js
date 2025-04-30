@@ -131,12 +131,11 @@ defineFeature(feature, test => {
       }
     });
 
-    //linea
     then('A confirmation message should be shown in the screen', async () => {
       await page.waitForSelector('.MuiSnackbar-root', { visible: true, timeout: 5000 });
       const snackbarText = await page.$eval('.MuiSnackbar-root', el => el.textContent.trim());
       console.log('Snackbar Text:', snackbarText);  // Esto te ayudará a depurar
-      expect(snackbarText).toMatch('Usuario registrado correctamente');
+      expect(snackbarText).toMatch('Usuario creado con éxito');
     });
 
   });

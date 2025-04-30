@@ -71,7 +71,7 @@ i18n
                     "login": "Iniciar sesión",
                     "loginMessageInPanel": "“ El conocimiento es un viaje sin final, una aventura que nos enriquece cada dia. Aprender, descubrir y compartir es lo que nos hace crecer, Porque en cada pregunta hay una oportunidad y en cada respuesta, un nuevo reto. Sigamos jugando y ganando juntos! “",
                     "loginSuccessful": "Inicio de sesión correcto",
-                    "addUserSuccessful": "Usuario registrado correctamente",
+                    "addUserSuccessful": "Usuario creado con éxito",
                     "logout": "Cerrar sesión",
                     "matches": "Partidas",
                     "nextQuestion": "Siguiente pregunta", // New

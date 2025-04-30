@@ -176,7 +176,7 @@ describe("AddUser Component", () => {
         username: validUserData.username,
         password: validUserData.password,
       });
-      expect(screen.getByText(/Usuario registrado correctamente/i)).toBeInTheDocument();
+      expect(screen.getByText(/Usuario creado con éxito/i)).toBeInTheDocument();
     });
   });
 
@@ -184,7 +184,7 @@ describe("AddUser Component", () => {
     axios.post.mockRejectedValueOnce({
       response: { data: { error: "Usuario ya existe" } },
     });
-    
+
     renderAddUser();
     fillFormFields();
     clickCreateAccountButton();
@@ -197,7 +197,7 @@ describe("AddUser Component", () => {
 
   test("shows generic error message when API fails without response data", async () => {
     axios.post.mockRejectedValueOnce({});
-    
+
     renderAddUser();
     fillFormFields();
     clickCreateAccountButton();
@@ -262,19 +262,19 @@ describe("AddUser Component", () => {
   test("closes Snackbar after success message", async () => {
     axios.post.mockResolvedValueOnce({ data: { success: true } });
     jest.useFakeTimers();
-  
+
     renderAddUser();
     fillFormFields();
     clickCreateAccountButton();
 
     await waitFor(() => {
-      expect(screen.getByText(/Usuario registrado correctamente/i)).toBeInTheDocument();
+      expect(screen.getByText(/Usuario creado con éxito/i)).toBeInTheDocument();
     });
 
     jest.advanceTimersByTime(6000);
 
     await waitFor(() => {
-      expect(screen.queryByText(/Usuario registrado correctamente/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Usuario creado con éxito/i)).not.toBeInTheDocument();
     });
 
     jest.useRealTimers();
