@@ -23,54 +23,35 @@ function validateRequiredFields(req, requiredFields) {
   }
 }
 
-// Route for user login
+//Route for post login
 app.post('/login',  [
   check('username').isLength({ min: 3 }).trim().escape(),
   check('password').isLength({ min: 3 }).trim().escape()
-], async (req, res) => {
+],async (req, res) => {
   try {
     // Check if required fields are present in the request body
+
     validateRequiredFields(req, ['username', 'password']);
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ error: errors.array().toString()});
     }
-
-    let username = req.body.username.toString();
-    let password = req.body.password.toString();
-
+    let username =req.body.username.toString();
+    let password =req.body.password.toString();
     // Find the user by username in the database
     const user = await User.findOne({ username });
 
-    if (!user) {
-      // If user is not found, return a specific error message
-      return res.status(401).json({
-        errorCode: 'USER_NOT_FOUND',
-        errorMessage: 'Usuario no encontrado'
-      });
+
+    // Check if the user exists and verify the password
+    if (user && await bcrypt.compare(password, user.password)) {
+      // Generate a JWT token
+      const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
+      // Respond with the token and user information
+      res.json({ token: token, username: username, createdAt: user.createdAt });
+    } else {
+      res.status(401).json({ error: 'Invalid credentials' });
     }
-
-    // Check if the password is correct
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordCorrect) {
-      // If the password is incorrect, return a specific error message
-      return res.status(401).json({
-        errorCode: 'INVALID_PASSWORD',
-        errorMessage: 'Contraseña incorrecta'
-      });
-    }
-
-    // If login is successful, generate a JWT token
-    const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
-
-    // Respond with the token and user information
-    res.json({
-      token: token,
-      username: username,
-      createdAt: user.createdAt
-    });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }

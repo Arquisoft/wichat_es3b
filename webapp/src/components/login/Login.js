@@ -36,13 +36,13 @@ const Login = ({ handleToggleView }) => {
     setShowPassword(!showPassword);
   };
 
+  // Iniciar sesión
   const loginUser = async () => {
     try {
-      const response = await axios.post(
-          `${GATEWAY_URL}/login`,
-          { username, password }
-      );
-
+      const response = await axios.post(`${GATEWAY_URL}/login`, {
+        username,
+        password,
+      });
       const { token } = response.data;
       // Guardar token en localStorage
       localStorage.setItem("token", token);
@@ -52,20 +52,10 @@ const Login = ({ handleToggleView }) => {
       setMessage(`Bienvenido, ${username}!`);
       navigate("/home");
     } catch (error) {
-      if (error.response) {
-        const { errorCode, errorMessage } = error.response.data;
-        if (errorCode === "USER_NOT_FOUND") {
-          setError(t("usernameIncorrect"));
-        } else if (errorCode === "INVALID_PASSWORD") {
-          setError(t("passwordIncorrect"));
-        } else {
-          setError(t("failedLogin"));
-        }
-      } else {
-        setError("Error de comunicación con el servidor.");
-      }
+      setError(error.response?.data?.error || t("failedLogin"));
     }
   };
+
 
 
   // Cerrar sesión
