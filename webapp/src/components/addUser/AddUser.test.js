@@ -268,13 +268,13 @@ describe("AddUser Component", () => {
     clickCreateAccountButton();
   
     await waitFor(() => {
-      expect(screen.getByText(/Usuario creado con éxito/i)).toBeInTheDocument();
+      expect(screen.getByText(/Usuario añadido correctamente/i)).toBeInTheDocument();
     });
   
     jest.advanceTimersByTime(6000);
   
     await waitFor(() => {
-      expect(screen.queryByText(/Usuario creado con éxito/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Usuario añadido correctamente/i)).not.toBeInTheDocument();
     });
   
     jest.useRealTimers();
