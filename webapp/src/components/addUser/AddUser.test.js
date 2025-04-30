@@ -176,7 +176,7 @@ describe("AddUser Component", () => {
         username: validUserData.username,
         password: validUserData.password,
       });
-      expect(screen.getByText(/Usuario creado con éxito/i)).toBeInTheDocument();
+      expect(screen.getByText(/Usuario añadido correctamente/i)).toBeInTheDocument();
     });
   });
 
