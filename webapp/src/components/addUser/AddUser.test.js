@@ -202,7 +202,7 @@ describe("AddUser Component", () => {
     fillFormFields();
     clickCreateAccountButton();
 
-    const successMessage = await screen.findByText(/Usuario añadido correctamente/i);
+    let successMessage = await screen.findByText(/Usuario añadido correctamente/i);
     expect(successMessage).toBeInTheDocument();
 
   });
@@ -267,13 +267,13 @@ describe("AddUser Component", () => {
     fillFormFields();
     clickCreateAccountButton();
 
-    const successMessage = await screen.findByText(/Usuario añadido correctamente/i);
+    let successMessage = await screen.findByText(/Usuario añadido correctamente/i);
     expect(successMessage).toBeInTheDocument();
 
 
     jest.advanceTimersByTime(6000);
 
-    const successMessage = await screen.findByText(/Usuario añadido correctamente/i);
+    successMessage = await screen.findByText(/Usuario añadido correctamente/i);
     expect(successMessage).toBeInTheDocument();
 
 
