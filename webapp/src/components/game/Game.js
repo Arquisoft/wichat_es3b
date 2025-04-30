@@ -417,6 +417,7 @@ const Game = ({ onGameEnd }) => {
               <div className="answerPanel">
                 {shuffledAnswers.map((respuesta, index) => (
                     <BaseButton
+                        id={`answer-${index}`}
                         key={index}
                         text={respuesta}
                         onClick={() => handleAnswerClick(respuesta)}
