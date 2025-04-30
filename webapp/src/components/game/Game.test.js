@@ -230,12 +230,13 @@ test("responde correctamente y actualiza el puntaje", async () => {
   render(<Game />);
   await waitFor(() => screen.getByText("Pregunta 1"));
 
-  expect(screen.getByText("0")).toBeInTheDocument();
+  const scoreDisplay = screen.getByText("score:").nextElementSibling;
+  expect(scoreDisplay).toHaveTextContent("0");
 
   fireEvent.click(screen.getByTestId("button-Correcta1"));
 
   await waitFor(() => {
-    expect(screen.getByText("10")).toBeInTheDocument();
+    expect(scoreDisplay).toHaveTextContent("30");
   });
 });
 
@@ -336,10 +337,18 @@ test("muestra el resumen al finalizar el juego", async () => {
   await waitFor(() => {
     expect(screen.getByTestId("info-dialog")).toBeInTheDocument();
     expect(screen.getByText("summaryTitle")).toBeInTheDocument();
-    expect(screen.getByText("summaryCorrect 1")).toBeInTheDocument();
-    expect(screen.getByText("summaryIncorrect 0")).toBeInTheDocument();
-    expect(screen.getByText("summaryRatio 100%")).toBeInTheDocument();
-    expect(screen.getByText("summaryMaxScore 10")).toBeInTheDocument();
+    expect(screen.getByText(/summaryCorrect/)).toHaveTextContent(
+      "summaryCorrect 1"
+    );
+    expect(screen.getByText(/summaryIncorrect/)).toHaveTextContent(
+      "summaryIncorrect 0"
+    );
+    expect(screen.getByText(/summaryRatio/)).toHaveTextContent(
+      "summaryRatio 100%"
+    );
+    expect(screen.getByText(/summaryMaxScore/)).toHaveTextContent(
+      "summaryMaxScore 30"
+    );
   });
 });
 
