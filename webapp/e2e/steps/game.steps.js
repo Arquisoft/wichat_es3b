@@ -52,6 +52,117 @@ defineFeature(feature, test => {
             await browser.close();
             throw error;
         }
+
+        // Habilitar la interceptación de solicitudes
+        await page.setRequestInterception(true);
+
+        page.on('request', (request) => {
+            if (request.url().includes('/questionsDB')) {
+                // Responder con el JSON corregido
+                request.respond({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify([
+                        {
+                            "pregunta": {
+                                "es": "¿Con qué país comparte frontera Japón?",
+                                "en": "Which country shares a border with Japón?"
+                            },
+                            "respuestaCorrecta": {
+                                "es": "Estados Unidos",
+                                "en": "United States"
+                            },
+                            "respuestas": {
+                                "es": [
+                                    "Estados Unidos",
+                                    "Reino de Dinamarca",
+                                    "Finlandia",
+                                    "Suecia"
+                                ],
+                                "en": [
+                                    "United States",
+                                    "Kingdom of Denmark",
+                                    "Finland",
+                                    "Sweden"
+                                ]
+                            },
+                            "descripcion": [
+                                {
+                                    "propiedad": "capital",
+                                    "valor": "Tokio"
+                                },
+                                {
+                                    "propiedad": "jefe de Estado",
+                                    "valor": "Naruhito"
+                                },
+                                {
+                                    "propiedad": "participó en",
+                                    "valor": "Grupo de los cuatro"
+                                },
+                                {
+                                    "propiedad": "idioma oficial",
+                                    "valor": "japonés"
+                                }
+                            ],
+                            "img": [
+                                "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Japan.svg"
+                            ]
+                        },
+                        {
+                            "pregunta": {
+                                "es": "¿Cuál es el estadio del club de fútbol Juventus?",
+                                "en": "What is the stadium of the football club Juventus?"
+                            },
+                            "respuestaCorrecta": {
+                                "es": "Juventus Stadium",
+                                "en": "Juventus Stadium"
+                            },
+                            "respuestas": {
+                                "es": [
+                                    "Estadio Luigi Ferraris",
+                                    "Parc Olympique lyonnais",
+                                    "Juventus Stadium",
+                                    "Estadio Giuseppe Meazza"
+                                ],
+                                "en": [
+                                    "Stadio Luigi Ferraris",
+                                    "Parc Olympique Lyonnais",
+                                    "Juventus Stadium",
+                                    "Giuseppe Meazza Stadium"
+                                ]
+                            },
+                            "descripcion": [
+                                {
+                                    "propiedad": "fecha de fundación o creación",
+                                    "valor": "1/11/1897"
+                                },
+                                {
+                                    "propiedad": "ubicación de la sede",
+                                    "valor": "Turín"
+                                },
+                                {
+                                    "propiedad": "país",
+                                    "valor": "Italia"
+                                },
+                                {
+                                    "propiedad": "fundador",
+                                    "valor": "Carlo Vittorio Varetti"
+                                },
+                                {
+                                    "propiedad": "entrenador",
+                                    "valor": "Igor Tudor"
+                                }
+                            ],
+                            "img": [
+                                "http://commons.wikimedia.org/wiki/Special:FilePath/Juventus%20FC%20-%20logo%20black%20%28Italy%2C%202020%29.svg"
+                            ]
+                        }
+                    ])
+                });
+            } else {
+                request.continue();
+            }
+        });
     });
 
     test('The user is able to play a game', ({ given, when, then }) => {
