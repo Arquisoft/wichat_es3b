@@ -7,6 +7,7 @@ import { Route, Routes } from "react-router-dom";
 import PlayView from "./pages/playView/PlayView.js";
 import PrivateRoute from "./components/routes/PrivateRoute.js";
 import Ranking from './pages/ranking/Ranking.js'
+import ApiKeyGenerator from "./pages/apiKeyGenerator/ApiKeyGenerator.js";
 
 function App() {
   return (
@@ -23,15 +24,22 @@ function App() {
         }
       />
       <Route
-        path="/profile"
+        path="/profile/"
         element={
           <PrivateRoute>
             <PerfilPage />
           </PrivateRoute>
         }
       />
+      <Route
+        path="/stats/:username"
+        element={
+            <PerfilPage />
+        }
+      />
       <Route path="/home" element={<Home />} />
       <Route path="/ranking" element={<Ranking/>} />
+      <Route path="/apiKeyGenerator" element={<ApiKeyGenerator/>} />
     </Routes>
   );
 }

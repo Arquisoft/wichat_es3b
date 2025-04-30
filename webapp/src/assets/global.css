@@ -38,3 +38,10 @@ h1 {
   font-size: var(--font-size-xl);
   font-weight: 700;
 }
+
+.main-container{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}

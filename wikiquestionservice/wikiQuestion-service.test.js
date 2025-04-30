@@ -227,17 +227,18 @@ describe('Wikidata Service', () => {
         });
 
         it('should return answers in random order', () => {
-            const respuestaCorrecta = { es: 'Respuesta correcta' };
-            const preguntas = { es: '¿Cuál es la capital de Francia?' };
+            const respuestaCorrecta     = { es: 'Respuesta correcta' };
+            const preguntas             = { es: '¿Cuál es la capital de Francia?' };
             const respuestasIncorrectas = { es: ['Madrid', 'Roma', 'Londres'] };
-            const descripcion = [{ propiedad: 'Capital', valor: 'París' }];
-            const img = ['img1.jpg'];
+            const descripcion           = [{ propiedad: 'Capital', valor: 'París' }];
+            const img                   = ['img1.jpg'];
 
-            const question = new Question(respuestaCorrecta, preguntas, respuestasIncorrectas, descripcion, img);
+            const question  = new Question(respuestaCorrecta, preguntas, respuestasIncorrectas, descripcion, img);
             const respuestas = question.obtenerRespuestas()['es'];
-            const original = ['Respuesta correcta', 'Madrid', 'Roma', 'Londres'];
+            const original   = ['Respuesta correcta', 'Madrid', 'Roma', 'Londres'];
 
-            expect(respuestas.sort()).toEqual(original.sort());
+            const cmp = (a, b) => a.localeCompare(b, 'es', { sensitivity: 'variant' });
+            expect(respuestas.sort(cmp)).toEqual(original.sort(cmp));
         });
 
         it('should return the image associated with the question', () => {

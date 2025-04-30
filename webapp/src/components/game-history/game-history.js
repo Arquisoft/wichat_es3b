@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import "./game-history.css";
+import { useTranslation } from "react-i18next";
 
 // Componente para mostrar el historial de partidas
 export default function GameHistory({ games, currentIndex, onNavigate }) {
+  const { t } = useTranslation();
   // Estado para controlar la animación
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -40,7 +42,7 @@ export default function GameHistory({ games, currentIndex, onNavigate }) {
 
   return (
     <section className="history-section">
-      <h2 className="section-title">Histórico de partidas</h2>
+      <h2 className="section-title">{t("gameHistory")}</h2>
 
       <div className="carousel-container">
         {/* Botón de navegación izquierdo */}
@@ -68,12 +70,16 @@ export default function GameHistory({ games, currentIndex, onNavigate }) {
             >
               <div className="game-date">{game.date}</div>
               <div className="game-number">#{game.id}</div>
-              <div className="game-score">{game.score} puntos</div>
-              <div className="game-correct">{game.correct} aciertos</div>
+              <div className="game-score">{`${game.score} ${t("points")}`}</div>
+              <div className="game-correct">{`${game.correct} ${t(
+                "rightQuestions"
+              ).toLowerCase()}`}</div>
               <div className="game-ratio">
-                Ratio aciertos/fallos: {parseFloat(game.ratio).toFixed(2)}
+                {`${t("rightAnswersRatio")}: ${parseFloat(game.ratio).toFixed(
+                  2
+                )}`}
               </div>
-              <div className="game-time">Tiempo: {game.time}</div>
+              <div className="game-time">{`${t("time")}: ${game.time}`}</div>
             </div>
           ))}
         </div>

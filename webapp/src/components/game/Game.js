@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useRef, useCallback } from "react"; // Added useCallback
+import { useEffect, useState, useRef, useCallback } from "react";
 import "./Game.css";
 import HintButton from "../hintButton/HintButton";
 import BaseButton from "../button/BaseButton";
@@ -11,12 +11,12 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
-// Added onGameEnd prop
+
 const Game = ({ onGameEnd }) => {
   const { i18n, t } = useTranslation();
   const currentLanguage = i18n.language || "es";
 
-  // --- State Variables ---
+
   const [questionNumber, setQuestionNumber] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -304,6 +304,33 @@ const Game = ({ onGameEnd }) => {
     return <div className="loading-div"><h1>Error: No question data available.</h1></div>;
   }
 
+  const getCategoryDisplay = () => {
+    if (!config || !config.categories || config.categories.length === 0)
+      return "";
+
+    if (config.categories.length > 1) {
+      return t("various") + " 🧩";
+    }
+  
+
+    const category = config.categories[0];
+    switch (category) {
+      case "clubes":
+        return t("football") + " ⚽";
+      case "cine":
+        return t("cinema") + " 🎬" ;
+      case "literatura":
+        return t("literature") + " 📚";
+      case "paises":
+        return t("countries") + " 🌎";
+      case "arte":
+        return t("art") + " 🎨" ;
+      case "all":
+      default:
+        return t("all") + " 🧠";
+    }
+  };
+
   return (
       <div className="gameContainer">
         {/* Main Game Area */}
@@ -350,6 +377,7 @@ const Game = ({ onGameEnd }) => {
                 onAnimationComplete={() => setQuestionAnimationComplete(true)}
             >
               <div className="question-section">
+                <div className="categoryDisplay"><h1>{getCategoryDisplay()}</h1></div>
                 <div className="questionNumber">
                   <h2>{`${t('question')} ${questionNumber + 1}/${config?.numPreguntas || 10}`}</h2>
                   {/* Enable next button only after answered and if not the last question */}

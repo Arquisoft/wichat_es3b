@@ -8,6 +8,8 @@ servers:
     description: Development server
   - url: http://SOMEIP:8006
     description: Production server
+security:
+  - apiKeyAuth: []
 paths:
   /health:
     get:
@@ -15,6 +17,7 @@ paths:
       operationId: checkHealth
       tags:
         - System
+      security: []  # No authentication required for health check
       responses:
         '200':
           description: Service is healthy.
@@ -37,7 +40,7 @@ paths:
           description: Number of questions to retrieve
         - name: topic
           in: path
-          required: true
+          required: false
           schema:
             type: string
           description: Topic of the questions (e.g., "all", "history", "history,geography")
@@ -50,6 +53,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/QuestionSummary'
+        '401':
+          description: Unauthorized - API key is missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Internal server error
           content:
@@ -76,6 +85,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserStats'
+        '401':
+          description: Unauthorized - API key is missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: User not found
           content:
@@ -89,6 +104,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key to authenticate requests
   schemas:
     HealthStatus:
       type: object

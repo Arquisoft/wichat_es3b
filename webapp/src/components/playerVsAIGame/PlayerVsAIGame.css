@@ -1,369 +1,196 @@
-/* Import global styles - Ensure path is correct */
 @import url("../../assets/global.css");
 
-/* --- Base Game Container --- */
-/* Styles for the main container of the game */
-.gameContainer.player-vs-ai {
-    display: flex; /* Use flexbox for layout */
-    flex-direction: column; /* Stack children vertically */
-    height: 100vh; /* Full viewport height */
-    width: 100%; /* Full width */
-    overflow: hidden; /* Prevent scrolling on the main container */
-    /* Background color is inherited from global styles (e.g., body) */
-}
 
-/* Styles for the loading indicator */
-.loading-div {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Center vertically */
-    align-items: center; /* Center horizontally */
-    font-size: 1.5rem; /* Text size */
-    color: var(--color-primario); /* Use primary color */
-    background-color: transparent; /* Ensure no conflicting background */
-}
-
-/* --- Main Content Area --- */
-/* Styles for the <main> element holding the game layout */
-main {
-    flex: 1; /* Allow main to grow and take available space */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center game layout horizontally */
-    width: 100%;
-    overflow: hidden; /* Prevent overflow within main */
-    padding: 1rem 0; /* Vertical padding */
-    margin: 0;
-    box-sizing: border-box; /* Include padding in size calculation */
-}
-
-/* --- 3-Column Layout --- */
-/* Container for the three main columns */
-.game-layout {
-    display: flex; /* Use flexbox for columns */
-    width: 100%;
-    max-width: 1400px; /* Maximum width of the game area */
-    height: 100%; /* Take full height of parent (main) */
-    overflow: hidden; /* Prevent overflow */
-    padding: 0 1rem; /* Horizontal padding */
-    box-sizing: border-box;
-    gap: 1.5rem; /* Space between columns */
-}
-
-/* Apply specificity using the parent class .player-vs-ai */
-/* Styles for the left column (Scoreboard, AI) */
-.player-vs-ai .left-column {
-    width: 22%; /* Adjusted width */
-    min-width: 200px; /* Minimum width */
-    padding: 0.5rem 0; /* Vertical padding only */
-    position: relative; /* For potential absolute positioning inside */
-    display: flex;
-    flex-direction: column; /* Stack scoreboard and AI vertically */
-    align-items: center; /* Center items horizontally in the column */
-    gap: 1.5rem; /* Space between scoreboard and AI container */
-    justify-content: flex-start; /* Align items to the top */
-}
-
-/* Styles for the center column (Question, Answers, Timer) */
-.player-vs-ai .center-column {
-    width: 56%; /* Adjusted width */
-    padding: 0.5rem; /* Internal padding */
-    display: flex;
-    flex-direction: column; /* Stack question/answers/timer vertically */
-    align-items: center; /* Center items horizontally */
-    justify-content: flex-start; /* Align content to the top */
-    gap: 1rem; /* Space between elements */
-    overflow: visible; /* Avoid scrollbars unless content truly overflows */
-    height: 100%; /* Allow column to use full height */
-}
-
-/* Styles for the right column (Rules button) */
-.player-vs-ai .right-column {
-    width: 22%; /* Adjusted width */
-    min-width: 180px; /* Minimum width */
-    padding: 0.5rem 0; /* Vertical padding only */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center items horizontally */
-    justify-content: flex-start; /* Align items (button section) to the top */
-    height: 100%;
-}
-
-/* --- Combined Scoreboard (Left Column) --- */
-/* Styles for the scoreboard container */
-.player-vs-ai .combined-scoreboard-left {
-    display: flex;
-    flex-direction: column; /* Stack AI/Player lines */
-    align-items: flex-start; /* Align text left */
-    gap: 0.3rem; /* Space between lines */
-    background-color: var(--color-fondo-marcador, rgba(255, 255, 255, 0.8)); /* Background */
-    padding: 0.75rem 1rem; /* Padding */
-    border-radius: var(--border-radius-md, 8px); /* Rounded corners */
-    box-shadow: var(--shadow-sm); /* Subtle shadow */
-    border: 1px solid var(--color-borde-marcador, rgba(0, 0, 0, 0.1)); /* Border */
-    width: 100%; /* Take full width of parent column */
-    max-width: 280px; /* Max width */
-    box-sizing: border-box;
-}
-
-/* Styles for individual lines within the scoreboard */
-.player-vs-ai .scoreboard-line {
-    display: flex;
-    align-items: center; /* Vertically align items in the line */
-    gap: 0.5rem; /* Space between name, score, indicator */
-    width: 100%;
-}
-/* Style for the separator line (-) */
-.player-vs-ai .scoreboard-line.separator {
-    justify-content: center; /* Center the dash */
-    font-weight: bold;
-    color: var(--color-texto-secundario, #aaa);
-    margin: 0.1rem 0; /* Small vertical margin */
-    font-size: 1.1rem;
-}
-/* Base style for text within scoreboard lines */
-.player-vs-ai .scoreboard-line span {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--color-texto-primario, #333);
-}
-/* Specific styles for names and scores */
-.player-vs-ai .scoreboard-line .ai-name { font-weight: bold; color: var(--color-ai, #e74c3c); flex-shrink: 0; }
-.player-vs-ai .scoreboard-line .player-name { font-weight: bold; color: var(--color-jugador, #3498db); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-grow: 1; min-width: 50px; }
-.player-vs-ai .scoreboard-line .score { font-weight: bold; font-size: 1.1rem; margin-left: auto; /* Push score right */ padding-left: 0.5rem; flex-shrink: 0; }
-
-/* Styles for the correct/incorrect checkmark/cross indicator */
-.player-vs-ai .answer-indicator {
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 0.85rem;
-    line-height: 1;
-    margin-left: 0.3rem; /* Space before indicator */
-    min-width: 18px;
-    text-align: center;
-    flex-shrink: 0; /* Prevent shrinking */
-}
-.player-vs-ai .answer-indicator.correct { background-color: var(--color-correcto-fondo, #2ecc71); color: white; }
-.player-vs-ai .answer-indicator.incorrect { background-color: var(--color-incorrecto-fondo, #e74c3c); color: white; }
-
-
-/* --- AI Character --- */
-/* Container for the robot image and bubbles */
-.player-vs-ai .ai-character-container {
-    display: flex;
-    flex-direction: column;
+.left-column.player-vs-ai{
     align-items: center;
-    justify-content: center;
-    padding: 0; /* No internal padding */
-    width: 100%;
+    gap: 3em;
 }
-/* Container for the image itself and absolutely positioned bubbles */
+
+.player-vs-ai .combined-scoreboard-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  background-color: var(
+    --color-fondo-marcador,
+    rgba(255, 255, 255, 0.8)
+  ); 
+  padding: 0.75rem 1rem; 
+  border-radius: var(--border-radius-md, 8px);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-borde-marcador, rgba(0, 0, 0, 0.1)); 
+  width: 100%;
+  max-width: 280px;
+  box-sizing: border-box;
+}
+
+.player-vs-ai .scoreboard-line {
+  display: flex;
+  align-items: center; 
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.player-vs-ai .scoreboard-line.separator {
+  justify-content: center; 
+  font-weight: bold;
+  color: var(--color-texto-secundario, #aaa);
+  margin: 0.1rem 0;
+  font-size: 1.1rem;
+}
+
+.player-vs-ai .scoreboard-line span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-texto-primario, #333);
+}
+
+.player-vs-ai .scoreboard-line .ai-name {
+  font-weight: bold;
+  color: var(--color-ai, #e74c3c);
+  flex-shrink: 0;
+}
+.player-vs-ai .scoreboard-line .player-name {
+  font-weight: bold;
+  color: var(--color-jugador, #3498db);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-grow: 1;
+  min-width: 50px;
+}
+.player-vs-ai .scoreboard-line .score {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-left: auto;
+  padding-left: 0.5rem;
+  flex-shrink: 0;
+}
+
+.player-vs-ai .answer-indicator {
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  line-height: 1;
+  margin-left: 0.3rem; 
+  min-width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.player-vs-ai .answer-indicator.correct {
+  background-color: var(--color-correcto-fondo, #2ecc71);
+  color: white;
+}
+.player-vs-ai .answer-indicator.incorrect {
+  background-color: var(--color-incorrecto-fondo, #e74c3c);
+  color: white;
+}
+
+.player-vs-ai .ai-character-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 100%;
+}
+
 .player-vs-ai .ai-robot {
-    position: relative; /* Needed for bubble positioning */
-    width: 100%; /* Take container width */
-    display: flex;
-    justify-content: center; /* Center image */
-    margin-bottom: 1rem; /* Space below robot */
+  position: relative; 
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
 }
-/* Robot image style */
+
 .player-vs-ai .robot-image {
-    width: 140px; /* Robot size */
-    height: 140px;
-    object-fit: contain; /* Maintain aspect ratio */
-    content: url("../../assets/img/FriendlyRobotThinking.png"); /* Check path */
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  content: url("../../assets/img/FriendlyRobotThinking.png");
 }
-/* Speech and thinking bubble styles */
+
 .player-vs-ai .ai-speech-bubble,
 .player-vs-ai .ai-thinking-bubble {
-    position: absolute; /* Position relative to .ai-robot */
-    top: -15px; /* Position above the robot */
-    right: -5px; /* Position slightly to the right */
-    background: white;
-    border: 2px solid var(--color-primario);
-    border-radius: 15px;
-    padding: 10px 12px;
-    max-width: 180px; /* Limit bubble width */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow effect */
-    z-index: 10; /* Ensure bubbles are above image */
-    font-size: 0.9rem;
-    white-space: normal; /* Allow text wrapping */
-}
-/* Triangle/arrow for the bubbles */
-.player-vs-ai .ai-speech-bubble:after, .player-vs-ai .ai-thinking-bubble:after { content: ""; position: absolute; bottom: -10px; left: 20px; border-width: 10px 10px 0; border-style: solid; border-color: white transparent; display: block; width: 0; }
-.player-vs-ai .ai-speech-bubble:before, .player-vs-ai .ai-thinking-bubble:before { content: ""; position: absolute; bottom: -12px; left: 19px; border-width: 11px 11px 0; border-style: solid; border-color: var(--color-primario) transparent; display: block; width: 0; z-index: -1; }
-/* Thinking dots animation */
-.player-vs-ai .thinking-dots { overflow: hidden; display: inline-block; vertical-align: bottom; width: 20px; animation: thinking 1.5s infinite steps(3, end); }
-@keyframes thinking { 0% { clip-path: inset(0 100% 0 0); } 33% { clip-path: inset(0 66% 0 0); } 66% { clip-path: inset(0 33% 0 0); } 100% { clip-path: inset(0 0 0 0); } }
-.player-vs-ai .ai-thinking-bubble span:first-child::after { content: '...'; position: absolute; left: 0; top: 0; opacity: 0; }
-
-
-/* --- Center Column Content --- */
-/* Container for question text, counter, button */
-.player-vs-ai .question-section {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 0.5rem;
-    background-color: var(--color-fondo-pregunta, #fff); /* Background for this section */
-    padding: 1rem 1.5rem; /* Padding */
-    border-radius: var(--border-radius-lg, 12px); /* Rounded corners */
-    box-shadow: var(--shadow-md); /* Shadow */
-    box-sizing: border-box;
+  position: absolute;
+  top: -15px;
+  right: -5px; 
+  background: white;
+  border: 2px solid var(--color-primario);
+  border-radius: 15px;
+  padding: 10px 12px;
+  max-width: 180px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  z-index: 10;
+  font-size: 0.9rem;
+  white-space: normal;
 }
 
-/* Container for the "Question X/N" text and the next button */
-.player-vs-ai .questionNumber {
-    display: flex; /* Use flexbox */
-    justify-content: center; /* Center items horizontally */
-    align-items: center; /* Vertically align items */
-    gap: 0.8em; /* Space between text and button */
-    margin-bottom: 0.75rem; /* Space below this container */
-    width: 100%; /* Take full width to allow centering */
+.player-vs-ai .ai-speech-bubble:after,
+.player-vs-ai .ai-thinking-bubble:after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 20px;
+  border-width: 10px 10px 0;
+  border-style: solid;
+  border-color: white transparent;
+  display: block;
+  width: 0;
+}
+.player-vs-ai .ai-speech-bubble:before,
+.player-vs-ai .ai-thinking-bubble:before {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 19px;
+  border-width: 11px 11px 0;
+  border-style: solid;
+  border-color: var(--color-primario) transparent;
+  display: block;
+  width: 0;
+  z-index: -1;
 }
 
-/* Style for the "Question X/N" text (H2) */
-.player-vs-ai .questionNumber h2 {
-    font-style: normal;
-    font-size: var(--font-size-md); /* Use defined font size */
-    margin: 0; /* Remove default margin */
-    color: #666; /* Explicit visible gray color */
-    opacity: 1;
-    visibility: visible;
-    line-height: 1.2; /* Ensure proper line height */
-    text-align: left; /* Align text left within its own box */
+.player-vs-ai .thinking-dots {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: bottom;
+  width: 20px;
+  animation: thinking 1.5s infinite steps(3, end);
+}
+@keyframes thinking {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  33% {
+    clip-path: inset(0 66% 0 0);
+  }
+  66% {
+    clip-path: inset(0 33% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.player-vs-ai .ai-thinking-bubble span:first-child::after {
+  content: "...";
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
 }
 
-/* Style for the main question text (H1) */
-.player-vs-ai .question-section h1 {
-    font-size: calc(var(--font-size-xl) * 0.9); /* Question text size */
-    margin-bottom: 0.75rem; /* Space below question */
-    overflow-y: auto; /* Allow scrolling if text is very long */
-    max-height: 5em; /* Limit height */
-    line-height: 1.3; /* Line spacing */
-    color: var(--color-primario); /* Use primary color (blue) */
+/* .summaryContent {
+  text-align: center;
+  padding: 1rem 0;
 }
-
-/* --- Next Arrow Button Styling --- */
-/* Removed CSS rules for .next-arrow-button, .enabled, .disabled */
-/* Styles are now handled inline via the 'style' prop in the JS */
-
-
-/* Optional Image container */
-.player-vs-ai .question-image {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 1rem;
-    max-height: 30vh; /* Max height relative to viewport */
-    min-height: 150px; /* Min height */
-    overflow: hidden; /* Hide parts of image that overflow */
-    border-radius: var(--border-radius-md);
+.summaryContent h3 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
 }
-.player-vs-ai .question-image img { object-fit: contain; max-width: 100%; max-height: 100%; display: block; }
-
-/* Answer Buttons Panel */
-.player-vs-ai .answerPanel {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 columns */
-    gap: 0.75em; /* Gap between buttons */
-    width: 100%;
-    margin-bottom: 0.5rem; /* Space below answers */
-    box-sizing: border-box;
-}
-/* Style for individual answer buttons */
-.player-vs-ai .answerPanel button {
-    width: 100%; /* Full width of grid cell */
-    padding: 0.75rem 1rem; /* Padding inside button */
-    height: auto; /* Auto height based on content */
-    min-height: 50px; /* Minimum button height */
-    white-space: normal; /* Allow text wrapping */
-    line-height: 1.3; /* Line spacing */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    font-size: 1rem; /* Text size */
-    box-sizing: border-box;
-}
-
-/* Timer Section */
-.player-vs-ai .timer-section {
-    width: 100%;
-    margin-top: 1rem; /* Space above timer */
-    padding: 0.5rem 1rem; /* Padding inside section */
-    background-color: var(--color-fondo-timer, #fff); /* Background */
-    border-radius: var(--border-radius-md); /* Rounded corners */
-    box-shadow: var(--shadow-sm); /* Shadow */
-    box-sizing: border-box;
-}
-/* Progress bar style */
-.player-vs-ai #progressBar { height: 0.75em; background-color: lightgray; border-radius: 5px; }
-.player-vs-ai #progressBar .MuiLinearProgress-bar { background-color: var(--color-primario); transition: transform .4s linear; /* Smooth animation */ }
-/* Timer text style */
-.player-vs-ai .timer-section span { color: var(--color-primario); font-weight: bold; font-size: 0.9rem; }
-
-/* --- Right Column Content --- */
-/* Container for the rules button */
-.player-vs-ai .rules-points-section {
-    align-items: center; /* Center button horizontally */
-    display: flex;
-    flex-direction: column;
-    gap: 1rem; /* Gap if there were more elements */
-    width: 100%; /* Take width of parent column */
-    max-width: 200px; /* Max width for the button */
-    margin-top: 0; /* Align to top */
-    margin-bottom: auto; /* Push down other potential elements */
-    box-sizing: border-box;
-}
-/* Ensure the BaseButton component takes the width */
-.player-vs-ai .rules-points-section .buttonSecondary { width: 100%; }
-
-/* --- Dialogs (Rules & Summary) --- */
-/* Overlay for dialogs */
-.overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(3px); /* Blur background */ }
-/* Class to apply blur to main content when overlay is active */
-main.blurred { filter: blur(5px); pointer-events: none; }
-/* Container for the dialog content */
-.dialogGameRulesContainer { width: 90%; max-width: 500px; background-color: white; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); }
-/* Specific styles for summary content */
-.summaryContent { text-align: center; padding: 1rem 0; }
-.summaryContent h3 { margin-bottom: 1rem; font-size: 1.5rem; }
-.summaryContent p { margin: 0.5rem 0; font-size: 1.1rem; }
-
-/* --- Responsive Adjustments --- */
-/* Styles for screens up to 1000px wide */
-@media (max-width: 1000px) {
-    .player-vs-ai .game-layout { flex-direction: column; height: auto; overflow-y: auto; padding: 0 0.5rem; gap: 1rem; }
-    .player-vs-ai .left-column, .player-vs-ai .center-column, .player-vs-ai .right-column { width: 100%; height: auto; padding: 0.5rem; overflow: visible; min-width: unset; }
-    .player-vs-ai .left-column { order: 1; flex-direction: row; justify-content: space-around; align-items: center; }
-    .player-vs-ai .combined-scoreboard-left { width: auto; max-width: none; }
-    .player-vs-ai .ai-character-container { padding: 0; width: auto; }
-    .player-vs-ai .center-column { order: 2; justify-content: flex-start; }
-    .player-vs-ai .right-column { order: 3; justify-content: center; padding-bottom: 1rem; }
-    .player-vs-ai .rules-points-section { margin-top: 1rem; margin-bottom: 0; }
-    .player-vs-ai .question-image { max-height: 25vh; }
-    .player-vs-ai .answerPanel { grid-template-columns: 1fr 1fr; } /* Keep 2 columns if possible */
-}
-/* Styles for screens up to 768px wide */
-@media (max-width: 768px) {
-    .player-vs-ai .left-column { flex-direction: column; align-items: center; }
-    .player-vs-ai .combined-scoreboard-left { width: 90%; }
-    .player-vs-ai .ai-character-container { margin-top: 1rem; }
-    .player-vs-ai .answerPanel { grid-template-columns: 1fr; gap: 0.5em; } /* Force single column */
-    .player-vs-ai .question-section h1 { font-size: calc(var(--font-size-lg) * 0.95); }
-    .dialogGameRulesContainer { width: 95%; }
-}
-/* Styles for screens up to 480px wide */
-@media (max-width: 480px) {
-    .player-vs-ai .combined-scoreboard-left { padding: 0.5rem 0.75rem; }
-    .player-vs-ai .scoreboard-line span { font-size: 0.9rem; }
-    .player-vs-ai .scoreboard-line .score { font-size: 1rem; }
-    .player-vs-ai .answer-indicator { font-size: 0.8rem; padding: 0.1rem 0.3rem; }
-    .player-vs-ai .robot-image { width: 100px; height: 100px; } /* Smaller robot */
-    .player-vs-ai .ai-speech-bubble, .player-vs-ai .ai-thinking-bubble { max-width: 140px; font-size: 0.8rem; padding: 8px 10px; right: 0; }
-    .player-vs-ai .answerPanel button { font-size: 0.9rem; padding: 0.6rem 0.8rem; min-height: 45px; }
-}
-
+.summaryContent p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+} */
