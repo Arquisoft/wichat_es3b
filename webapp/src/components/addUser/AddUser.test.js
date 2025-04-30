@@ -176,7 +176,7 @@ describe("AddUser Component", () => {
         username: validUserData.username,
         password: validUserData.password,
       });
-      expect(screen.getByText(/Usuario añadido correctamente/i)).toBeInTheDocument();
+      expect(screen.findByText(/Usuario añadido correctamente/i)).toBeInTheDocument();
     });
   });
 
@@ -268,13 +268,13 @@ describe("AddUser Component", () => {
     clickCreateAccountButton();
   
     await waitFor(() => {
-      expect(screen.getByText(/Usuario añadido correctamente/i)).toBeInTheDocument();
+      expect(screen.findByText(/Usuario añadido correctamente/i)).toBeInTheDocument();
     });
   
     jest.advanceTimersByTime(6000);
   
     await waitFor(() => {
-      expect(screen.queryByText(/Usuario añadido correctamente/i)).not.toBeInTheDocument();
+      expect(screen.findByText(/Usuario añadido correctamente/i)).not.toBeInTheDocument();
     });
   
     jest.useRealTimers();
