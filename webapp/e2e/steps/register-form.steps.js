@@ -34,7 +34,7 @@ defineFeature(feature, test => {
       try {
 
         const buttonExists = await page.evaluate(() => {
-          const button = document.querySelector('#create-button');
+          const button = document.querySelector('#buttonSecondary');
           return button !== null;
         });
 
@@ -54,11 +54,11 @@ defineFeature(feature, test => {
           fs.writeFileSync(htmlPath, pageContent);
           console.log(`Guardando HTML de la página en: ${htmlPath}`);
 
-          throw new Error('El botón #create-button no está presente en el DOM');
+          throw new Error('El botón #buttonSecondary no está presente en el DOM');
         }
 
         // Esperar a que aparezca el botón para cambiar a la vista de registro
-        await page.waitForSelector('#create-button', { visible: true, timeout: 5000 });
+        await page.waitForSelector('button', { visible: true, timeout: 5000 });
         await expect(page).toClick('button', { text: 'Crear cuenta' });
 
       } catch (error) {
@@ -104,7 +104,7 @@ defineFeature(feature, test => {
         console.log('Completamos confirm password');
         await page.waitForTimeout(500);
 
-        await page.waitForSelector('#create-button', { visible: true, timeout: 5000 });
+        await page.waitForSelector('button', { visible: true, timeout: 5000 });
         await expect(page).toClick('button', { text: 'Crear cuenta' });
 
       } catch (error) {
