@@ -142,10 +142,18 @@ afterEach(() => {
 
 test("carga inicial y renderiza la primera pregunta", async () => {
   render(<Game />);
+
+  // Wait for the first question text to appear
   await waitFor(() => {
     expect(screen.getByText("Pregunta 1")).toBeInTheDocument();
   });
-  expect(screen.getByTestId("button-Correcta1")).toBeInTheDocument();
+
+  // Wait for answer buttons to be rendered
+  await waitFor(() => {
+    expect(screen.getByTestId("button-Correcta1")).toBeInTheDocument();
+  });
+
+  // Now test for the other buttons
   expect(screen.getByTestId("button-Incorrecta1A")).toBeInTheDocument();
   expect(screen.getByTestId("button-Incorrecta1B")).toBeInTheDocument();
 });
