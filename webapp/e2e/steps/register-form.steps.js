@@ -135,7 +135,7 @@ defineFeature(feature, test => {
       await page.waitForSelector('.MuiSnackbar-root', { visible: true, timeout: 5000 });
       const snackbarText = await page.$eval('.MuiSnackbar-root', el => el.textContent.trim());
       console.log('Snackbar Text:', snackbarText);  // Esto te ayudará a depurar
-      expect(snackbarText).toMatch('Usuario creado con éxito');
+      expect(snackbarText).toMatch('Inicio de sesión correcto');
     });
 
   });

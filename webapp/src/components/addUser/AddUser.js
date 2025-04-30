@@ -129,7 +129,7 @@ const AddUser = ({ handleToggleView }) => {
           open={openSnackbar}
           autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          message={t("addUserSuccessful")}
+          message={t("loginSuccessful")}
         />
         {error && (
           <Snackbar
