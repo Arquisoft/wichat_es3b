@@ -58,10 +58,15 @@ defineFeature(feature, test => {
 
         page.on('request', (request) => {
             if (request.url().includes('/questionsDB')) {
-                // Responder con el JSON corregido
+                // Respond with the JSON and include CORS headers
                 request.respond({
                     status: 200,
                     contentType: 'application/json',
+                    headers: {
+                        'Access-Control-Allow-Origin': '*', // Allow all origins
+                        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', // Allow specific methods
+                        'Access-Control-Allow-Headers': 'Content-Type' // Allow specific headers
+                    },
                     body: JSON.stringify([
                         {
                             "pregunta": {
@@ -107,56 +112,8 @@ defineFeature(feature, test => {
                             "img": [
                                 "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Japan.svg"
                             ]
-                        },
-                        {
-                            "pregunta": {
-                                "es": "¿Cuál es el estadio del club de fútbol Juventus?",
-                                "en": "What is the stadium of the football club Juventus?"
-                            },
-                            "respuestaCorrecta": {
-                                "es": "Juventus Stadium",
-                                "en": "Juventus Stadium"
-                            },
-                            "respuestas": {
-                                "es": [
-                                    "Estadio Luigi Ferraris",
-                                    "Parc Olympique lyonnais",
-                                    "Juventus Stadium",
-                                    "Estadio Giuseppe Meazza"
-                                ],
-                                "en": [
-                                    "Stadio Luigi Ferraris",
-                                    "Parc Olympique Lyonnais",
-                                    "Juventus Stadium",
-                                    "Giuseppe Meazza Stadium"
-                                ]
-                            },
-                            "descripcion": [
-                                {
-                                    "propiedad": "fecha de fundación o creación",
-                                    "valor": "1/11/1897"
-                                },
-                                {
-                                    "propiedad": "ubicación de la sede",
-                                    "valor": "Turín"
-                                },
-                                {
-                                    "propiedad": "país",
-                                    "valor": "Italia"
-                                },
-                                {
-                                    "propiedad": "fundador",
-                                    "valor": "Carlo Vittorio Varetti"
-                                },
-                                {
-                                    "propiedad": "entrenador",
-                                    "valor": "Igor Tudor"
-                                }
-                            ],
-                            "img": [
-                                "http://commons.wikimedia.org/wiki/Special:FilePath/Juventus%20FC%20-%20logo%20black%20%28Italy%2C%202020%29.svg"
-                            ]
                         }
+                        // Add more questions as needed
                     ])
                 });
             } else {
