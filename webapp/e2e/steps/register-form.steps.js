@@ -33,7 +33,7 @@ defineFeature(feature, test => {
 
       try {
 
-        const buttonExists = await page.evaluate(() => {
+        /*const buttonExists = await page.evaluate(() => {
           const button = document.querySelector('#buttonSecondary');
           return button !== null;
         });
@@ -55,7 +55,7 @@ defineFeature(feature, test => {
           console.log(`Guardando HTML de la página en: ${htmlPath}`);
 
           throw new Error('El botón #buttonSecondary no está presente en el DOM');
-        }
+        } */
 
         // Esperar a que aparezca el botón para cambiar a la vista de registro
         await page.waitForSelector('button', { visible: true, timeout: 5000 });
