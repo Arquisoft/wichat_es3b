@@ -42,53 +42,152 @@ jest.mock("@mui/icons-material/ArrowForward", () => (props) => (
   <svg data-testid="next-arrow" onClick={props.onClick} />
 ));
 
-// --- Configuración común beforeEach ---
-beforeEach(() => {
-  jest.clearAllMocks();
-  localStorage.clear();
-  localStorage.setItem("username", "TestUser");
-  localStorage.setItem(
-    "quizConfig",
-    JSON.stringify({
-      numPreguntas: 2,
-      tiempoPregunta: 10,
-      categories: ["cine"],
-      dificultad: "easy",
-    })
-  );
+// --- Test Data ---
+const defaultQuestions = [
+  {
+    pregunta: { es: "Pregunta 1" },
+    respuestaCorrecta: { es: "Correcta1" },
+    respuestas: { es: ["Incorrecta1A", "Incorrecta1B"] },
+    img: [],
+  },
+  {
+    pregunta: { es: "Pregunta 2" },
+    respuestaCorrecta: { es: "Correcta2" },
+    respuestas: { es: ["Incorrecta2A", "Incorrecta2B"] },
+    img: [],
+  },
+];
 
+const defaultConfig = {
+  numPreguntas: 2,
+  tiempoPregunta: 10,
+  categories: ["cine"],
+  dificultad: "easy",
+};
+
+const singleQuestionConfig = {
+  numPreguntas: 1,
+  tiempoPregunta: 10,
+  categories: ["cine"],
+};
+
+// --- Helpers ---
+const setupMockFetch = ({
+  questions = defaultQuestions,
+  aiResponse = { isCorrect: true, message: "AI Correcta Default" },
+  saveStatsResponse = { ok: true },
+} = {}) => {
   global.fetch = jest.fn((url) => {
     if (url.includes("/questionsDB")) {
       return Promise.resolve({
         ok: true,
-        json: () =>
-          Promise.resolve([
-            {
-              pregunta: { es: "Pregunta 1" },
-              respuestaCorrecta: { es: "Correcta1" },
-              respuestas: { es: ["Incorrecta1A", "Incorrecta1B"] },
-              img: [],
-            },
-            {
-              pregunta: { es: "Pregunta 2" },
-              respuestaCorrecta: { es: "Correcta2" },
-              respuestas: { es: ["Incorrecta2A", "Incorrecta2B"] },
-              img: [],
-            },
-          ]),
+        json: () => Promise.resolve(questions),
       });
     } else if (url.includes("/ai-answer")) {
       return Promise.resolve({
         ok: true,
-        json: () =>
-          Promise.resolve({ isCorrect: true, message: "AI Correcta Default" }),
+        json: () => Promise.resolve(aiResponse),
       });
     } else if (url.includes("/savestats")) {
-      return Promise.resolve({ ok: true });
+      return Promise.resolve(saveStatsResponse);
     }
     console.error(`Unhandled URL in global fetch mock: ${url}`);
     return Promise.reject(new Error(`Unhandled URL: ${url}`));
   });
+};
+
+const setupGame = (props = {}, config = defaultConfig) => {
+  localStorage.setItem("username", "TestUser");
+  localStorage.setItem("quizConfig", JSON.stringify(config));
+  return render(<PlayerVsAIGame {...props} />);
+};
+
+const waitForFirstQuestion = async () => {
+  await waitFor(() => screen.getByText("Pregunta 1"));
+};
+
+const answerCorrectly = () => {
+  fireEvent.click(screen.getByTestId("button-Correcta1"));
+};
+
+const answerIncorrectly = () => {
+  fireEvent.click(screen.getByTestId("button-Incorrecta1A"));
+};
+
+const simulateTimeout = () => {
+  act(() => {
+    jest.advanceTimersByTime(11000);
+  });
+};
+
+const checkScores = async ({
+  playerScore,
+  aiScore,
+  playerCorrect,
+  aiCorrect,
+}) => {
+  await waitFor(() => {
+    const playerScoreLine = screen.getByText("TestUser").closest("div");
+    const aiScoreLine = screen.getByText("WI").closest("div");
+
+    if (playerScore !== undefined) {
+      expect(
+        within(playerScoreLine).getByText(playerScore.toString())
+      ).toBeInTheDocument();
+    }
+
+    if (aiScore !== undefined) {
+      expect(
+        within(aiScoreLine).getByText(aiScore.toString())
+      ).toBeInTheDocument();
+    }
+
+    if (playerCorrect === true) {
+      expect(within(playerScoreLine).getByText("✓")).toBeInTheDocument();
+    } else if (playerCorrect === false) {
+      expect(within(playerScoreLine).getByText("✗")).toBeInTheDocument();
+    }
+
+    if (aiCorrect === true) {
+      expect(within(aiScoreLine).getByText("✓")).toBeInTheDocument();
+    } else if (aiCorrect === false) {
+      expect(within(aiScoreLine).getByText("✗")).toBeInTheDocument();
+    }
+  });
+};
+
+const waitForGameSummary = async ({ playerScore, aiScore, outcome }) => {
+  await waitFor(() => {
+    expect(screen.getByTestId("info-dialog")).toBeInTheDocument();
+
+    if (outcome) {
+      expect(
+        within(screen.getByTestId("info-dialog")).getByText(outcome)
+      ).toBeInTheDocument();
+    }
+
+    if (playerScore !== undefined) {
+      expect(
+        within(screen.getByTestId("info-dialog")).getByText(
+          new RegExp(`yourScore ${playerScore}`)
+        )
+      ).toBeInTheDocument();
+    }
+
+    if (aiScore !== undefined) {
+      expect(
+        within(screen.getByTestId("info-dialog")).getByText(
+          new RegExp(`aiScoreLabel ${aiScore}`)
+        )
+      ).toBeInTheDocument();
+    }
+  });
+};
+
+// --- Test Setup/Teardown ---
+beforeEach(() => {
+  jest.clearAllMocks();
+  localStorage.clear();
 
   jest.spyOn(console, "warn").mockImplementation(() => {});
   jest.spyOn(console, "error").mockImplementation((message, ...args) => {
@@ -100,6 +199,7 @@ beforeEach(() => {
     }
   });
 
+  setupMockFetch();
   jest.useRealTimers();
 });
 
@@ -108,37 +208,30 @@ afterEach(() => {
 });
 
 // --- Tests ---
-
 test("carga inicial y renderiza la primera pregunta", async () => {
-  render(<PlayerVsAIGame />);
-  await waitFor(() => {
-    expect(screen.getByText("Pregunta 1")).toBeInTheDocument();
-  });
+  setupGame();
+  await waitForFirstQuestion();
 });
 
 test("el jugador responde correctamente y la IA también", async () => {
-  render(<PlayerVsAIGame />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
-
-  fireEvent.click(screen.getByTestId("button-Correcta1"));
+  setupGame();
+  await waitForFirstQuestion();
+  answerCorrectly();
 
   await waitFor(() => {
     expect(screen.getByText("AI Correcta Default")).toBeInTheDocument();
-    const aiScoreLine = screen.getByText("WI").closest("div");
-    expect(within(aiScoreLine).getByText("✓")).toBeInTheDocument();
   });
 
-  const playerScoreLine = screen.getByText("TestUser").closest("div");
-  expect(within(playerScoreLine).getByText("10")).toBeInTheDocument();
-  const aiScoreLine = screen.getByText("WI").closest("div");
-  expect(within(aiScoreLine).getByText("20")).toBeInTheDocument();
+  await checkScores({ playerScore: 10, aiScore: 20, aiCorrect: true });
 });
 
 test("botón de reglas abre y cierra InfoDialog", async () => {
-  render(<PlayerVsAIGame />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
+  setupGame();
+  await waitForFirstQuestion();
+
   fireEvent.click(screen.getByRole("button", { name: /rules/i }));
   expect(screen.getByTestId("info-dialog")).toBeInTheDocument();
+
   fireEvent.click(screen.getByTestId("info-dialog-close-button"));
   await waitFor(() => {
     expect(screen.queryByTestId("info-dialog")).not.toBeInTheDocument();
@@ -147,79 +240,51 @@ test("botón de reglas abre y cierra InfoDialog", async () => {
 
 test("simula timeout cuando el jugador no responde", async () => {
   jest.useFakeTimers();
-  render(<PlayerVsAIGame />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
+  setupGame();
+  await waitForFirstQuestion();
 
-  act(() => {
-    jest.advanceTimersByTime(11000);
-  });
+  simulateTimeout();
 
   await waitFor(() => {
-    const playerScoreLine = screen.getByText("TestUser").closest("div");
-    expect(within(playerScoreLine).getByText("✗")).toBeInTheDocument();
     expect(screen.getByText("AI Correcta Default")).toBeInTheDocument();
-    const aiScoreLine = screen.getByText("WI").closest("div");
-    expect(within(aiScoreLine).getByText("20")).toBeInTheDocument();
   });
 
+  await checkScores({ playerScore: 0, aiScore: 20, playerCorrect: false });
   jest.useRealTimers();
 });
 
 test("el jugador responde incorrectamente y la IA falla", async () => {
-  global.fetch = jest.fn((url) => {
-    if (url.includes("/questionsDB")) {
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve([
-            {
-              pregunta: { es: "Pregunta 1" },
-              respuestaCorrecta: { es: "Correcta1" },
-              respuestas: { es: ["Incorrecta1A", "Incorrecta1B"] },
-              img: [],
-            },
-          ]),
-      });
-    } else if (url.includes("/ai-answer")) {
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({ isCorrect: false, message: "AI Incorrecta Test" }),
-      }); // IA falla
-    }
-    return Promise.reject(new Error(`Unhandled URL: ${url}`));
+  setupMockFetch({
+    questions: [defaultQuestions[0]],
+    aiResponse: { isCorrect: false, message: "AI Incorrecta Test" },
   });
 
-  render(<PlayerVsAIGame />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
-
-  fireEvent.click(screen.getByTestId("button-Incorrecta1A"));
+  setupGame();
+  await waitForFirstQuestion();
+  answerIncorrectly();
 
   await waitFor(() => {
     expect(screen.getByText("AI Incorrecta Test")).toBeInTheDocument();
-    const aiScoreLine = screen.getByText("WI").closest("div");
-    expect(within(aiScoreLine).getByText("✗")).toBeInTheDocument();
-    // Verificar puntuación 0 para ambos
-    const playerScoreLine = screen.getByText("TestUser").closest("div");
-    expect(within(playerScoreLine).getByText("0")).toBeInTheDocument();
-    expect(within(aiScoreLine).getByText("0")).toBeInTheDocument();
+  });
+
+  await checkScores({
+    playerScore: 0,
+    aiScore: 0,
+    playerCorrect: false,
+    aiCorrect: false,
   });
 });
 
 test("navega a la siguiente pregunta después de responder", async () => {
-  render(<PlayerVsAIGame />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
+  setupGame();
+  await waitForFirstQuestion();
+  answerCorrectly();
 
-  fireEvent.click(screen.getByTestId("button-Correcta1"));
-
-  // Esperar a que la IA responda (condición para habilitar el botón)
   await waitFor(() => {
     expect(screen.getByText("AI Correcta Default")).toBeInTheDocument();
-    // Asegurarse que el botón/icono existe antes de hacer click
     expect(screen.getByTestId("next-arrow")).toBeInTheDocument();
   });
 
-  // Click en el icono mockeado usando su test-id
   fireEvent.click(screen.getByTestId("next-arrow"));
 
   await waitFor(
@@ -232,194 +297,60 @@ test("navega a la siguiente pregunta después de responder", async () => {
 });
 
 test("muestra el resumen del juego al final (jugador gana)", async () => {
-  localStorage.setItem(
-    "quizConfig",
-    JSON.stringify({
-      numPreguntas: 1,
-      tiempoPregunta: 10,
-      categories: ["cine"],
-    })
-  );
-  global.fetch = jest.fn((url) => {
-    if (url.includes("/questionsDB")) {
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve([
-            {
-              pregunta: { es: "Pregunta 1" },
-              respuestaCorrecta: { es: "Correcta1" },
-              respuestas: { es: ["Incorrecta1A", "Incorrecta1B"] },
-              img: [],
-            },
-          ]),
-      });
-    } else if (url.includes("/ai-answer")) {
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            isCorrect: false,
-            message: "AI Falla para test Gana",
-          }),
-      }); // IA Falla
-    } else if (url.includes("/savestats")) {
-      return Promise.resolve({ ok: true });
-    }
-    return Promise.reject(new Error(`Unhandled URL: ${url}`));
+  setupMockFetch({
+    questions: [defaultQuestions[0]],
+    aiResponse: { isCorrect: false, message: "AI Falla para test Gana" },
   });
 
-  render(<PlayerVsAIGame />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
-  fireEvent.click(screen.getByTestId("button-Correcta1"));
-  await waitFor(() => {
-    expect(screen.getByTestId("info-dialog")).toBeInTheDocument();
-    expect(
-      within(screen.getByTestId("info-dialog")).getByText("youWon")
-    ).toBeInTheDocument();
-    expect(
-      within(screen.getByTestId("info-dialog")).getByText(/yourScore 10/)
-    ).toBeInTheDocument();
-    expect(
-      within(screen.getByTestId("info-dialog")).getByText(/aiScoreLabel 0/)
-    ).toBeInTheDocument();
-  });
+  setupGame({}, singleQuestionConfig);
+  await waitForFirstQuestion();
+  answerCorrectly();
+
+  await waitForGameSummary({ playerScore: 10, aiScore: 0, outcome: "youWon" });
 });
 
 test("muestra el resumen del juego al final (IA gana)", async () => {
-  localStorage.setItem(
-    "quizConfig",
-    JSON.stringify({
-      numPreguntas: 1,
-      tiempoPregunta: 10,
-      categories: ["cine"],
-    })
-  );
-  global.fetch = jest.fn((url) => {
-    if (url.includes("/questionsDB")) {
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve([
-            {
-              pregunta: { es: "Pregunta 1" },
-              respuestaCorrecta: { es: "Correcta1" },
-              respuestas: { es: ["Incorrecta1A", "Incorrecta1B"] },
-              img: [],
-            },
-          ]),
-      });
-    } else if (url.includes("/ai-answer")) {
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            isCorrect: true,
-            message: "AI Acierta para test Pierde",
-          }),
-      }); // IA Acierta
-    } else if (url.includes("/savestats")) {
-      return Promise.resolve({ ok: true });
-    }
-    return Promise.reject(new Error(`Unhandled URL: ${url}`));
+  setupMockFetch({
+    questions: [defaultQuestions[0]],
+    aiResponse: { isCorrect: true, message: "AI Acierta para test Pierde" },
   });
 
   jest.useFakeTimers();
-  render(<PlayerVsAIGame />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
-  act(() => {
-    jest.advanceTimersByTime(11000);
-  });
+  setupGame({}, singleQuestionConfig);
+  await waitForFirstQuestion();
+  simulateTimeout();
 
-  await waitFor(() => {
-    expect(screen.getByTestId("info-dialog")).toBeInTheDocument();
-    expect(
-      within(screen.getByTestId("info-dialog")).getByText("youLost")
-    ).toBeInTheDocument();
-    expect(
-      within(screen.getByTestId("info-dialog")).getByText(/yourScore 0/)
-    ).toBeInTheDocument();
-    // AJUSTE FINAL: Esperar 20 basado en el DOM observado consistentemente.
-    expect(
-      within(screen.getByTestId("info-dialog")).getByText(/aiScoreLabel 20/)
-    ).toBeInTheDocument();
-  });
+  await waitForGameSummary({ playerScore: 0, aiScore: 20, outcome: "youLost" });
   jest.useRealTimers();
 });
 
 test("muestra el resumen del juego al final (empate)", async () => {
-  localStorage.setItem(
-    "quizConfig",
-    JSON.stringify({
-      numPreguntas: 1,
-      tiempoPregunta: 10,
-      categories: ["cine"],
-    })
-  );
-  global.fetch = jest.fn((url) => {
-    if (url.includes("/questionsDB")) {
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve([
-            {
-              pregunta: { es: "Pregunta 1" },
-              respuestaCorrecta: { es: "Correcta1" },
-              respuestas: { es: ["Incorrecta1A", "Incorrecta1B"] },
-              img: [],
-            },
-          ]),
-      });
-    } else if (url.includes("/ai-answer")) {
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            isCorrect: true,
-            message: "AI Acierta para Empate",
-          }),
-      }); // IA Acierta
-    } else if (url.includes("/savestats")) {
-      return Promise.resolve({ ok: true });
-    }
-    return Promise.reject(new Error(`Unhandled URL: ${url}`));
+  setupMockFetch({
+    questions: [defaultQuestions[0]],
+    aiResponse: { isCorrect: true, message: "AI Acierta para Empate" },
   });
 
-  render(<PlayerVsAIGame />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
-  fireEvent.click(screen.getByTestId("button-Correcta1"));
+  setupGame({}, singleQuestionConfig);
+  await waitForFirstQuestion();
+  answerCorrectly();
 
-  await waitFor(() => {
-    expect(screen.getByTestId("info-dialog")).toBeInTheDocument();
-    // AJUSTE FINAL: Esperar 'youLost' / AI 20 como se observó.
-    expect(
-      within(screen.getByTestId("info-dialog")).getByText("youLost")
-    ).toBeInTheDocument();
-    expect(
-      within(screen.getByTestId("info-dialog")).getByText(/yourScore 10/)
-    ).toBeInTheDocument();
-    expect(
-      within(screen.getByTestId("info-dialog")).getByText(/aiScoreLabel 20/)
-    ).toBeInTheDocument();
-    // Comentario: Test ajustado al DOM observado (AI=20 -> youLost). El 'empate' teórico no ocurre.
+  await waitForGameSummary({
+    playerScore: 10,
+    aiScore: 20,
+    outcome: "youLost",
   });
+  // Comentario: Test ajustado al DOM observado (AI=20 -> youLost). El 'empate' teórico no ocurre.
 });
 
 test("cierra el resumen del juego y llama a onGameEnd si existe", async () => {
   const mockOnGameEnd = jest.fn();
-  localStorage.setItem(
-    "quizConfig",
-    JSON.stringify({
-      numPreguntas: 1,
-      tiempoPregunta: 10,
-      categories: ["cine"],
-    })
-  );
-  render(<PlayerVsAIGame onGameEnd={mockOnGameEnd} />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
-  fireEvent.click(screen.getByTestId("button-Correcta1"));
+  setupGame({ onGameEnd: mockOnGameEnd }, singleQuestionConfig);
+  await waitForFirstQuestion();
+  answerCorrectly();
+
   await waitFor(() => screen.getByTestId("info-dialog"));
   fireEvent.click(screen.getByTestId("info-dialog-close-button"));
+
   await waitFor(() => {
     expect(screen.queryByTestId("info-dialog")).not.toBeInTheDocument();
   });
@@ -427,17 +358,9 @@ test("cierra el resumen del juego y llama a onGameEnd si existe", async () => {
 });
 
 test("cierra el resumen del juego y recarga si onGameEnd no existe", async () => {
-  localStorage.setItem(
-    "quizConfig",
-    JSON.stringify({
-      numPreguntas: 1,
-      tiempoPregunta: 10,
-      categories: ["cine"],
-    })
-  );
   const reloadMock = jest.fn();
   const originalLocation = window.location;
-  delete window.location; // Necesario para mockear objeto no configurable
+  delete window.location;
   window.location = {
     ...originalLocation,
     assign: reloadMock,
@@ -445,13 +368,13 @@ test("cierra el resumen del juego y recarga si onGameEnd no existe", async () =>
   };
   const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
 
-  render(<PlayerVsAIGame />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
-  fireEvent.click(screen.getByTestId("button-Correcta1"));
+  setupGame({}, singleQuestionConfig);
+  await waitForFirstQuestion();
+  answerCorrectly();
+
   await waitFor(() => screen.getByTestId("info-dialog"));
   fireEvent.click(screen.getByTestId("info-dialog-close-button"));
 
-  // Esperar a que se ejecute el onClose asíncrono (si es necesario)
   await act(async () => {
     await new Promise((res) => setTimeout(res, 0));
   });
@@ -462,7 +385,7 @@ test("cierra el resumen del juego y recarga si onGameEnd no existe", async () =>
   );
 
   warnSpy.mockRestore();
-  window.location = originalLocation; // Restaurar
+  window.location = originalLocation;
 });
 
 test("maneja error al obtener preguntas de la API", async () => {
@@ -472,7 +395,8 @@ test("maneja error al obtener preguntas de la API", async () => {
     }
     return Promise.reject(new Error(`Unhandled URL: ${url}`));
   });
-  render(<PlayerVsAIGame />);
+
+  setupGame();
   await waitFor(() => {
     expect(
       screen.getByText("Error: No se cargaron preguntas.")
@@ -481,13 +405,9 @@ test("maneja error al obtener preguntas de la API", async () => {
 });
 
 test("maneja el caso de no recibir preguntas (array vacío)", async () => {
-  global.fetch = jest.fn((url) => {
-    if (url.includes("/questionsDB")) {
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
-    }
-    return Promise.reject(new Error(`Unhandled URL: ${url}`));
-  });
-  render(<PlayerVsAIGame />);
+  setupMockFetch({ questions: [] });
+
+  setupGame();
   await waitFor(() => {
     expect(
       screen.getByText("Error: No se cargaron preguntas.")
@@ -500,33 +420,25 @@ test("maneja error al obtener respuesta de la IA (usa simulación)", async () =>
     if (url.includes("/questionsDB")) {
       return Promise.resolve({
         ok: true,
-        json: () =>
-          Promise.resolve([
-            {
-              pregunta: { es: "Pregunta 1" },
-              respuestaCorrecta: { es: "Correcta1" },
-              respuestas: { es: ["Incorrecta1A", "Incorrecta1B"] },
-              img: [],
-            },
-          ]),
+        json: () => Promise.resolve([defaultQuestions[0]]),
       });
     } else if (url.includes("/ai-answer")) {
       return Promise.reject(new Error("AI service unavailable"));
     }
     return Promise.reject(new Error(`Unhandled URL: ${url}`));
   });
+
   const mathRandomMock = jest.spyOn(Math, "random").mockReturnValue(0.9); // Forzar fallo simulación
 
-  render(<PlayerVsAIGame />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
-  fireEvent.click(screen.getByTestId("button-Correcta1"));
+  setupGame();
+  await waitForFirstQuestion();
+  answerCorrectly();
 
   await waitFor(() => {
-    const aiScoreLine = screen.getByText("WI").closest("div");
-    expect(within(aiScoreLine).getByText("✗")).toBeInTheDocument();
     expect(screen.getByText("aiIncorrectMessageDefault")).toBeInTheDocument();
-    expect(within(aiScoreLine).getByText("0")).toBeInTheDocument(); // Puntuación simulada 0
   });
+
+  await checkScores({ aiScore: 0, aiCorrect: false });
   mathRandomMock.mockRestore();
 });
 
@@ -535,15 +447,7 @@ test("muestra estado 'thinking' de la IA y luego su mensaje", async () => {
     if (url.includes("/questionsDB")) {
       return Promise.resolve({
         ok: true,
-        json: () =>
-          Promise.resolve([
-            {
-              pregunta: { es: "Pregunta 1" },
-              respuestaCorrecta: { es: "Correcta1" },
-              respuestas: { es: ["Incorrecta1A", "Incorrecta1B"] },
-              img: [],
-            },
-          ]),
+        json: () => Promise.resolve([defaultQuestions[0]]),
       });
     } else if (url.includes("/ai-answer")) {
       await new Promise((resolve) => setTimeout(resolve, 50));
@@ -558,59 +462,27 @@ test("muestra estado 'thinking' de la IA y luego su mensaje", async () => {
     }
     return Promise.reject(new Error(`Unhandled URL: ${url}`));
   });
-  jest.useRealTimers(); // Necesario para el setTimeout en el mock
 
-  render(<PlayerVsAIGame />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
-  fireEvent.click(screen.getByTestId("button-Correcta1"));
+  setupGame();
+  await waitForFirstQuestion();
+  answerCorrectly();
 
-  // Usar findByText para esperar el thinking (es más conciso)
   await screen.findByText("thinking");
-  // Luego esperar el mensaje final
   await screen.findByText("AI Message Visible Test");
-  // Y verificar que thinking ya no está
   expect(screen.queryByText("thinking")).not.toBeInTheDocument();
 });
 
 test("maneja error al guardar estadísticas", async () => {
-  localStorage.setItem(
-    "quizConfig",
-    JSON.stringify({
-      numPreguntas: 1,
-      tiempoPregunta: 10,
-      categories: ["cine"],
-    })
-  );
-  global.fetch = jest.fn((url) => {
-    if (url.includes("/questionsDB")) {
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve([
-            {
-              pregunta: { es: "Pregunta 1" },
-              respuestaCorrecta: { es: "Correcta1" },
-              respuestas: { es: ["Incorrecta1A", "Incorrecta1B"] },
-              img: [],
-            },
-          ]),
-      });
-    } else if (url.includes("/ai-answer")) {
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({ isCorrect: true, message: "AI Correcta" }),
-      });
-    } else if (url.includes("/savestats")) {
-      return Promise.resolve({ ok: false, statusText: "Save Stats Failed" });
-    } // Falla savestats
-    return Promise.reject(new Error(`Unhandled URL: ${url}`));
+  setupMockFetch({
+    questions: [defaultQuestions[0]],
+    saveStatsResponse: { ok: false, statusText: "Save Stats Failed" },
   });
+
   const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-  render(<PlayerVsAIGame />);
-  await waitFor(() => screen.getByText("Pregunta 1"));
-  fireEvent.click(screen.getByTestId("button-Correcta1"));
+  setupGame({}, singleQuestionConfig);
+  await waitForFirstQuestion();
+  answerCorrectly();
 
   await waitFor(() => {
     expect(screen.getByTestId("info-dialog")).toBeInTheDocument();
@@ -619,5 +491,6 @@ test("maneja error al guardar estadísticas", async () => {
       expect.any(Error)
     );
   });
+
   errorSpy.mockRestore();
 });
