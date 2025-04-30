@@ -16,12 +16,10 @@ export default function PerfilPage() {
   const { t } = useTranslation();
   const { username: paramUsername } = useParams();
   const username = paramUsername || localStorage.getItem("username");
-
+  
   const [userData, setUserData] = useState({
     username: "",
     level: 1, // TODO: no está en el servicio de estadísticas
-    avatar:
-      "https://i.pinimg.com/736x/8d/16/90/8d16902ae35c1e982c2990ff85fa11fb.jpg",
     stats: {
       gamesPlayed: 0,
       correctAnswers: 0,
