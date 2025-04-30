@@ -118,8 +118,6 @@ app.get("/questionsDB", async (req, res) => {
         console.log(`⚠️ No hay preguntas disponibles para la categoría '${topic}'`);
       }
 
-      const questionIds = categoryQuestions.map(q => q._id);
-      await Question.deleteMany({ _id: { $in: questionIds } });
 
       selectedQuestions.push(...categoryQuestions);
     }
