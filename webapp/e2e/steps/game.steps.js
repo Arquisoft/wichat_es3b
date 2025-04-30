@@ -55,14 +55,13 @@ defineFeature(feature, test => {
     });
 
     test('The user is able to play a game', ({ given, when, then }) => {
-        let questions;
 
-        given('Given A logged user', async () => {
+        given('A logged user', async () => {
             // Ensure the game page is loaded
             await page.waitForSelector('button', { visible: true, timeout: 5000 });
         });
 
-        when('When I play a game', async () => {
+        when('I play a game', async () => {
             try{
             await expect(page).toClick('a', { text: 'Jugar' });
             await page.waitForSelector('#numPreguntas', { visible: true, timeout: 5000 });
@@ -91,7 +90,7 @@ defineFeature(feature, test => {
             }
         });
 
-        then('Then the results page should be shown', async () => {
+        then('The results page should be shown', async () => {
             await page.waitForSelector('h1', { text: "Resumen de la partida", timeout: 5000 });
             const finalScoreText = await page.$eval('h1', el => el.textContent.trim());
             expect(finalScoreText).toBe('Resumen de la partida');
