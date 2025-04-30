@@ -47,13 +47,6 @@ class QuestionManager {
         }
     }
 
-
-    getRandomQuestion() {
-        if (this.questions.length === 0) {
-            throw new Error("No hay preguntas disponibles.");
-        }
-        return this.questions.shift();
-    }
 }
 
 module.exports = QuestionManager;
