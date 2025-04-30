@@ -140,6 +140,7 @@ defineFeature(feature, test => {
 
   });
 
+  //linea de cambio
   afterAll(async () => {
     await browser.close();
   });
