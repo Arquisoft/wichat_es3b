@@ -3,7 +3,7 @@ const { defineFeature, loadFeature } = require('jest-cucumber');
 const fs = require("fs");
 const path = require("path");
 const setDefaultOptions = require('expect-puppeteer').setDefaultOptions;
-const feature = loadFeature('./features/complete-game.feature');
+const feature = loadFeature('./features/game.feature');
 
 let page;
 let browser;
@@ -54,15 +54,15 @@ defineFeature(feature, test => {
         }
     });
 
-    test('The user plays a complete game', ({ given, when, then }) => {
+    test('The user is able to play a game', ({ given, when, then }) => {
         let questions;
 
-        given('The game is ready to start', async () => {
+        given('Given A logged user', async () => {
             // Ensure the game page is loaded
             await page.waitForSelector('button', { visible: true, timeout: 5000 });
         });
 
-        when('The user starts the game and answers all questions', async () => {
+        when('When I play a game', async () => {
             try{
             await expect(page).toClick('a', { text: 'Jugar' });
             await page.waitForSelector('#numPreguntas', { visible: true, timeout: 5000 });
@@ -91,7 +91,7 @@ defineFeature(feature, test => {
             }
         });
 
-        then('The game should display the final score', async () => {
+        then('When I play a game', async () => {
             await page.waitForSelector('h1', { text: "Resumen de la partida", timeout: 5000 });
             const finalScoreText = await page.$eval('h1', el => el.textContent.trim());
             expect(finalScoreText).toBe('Resumen de la partida');
