@@ -4,14 +4,13 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import axios from "axios";
 import AddUser from "./AddUser";
 import { I18nextProvider } from "react-i18next";
-import i18n from "../../i18n"; // Asegúrate de importar tu configuración de i18n
+import i18n from "../../i18n";
 
 // Mock de axios
 jest.mock("axios");
 
 // Mock del hook de traducción
 jest.mock("react-i18next", () => ({
-  // esto es necesario para mantener el HOC
   ...jest.requireActual("react-i18next"),
   useTranslation: () => ({
     t: (key) => {
@@ -46,34 +45,69 @@ jest.mock("../../hooks/useSubmitOnEnter", () => {
 
 describe("AddUser Component", () => {
   const handleToggleViewMock = jest.fn();
+  const validUserData = {
+    email: "test@example.com",
+    username: "testuser",
+    password: "password123",
+    confirmPassword: "password123"
+  };
+
+  // Helper function to render component
+  const renderAddUser = () => {
+    return render(
+      <I18nextProvider i18n={i18n}>
+        <AddUser handleToggleView={handleToggleViewMock} />
+      </I18nextProvider>
+    );
+  };
+
+  // Helper function to fill form fields
+  const fillFormFields = (fields = {}) => {
+    const formData = { ...validUserData, ...fields };
+    
+    if (formData.email !== null) {
+      const emailInput = screen.getByLabelText(/Correo electrónico/i);
+      fireEvent.change(emailInput, { target: { value: formData.email } });
+    }
+    
+    if (formData.username !== null) {
+      const usernameInput = screen.getByLabelText(/Nombre de usuario/i);
+      fireEvent.change(usernameInput, { target: { value: formData.username } });
+    }
+    
+    if (formData.password !== null) {
+      const passwordInput = screen.getByLabelText(/^Contraseña$/i);
+      fireEvent.change(passwordInput, { target: { value: formData.password } });
+    }
+    
+    if (formData.confirmPassword !== null) {
+      const confirmPasswordInput = screen.getByLabelText(/Confirmar contraseña/i);
+      fireEvent.change(confirmPasswordInput, { target: { value: formData.confirmPassword } });
+    }
+  };
+
+  // Helper function to click create account button
+  const clickCreateAccountButton = () => {
+    const createAccountButton = screen.getByRole("button", { name: /Crear cuenta/i });
+    fireEvent.click(createAccountButton);
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   test("renders AddUser component correctly", () => {
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
+    renderAddUser();
 
     expect(screen.getByLabelText(/Correo electrónico/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Nombre de usuario/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Contraseña$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Confirmar contraseña/i)).toBeInTheDocument();
-    // Usar getByRole para el botón específicamente para evitar duplicados con el título
-    expect(
-      screen.getByRole("button", { name: /Crear cuenta/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Crear cuenta/i })).toBeInTheDocument();
   });
 
   test("toggles view when login button is clicked", () => {
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
+    renderAddUser();
 
     const loginButton = screen.getByRole("button", { name: /Iniciar sesión/i });
     fireEvent.click(loginButton);
@@ -82,171 +116,65 @@ describe("AddUser Component", () => {
   });
 
   test("shows error when email is empty", async () => {
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
-
-    const createAccountButton = screen.getByRole("button", {
-      name: /Crear cuenta/i,
-    });
-    fireEvent.click(createAccountButton);
+    renderAddUser();
+    clickCreateAccountButton();
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Error: El correo electrónico es obligatorio/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Error: El correo electrónico es obligatorio/i)).toBeInTheDocument();
     });
   });
 
   test("shows error when username is empty", async () => {
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
-
-    // Llenar el email
-    const emailInput = screen.getByLabelText(/Correo electrónico/i);
-    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-
-    const createAccountButton = screen.getByRole("button", {
-      name: /Crear cuenta/i,
-    });
-    fireEvent.click(createAccountButton);
+    renderAddUser();
+    fillFormFields({ username: null });
+    clickCreateAccountButton();
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Error: El nombre de usuario es obligatorio/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Error: El nombre de usuario es obligatorio/i)).toBeInTheDocument();
     });
   });
 
   test("shows error when password is empty", async () => {
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
-
-    // Llenar el email y username
-    const emailInput = screen.getByLabelText(/Correo electrónico/i);
-    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-
-    const usernameInput = screen.getByLabelText(/Nombre de usuario/i);
-    fireEvent.change(usernameInput, { target: { value: "testuser" } });
-
-    const createAccountButton = screen.getByRole("button", {
-      name: /Crear cuenta/i,
-    });
-    fireEvent.click(createAccountButton);
+    renderAddUser();
+    fillFormFields({ password: null });
+    clickCreateAccountButton();
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Error: La contraseña es obligatoria/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Error: La contraseña es obligatoria/i)).toBeInTheDocument();
     });
   });
 
   test("shows error when password confirmation is empty", async () => {
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
-
-    // Llenar el email, username y password
-    const emailInput = screen.getByLabelText(/Correo electrónico/i);
-    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-
-    const usernameInput = screen.getByLabelText(/Nombre de usuario/i);
-    fireEvent.change(usernameInput, { target: { value: "testuser" } });
-
-    const passwordInput = screen.getByLabelText(/^Contraseña$/i);
-    fireEvent.change(passwordInput, { target: { value: "password123" } });
-
-    const createAccountButton = screen.getByRole("button", {
-      name: /Crear cuenta/i,
-    });
-    fireEvent.click(createAccountButton);
+    renderAddUser();
+    fillFormFields({ confirmPassword: null });
+    clickCreateAccountButton();
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Error: Confirma la contraseña/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Error: Confirma la contraseña/i)).toBeInTheDocument();
     });
   });
 
   test("shows error when passwords do not match", async () => {
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
-
-    // Llenar todos los campos pero con contraseñas diferentes
-    const emailInput = screen.getByLabelText(/Correo electrónico/i);
-    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-
-    const usernameInput = screen.getByLabelText(/Nombre de usuario/i);
-    fireEvent.change(usernameInput, { target: { value: "testuser" } });
-
-    const passwordInput = screen.getByLabelText(/^Contraseña$/i);
-    fireEvent.change(passwordInput, { target: { value: "password123" } });
-
-    const confirmPasswordInput = screen.getByLabelText(/Confirmar contraseña/i);
-    fireEvent.change(confirmPasswordInput, {
-      target: { value: "differentpassword" },
-    });
-
-    const createAccountButton = screen.getByRole("button", {
-      name: /Crear cuenta/i,
-    });
-    fireEvent.click(createAccountButton);
+    renderAddUser();
+    fillFormFields({ confirmPassword: "differentpassword" });
+    clickCreateAccountButton();
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Error: Las contraseñas no coinciden/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Error: Las contraseñas no coinciden/i)).toBeInTheDocument();
     });
   });
 
   test("successfully adds user when all inputs are valid", async () => {
     axios.post.mockResolvedValueOnce({ data: { success: true } });
-
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
-
-    // Llenar todos los campos correctamente
-    const emailInput = screen.getByLabelText(/Correo electrónico/i);
-    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-
-    const usernameInput = screen.getByLabelText(/Nombre de usuario/i);
-    fireEvent.change(usernameInput, { target: { value: "testuser" } });
-
-    const passwordInput = screen.getByLabelText(/^Contraseña$/i);
-    fireEvent.change(passwordInput, { target: { value: "password123" } });
-
-    const confirmPasswordInput = screen.getByLabelText(/Confirmar contraseña/i);
-    fireEvent.change(confirmPasswordInput, {
-      target: { value: "password123" },
-    });
-
-    // Usamos getByRole para ser más específicos y obtener el botón
-    const createAccountButton = screen.getByRole("button", {
-      name: /Crear cuenta/i,
-    });
-    fireEvent.click(createAccountButton);
+    renderAddUser();
+    fillFormFields();
+    clickCreateAccountButton();
 
     await waitFor(() => {
       expect(axios.post).toHaveBeenCalledWith(expect.any(String), {
-        email: "test@example.com",
-        username: "testuser",
-        password: "password123",
+        email: validUserData.email,
+        username: validUserData.username,
+        password: validUserData.password,
       });
       expect(screen.getByText(/Usuario creado con éxito/i)).toBeInTheDocument();
     });
@@ -256,92 +184,37 @@ describe("AddUser Component", () => {
     axios.post.mockRejectedValueOnce({
       response: { data: { error: "Usuario ya existe" } },
     });
-
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
-
-    // Llenar todos los campos correctamente
-    const emailInput = screen.getByLabelText(/Correo electrónico/i);
-    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-
-    const usernameInput = screen.getByLabelText(/Nombre de usuario/i);
-    fireEvent.change(usernameInput, { target: { value: "testuser" } });
-
-    const passwordInput = screen.getByLabelText(/^Contraseña$/i);
-    fireEvent.change(passwordInput, { target: { value: "password123" } });
-
-    const confirmPasswordInput = screen.getByLabelText(/Confirmar contraseña/i);
-    fireEvent.change(confirmPasswordInput, {
-      target: { value: "password123" },
-    });
-
-    const createAccountButton = screen.getByRole("button", {
-      name: /Crear cuenta/i,
-    });
-    fireEvent.click(createAccountButton);
+    
+    renderAddUser();
+    fillFormFields();
+    clickCreateAccountButton();
 
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.any(Object)
-      );
+      expect(axios.post).toHaveBeenCalledWith(expect.any(String), expect.any(Object));
       expect(screen.getByText(/Error: Usuario ya existe/i)).toBeInTheDocument();
     });
   });
 
   test("shows generic error message when API fails without response data", async () => {
     axios.post.mockRejectedValueOnce({});
-
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
-
-    // Llenar todos los campos correctamente
-    const emailInput = screen.getByLabelText(/Correo electrónico/i);
-    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-
-    const usernameInput = screen.getByLabelText(/Nombre de usuario/i);
-    fireEvent.change(usernameInput, { target: { value: "testuser" } });
-
-    const passwordInput = screen.getByLabelText(/^Contraseña$/i);
-    fireEvent.change(passwordInput, { target: { value: "password123" } });
-
-    const confirmPasswordInput = screen.getByLabelText(/Confirmar contraseña/i);
-    fireEvent.change(confirmPasswordInput, {
-      target: { value: "password123" },
-    });
-
-    const createAccountButton = screen.getByRole("button", {
-      name: /Crear cuenta/i,
-    });
-    fireEvent.click(createAccountButton);
+    
+    renderAddUser();
+    fillFormFields();
+    clickCreateAccountButton();
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Error: Error al crear el usuario/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Error: Error al crear el usuario/i)).toBeInTheDocument();
     });
   });
 
   test("toggles password visibility", () => {
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
+    renderAddUser();
 
     const passwordInput = screen.getByLabelText(/^Contraseña$/i);
     expect(passwordInput).toHaveAttribute("type", "password");
 
-    const togglePasswordVisibilityButton =
-      passwordInput.parentElement.querySelector("span");
+    const togglePasswordVisibilityButton = passwordInput.parentElement.querySelector("span");
     fireEvent.click(togglePasswordVisibilityButton);
-
     expect(passwordInput).toHaveAttribute("type", "text");
 
     // Volver a ocultar la contraseña
@@ -350,19 +223,13 @@ describe("AddUser Component", () => {
   });
 
   test("toggles password confirmation visibility", () => {
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
+    renderAddUser();
 
     const confirmPasswordInput = screen.getByLabelText(/Confirmar contraseña/i);
     expect(confirmPasswordInput).toHaveAttribute("type", "password");
 
-    const togglePasswordVisibilityButton =
-      confirmPasswordInput.parentElement.querySelector("span");
+    const togglePasswordVisibilityButton = confirmPasswordInput.parentElement.querySelector("span");
     fireEvent.click(togglePasswordVisibilityButton);
-
     expect(confirmPasswordInput).toHaveAttribute("type", "text");
 
     // Volver a ocultar la contraseña
@@ -381,27 +248,10 @@ describe("AddUser Component", () => {
       };
     });
 
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
-
-    // Llenar todos los campos correctamente
-    const emailInput = screen.getByLabelText(/Correo electrónico/i);
-    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-
-    const usernameInput = screen.getByLabelText(/Nombre de usuario/i);
-    fireEvent.change(usernameInput, { target: { value: "testuser" } });
-
-    const passwordInput = screen.getByLabelText(/^Contraseña$/i);
-    fireEvent.change(passwordInput, { target: { value: "password123" } });
+    renderAddUser();
+    fillFormFields();
 
     const confirmPasswordInput = screen.getByLabelText(/Confirmar contraseña/i);
-    fireEvent.change(confirmPasswordInput, {
-      target: { value: "password123" },
-    });
-
     fireEvent.keyDown(confirmPasswordInput, { key: "Enter", code: "Enter" });
 
     await waitFor(() => {
@@ -413,26 +263,9 @@ describe("AddUser Component", () => {
     axios.post.mockResolvedValueOnce({ data: { success: true } });
     jest.useFakeTimers();
   
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddUser handleToggleView={handleToggleViewMock} />
-      </I18nextProvider>
-    );
-  
-    fireEvent.change(screen.getByLabelText(/Correo electrónico/i), {
-      target: { value: "test@example.com" },
-    });
-    fireEvent.change(screen.getByLabelText(/Nombre de usuario/i), {
-      target: { value: "testuser" },
-    });
-    fireEvent.change(screen.getByLabelText(/^Contraseña$/i), {
-      target: { value: "password123" },
-    });
-    fireEvent.change(screen.getByLabelText(/Confirmar contraseña/i), {
-      target: { value: "password123" },
-    });
-  
-    fireEvent.click(screen.getByRole("button", { name: /Crear cuenta/i }));
+    renderAddUser();
+    fillFormFields();
+    clickCreateAccountButton();
   
     await waitFor(() => {
       expect(screen.getByText(/Usuario creado con éxito/i)).toBeInTheDocument();
@@ -441,11 +274,9 @@ describe("AddUser Component", () => {
     jest.advanceTimersByTime(6000);
   
     await waitFor(() => {
-      expect(
-        screen.queryByText(/Usuario creado con éxito/i)
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText(/Usuario creado con éxito/i)).not.toBeInTheDocument();
     });
   
     jest.useRealTimers();
   });
-});  
+});

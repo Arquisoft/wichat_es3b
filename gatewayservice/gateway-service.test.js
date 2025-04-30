@@ -8,91 +8,127 @@ afterAll(async () => {
 
 jest.mock("axios");
 
+// Función auxiliar para crear respuestas de error
+const mockAxiosError = (statusCode, errorData, errorType = "response") => {
+  // errorType puede ser 'response', 'request' o 'generic'
+  if (errorType === "response") {
+    return {
+      response: {
+        status: statusCode,
+        data: errorData,
+      },
+    };
+  } else if (errorType === "request") {
+    return {
+      request: {},
+      message: errorData.message || "Connection refused",
+    };
+  } else {
+    // Error genérico
+    return new Error(errorData.message || "Error inesperado");
+  }
+};
+
+// Respuestas exitosas comunes para reutilizar
+const successResponses = {
+  login: { data: { token: "mockedToken" } },
+  adduser: { data: { userId: "mockedUserId" } },
+  askllm: { data: { answer: "llmanswer" } },
+  aiAnswer: { data: { answer: "AI generó esta respuesta" } },
+  generateApikey: { data: { apiKey: "mock-api-key-12345" } },
+  savestats: { data: { success: true, message: "Estadísticas guardadas" } },
+  validateApikey: { data: { valid: true, username: "testuser" } },
+  getStats: { data: { games: 10, wins: 7, ratio: 0.7 } },
+  getRanking: {
+    data: [
+      { username: "user1", wins: 10 },
+      { username: "user2", wins: 8 },
+    ],
+  },
+  getTop3: {
+    data: [
+      { username: "user1", wins: 10 },
+      { username: "user2", wins: 8 },
+      { username: "user3", wins: 5 },
+    ],
+  },
+  getGames: {
+    data: {
+      totalGames: 20,
+      gamesPerMonth: [
+        { month: "Enero", games: 5 },
+        { month: "Febrero", games: 15 },
+      ],
+    },
+  },
+  getRatiosPerMonth: {
+    data: [
+      { month: "Enero", ratio: 0.8 },
+      { month: "Febrero", ratio: 0.6 },
+    ],
+  },
+  getQuestionsGenerated: {
+    data: [
+      {
+        id: 1,
+        question: "¿Pregunta generada?",
+        answer: "respuesta",
+        topic: "ciencia",
+      },
+    ],
+  },
+  getQuestionsDB: {
+    data: [
+      {
+        id: 1,
+        question: "¿Pregunta de la base de datos?",
+        answer: "respuesta",
+        topic: "historia",
+      },
+    ],
+  },
+};
+
 describe("Gateway Service", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
     // Default mock implementations
-    axios.post.mockImplementation((url, data) => {
+    axios.post.mockImplementation((url) => {
       if (url.endsWith("/login")) {
-        return Promise.resolve({ data: { token: "mockedToken" } });
+        return Promise.resolve(successResponses.login);
       } else if (url.endsWith("/adduser")) {
-        return Promise.resolve({ data: { userId: "mockedUserId" } });
+        return Promise.resolve(successResponses.adduser);
       } else if (url.endsWith("/ask")) {
-        return Promise.resolve({ data: { answer: "llmanswer" } });
+        return Promise.resolve(successResponses.askllm);
       } else if (url.endsWith("/ai-answer")) {
-        return Promise.resolve({
-          data: { answer: "AI generó esta respuesta" },
-        });
+        return Promise.resolve(successResponses.aiAnswer);
       } else if (url.endsWith("/generate-apikey")) {
-        return Promise.resolve({ data: { apiKey: "mock-api-key-12345" } });
+        return Promise.resolve(successResponses.generateApikey);
       } else if (url.endsWith("/savestats")) {
-        return Promise.resolve({
-          data: { success: true, message: "Estadísticas guardadas" },
-        });
+        return Promise.resolve(successResponses.savestats);
       }
     });
 
     axios.get.mockImplementation((url) => {
       if (url.includes("/validate-apikey/")) {
-        return Promise.resolve({ data: { valid: true, username: "testuser" } });
+        return Promise.resolve(successResponses.validateApikey);
       } else if (url.includes("/getstats/")) {
-        return Promise.resolve({ data: { games: 10, wins: 7, ratio: 0.7 } });
+        return Promise.resolve(successResponses.getStats);
       } else if (url.includes("/getranking")) {
-        return Promise.resolve({
-          data: [
-            { username: "user1", wins: 10 },
-            { username: "user2", wins: 8 },
-          ],
-        });
+        return Promise.resolve(successResponses.getRanking);
       } else if (url.includes("/getTop3")) {
-        return Promise.resolve({
-          data: [
-            { username: "user1", wins: 10 },
-            { username: "user2", wins: 8 },
-            { username: "user3", wins: 5 },
-          ],
-        });
+        return Promise.resolve(successResponses.getTop3);
       } else if (url.includes("/games/")) {
-        return Promise.resolve({
-          data: {
-            totalGames: 20,
-            gamesPerMonth: [
-              { month: "Enero", games: 5 },
-              { month: "Febrero", games: 15 },
-            ],
-          },
-        });
+        return Promise.resolve(successResponses.getGames);
       } else if (url.includes("/ratios-per-month/")) {
-        return Promise.resolve({
-          data: [
-            { month: "Enero", ratio: 0.8 },
-            { month: "Febrero", ratio: 0.6 },
-          ],
-        });
+        return Promise.resolve(successResponses.getRatiosPerMonth);
       } else if (url.includes("/questions")) {
-        const response = url.includes("/questionsDB")
-          ? {
-              data: [
-                {
-                  id: 1,
-                  question: "¿Pregunta de la base de datos?",
-                  answer: "respuesta",
-                  topic: "historia",
-                },
-              ],
-            }
-          : {
-              data: [
-                {
-                  id: 1,
-                  question: "¿Pregunta generada?",
-                  answer: "respuesta",
-                  topic: "ciencia",
-                },
-              ],
-            };
-        return Promise.resolve(response);
+        return Promise.resolve(
+          url.includes("/questionsDB")
+            ? successResponses.getQuestionsDB
+            : successResponses.getQuestionsGenerated
+        );
       }
     });
   });
@@ -119,16 +155,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle login service errors", async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith("/login")) {
-        return Promise.reject({
-          response: {
-            status: 401,
-            data: { error: "Credenciales inválidas" },
-          },
-        });
-      }
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(401, { error: "Credenciales inválidas" })
+    );
 
     const response = await request(app)
       .post("/login")
@@ -153,16 +182,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle adduser service errors", async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith("/adduser")) {
-        return Promise.reject({
-          response: {
-            status: 409,
-            data: { error: "El usuario ya existe" },
-          },
-        });
-      }
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(409, { error: "El usuario ya existe" })
+    );
 
     const response = await request(app)
       .post("/adduser")
@@ -188,16 +210,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle askllm service errors", async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith("/ask")) {
-        return Promise.reject({
-          response: {
-            status: 400,
-            data: { error: "Formato de pregunta incorrecto" },
-          },
-        });
-      }
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(400, { error: "Formato de pregunta incorrecto" })
+    );
 
     const response = await request(app)
       .post("/askllm")
@@ -222,16 +237,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle ai-answer service errors with response", async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith("/ai-answer")) {
-        return Promise.reject({
-          response: {
-            status: 400,
-            data: { error: "Contexto insuficiente" },
-          },
-        });
-      }
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(400, { error: "Contexto insuficiente" })
+    );
 
     const response = await request(app)
       .post("/ai-answer")
@@ -242,14 +250,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle ai-answer service errors with request failure", async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith("/ai-answer")) {
-        return Promise.reject({
-          request: {}, // Solo contiene el objeto request sin response
-          message: "Connection refused",
-        });
-      }
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(0, { message: "Connection refused" }, "request")
+    );
 
     const response = await request(app)
       .post("/ai-answer")
@@ -260,11 +263,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle ai-answer general errors", async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith("/ai-answer")) {
-        return Promise.reject(new Error("Error inesperado"));
-      }
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(0, { message: "Error inesperado" }, "generic")
+    );
 
     const response = await request(app)
       .post("/ai-answer")
@@ -288,16 +289,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle savestats service errors with response", async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith("/savestats")) {
-        return Promise.reject({
-          response: {
-            status: 400,
-            data: { error: "Datos incompletos" },
-          },
-        });
-      }
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(400, { error: "Datos incompletos" })
+    );
 
     const response = await request(app)
       .post("/savestats")
@@ -308,14 +302,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle savestats service errors with request failure", async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith("/savestats")) {
-        return Promise.reject({
-          request: {}, // Solo contiene el objeto request sin response
-          message: "Connection refused",
-        });
-      }
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(0, { message: "Connection refused" }, "request")
+    );
 
     const response = await request(app)
       .post("/savestats")
@@ -328,11 +317,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle savestats general errors", async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith("/savestats")) {
-        return Promise.reject(new Error("Error inesperado"));
-      }
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(0, { message: "Error inesperado" }, "generic")
+    );
 
     const response = await request(app)
       .post("/savestats")
@@ -355,16 +342,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle getstats service errors with response", async () => {
-    axios.get.mockImplementationOnce((url) => {
-      if (url.includes("/getstats/")) {
-        return Promise.reject({
-          response: {
-            status: 404,
-            data: { error: "Usuario no encontrado" },
-          },
-        });
-      }
-    });
+    axios.get.mockRejectedValueOnce(
+      mockAxiosError(404, { error: "Usuario no encontrado" })
+    );
 
     const response = await request(app).get("/getstats/nonexistentuser");
 
@@ -373,14 +353,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle getstats service errors with request failure", async () => {
-    axios.get.mockImplementationOnce((url) => {
-      if (url.includes("/getstats/")) {
-        return Promise.reject({
-          request: {}, // Solo contiene el objeto request sin response
-          message: "Connection refused",
-        });
-      }
-    });
+    axios.get.mockRejectedValueOnce(
+      mockAxiosError(0, { message: "Connection refused" }, "request")
+    );
 
     const response = await request(app).get("/getstats/testuser");
 
@@ -391,11 +366,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle getstats general errors", async () => {
-    axios.get.mockImplementationOnce((url) => {
-      if (url.includes("/getstats/")) {
-        return Promise.reject(new Error("Error inesperado"));
-      }
-    });
+    axios.get.mockRejectedValueOnce(
+      mockAxiosError(0, { message: "Error inesperado" }, "generic")
+    );
 
     const response = await request(app).get("/getstats/testuser");
 
@@ -418,16 +391,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle getranking service errors", async () => {
-    axios.get.mockImplementationOnce((url) => {
-      if (url.includes("/getranking")) {
-        return Promise.reject({
-          response: {
-            status: 500,
-            data: { error: "Error al obtener ranking" },
-          },
-        });
-      }
-    });
+    axios.get.mockRejectedValueOnce(
+      mockAxiosError(500, { error: "Error al obtener ranking" })
+    );
 
     const response = await request(app).get("/getranking");
 
@@ -449,16 +415,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle getTop3 service errors", async () => {
-    axios.get.mockImplementationOnce((url) => {
-      if (url.includes("/getTop3")) {
-        return Promise.reject({
-          response: {
-            status: 500,
-            data: { error: "Error al obtener top 3" },
-          },
-        });
-      }
-    });
+    axios.get.mockRejectedValueOnce(
+      mockAxiosError(500, { error: "Error al obtener top 3" })
+    );
 
     const response = await request(app).get("/getTop3");
 
@@ -491,16 +450,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle games service errors", async () => {
-    axios.get.mockImplementationOnce((url) => {
-      if (url.includes("/games/")) {
-        return Promise.reject({
-          response: {
-            status: 404,
-            data: { error: "Usuario no encontrado" },
-          },
-        });
-      }
-    });
+    axios.get.mockRejectedValueOnce(
+      mockAxiosError(404, { error: "Usuario no encontrado" })
+    );
 
     const response = await request(app).get("/games/nonexistentuser");
 
@@ -530,16 +482,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle ratios-per-month service errors", async () => {
-    axios.get.mockImplementationOnce((url) => {
-      if (url.includes("/ratios-per-month/")) {
-        return Promise.reject({
-          response: {
-            status: 404,
-            data: { error: "Usuario no encontrado" },
-          },
-        });
-      }
-    });
+    axios.get.mockRejectedValueOnce(
+      mockAxiosError(404, { error: "Usuario no encontrado" })
+    );
 
     const response = await request(app).get(
       "/ratios-per-month/nonexistentuser"
@@ -577,11 +522,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle questions service errors", async () => {
-    axios.get.mockImplementationOnce((url) => {
-      if (url.includes("/questions")) {
-        return Promise.reject(new Error("Error al obtener preguntas"));
-      }
-    });
+    axios.get.mockRejectedValueOnce(
+      mockAxiosError(0, { message: "Error al obtener preguntas" }, "generic")
+    );
 
     const response = await request(app).get("/questions");
 
@@ -617,11 +560,13 @@ describe("Gateway Service", () => {
   });
 
   it("should handle questionsDB service errors", async () => {
-    axios.get.mockImplementationOnce((url) => {
-      if (url.includes("/questionsDB")) {
-        return Promise.reject(new Error("Error al obtener preguntas de DB"));
-      }
-    });
+    axios.get.mockRejectedValueOnce(
+      mockAxiosError(
+        0,
+        { message: "Error al obtener preguntas de DB" },
+        "generic"
+      )
+    );
 
     const response = await request(app).get("/questionsDB");
 
@@ -644,12 +589,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle EMAIL_REQUIRED error from user service", async () => {
-    axios.post.mockRejectedValueOnce({
-      response: {
-        status: 400,
-        data: { errorCode: "EMAIL_REQUIRED" },
-      },
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(400, { errorCode: "EMAIL_REQUIRED" })
+    );
 
     const response = await request(app).post("/generate-apikey").send({}); // Sin email
 
@@ -658,12 +600,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle INVALID_EMAIL_FORMAT error from user service", async () => {
-    axios.post.mockRejectedValueOnce({
-      response: {
-        status: 400,
-        data: { errorCode: "INVALID_EMAIL_FORMAT" },
-      },
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(400, { errorCode: "INVALID_EMAIL_FORMAT" })
+    );
 
     const response = await request(app)
       .post("/generate-apikey")
@@ -674,12 +613,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle EMAIL_ALREADY_EXISTS error from user service", async () => {
-    axios.post.mockRejectedValueOnce({
-      response: {
-        status: 400,
-        data: { errorCode: "EMAIL_ALREADY_EXISTS" },
-      },
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(400, { errorCode: "EMAIL_ALREADY_EXISTS" })
+    );
 
     const response = await request(app)
       .post("/generate-apikey")
@@ -690,12 +626,9 @@ describe("Gateway Service", () => {
   });
 
   it("should return GENERIC error code for unexpected errors", async () => {
-    axios.post.mockRejectedValueOnce({
-      response: {
-        status: 500,
-        data: { error: "Internal server error" },
-      },
-    });
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(500, { error: "Internal server error" })
+    );
 
     const response = await request(app)
       .post("/generate-apikey")
@@ -706,9 +639,7 @@ describe("Gateway Service", () => {
   });
 
   it("should handle network errors when user service is unavailable", async () => {
-    axios.post.mockRejectedValueOnce({
-      request: {}, // Simula un error de red (sin respuesta)
-    });
+    axios.post.mockRejectedValueOnce(mockAxiosError(0, {}, "request"));
 
     const response = await request(app)
       .post("/generate-apikey")
@@ -732,16 +663,9 @@ describe("Gateway Service", () => {
   });
 
   it("should handle errors from validate-apikey endpoint", async () => {
-    axios.get.mockImplementationOnce((url) => {
-      if (url.includes("/validate-apikey/")) {
-        return Promise.reject({
-          response: {
-            status: 401,
-            data: { error: "API key inválida" },
-          },
-        });
-      }
-    });
+    axios.get.mockRejectedValueOnce(
+      mockAxiosError(401, { error: "API key inválida" })
+    );
 
     const response = await request(app).get("/validate-apikey/invalid-key");
 
