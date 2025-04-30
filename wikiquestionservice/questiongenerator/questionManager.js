@@ -16,10 +16,7 @@ class QuestionManager {
             if (wikidataService) {
                 const promise = wikidataService.generateQuestions()
                     .then(() => {
-                        const preguntas = wikidataService.getQuestions().map(pregunta => ({
-                            ...pregunta,
-                            categoria: categoryName
-                        }));
+                        const preguntas = wikidataService.getQuestions();
                         console.log(`✅ ${preguntas.length} preguntas generadas para '${categoryName}'`);
                         return preguntas;
                     })
@@ -50,13 +47,6 @@ class QuestionManager {
         }
     }
 
-
-    getRandomQuestion() {
-        if (this.questions.length === 0) {
-            throw new Error("No hay preguntas disponibles.");
-        }
-        return this.questions.shift();
-    }
 }
 
 module.exports = QuestionManager;
