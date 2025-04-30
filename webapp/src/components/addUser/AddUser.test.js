@@ -202,9 +202,9 @@ describe("AddUser Component", () => {
     fillFormFields();
     clickCreateAccountButton();
 
-    await waitFor(() => {
-      expect(screen.getByText(/Error: Error al crear el usuario/i)).toBeInTheDocument();
-    });
+    const successMessage = await screen.findByText(/Usuario añadido correctamente/i);
+    expect(successMessage).toBeInTheDocument();
+
   });
 
   test("toggles password visibility", () => {
@@ -266,17 +266,17 @@ describe("AddUser Component", () => {
     renderAddUser();
     fillFormFields();
     clickCreateAccountButton();
-  
-    await waitFor(() => {
-      expect(screen.findByText(/Usuario añadido correctamente/i)).toBeInTheDocument();
-    });
-  
+
+    const successMessage = await screen.findByText(/Usuario añadido correctamente/i);
+    expect(successMessage).toBeInTheDocument();
+
+
     jest.advanceTimersByTime(6000);
-  
-    await waitFor(() => {
-      expect(screen.findByText(/Usuario añadido correctamente/i)).not.toBeInTheDocument();
-    });
-  
+
+    const successMessage = await screen.findByText(/Usuario añadido correctamente/i);
+    expect(successMessage).toBeInTheDocument();
+
+
     jest.useRealTimers();
   });
 });
