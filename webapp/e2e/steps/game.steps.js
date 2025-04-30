@@ -91,7 +91,7 @@ defineFeature(feature, test => {
             }
         });
 
-        then('When I play a game', async () => {
+        then('Then the results page should be shown', async () => {
             await page.waitForSelector('h1', { text: "Resumen de la partida", timeout: 5000 });
             const finalScoreText = await page.$eval('h1', el => el.textContent.trim());
             expect(finalScoreText).toBe('Resumen de la partida');
