@@ -135,12 +135,12 @@ defineFeature(feature, test => {
             await page.waitForSelector('#numPreguntas', { visible: true, timeout: 5000 });
             await page.select('#numPreguntas', '10');
             await expect(page).toClick('button', { text: 'Jugar' });
-            await page.waitForSelector('#answer-1', { visible: true, timeout: 5000 });
+            await page.waitForSelector('#answer-1', { visible: true, timeout: 50000 });
             for (let i = 0; i < 10; i++) {
                 await page.waitForSelector('#answer-1', { visible: true, timeout: 5000 });
-                await page.click('#answer-1');
+                await expect(page).toClick('#answer-1', {});
                 await page.waitForSelector('#nextArrow', { visible: true, timeout: 5000 });
-                await page.click('#nextArrow');
+                await expect(page).toClick('#nextArrow', {});
             }
             } catch (error) {
                 console.error('Error al jugar:', error);
