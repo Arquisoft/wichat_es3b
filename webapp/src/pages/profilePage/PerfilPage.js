@@ -15,8 +15,9 @@ import { useTranslation } from "react-i18next";
 export default function PerfilPage() {
   const { t } = useTranslation();
   const { username: paramUsername } = useParams();
+  const [userNotFound, setUserNotFound] = useState(false);
   const username = paramUsername || localStorage.getItem("username");
-  
+
   const [userData, setUserData] = useState({
     username: "",
     level: 1, // TODO: no está en el servicio de estadísticas
@@ -99,6 +100,11 @@ export default function PerfilPage() {
       }));
     } catch (error) {
       console.error("Error al cargar las estadísticas: ", error);
+      if (error.response && error.response.status === 404) {
+        setUserNotFound(true);
+      } else {
+        setUserNotFound(false); // Otro tipo de error
+      }
     }
   };
 
@@ -203,7 +209,7 @@ export default function PerfilPage() {
 
   // Cargar estadísticas de usuario
   useEffect(() => {
-    if(userData.username){
+    if (userData.username) {
       loadUserStats(userData.username);
       loadGameHistory(userData.username);
       loadMonthlyStats(userData.username);
@@ -214,31 +220,38 @@ export default function PerfilPage() {
     <div className="app-container">
       <Navbar />
       <div className={`main-content ${sidebarVisible ? "with-sidebar" : ""}`}>
-        <SidebarToggleButton onClick={toggleSidebar}></SidebarToggleButton>
-        <div className="sidebar-stats">
-          <Sidebar
-            userData={userData}
-            isVisible={sidebarVisible}
-            onClose={closeSideBar}
-          ></Sidebar>
-        </div>
-        <div className="content-area">
-          <ProfileCard userData={userData} />
-          <StatsGraphs
-            monthlyData={userData.monthlyData}
-            pieData={userData.pieData}
-          />
-          {userData.gameHistory && userData.gameHistory.length > 0 && (
-            <GameHistory
-              games={userData.gameHistory}
-              currentIndex={currentGameIndex}
-              onNavigate={navigateGames}
-            />
-          )}
-        </div>
+        {userNotFound ? (
+          <div className="user-not-found">
+            <h1>{t("userNotFound")}</h1>
+          </div>
+        ) : (
+          <>
+            <SidebarToggleButton onClick={toggleSidebar} />
+            <div className="sidebar-stats">
+              <Sidebar
+                userData={userData}
+                isVisible={sidebarVisible}
+                onClose={closeSideBar}
+              />
+            </div>
+            <div className="content-area">
+              <ProfileCard userData={userData} />
+              <StatsGraphs
+                monthlyData={userData.monthlyData}
+                pieData={userData.pieData}
+              />
+              {userData.gameHistory && userData.gameHistory.length > 0 && (
+                <GameHistory
+                  games={userData.gameHistory}
+                  currentIndex={currentGameIndex}
+                  onNavigate={navigateGames}
+                />
+              )}
+            </div>
+          </>
+        )}
       </div>
-
-      <Footer></Footer>
+      <Footer />
     </div>
   );
 }

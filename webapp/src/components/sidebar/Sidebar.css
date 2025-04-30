@@ -6,7 +6,8 @@
   height: 100%;
   width: 100%;
   overflow-y: auto;
-  transform: translateX(-100%);
+  transform: translateX(-200%);
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar.visible {
@@ -127,7 +128,7 @@
   }
 
   .sidebar:not(.visible) {
-    transform: translateX(-100%);
+    transform: translateX(-200%);
   }
 
   .sidebar-overlay {
