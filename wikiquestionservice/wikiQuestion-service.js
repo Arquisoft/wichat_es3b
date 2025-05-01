@@ -139,7 +139,7 @@ async function saveQuestionsToDB(questions) {
   try {
     for (const q of questions) {
       const newQuestion = new Question({
-        category: q.categoria,
+        category: q.categoryName,
         question: q.preguntas,
         correctAnswer: q.respuestaCorrecta,
         incorrectAnswers: q.respuestasIncorrectas,
@@ -180,9 +180,31 @@ async function generateQuestions() {
   }
 }
 
+async function obtainQuestions() {
+  try {
+    await connectDB();
+
+    const total = await Question.countDocuments();
+    console.log(`📊 Total de preguntas en la base de datos: ${total}`);
+
+    const categorias = ["paises", "cine", "clubes", "literatura", "arte"];
+    for (const categoria of categorias) {
+      const count = await Question.countDocuments({ category: categoria });
+      console.log(`📂 ${categoria}: ${count} preguntas`);
+    }
+
+    await disconnectDB();
+  } catch (error) {
+    console.error("❌ Error al obtener el conteo de preguntas:", error);
+  }
+}
+
 if (require.main === module) {
   app.listen(port, () => {
     console.log(`🚀 Question Service listening at http://localhost:${port}`);
+    obtainQuestions().catch((err) =>
+        console.error("❌ Error al obtener preguntas:", err)
+    );
   });
 }
 
