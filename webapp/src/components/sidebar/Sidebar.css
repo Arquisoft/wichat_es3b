@@ -6,7 +6,8 @@
   height: 100%;
   width: 100%;
   overflow-y: auto;
-  transform: translateX(-100%);
+  transform: translateX(-200%);
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar.visible {
@@ -16,6 +17,10 @@
 .sidebar-header {
   margin-bottom: 1.25rem;
   padding-top: 3.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
 }
 
 .user-header {
@@ -58,18 +63,13 @@
   display: flex;
   justify-content: center;
   margin-bottom: 1.25rem;
-}
-
-.avatar {
   width: 7.5rem;
   height: 7.5rem;
-  border-radius: 0.625rem;
-  object-fit: cover;
-  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
 }
 
-.avatar:hover {
+
+.avatar-container:hover {
   transform: scale(1.05);
 }
 
@@ -128,7 +128,7 @@
   }
 
   .sidebar:not(.visible) {
-    transform: translateX(-100%);
+    transform: translateX(-200%);
   }
 
   .sidebar-overlay {

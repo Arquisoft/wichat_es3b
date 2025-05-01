@@ -1,7 +1,5 @@
 const express = require("express");
-const cors = require("cors");
 const bodyParser = require("body-parser");
-const cron = require("node-cron");
 const QuestionManager = require("./questiongenerator/questionManager");
 const mongoose = require("mongoose");
 const Question = require("./question-model");
@@ -31,7 +29,6 @@ const defaultNumQuestions = 25;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
 
 function filterValidTopics(rawTopic) {
   const validCategories = ["paises", "cine", "clubes", "literatura", "arte", "all"];
@@ -118,8 +115,6 @@ app.get("/questionsDB", async (req, res) => {
         console.log(`⚠️ No hay preguntas disponibles para la categoría '${topic}'`);
       }
 
-      const questionIds = categoryQuestions.map(q => q._id);
-      await Question.deleteMany({ _id: { $in: questionIds } });
 
       selectedQuestions.push(...categoryQuestions);
     }
