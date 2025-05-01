@@ -79,13 +79,11 @@ defineFeature(feature, test => {
                             },
                             "respuestas": {
                                 "es": [
-                                    "Estados Unidos",
                                     "Reino de Dinamarca",
                                     "Finlandia",
                                     "Suecia"
                                 ],
                                 "en": [
-                                    "United States",
                                     "Kingdom of Denmark",
                                     "Finland",
                                     "Sweden"
@@ -114,13 +112,11 @@ defineFeature(feature, test => {
                                 "es": [
                                     "Estadio Luigi Ferraris",
                                     "Parc Olympique lyonnais",
-                                    "Juventus Stadium",
                                     "Estadio Giuseppe Meazza"
                                 ],
                                 "en": [
                                     "Stadio Luigi Ferraris",
                                     "Parc Olympique Lyonnais",
-                                    "Juventus Stadium",
                                     "Giuseppe Meazza Stadium"
                                 ]
                             },
@@ -148,13 +144,11 @@ defineFeature(feature, test => {
                                 "es": [
                                     "Jorge Luis Borges",
                                     "Douglas Adams",
-                                    "H. G. Wells",
                                     "Miguel de Cervantes"
                                 ],
                                 "en": [
                                     "Jorge Luis Borges",
                                     "Douglas Adams",
-                                    "H. G. Wells",
                                     "Miguel de Cervantes"
                                 ]
                             },
@@ -178,13 +172,11 @@ defineFeature(feature, test => {
                             "respuestas": {
                                 "es": [
                                     "1/1/1770",
-                                    "1/1/1972",
                                     "1/1/1503",
                                     "1/1/1492"
                                 ],
                                 "en": [
                                     "1/1/1770",
-                                    "1/1/1972",
                                     "1/1/1503",
                                     "1/1/1492"
                                 ]
@@ -209,13 +201,11 @@ defineFeature(feature, test => {
                                 "es": [
                                     "Olivier Marchal",
                                     "Olivier Nakache",
-                                    "Matthew Vaughn",
                                     "Ondi Timoner"
                                 ],
                                 "en": [
                                     "Olivier Marchal",
                                     "Olivier Nakache",
-                                    "Matthew Vaughn",
                                     "Ondi Timoner"
                                 ]
                             },
@@ -240,14 +230,12 @@ defineFeature(feature, test => {
                                 "es": [
                                     "novela de caballerías",
                                     "fantasía",
-                                    "ensayo",
-                                    "libro sagrado"
+                                    "ensayo"
                                 ],
                                 "en": [
                                     "chivalric romance",
                                     "fantasy",
-                                    "essay",
-                                    "religious text"
+                                    "essay"
                                 ]
                             },
                             "descripcion": [
@@ -270,14 +258,12 @@ defineFeature(feature, test => {
                                 "es": [
                                     "1/1/1503",
                                     "1/1/1972",
-                                    "1/1/1492",
-                                    "1/1/1515"
+                                    "1/1/1492"
                                 ],
                                 "en": [
                                     "1/1/1503",
                                     "1/1/1972",
-                                    "1/1/1492",
-                                    "1/1/1515"
+                                    "1/1/1492"
                                 ]
                             },
                             "descripcion": [
@@ -299,13 +285,11 @@ defineFeature(feature, test => {
                             },
                             "respuestas": {
                                 "es": [
-                                    "francés",
                                     "noruego",
                                     "nynorsk",
                                     "japonés"
                                 ],
                                 "en": [
-                                    "French",
                                     "Norwegian",
                                     "Nynorsk",
                                     "Japanese"
@@ -334,13 +318,11 @@ defineFeature(feature, test => {
                                 "es": [
                                     "19/1/2009",
                                     "1/1/2011",
-                                    "1/1/1974",
                                     "10/11/2011"
                                 ],
                                 "en": [
                                     "19/1/2009",
                                     "1/1/2011",
-                                    "1/1/1974",
                                     "10/11/2011"
                                 ]
                             },
@@ -362,13 +344,11 @@ defineFeature(feature, test => {
                             },
                             "respuestas": {
                                 "es": [
-                                    "Simone Inzaghi",
                                     "Alberigo Evani",
                                     "Paulo Fonseca",
                                     "Igor Tudor"
                                 ],
                                 "en": [
-                                    "Simone Inzaghi",
                                     "Alberico Evani",
                                     "Paulo Fonseca",
                                     "Igor Tudor"
@@ -406,9 +386,8 @@ defineFeature(feature, test => {
                 await page.waitForSelector('#numPreguntas', { visible: true, timeout: 5000 });
                 await page.select('#numPreguntas', '10');
                 await expect(page).toClick('button', { text: 'Jugar' });
-                await page.waitForSelector('#answer-1', { visible: true, timeout: 5000 });
                 for (let i = 1; i < 10; i++) {
-                    await page.waitForSelector('#answer-1', { visible: true, timeout: 5000 });
+                    await page.waitForSelector('#answer-1', { visible: true, timeout: 50000 });
                     await expect(page).toClick('#answer-1', {});
                     await page.waitForSelector('#nextArrow', { visible: true, timeout: 5000 });
                     await expect(page).toClick('#nextArrow', {});

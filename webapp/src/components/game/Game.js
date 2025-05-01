@@ -414,7 +414,7 @@ const Game = ({ onGameEnd }) => {
 
               {/* Answer Buttons */}
               <div className="answerPanel">
-                {shuffledAnswers.map((respuesta, index) => (
+                { shuffledAnswers.map((respuesta, index) => (
                     <BaseButton
                         buttonid={`answer-${index}`}
                         key={index}
