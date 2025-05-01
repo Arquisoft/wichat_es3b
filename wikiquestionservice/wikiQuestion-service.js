@@ -158,47 +158,25 @@ async function saveQuestionsToDB(questions) {
 async function obtainQuestions() {
   try {
     await connectDB();
-
-    const total = await Question.countDocuments();
-    console.log(`📊 Total de preguntas en la base de datos: ${total}`);
-
     const categorias = ["paises", "cine", "clubes", "literatura", "arte"];
     for (const categoria of categorias) {
       const count = await Question.countDocuments({ category: categoria });
-      console.log(`📂 ${categoria}: ${count} preguntas`);
       if (count < 60) {
         const missingQuestionsCount = 60 - count;
-        console.log(`⚠️ Faltan ${missingQuestionsCount} preguntas en la categoría '${categoria}'`);
         const additionalQuestions = await questionManager.loadAllQuestions([categoria], missingQuestionsCount);
         if (additionalQuestions && additionalQuestions.length > 0) {
           await saveQuestionsToDB(additionalQuestions);
-          console.log(`✅ Se han guardado ${additionalQuestions.length} preguntas adicionales en la categoría '${categoria}'`);
-        } else {
-          console.log(`❌ No se generaron preguntas adicionales para '${categoria}'`);
         }
       }else {
-        console.log(`💡 La categoría '${categoria}' tiene 60 o más preguntas. Procediendo a eliminar 4 preguntas y agregar 4 nuevas...`);
-
         const questionsToDelete = await Question.find({ category: categoria }).limit(4);
         const questionIdsToDelete = questionsToDelete.map(q => q._id);
-
         await Question.deleteMany({ _id: { $in: questionIdsToDelete } });
-        console.log(`✅ Se han eliminado 4 preguntas de la categoría '${categoria}'`);
-
         const newQuestions = await questionManager.loadAllQuestions([categoria], 4);
         if (newQuestions && newQuestions.length > 0) {
           await saveQuestionsToDB(newQuestions);
-          console.log(`✅ Se han guardado 4 nuevas preguntas en la categoría '${categoria}'`);
-        } else {
-          console.log(`❌ No se generaron nuevas preguntas para '${categoria}'`);
         }
       }
     }
-
-    const updatedQuestions = await Question.find();
-    console.log("📋 Preguntas actuales en la base de datos:");
-    console.log(updatedQuestions);
-
     await disconnectDB();
   } catch (error) {
     console.error("❌ Error al obtener el conteo de preguntas:", error);
