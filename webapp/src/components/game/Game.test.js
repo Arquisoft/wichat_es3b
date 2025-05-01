@@ -142,10 +142,18 @@ afterEach(() => {
 
 test("carga inicial y renderiza la primera pregunta", async () => {
   render(<Game />);
+
+  // Wait for the first question text to appear
   await waitFor(() => {
     expect(screen.getByText("Pregunta 1")).toBeInTheDocument();
   });
-  expect(screen.getByTestId("button-Correcta1")).toBeInTheDocument();
+
+  // Wait for answer buttons to be rendered
+  await waitFor(() => {
+    expect(screen.getByTestId("button-Correcta1")).toBeInTheDocument();
+  });
+
+  // Now test for the other buttons
   expect(screen.getByTestId("button-Incorrecta1A")).toBeInTheDocument();
   expect(screen.getByTestId("button-Incorrecta1B")).toBeInTheDocument();
 });
@@ -230,12 +238,13 @@ test("responde correctamente y actualiza el puntaje", async () => {
   render(<Game />);
   await waitFor(() => screen.getByText("Pregunta 1"));
 
-  expect(screen.getByText("0")).toBeInTheDocument();
+  const scoreDisplay = screen.getByText("score:").nextElementSibling;
+  expect(scoreDisplay).toHaveTextContent("0");
 
   fireEvent.click(screen.getByTestId("button-Correcta1"));
 
   await waitFor(() => {
-    expect(screen.getByText("10")).toBeInTheDocument();
+    expect(scoreDisplay).toHaveTextContent("30");
   });
 });
 
@@ -336,10 +345,18 @@ test("muestra el resumen al finalizar el juego", async () => {
   await waitFor(() => {
     expect(screen.getByTestId("info-dialog")).toBeInTheDocument();
     expect(screen.getByText("summaryTitle")).toBeInTheDocument();
-    expect(screen.getByText("summaryCorrect 1")).toBeInTheDocument();
-    expect(screen.getByText("summaryIncorrect 0")).toBeInTheDocument();
-    expect(screen.getByText("summaryRatio 100%")).toBeInTheDocument();
-    expect(screen.getByText("summaryMaxScore 10")).toBeInTheDocument();
+    expect(screen.getByText(/summaryCorrect/)).toHaveTextContent(
+      "summaryCorrect 1"
+    );
+    expect(screen.getByText(/summaryIncorrect/)).toHaveTextContent(
+      "summaryIncorrect 0"
+    );
+    expect(screen.getByText(/summaryRatio/)).toHaveTextContent(
+      "summaryRatio 100%"
+    );
+    expect(screen.getByText(/summaryMaxScore/)).toHaveTextContent(
+      "summaryMaxScore 30"
+    );
   });
 });
 

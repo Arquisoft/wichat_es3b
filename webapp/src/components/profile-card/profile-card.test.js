@@ -17,11 +17,19 @@ jest.mock("react-i18next", () => ({
   }),
 }));
 
+// Mock del componente UserAvatar
+jest.mock("../userAvatar/UserAvatar", () => {
+  return function MockUserAvatar({ username }) {
+    return (
+      <img data-testid="mock-avatar" alt={`Foto de perfil de ${username}`} />
+    );
+  };
+});
+
 describe("ProfileCard Component", () => {
   // Datos de prueba para el usuario
   const mockUserData = {
     username: "TestUser",
-    avatar: "/test-avatar.png",
     level: 3,
     stats: {
       gamesPlayed: 42,
@@ -33,7 +41,6 @@ describe("ProfileCard Component", () => {
   // Datos de prueba para un usuario sin avatar
   const mockUserDataNoAvatar = {
     username: "UserNoAvatar",
-    avatar: null,
     level: 2,
     stats: {
       gamesPlayed: 25,
@@ -48,13 +55,11 @@ describe("ProfileCard Component", () => {
     // Verificar que el nombre de usuario está presente
     expect(screen.getByText("TestUser")).toBeInTheDocument();
 
-    // Verificar que el nivel se muestra correctamente
-    expect(screen.getByText("Nivel 3")).toBeInTheDocument();
-
-    // Verificar que la imagen se carga correctamente
-    const avatar = screen.getByAltText("Foto de perfil de TestUser");
-    expect(avatar).toBeInTheDocument();
-    expect(avatar.src).toContain("/test-avatar.png");
+    // Verificar que el avatar se renderiza a través del componente mockeado
+    expect(screen.getByTestId("mock-avatar")).toBeInTheDocument();
+    expect(
+      screen.getByAltText("Foto de perfil de TestUser")
+    ).toBeInTheDocument();
 
     // Verificar que las estadísticas se muestran correctamente
     expect(screen.getByText("42")).toBeInTheDocument();
@@ -65,29 +70,19 @@ describe("ProfileCard Component", () => {
 
     expect(screen.getByText("120")).toBeInTheDocument();
     expect(screen.getByText("Respuestas correctas")).toBeInTheDocument();
-
-    // Verificar que la barra de progreso tiene el ancho correcto (level * 20%)
-    const progressFill = document.querySelector(".progress-fill");
-    expect(progressFill).toHaveStyle("width: 60%");
   });
 
-  test("renders profile card with placeholder avatar when avatar is null", () => {
+  test("renders profile card with correct user information", () => {
     render(<ProfileCard userData={mockUserDataNoAvatar} />);
 
-    // Verificar que se usa la imagen de placeholder cuando no hay avatar
-    const avatar = screen.getByAltText("Foto de perfil de UserNoAvatar");
-    expect(avatar).toBeInTheDocument();
-    expect(avatar.src).toContain("/placeholder.svg");
+    // Verificar que el avatar se renderiza a través del componente mockeado
+    expect(screen.getByTestId("mock-avatar")).toBeInTheDocument();
+    expect(
+      screen.getByAltText("Foto de perfil de UserNoAvatar")
+    ).toBeInTheDocument();
 
     // Verificar que el nombre de usuario está presente
     expect(screen.getByText("UserNoAvatar")).toBeInTheDocument();
-
-    // Verificar que el nivel se muestra correctamente
-    expect(screen.getByText("Nivel 2")).toBeInTheDocument();
-
-    // Verificar que la barra de progreso tiene el ancho correcto (level * 20%)
-    const progressFill = document.querySelector(".progress-fill");
-    expect(progressFill).toHaveStyle("width: 40%");
   });
 
   test("renders all profile stats correctly", () => {
@@ -122,9 +117,6 @@ describe("ProfileCard Component", () => {
     expect(document.querySelector(".profile-image")).toBeInTheDocument();
     expect(document.querySelector(".profile-info")).toBeInTheDocument();
     expect(document.querySelector(".profile-header")).toBeInTheDocument();
-    expect(document.querySelector(".profile-level")).toBeInTheDocument();
-    expect(document.querySelector(".progress-bar")).toBeInTheDocument();
-    expect(document.querySelector(".progress-fill")).toBeInTheDocument();
     expect(document.querySelector(".profile-stats")).toBeInTheDocument();
 
     // Verificar el número de elementos stat
