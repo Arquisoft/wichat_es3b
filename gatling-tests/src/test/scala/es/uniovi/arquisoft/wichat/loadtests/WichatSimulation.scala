@@ -3,76 +3,142 @@ package es.uniovi.arquisoft.wichat.loadtests
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import scala.concurrent.duration._
-import java.util.UUID             // Para generar usuarios únicos
+import java.util.UUID
+import scala.util.Random // Para simular datos de partida
+import java.time.Instant // Para obtener la fecha actual en formato ISO
 
 class WichatSimulation extends Simulation {
 
   // 1. Configuración HTTP
-  // Define el protocolo base para las peticiones HTTP
   val httpProtocol = http
-    .baseUrl("http://localhost:8000") // URL base del servicio gateway
-    .acceptHeader("application/json") // Acepta respuestas JSON
-    .contentTypeHeader("application/json") // Envía el cuerpo de las peticiones como JSON
-    .doNotTrackHeader("1") // Añade cabecera DNT (Do Not Track)
-    .acceptLanguageHeader("es-ES,es;q=0.5") // Cabecera de idioma preferido
-    .acceptEncodingHeader("gzip, deflate") // Acepta compresión gzip/deflate
-    .userAgentHeader("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0") // Simula un navegador
+    .baseUrl("http://localhost:8000") // Trabajando en local
+    .acceptHeader("application/json")
+    .contentTypeHeader("application/json")
+    .doNotTrackHeader("1")
+    .acceptLanguageHeader("es-ES,es;q=0.5")
+    .acceptEncodingHeader("gzip, deflate")
+    .userAgentHeader("Gatling/PerformanceTest - Mozilla/5.0")
+  // Considera añadir timeouts si las peticiones tardan demasiado bajo carga alta
+  // .requestTimeout(60.seconds)
 
   // 2. Datos dinámicos para usuarios
-  // Crea un "Feeder" infinito que genera un mapa con username y password únicos en cada iteración
-  val userFeeder = Iterator.continually(Map(
-    "username" -> ( "user_" + UUID.randomUUID().toString.substring(0, 8) ), // Username aleatorio
-    "password" -> ( "pass_" + UUID.randomUUID().toString.substring(0, 8) )  // Password aleatoria
-  ))
+  val userFeeder = Iterator.continually {
+    val uniqueId = UUID.randomUUID().toString.substring(0, 8)
+    Map(
+      "username" -> s"user_$uniqueId",
+      "password" -> s"pass_$uniqueId",
+      "email"    -> s"user_$uniqueId@example.com"
+    )
+  }
 
   // 3. Definición del escenario de usuario virtual
-  val scn = scenario("Simulación básica de WiChat") // Nombre del escenario
-    .feed(userFeeder) // Cada usuario virtual tomará datos únicos del feeder (username/password)
+  val scn = scenario("Simulación WiChat: Flujo con QuestionsDB")
+    .feed(userFeeder)
     .exec(
-      // Primera acción: Registrar el usuario
-      http("1. Registrar Usuario") // Nombre de la petición (aparecerá en los informes)
-        .post("/adduser") // Petición POST al endpoint /adduser
-        .body(StringBody("""{ "username": "${username}", "password": "${password}" }""")).asJson // Cuerpo JSON usando los datos del feeder
-        .check(status.is(200)) // Verifica que el código de estado HTTP sea 200 (OK)
+      // --- REGISTRO ---
+      http("1. Registrar Usuario")
+        .post("/adduser")
+        .body(StringBody("""{ "email": "${email}", "username": "${username}", "password": "${password}" }""")).asJson
+        .check(status.is(200))
     )
-    .pause(1.second) // Espera 1 segundo (simula tiempo de pensamiento)
+    .pause(500.milliseconds, 1.second)
     .exec(
-      // Segunda acción: Iniciar sesión con el usuario recién registrado
+      // --- LOGIN ---
       http("2. Iniciar Sesión")
         .post("/login")
         .body(StringBody("""{ "username": "${username}", "password": "${password}" }""")).asJson
         .check(status.is(200))
-        // Extrae valores de la respuesta JSON y los guarda en la sesión del usuario virtual
-        .check(jsonPath("$.token").saveAs("authToken")) // Guarda el token de autenticación (si existe)
-        .check(jsonPath("$.username").saveAs("loggedInUser")) // Guarda el nombre de usuario logueado
+        .check(jsonPath("$.token").exists.saveAs("authToken"))
+        .check(jsonPath("$.username").is("${username}"))
     )
-    .pause(1.second) // Espera 1 segundo
+    .pause(1.second, 2.seconds)
     .exec(
-      // Tercera acción: Obtener preguntas (requiere estar logueado, aunque no usemos el token en este ejemplo)
-      http("3. Obtener Preguntas (Autenticado)")
-        .get("/questions?n=5&topic=all") // Petición GET para 5 preguntas de cualquier tema
-        // Si la API requiriera autenticación por token:
-        // .header("Authorization", "Bearer ${authToken}") // Añadiría la cabecera de autorización
-        .check(status.is(200))
-        // Verifica la estructura de la respuesta JSON
-        .check(jsonPath("$").ofType[Seq[Any]]) // Verifica que la raíz del JSON sea un Array/Secuencia
-        .check(jsonPath("$.length()").ofType[Int].is(5)) // <-- Check CORREGIDO: Verifica que la longitud (Int) sea 5
+      // --- OBTENER PREGUNTAS DB (Inicio de Partida) ---
+      http("3. Obtener Preguntas DB")
+        .get("/questionsDB?n=5&topic=all") // Usamos el endpoint correcto
+        // --- CORRECCIÓN: Eliminada cabecera Authorization ya que no es necesaria ---
+        // .header("Authorization", "Bearer ${authToken}")
+        .check(status.is(200)) // Aún esperamos 200 OK, pero fallará si el backend tiene errores 500
+        .check(jsonPath("$").ofType[Seq[Any]]) // Esperamos un array
+        .check(jsonPath("$.length()").ofType[Int].is(5)) // Verificamos que vienen 5
     )
-    .pause(1.second) // Espera 1 segundo
+    // --- SIMULAR TIEMPO DE PARTIDA (Lectura + Respuestas en Frontend) ---
+    .pause(20.seconds, 60.seconds) // Simula el tiempo que el usuario interactúa en el frontend
+
+    // --- GUARDAR ESTADÍSTICAS (Fin de Partida) ---
     .exec(
-      // Cuarta acción: Obtener estadísticas del usuario logueado
-      http("4. Obtener Estadísticas (Usuario Logueado)")
-        .get("/getstats/${loggedInUser}") // Petición GET usando el username guardado en la sesión
+      http("4. Guardar Estadísticas")
+        .post("/savestats")
+        // Asumimos que guardar stats SÍ requiere autenticación
+        .header("Authorization", "Bearer ${authToken}")
+        .body(StringBody(session => {
+          val rightAnswers = Random.nextInt(6)
+          val wrongAnswers = 5 - rightAnswers
+          val time = Random.nextInt(41) + 20
+          val score = rightAnswers * (Random.nextInt(5) + 8)
+          val win = rightAnswers > wrongAnswers
+          val currentDate = Instant.now().toString()
+          s"""{
+             |  "username": "${session("username").as[String]}",
+             |  "rightAnswers": $rightAnswers,
+             |  "wrongAnswers": $wrongAnswers,
+             |  "time": $time,
+             |  "score": $score,
+             |  "win": $win,
+             |  "date": "$currentDate",
+             |  "gameMode": "singleplayer"
+             |}""".stripMargin
+        })).asJson
+        .check(status.is(200)) // Se espera 200 OK
+    )
+    .pause(1.second, 3.seconds)
+
+    // --- CONSULTAS DESPUÉS DE JUGAR ---
+    // Asumimos que estas consultas SÍ requieren autenticación
+    .exec(
+      http("5. Obtener Estadísticas (Después de Jugar)")
+        .get("/getstats/${username}")
+        .header("Authorization", "Bearer ${authToken}")
         .check(status.is(200))
-        .check(jsonPath("$.username").is("${loggedInUser}")) // Verifica que el username en la respuesta coincida
+        .check(jsonPath("$.username").is("${username}"))
+        .check(jsonPath("$.games").ofType[Int].is(1))
+    )
+    .pause(500.milliseconds, 1.second)
+    .exec(
+      http("6. Obtener Historial Partidas")
+        .get("/games/${username}")
+        .header("Authorization", "Bearer ${authToken}")
+        .check(status.is(200))
+        .check(jsonPath("$").ofType[Seq[Any]]) // Verificar que la respuesta es un array JSON
+    )
+    .pause(500.milliseconds, 1.second)
+    .exec(
+      http("7. Obtener Ratios Mensuales")
+        .get("/ratios-per-month/${username}")
+        .header("Authorization", "Bearer ${authToken}")
+        .check(status.is(200))
+        .check(jsonPath("$").ofType[Seq[Any]]) // Esperamos un array
+    )
+    .pause(500.milliseconds, 1.second)
+    .exec(
+      http("8. Obtener Ranking")
+        .get("/getranking")
+        // El ranking podría ser público o requerir auth, mantenemos el token por si acaso
+        .header("Authorization", "Bearer ${authToken}")
+        .check(status.is(200))
+        .check(jsonPath("$").ofType[Seq[Any]]) // Esperamos un array
     )
 
-  // 4. Configuración de la inyección de carga
+  // 4. Configuración de la inyección de carga y Aserciones Globales
   setUp(
-    // Define cómo se inyectarán los usuarios virtuales en el escenario 'scn'
-    scn.inject(atOnceUsers(10)) // Inyecta 10 usuarios virtuales de golpe al inicio de la simulación
-    // --- Otras estrategias de inyección comentadas como ejemplo ---
-    // rampUsers(10).during(5.seconds) // Incrementa linealmente 10 usuarios durante 5 segundos
-    // constantUsersPerSec(2).during(15.seconds) // Mantiene una tasa constante de 2 usuarios nuevos por segundo durante 15 segundos
-  ).protocols(httpProtocol) // Asocia el protocolo HTTP definido al principio con esta configuración
+    scn.inject(
+      rampUsers(50).during(30.seconds) // Perfil de carga ejemplo
+    )
+  ).protocols(httpProtocol)
+    .assertions(
+      // Las aserciones sobre tiempo probablemente pasarán, pero la de fallos no mientras /questionsDB falle
+      global.responseTime.percentile(95).lt(1000),
+      global.responseTime.max.lt(2000),
+      global.failedRequests.percent.lt(1) // Objetivo: < 1% de fallos
+    )
 }
