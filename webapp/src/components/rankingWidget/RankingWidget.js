@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { Medal } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import UserAvatar from "../userAvatar/UserAvatar";
 
 const RankingWidget = () => {
   const { t, ready } = useTranslation();
@@ -21,8 +22,6 @@ const RankingWidget = () => {
       const usersInRanking = data.map((user) => ({
         id: user._id,
         name: user.username,
-        profilePic:
-          "https://i.pinimg.com/736x/8d/16/90/8d16902ae35c1e982c2990ff85fa11fb.jpg",
         stats: {
           gamesPlayed: user.games,
           correctAnswers: user.rightAnswers,
@@ -116,11 +115,9 @@ const RankingWidget = () => {
               </div>
               {renderMedalIcon(index)}
               <div className="ranking-user-info">
-                <img
-                  src={user.profilePic}
-                  alt={`Avatar de ${user.name}`}
-                  className="ranking-profile-pic"
-                />
+                <div className="ranking-profile-pic">
+                  <UserAvatar username={user.name}></UserAvatar>
+                </div>
                 <div className="ranking-user-details">
                   <h2 className="ranking-user-name">{user.name}</h2>
                   <div className="ranking-user-stats">

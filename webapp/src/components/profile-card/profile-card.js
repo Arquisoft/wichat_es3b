@@ -1,24 +1,20 @@
-import "./profile-card.css"
+import "./profile-card.css";
 import { useTranslation } from "react-i18next";
+import UserAvatar from "../userAvatar/UserAvatar";
 
 // Componente para mostrar la tarjeta de perfil del usuario
 export default function ProfileCard({ userData }) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <section className="profile-card">
       <div className="profile-image">
-        <img src={userData.avatar || "/placeholder.svg"} alt={`Foto de perfil de ${userData.username}`} />
+        <UserAvatar username={userData.username}></UserAvatar>
       </div>
 
       <div className="profile-info">
         <div className="profile-header">
           <h2>{userData.username}</h2>
-          <div className="profile-level">{`${t("level")} ${userData.level}`}</div>
-        </div>
-
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: `${userData.level * 20}%` }}></div>
         </div>
 
         <div className="profile-stats">
@@ -48,6 +44,5 @@ export default function ProfileCard({ userData }) {
         </div>
       </div>
     </section>
-  )
+  );
 }
-

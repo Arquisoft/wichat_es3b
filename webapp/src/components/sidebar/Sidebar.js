@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import "./Sidebar.css";
 import { useTranslation } from "react-i18next";
+import UserAvatar from "../userAvatar/UserAvatar";
 
 // Componente para la barra lateral con información del usuario
 export default function Sidebar({ userData, isVisible, onClose }) {
@@ -21,11 +22,7 @@ export default function Sidebar({ userData, isVisible, onClose }) {
           </div>
 
           <div className="avatar-container">
-            <img
-              src={userData.avatar || "/placeholder.svg"}
-              alt="Avatar de usuario"
-              className="avatar"
-            />
+            <UserAvatar username={userData.username}></UserAvatar>
           </div>
         </div>
 
