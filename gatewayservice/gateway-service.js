@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
+const path = require("path");
 const promBundle = require("express-prom-bundle");
 
 const app = express();
@@ -14,7 +15,11 @@ const userServiceUrl = process.env.USER_SERVICE_URL || "http://localhost:8001";
 const statsServiceUrl =
   process.env.STATS_SERVICE_URL || "http://localhost:8005";
 
-app.use(cors());
+app.use(cors({origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
+  }));
+
 app.use(express.json());
 
 //Prometheus configuration
@@ -33,8 +38,8 @@ app.post("/login", async (req, res) => {
     res.json(authResponse.data);
   } catch (error) {
     res
-        .status(error.response.status)
-        .json({ error: error.response.data.error });
+        .status(error?.response?.status)
+        .json({ error: error?.response?.data.error });
   }
 });
 
@@ -239,7 +244,12 @@ app.get('/questionsDB', async (req, res) => {
     const fullURL = `${wikiQuestionServiceUrl}/questionsDB?n=${n}&topic=${encodeURIComponent(topic)}`;
     console.log("Redirigiendo a:", fullURL);
 
-    const response = await axios.get(fullURL);
+    const response = await axios.get(fullURL, {
+      headers: {
+        // Agregar encabezados personalizados si es necesario
+        'X-Forwarded-For': req.ip,
+      },
+    });
     res.json(response.data);
   } catch (error) {
     console.error("Error al obtener preguntas:", error.message);

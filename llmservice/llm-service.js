@@ -631,7 +631,7 @@ function closeServer() {
 }
 
 // Si este archivo se ejecuta directamente, inicia el servidor
-if (require.main === module) {
+if (require.main === module || process.env.NODE_ENV === 'test') {
     startServer();
 }
 

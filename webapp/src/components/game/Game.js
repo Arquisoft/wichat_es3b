@@ -92,6 +92,7 @@ const Game = ({ onGameEnd }) => {
           const queryString = `questionsDB?n=${config.numPreguntas}&topic=${categories.join(",")}`;
           console.log("URL de la solicitud al gateway:", `${GATEWAY_URL}/${queryString}`);
           const response = await fetch(`${GATEWAY_URL}/${queryString}`);
+          console.log(response);
           if (!response.ok) {
             throw new Error(`Failed to fetch questions: ${response.statusText}`);
           }
@@ -107,6 +108,7 @@ const Game = ({ onGameEnd }) => {
             setIsLoading(false);
           }
         } catch (error) {
+          console.log(error);
           console.error("Error fetching questions:", error);
           if (isMounted.current) setIsLoading(false);
         }

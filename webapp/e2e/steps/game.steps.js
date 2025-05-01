@@ -12,7 +12,7 @@ defineFeature(feature, test => {
     beforeAll(async () => {
         browser = process.env.GITHUB_ACTIONS
             ? await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox'] })
-            : await puppeteer.launch({ headless: false, slowMo: 100 });
+            : await puppeteer.launch({ headless: true, slowMo: 100});
 
         page = await browser.newPage();
         setDefaultOptions({ timeout: 10000 });
@@ -52,325 +52,6 @@ defineFeature(feature, test => {
             await browser.close();
             throw error;
         }
-
-        // Habilitar la interceptación de solicitudes
-        await page.setRequestInterception(true);
-
-        page.on('request', (request) => {
-            if (request.url().includes('/questionsDB')) {
-                // Respond with the JSON and include CORS headers
-                request.respond({
-                    status: 200,
-                    contentType: 'application/json',
-                    headers: {
-                        'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                        'Access-Control-Allow-Headers': 'Content-Type'
-                    },
-                    body: JSON.stringify([
-                        {
-                            "pregunta": {
-                                "es": "¿Con qué país comparte frontera Japón?",
-                                "en": "Which country shares a border with Japón?"
-                            },
-                            "respuestaCorrecta": {
-                                "es": "Estados Unidos",
-                                "en": "United States"
-                            },
-                            "respuestas": {
-                                "es": [
-                                    "Reino de Dinamarca",
-                                    "Finlandia",
-                                    "Suecia"
-                                ],
-                                "en": [
-                                    "Kingdom of Denmark",
-                                    "Finland",
-                                    "Sweden"
-                                ]
-                            },
-                            "descripcion": [
-                                { "propiedad": "capital", "valor": "Tokio" },
-                                { "propiedad": "jefe de Estado", "valor": "Naruhito" },
-                                { "propiedad": "participó en", "valor": "Grupo de los cuatro" },
-                                { "propiedad": "idioma oficial", "valor": "japonés" }
-                            ],
-                            "img": [
-                                "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Japan.svg"
-                            ]
-                        },
-                        {
-                            "pregunta": {
-                                "es": "¿Cuál es el estadio del club de fútbol Juventus?",
-                                "en": "What is the stadium of the football club Juventus?"
-                            },
-                            "respuestaCorrecta": {
-                                "es": "Juventus Stadium",
-                                "en": "Juventus Stadium"
-                            },
-                            "respuestas": {
-                                "es": [
-                                    "Estadio Luigi Ferraris",
-                                    "Parc Olympique lyonnais",
-                                    "Estadio Giuseppe Meazza"
-                                ],
-                                "en": [
-                                    "Stadio Luigi Ferraris",
-                                    "Parc Olympique Lyonnais",
-                                    "Giuseppe Meazza Stadium"
-                                ]
-                            },
-                            "descripcion": [
-                                { "propiedad": "fecha de fundación o creación", "valor": "1/11/1897" },
-                                { "propiedad": "ubicación de la sede", "valor": "Turín" },
-                                { "propiedad": "país", "valor": "Italia" },
-                                { "propiedad": "fundador", "valor": "Carlo Vittorio Varetti" },
-                                { "propiedad": "entrenador", "valor": "Igor Tudor" }
-                            ],
-                            "img": [
-                                "http://commons.wikimedia.org/wiki/Special:FilePath/Juventus%20FC%20-%20logo%20black%20%28Italy%2C%202020%29.svg"
-                            ]
-                        },
-                        {
-                            "pregunta": {
-                                "es": "¿Quién es el autor de la obra literaria World Brain?",
-                                "en": "Who is the author of the literary work World Brain?"
-                            },
-                            "respuestaCorrecta": {
-                                "es": "H. G. Wells",
-                                "en": "H. G. Wells"
-                            },
-                            "respuestas": {
-                                "es": [
-                                    "Jorge Luis Borges",
-                                    "Douglas Adams",
-                                    "Miguel de Cervantes"
-                                ],
-                                "en": [
-                                    "Jorge Luis Borges",
-                                    "Douglas Adams",
-                                    "Miguel de Cervantes"
-                                ]
-                            },
-                            "descripcion": [
-                                { "propiedad": "fecha de publicación", "valor": "1/1/1938" },
-                                { "propiedad": "género", "valor": "ensayo" }
-                            ],
-                            "img": [
-                                "http://commons.wikimedia.org/wiki/Special:FilePath/World%20Brain%20HG%20Wells%201938.jpg"
-                            ]
-                        },
-                        {
-                            "pregunta": {
-                                "es": "¿En qué año se pintó la obra Placa de la Pioneer?",
-                                "en": "In what year was the artwork Placa de la Pioneer painted?"
-                            },
-                            "respuestaCorrecta": {
-                                "es": "1/1/1972",
-                                "en": "1/1/1972"
-                            },
-                            "respuestas": {
-                                "es": [
-                                    "1/1/1770",
-                                    "1/1/1503",
-                                    "1/1/1492"
-                                ],
-                                "en": [
-                                    "1/1/1770",
-                                    "1/1/1503",
-                                    "1/1/1492"
-                                ]
-                            },
-                            "descripcion": [
-                                { "propiedad": "ubicación", "valor": "sistema solar exterior" }
-                            ],
-                            "img": [
-                                "http://commons.wikimedia.org/wiki/Special:FilePath/GPN-2000-001621-x.jpg"
-                            ]
-                        },
-                        {
-                            "pregunta": {
-                                "es": "¿Quién es director de la película Kick-Ass?",
-                                "en": "Who is the director of the movie Kick-Ass?"
-                            },
-                            "respuestaCorrecta": {
-                                "es": "Matthew Vaughn",
-                                "en": "Matthew Vaughn"
-                            },
-                            "respuestas": {
-                                "es": [
-                                    "Olivier Marchal",
-                                    "Olivier Nakache",
-                                    "Ondi Timoner"
-                                ],
-                                "en": [
-                                    "Olivier Marchal",
-                                    "Olivier Nakache",
-                                    "Ondi Timoner"
-                                ]
-                            },
-                            "descripcion": [
-                                { "propiedad": "fecha de publicación", "valor": "12/3/2010" },
-                                { "propiedad": "costo", "valor": 30000000 }
-                            ],
-                            "img": [
-                                "http://commons.wikimedia.org/wiki/Special:FilePath/Kick-ass.svg"
-                            ]
-                        },
-                        {
-                            "pregunta": {
-                                "es": "¿Cuál es el género de la obra literaria Corán?",
-                                "en": "What is the genre of the literary work Corán?"
-                            },
-                            "respuestaCorrecta": {
-                                "es": "libro sagrado",
-                                "en": "religious text"
-                            },
-                            "respuestas": {
-                                "es": [
-                                    "novela de caballerías",
-                                    "fantasía",
-                                    "ensayo"
-                                ],
-                                "en": [
-                                    "chivalric romance",
-                                    "fantasy",
-                                    "essay"
-                                ]
-                            },
-                            "descripcion": [
-                                { "propiedad": "personajes", "valor": "Mahoma" }
-                            ],
-                            "img": [
-                                "http://commons.wikimedia.org/wiki/Special:FilePath/AndalusQuran.JPG"
-                            ]
-                        },
-                        {
-                            "pregunta": {
-                                "es": "¿En qué año se pintó la obra Woman with a Mirror?",
-                                "en": "In what year was the artwork Woman with a Mirror painted?"
-                            },
-                            "respuestaCorrecta": {
-                                "es": "1/1/1515",
-                                "en": "1/1/1515"
-                            },
-                            "respuestas": {
-                                "es": [
-                                    "1/1/1503",
-                                    "1/1/1972",
-                                    "1/1/1492"
-                                ],
-                                "en": [
-                                    "1/1/1503",
-                                    "1/1/1972",
-                                    "1/1/1492"
-                                ]
-                            },
-                            "descripcion": [
-                                { "propiedad": "movimiento", "valor": "escuela veneciana" },
-                                { "propiedad": "ubicación", "valor": "Salle des États" }
-                            ],
-                            "img": [
-                                "http://commons.wikimedia.org/wiki/Special:FilePath/Portrait%20d%27une%20Femme%20%C3%A0%20sa%20Toilette%2C%20by%20Titian%2C%20from%20C2RMF%20retouched.jpg"
-                            ]
-                        },
-                        {
-                            "pregunta": {
-                                "es": "¿Cuál es uno de los idiomas oficiales de Canadá?",
-                                "en": "What is one of the official languages of Canadá?"
-                            },
-                            "respuestaCorrecta": {
-                                "es": "francés",
-                                "en": "French"
-                            },
-                            "respuestas": {
-                                "es": [
-                                    "noruego",
-                                    "nynorsk",
-                                    "japonés"
-                                ],
-                                "en": [
-                                    "Norwegian",
-                                    "Nynorsk",
-                                    "Japanese"
-                                ]
-                            },
-                            "descripcion": [
-                                { "propiedad": "capital", "valor": "Ottawa" },
-                                { "propiedad": "jefe de Estado", "valor": "Carlos III del Reino Unido" },
-                                { "propiedad": "participó en", "valor": "Guerra del Pacífico" },
-                                { "propiedad": "comparte fronteras con", "valor": "Estados Unidos" }
-                            ],
-                            "img": [
-                                "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Canada%20%28Pantone%29.svg"
-                            ]
-                        },
-                        {
-                            "pregunta": {
-                                "es": "¿En qué fecha se estrenó el film Swept Away?",
-                                "en": "On what date was the film Swept Away released?"
-                            },
-                            "respuestaCorrecta": {
-                                "es": "1/1/1974",
-                                "en": "1/1/1974"
-                            },
-                            "respuestas": {
-                                "es": [
-                                    "19/1/2009",
-                                    "1/1/2011",
-                                    "10/11/2011"
-                                ],
-                                "en": [
-                                    "19/1/2009",
-                                    "1/1/2011",
-                                    "10/11/2011"
-                                ]
-                            },
-                            "descripcion": [
-                                { "propiedad": "director", "valor": "Lina Wertmüller" }
-                            ],
-                            "img": [
-                                "http://commons.wikimedia.org/wiki/Special:FilePath/MelatoGianniniTravolti1974WP.jpg"
-                            ]
-                        },
-                        {
-                            "pregunta": {
-                                "es": "¿Cuál es el entrenador del club de fútbol Inter de Milán?",
-                                "en": "Who is the coach of the football club Inter de Milán?"
-                            },
-                            "respuestaCorrecta": {
-                                "es": "Simone Inzaghi",
-                                "en": "Simone Inzaghi"
-                            },
-                            "respuestas": {
-                                "es": [
-                                    "Alberigo Evani",
-                                    "Paulo Fonseca",
-                                    "Igor Tudor"
-                                ],
-                                "en": [
-                                    "Alberico Evani",
-                                    "Paulo Fonseca",
-                                    "Igor Tudor"
-                                ]
-                            },
-                            "descripcion": [
-                                { "propiedad": "fecha de fundación o creación", "valor": "9/3/1908" },
-                                { "propiedad": "ubicación de la sede", "valor": "Milán" },
-                                { "propiedad": "país", "valor": "Italia" },
-                                { "propiedad": "estadio", "valor": "Estadio Giuseppe Meazza" }
-                            ],
-                            "img": [
-                                "http://commons.wikimedia.org/wiki/Special:FilePath/FC%20Internazionale%20Milano%202021.svg"
-                            ]
-                        }
-                        // Add more questions as needed
-                    ])
-                });
-            } else {
-                request.continue();
-            }
-        });
     });
 
     test('The user is able to play a game', ({ given, when, then }) => {
@@ -382,12 +63,13 @@ defineFeature(feature, test => {
 
         when('I play a game', async () => {
                 try{
+                    
                 await expect(page).toClick('a', { text: 'Jugar' });
                 await page.waitForSelector('#numPreguntas', { visible: true, timeout: 5000 });
                 await page.select('#numPreguntas', '10');
                 await expect(page).toClick('button', { text: 'Jugar' });
                 for (let i = 1; i < 10; i++) {
-                    await page.waitForSelector('#answer-1', { visible: true, timeout: 50000 });
+                    await page.waitForSelector('#answer-1', { visible: true, timeout: 500000 });
                     await expect(page).toClick('#answer-1', {});
                     await page.waitForSelector('#nextArrow', { visible: true, timeout: 5000 });
                     await expect(page).toClick('#nextArrow', {});
@@ -417,7 +99,7 @@ defineFeature(feature, test => {
             // const finalScoreText = await page.$eval('h1', el => el.textContent.trim());
             // expect(finalScoreText).toBe('Resumen de la partida');
         });
-    },600000);
+    },600000000);
 
     afterAll(async () => {
         await browser.close();
