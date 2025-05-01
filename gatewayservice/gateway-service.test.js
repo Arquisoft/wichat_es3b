@@ -89,48 +89,172 @@ const successResponses = {
   },
 };
 
+// Función para probar endpoints GET con parámetros opcionales
+const testGetEndpoint = (
+  endpoint,
+  paramName = null,
+  paramValue = null,
+  expectedStatus = 200,
+  mockResponseKey = null,
+  expectedError = null,
+  errorType = null
+) => {
+  const baseUrl = paramName ? `/${endpoint}/${paramValue}` : `/${endpoint}`;
+
+  it(`should forward ${endpoint} request to the service${
+    paramName ? ` with ${paramName}` : ""
+  }`, async () => {
+    if (errorType) {
+      // Si hay un errorType, configuramos el mock para rechazar con error
+      const errorData = expectedError ? { error: expectedError } : {};
+      axios.get.mockRejectedValueOnce(
+        mockAxiosError(expectedStatus, errorData, errorType)
+      );
+    }
+
+    const response = await request(app).get(baseUrl);
+
+    expect(response.statusCode).toBe(expectedStatus);
+
+    if (expectedStatus === 200 && mockResponseKey) {
+      // Para respuestas exitosas, verificamos que el cuerpo contenga los datos esperados
+      expect(response.body).toEqual(successResponses[mockResponseKey].data);
+      expect(axios.get).toHaveBeenCalledWith(expect.stringContaining(baseUrl));
+    } else if (expectedError) {
+      // Para respuestas de error, verificamos el mensaje de error
+      if (errorType === "request") {
+        expect(response.body.error).toContain("no está disponible");
+      } else if (errorType === "generic") {
+        expect(response.body.error).toBe("Error interno del servidor");
+      } else {
+        expect(response.body.error).toBe(expectedError);
+      }
+    }
+  });
+};
+
+// Función para probar endpoints POST
+const testPostEndpoint = (
+  endpoint,
+  payload,
+  expectedStatus = 200,
+  mockResponseKey = null,
+  expectedError = null,
+  errorType = null,
+  serviceName = null,
+  actualServiceEndpoint = null
+) => {
+  it(`should forward ${endpoint} request to the ${
+    serviceName || endpoint
+  } service`, async () => {
+    if (errorType) {
+      // Si hay un errorType, configuramos el mock para rechazar con error
+      const errorData = expectedError ? { error: expectedError } : {};
+      axios.post.mockRejectedValueOnce(
+        mockAxiosError(expectedStatus, errorData, errorType)
+      );
+    }
+
+    const response = await request(app).post(`/${endpoint}`).send(payload);
+
+    expect(response.statusCode).toBe(expectedStatus);
+
+    if (expectedStatus === 200 && mockResponseKey) {
+      // Para respuestas exitosas, verificamos que el cuerpo contenga los datos esperados
+      Object.entries(successResponses[mockResponseKey].data).forEach(
+        ([key, value]) => {
+          expect(response.body[key]).toEqual(value);
+        }
+      );
+      const expectedUrl = actualServiceEndpoint
+        ? expect.stringContaining(`/${actualServiceEndpoint}`)
+        : expect.stringContaining(`/${endpoint}`);
+      expect(axios.post).toHaveBeenCalledWith(expectedUrl, payload);
+    } else if (expectedError) {
+      // Para respuestas de error, verificamos el mensaje de error
+      if (errorType === "request") {
+        if (serviceName === "llm") {
+          expect(response.body.error).toBe(
+            "El servicio LLM no está disponible"
+          );
+        } else if (serviceName === "stats") {
+          expect(response.body.error).toBe(
+            "El servidor de estadísticas no está disponible"
+          );
+        } else {
+          expect(response.body.error).toContain("no está disponible");
+        }
+      } else if (errorType === "generic") {
+        expect(response.body.error).toBe("Error interno del servidor");
+      } else {
+        expect(response.body.error).toBe(expectedError);
+      }
+    }
+  });
+};
+
+// Función específica para probar errores de api-key
+const testApiKeyErrors = (errorCode, expectedStatus) => {
+  it(`should handle ${errorCode} error from user service`, async () => {
+    axios.post.mockRejectedValueOnce(
+      mockAxiosError(expectedStatus, { errorCode })
+    );
+
+    const response = await request(app)
+      .post("/generate-apikey")
+      .send({
+        email: errorCode === "EMAIL_REQUIRED" ? {} : "test@example.com",
+      });
+
+    expect(response.status).toBe(expectedStatus);
+    expect(response.body).toEqual({ errorCode });
+  });
+};
+
+// Función para configurar los mocks por defecto
+const setupDefaultMocks = () => {
+  axios.post.mockImplementation((url) => {
+    if (url.endsWith("/login")) return Promise.resolve(successResponses.login);
+    if (url.endsWith("/adduser"))
+      return Promise.resolve(successResponses.adduser);
+    if (url.endsWith("/ask")) return Promise.resolve(successResponses.askllm);
+    if (url.endsWith("/ai-answer"))
+      return Promise.resolve(successResponses.aiAnswer);
+    if (url.endsWith("/generate-apikey"))
+      return Promise.resolve(successResponses.generateApikey);
+    if (url.endsWith("/savestats"))
+      return Promise.resolve(successResponses.savestats);
+    return Promise.resolve({});
+  });
+
+  axios.get.mockImplementation((url) => {
+    if (url.includes("/validate-apikey/"))
+      return Promise.resolve(successResponses.validateApikey);
+    if (url.includes("/getstats/"))
+      return Promise.resolve(successResponses.getStats);
+    if (url.includes("/getranking"))
+      return Promise.resolve(successResponses.getRanking);
+    if (url.includes("/getTop3"))
+      return Promise.resolve(successResponses.getTop3);
+    if (url.includes("/games/"))
+      return Promise.resolve(successResponses.getGames);
+    if (url.includes("/ratios-per-month/"))
+      return Promise.resolve(successResponses.getRatiosPerMonth);
+    if (url.includes("/questions")) {
+      return Promise.resolve(
+        url.includes("/questionsDB")
+          ? successResponses.getQuestionsDB
+          : successResponses.getQuestionsGenerated
+      );
+    }
+    return Promise.resolve({});
+  });
+};
+
 describe("Gateway Service", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-
-    // Default mock implementations
-    axios.post.mockImplementation((url) => {
-      if (url.endsWith("/login")) {
-        return Promise.resolve(successResponses.login);
-      } else if (url.endsWith("/adduser")) {
-        return Promise.resolve(successResponses.adduser);
-      } else if (url.endsWith("/ask")) {
-        return Promise.resolve(successResponses.askllm);
-      } else if (url.endsWith("/ai-answer")) {
-        return Promise.resolve(successResponses.aiAnswer);
-      } else if (url.endsWith("/generate-apikey")) {
-        return Promise.resolve(successResponses.generateApikey);
-      } else if (url.endsWith("/savestats")) {
-        return Promise.resolve(successResponses.savestats);
-      }
-    });
-
-    axios.get.mockImplementation((url) => {
-      if (url.includes("/validate-apikey/")) {
-        return Promise.resolve(successResponses.validateApikey);
-      } else if (url.includes("/getstats/")) {
-        return Promise.resolve(successResponses.getStats);
-      } else if (url.includes("/getranking")) {
-        return Promise.resolve(successResponses.getRanking);
-      } else if (url.includes("/getTop3")) {
-        return Promise.resolve(successResponses.getTop3);
-      } else if (url.includes("/games/")) {
-        return Promise.resolve(successResponses.getGames);
-      } else if (url.includes("/ratios-per-month/")) {
-        return Promise.resolve(successResponses.getRatiosPerMonth);
-      } else if (url.includes("/questions")) {
-        return Promise.resolve(
-          url.includes("/questionsDB")
-            ? successResponses.getQuestionsDB
-            : successResponses.getQuestionsGenerated
-        );
-      }
-    });
+    setupDefaultMocks();
   });
 
   // Test /health endpoint
@@ -140,490 +264,288 @@ describe("Gateway Service", () => {
     expect(response.body.status).toBe("OK");
   });
 
-  // Test /login endpoint
-  it("should forward login request to auth service", async () => {
-    const response = await request(app)
-      .post("/login")
-      .send({ username: "testuser", password: "testpassword" });
+  // Tests para el endpoint /login
+  testPostEndpoint(
+    "login",
+    { username: "testuser", password: "testpassword" },
+    200,
+    "login"
+  );
+  testPostEndpoint(
+    "login",
+    { username: "baduser", password: "wrongpassword" },
+    401,
+    null,
+    "Credenciales inválidas",
+    "response"
+  );
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body.token).toBe("mockedToken");
-    expect(axios.post).toHaveBeenCalledWith(expect.stringContaining("/login"), {
-      username: "testuser",
-      password: "testpassword",
-    });
-  });
+  // Tests para el endpoint /adduser
+  testPostEndpoint(
+    "adduser",
+    { username: "newuser", password: "newpassword" },
+    200,
+    "adduser"
+  );
+  testPostEndpoint(
+    "adduser",
+    { username: "existinguser", password: "password" },
+    409,
+    null,
+    "El usuario ya existe",
+    "response"
+  );
 
-  it("should handle login service errors", async () => {
-    axios.post.mockRejectedValueOnce(
-      mockAxiosError(401, { error: "Credenciales inválidas" })
-    );
+  // Tests para el endpoint /askllm
+  testPostEndpoint(
+    "askllm",
+    { question: "question", apiKey: "apiKey", model: "gemini" },
+    200,
+    "askllm",
+    null,
+    null,
+    null,
+    "ask"
+  );
+  testPostEndpoint(
+    "askllm",
+    { badformat: true },
+    400,
+    null,
+    "Formato de pregunta incorrecto",
+    "response"
+  );
 
-    const response = await request(app)
-      .post("/login")
-      .send({ username: "baduser", password: "wrongpassword" });
+  // Tests para el endpoint /ai-answer
+  testPostEndpoint(
+    "ai-answer",
+    { question: "question", context: "context" },
+    200,
+    "aiAnswer"
+  );
+  testPostEndpoint(
+    "ai-answer",
+    { question: "question" },
+    400,
+    null,
+    "Contexto insuficiente",
+    "response"
+  );
+  testPostEndpoint(
+    "ai-answer",
+    { question: "question" },
+    500,
+    null,
+    "El servicio LLM no está disponible",
+    "request",
+    "llm"
+  );
+  testPostEndpoint(
+    "ai-answer",
+    { question: "question" },
+    500,
+    null,
+    "Error interno del servidor",
+    "generic"
+  );
 
-    expect(response.statusCode).toBe(401);
-    expect(response.body.error).toBe("Credenciales inválidas");
-  });
+  // Tests para el endpoint /savestats
+  testPostEndpoint(
+    "savestats",
+    { username: "testuser", win: true, date: "2023-05-01" },
+    200,
+    "savestats"
+  );
+  testPostEndpoint(
+    "savestats",
+    { incomplete: true },
+    400,
+    null,
+    "Datos incompletos",
+    "response"
+  );
+  testPostEndpoint(
+    "savestats",
+    { username: "testuser", win: true },
+    500,
+    null,
+    "El servidor de estadísticas no está disponible",
+    "request",
+    "stats"
+  );
+  testPostEndpoint(
+    "savestats",
+    { username: "testuser", win: true },
+    500,
+    null,
+    "Error interno del servidor",
+    "generic"
+  );
 
-  // Test /adduser endpoint
-  it("should forward add user request to user service", async () => {
-    const response = await request(app)
-      .post("/adduser")
-      .send({ username: "newuser", password: "newpassword" });
+  // Tests para el endpoint /getstats
+  testGetEndpoint("getstats", "username", "testuser", 200, "getStats");
+  testGetEndpoint(
+    "getstats",
+    "username",
+    "nonexistentuser",
+    404,
+    null,
+    "Usuario no encontrado",
+    "response"
+  );
+  testGetEndpoint(
+    "getstats",
+    "username",
+    "testuser",
+    500,
+    null,
+    "El servidor de estadísticas no está disponible",
+    "request"
+  );
+  testGetEndpoint(
+    "getstats",
+    "username",
+    "testuser",
+    500,
+    null,
+    "Error interno del servidor",
+    "generic"
+  );
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body.userId).toBe("mockedUserId");
-    expect(axios.post).toHaveBeenCalledWith(
-      expect.stringContaining("/adduser"),
-      { username: "newuser", password: "newpassword" }
-    );
-  });
+  // Tests para el endpoint /getranking
+  testGetEndpoint("getranking", null, null, 200, "getRanking");
+  testGetEndpoint(
+    "getranking",
+    null,
+    null,
+    500,
+    null,
+    "Error al obtener ranking",
+    "response"
+  );
 
-  it("should handle adduser service errors", async () => {
-    axios.post.mockRejectedValueOnce(
-      mockAxiosError(409, { error: "El usuario ya existe" })
-    );
+  // Tests para el endpoint /getTop3
+  testGetEndpoint("getTop3", null, null, 200, "getTop3");
+  testGetEndpoint(
+    "getTop3",
+    null,
+    null,
+    500,
+    null,
+    "Error al obtener top 3",
+    "response"
+  );
 
-    const response = await request(app)
-      .post("/adduser")
-      .send({ username: "existinguser", password: "password" });
-
-    expect(response.statusCode).toBe(409);
-    expect(response.body.error).toBe("El usuario ya existe");
-  });
-
-  // Test /askllm endpoint
-  it("should forward askllm request to the llm service", async () => {
-    const response = await request(app)
-      .post("/askllm")
-      .send({ question: "question", apiKey: "apiKey", model: "gemini" });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body.answer).toBe("llmanswer");
-    expect(axios.post).toHaveBeenCalledWith(expect.stringContaining("/ask"), {
-      question: "question",
-      apiKey: "apiKey",
-      model: "gemini",
-    });
-  });
-
-  it("should handle askllm service errors", async () => {
-    axios.post.mockRejectedValueOnce(
-      mockAxiosError(400, { error: "Formato de pregunta incorrecto" })
-    );
-
-    const response = await request(app)
-      .post("/askllm")
-      .send({ badformat: true });
-
-    expect(response.statusCode).toBe(400);
-    expect(response.body.error).toBe("Formato de pregunta incorrecto");
-  });
-
-  // Test /ai-answer endpoint
-  it("should forward ai-answer request to the llm service", async () => {
-    const response = await request(app)
-      .post("/ai-answer")
-      .send({ question: "question", context: "context" });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body.answer).toBe("AI generó esta respuesta");
-    expect(axios.post).toHaveBeenCalledWith(
-      expect.stringContaining("/ai-answer"),
-      { question: "question", context: "context" }
-    );
-  });
-
-  it("should handle ai-answer service errors with response", async () => {
-    axios.post.mockRejectedValueOnce(
-      mockAxiosError(400, { error: "Contexto insuficiente" })
-    );
-
-    const response = await request(app)
-      .post("/ai-answer")
-      .send({ question: "question" });
-
-    expect(response.statusCode).toBe(400);
-    expect(response.body.error).toBe("Contexto insuficiente");
-  });
-
-  it("should handle ai-answer service errors with request failure", async () => {
-    axios.post.mockRejectedValueOnce(
-      mockAxiosError(0, { message: "Connection refused" }, "request")
-    );
-
-    const response = await request(app)
-      .post("/ai-answer")
-      .send({ question: "question" });
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe("El servicio LLM no está disponible");
-  });
-
-  it("should handle ai-answer general errors", async () => {
-    axios.post.mockRejectedValueOnce(
-      mockAxiosError(0, { message: "Error inesperado" }, "generic")
-    );
-
-    const response = await request(app)
-      .post("/ai-answer")
-      .send({ question: "question" });
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe("Error interno del servidor");
-  });
-
-  // Test /savestats endpoint
-  it("should forward savestats request to the stats service", async () => {
-    const statsData = { username: "testuser", win: true, date: "2023-05-01" };
-    const response = await request(app).post("/savestats").send(statsData);
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body.success).toBe(true);
-    expect(axios.post).toHaveBeenCalledWith(
-      expect.stringContaining("/savestats"),
-      statsData
-    );
-  });
-
-  it("should handle savestats service errors with response", async () => {
-    axios.post.mockRejectedValueOnce(
-      mockAxiosError(400, { error: "Datos incompletos" })
-    );
-
-    const response = await request(app)
-      .post("/savestats")
-      .send({ incomplete: true });
-
-    expect(response.statusCode).toBe(400);
-    expect(response.body.error).toBe("Datos incompletos");
-  });
-
-  it("should handle savestats service errors with request failure", async () => {
-    axios.post.mockRejectedValueOnce(
-      mockAxiosError(0, { message: "Connection refused" }, "request")
-    );
-
-    const response = await request(app)
-      .post("/savestats")
-      .send({ username: "testuser", win: true });
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe(
-      "El servidor de estadísticas no está disponible"
-    );
-  });
-
-  it("should handle savestats general errors", async () => {
-    axios.post.mockRejectedValueOnce(
-      mockAxiosError(0, { message: "Error inesperado" }, "generic")
-    );
-
-    const response = await request(app)
-      .post("/savestats")
-      .send({ username: "testuser", win: true });
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe("Error interno del servidor");
-  });
-
-  // Test /getstats endpoint
-  it("should forward getstats request to the stats service", async () => {
-    const username = "testuser";
-    const response = await request(app).get(`/getstats/${username}`);
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({ games: 10, wins: 7, ratio: 0.7 });
-    expect(axios.get).toHaveBeenCalledWith(
-      expect.stringContaining(`/getstats/${username}`)
-    );
-  });
-
-  it("should handle getstats service errors with response", async () => {
-    axios.get.mockRejectedValueOnce(
-      mockAxiosError(404, { error: "Usuario no encontrado" })
-    );
-
-    const response = await request(app).get("/getstats/nonexistentuser");
-
-    expect(response.statusCode).toBe(404);
-    expect(response.body.error).toBe("Usuario no encontrado");
-  });
-
-  it("should handle getstats service errors with request failure", async () => {
-    axios.get.mockRejectedValueOnce(
-      mockAxiosError(0, { message: "Connection refused" }, "request")
-    );
-
-    const response = await request(app).get("/getstats/testuser");
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe(
-      "El servidor de estadísticas no está disponible"
-    );
-  });
-
-  it("should handle getstats general errors", async () => {
-    axios.get.mockRejectedValueOnce(
-      mockAxiosError(0, { message: "Error inesperado" }, "generic")
-    );
-
-    const response = await request(app).get("/getstats/testuser");
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe("Error interno del servidor");
-  });
-
-  // Test /getranking endpoint
-  it("should forward getranking request to the stats service", async () => {
-    const response = await request(app).get("/getranking");
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual([
-      { username: "user1", wins: 10 },
-      { username: "user2", wins: 8 },
-    ]);
-    expect(axios.get).toHaveBeenCalledWith(
-      expect.stringContaining("/getranking")
-    );
-  });
-
-  it("should handle getranking service errors", async () => {
-    axios.get.mockRejectedValueOnce(
-      mockAxiosError(500, { error: "Error al obtener ranking" })
-    );
-
-    const response = await request(app).get("/getranking");
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe("Error al obtener ranking");
-  });
-
-  // Test /getTop3 endpoint
-  it("should forward getTop3 request to the stats service", async () => {
-    const response = await request(app).get("/getTop3");
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual([
-      { username: "user1", wins: 10 },
-      { username: "user2", wins: 8 },
-      { username: "user3", wins: 5 },
-    ]);
-    expect(axios.get).toHaveBeenCalledWith(expect.stringContaining("/getTop3"));
-  });
-
-  it("should handle getTop3 service errors", async () => {
-    axios.get.mockRejectedValueOnce(
-      mockAxiosError(500, { error: "Error al obtener top 3" })
-    );
-
-    const response = await request(app).get("/getTop3");
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe("Error al obtener top 3");
-  });
-
-  // Test /games endpoint
-  it("should forward games request to the stats service", async () => {
-    const username = "testuser";
-    const response = await request(app).get(`/games/${username}`);
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
-      totalGames: 20,
-      gamesPerMonth: [
-        { month: "Enero", games: 5 },
-        { month: "Febrero", games: 15 },
-      ],
-    });
-    expect(axios.get).toHaveBeenCalledWith(
-      expect.stringContaining(`/games/${username}`)
-    );
-  });
+  // Tests para el endpoint /games
+  testGetEndpoint("games", "username", "testuser", 200, "getGames");
 
   it("should validate username in games request", async () => {
     const response = await request(app).get("/games/");
-
     expect(response.statusCode).toBe(404); // Ruta no encontrada
   });
 
-  it("should handle games service errors", async () => {
-    axios.get.mockRejectedValueOnce(
-      mockAxiosError(404, { error: "Usuario no encontrado" })
-    );
+  testGetEndpoint(
+    "games",
+    "username",
+    "nonexistentuser",
+    404,
+    null,
+    "Usuario no encontrado",
+    "response"
+  );
 
-    const response = await request(app).get("/games/nonexistentuser");
-
-    expect(response.statusCode).toBe(404);
-    expect(response.body.error).toBe("Usuario no encontrado");
-  });
-
-  // Test /ratios-per-month endpoint
-  it("should forward ratios-per-month request to the stats service", async () => {
-    const username = "testuser";
-    const response = await request(app).get(`/ratios-per-month/${username}`);
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual([
-      { month: "Enero", ratio: 0.8 },
-      { month: "Febrero", ratio: 0.6 },
-    ]);
-    expect(axios.get).toHaveBeenCalledWith(
-      expect.stringContaining(`/ratios-per-month/${username}`)
-    );
-  });
+  // Tests para el endpoint /ratios-per-month
+  testGetEndpoint(
+    "ratios-per-month",
+    "username",
+    "testuser",
+    200,
+    "getRatiosPerMonth"
+  );
 
   it("should validate username in ratios-per-month request", async () => {
     const response = await request(app).get("/ratios-per-month/");
-
     expect(response.statusCode).toBe(404); // Ruta no encontrada
   });
 
-  it("should handle ratios-per-month service errors", async () => {
-    axios.get.mockRejectedValueOnce(
-      mockAxiosError(404, { error: "Usuario no encontrado" })
-    );
+  testGetEndpoint(
+    "ratios-per-month",
+    "username",
+    "nonexistentuser",
+    404,
+    null,
+    "Usuario no encontrado",
+    "response"
+  );
 
-    const response = await request(app).get(
-      "/ratios-per-month/nonexistentuser"
-    );
+  // Funciones auxiliares para probar endpoints con parámetros de query
+  const testQuestionsEndpoint = (endpoint, queryParams, defaultParams) => {
+    it(`should forward ${endpoint} request to the wiki question service`, async () => {
+      const query = new URLSearchParams(queryParams).toString();
+      const response = await request(app).get(`/${endpoint}?${query}`);
 
-    expect(response.statusCode).toBe(404);
-    expect(response.body.error).toBe("Usuario no encontrado");
-  });
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual(
+        endpoint === "questions"
+          ? successResponses.getQuestionsGenerated.data
+          : successResponses.getQuestionsDB.data
+      );
+      expect(axios.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/${endpoint}?${query}`)
+      );
+    });
 
-  // Test /questions endpoint
-  it("should forward questions request to the wiki question service", async () => {
-    const response = await request(app).get("/questions?n=5&topic=ciencia");
+    it(`should use default values for ${endpoint} request if not provided`, async () => {
+      const response = await request(app).get(`/${endpoint}`);
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual([
-      {
-        id: 1,
-        question: "¿Pregunta generada?",
-        answer: "respuesta",
-        topic: "ciencia",
-      },
-    ]);
-    expect(axios.get).toHaveBeenCalledWith(
-      expect.stringContaining("/questions?n=5&topic=ciencia")
-    );
-  });
+      expect(response.statusCode).toBe(200);
+      const defaultQueryString = new URLSearchParams(defaultParams).toString();
+      expect(axios.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/${endpoint}?${defaultQueryString}`)
+      );
+    });
 
-  it("should use default values for questions request if not provided", async () => {
-    const response = await request(app).get("/questions");
+    it(`should handle ${endpoint} service errors`, async () => {
+      const errorMessage = `Error al obtener preguntas${
+        endpoint === "questionsDB" ? " de DB" : ""
+      }`;
+      axios.get.mockRejectedValueOnce(
+        mockAxiosError(0, { message: errorMessage }, "generic")
+      );
 
-    expect(response.statusCode).toBe(200);
-    expect(axios.get).toHaveBeenCalledWith(
-      expect.stringContaining("/questions?n=10&topic=all")
-    );
-  });
+      const response = await request(app).get(`/${endpoint}`);
 
-  it("should handle questions service errors", async () => {
-    axios.get.mockRejectedValueOnce(
-      mockAxiosError(0, { message: "Error al obtener preguntas" }, "generic")
-    );
+      expect(response.statusCode).toBe(500);
+      expect(response.body.error).toBe(errorMessage);
+    });
+  };
 
-    const response = await request(app).get("/questions");
+  // Tests para el endpoint /questions
+  testQuestionsEndpoint(
+    "questions",
+    { n: 5, topic: "ciencia" },
+    { n: 10, topic: "all" }
+  );
 
-    expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe("Error al obtener preguntas");
-  });
+  // Tests para el endpoint /questionsDB
+  testQuestionsEndpoint(
+    "questionsDB",
+    { n: 5, topic: "historia" },
+    { n: 10, topic: "all" }
+  );
 
-  // Test /questionsDB endpoint
-  it("should forward questionsDB request to the wiki question service", async () => {
-    const response = await request(app).get("/questionsDB?n=5&topic=historia");
+  // Tests para el endpoint /generate-apikey
+  testPostEndpoint(
+    "generate-apikey",
+    { username: "testuser" },
+    200,
+    "generateApikey"
+  );
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual([
-      {
-        id: 1,
-        question: "¿Pregunta de la base de datos?",
-        answer: "respuesta",
-        topic: "historia",
-      },
-    ]);
-    expect(axios.get).toHaveBeenCalledWith(
-      expect.stringContaining("/questionsDB?n=5&topic=historia")
-    );
-  });
-
-  it("should use default values for questionsDB request if not provided", async () => {
-    const response = await request(app).get("/questionsDB");
-
-    expect(response.statusCode).toBe(200);
-    expect(axios.get).toHaveBeenCalledWith(
-      expect.stringContaining("/questionsDB?n=10&topic=all")
-    );
-  });
-
-  it("should handle questionsDB service errors", async () => {
-    axios.get.mockRejectedValueOnce(
-      mockAxiosError(
-        0,
-        { message: "Error al obtener preguntas de DB" },
-        "generic"
-      )
-    );
-
-    const response = await request(app).get("/questionsDB");
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe("Error al obtener preguntas de DB");
-  });
-
-  // Test /generate-apikey endpoint
-  it("should forward generate-apikey request to the user service", async () => {
-    const response = await request(app)
-      .post("/generate-apikey")
-      .send({ username: "testuser" });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body.apiKey).toBe("mock-api-key-12345");
-    expect(axios.post).toHaveBeenCalledWith(
-      expect.stringContaining("/generate-apikey"),
-      { username: "testuser" }
-    );
-  });
-
-  it("should handle EMAIL_REQUIRED error from user service", async () => {
-    axios.post.mockRejectedValueOnce(
-      mockAxiosError(400, { errorCode: "EMAIL_REQUIRED" })
-    );
-
-    const response = await request(app).post("/generate-apikey").send({}); // Sin email
-
-    expect(response.status).toBe(400);
-    expect(response.body).toEqual({ errorCode: "EMAIL_REQUIRED" });
-  });
-
-  it("should handle INVALID_EMAIL_FORMAT error from user service", async () => {
-    axios.post.mockRejectedValueOnce(
-      mockAxiosError(400, { errorCode: "INVALID_EMAIL_FORMAT" })
-    );
-
-    const response = await request(app)
-      .post("/generate-apikey")
-      .send({ email: "invalid-email" });
-
-    expect(response.status).toBe(400);
-    expect(response.body).toEqual({ errorCode: "INVALID_EMAIL_FORMAT" });
-  });
-
-  it("should handle EMAIL_ALREADY_EXISTS error from user service", async () => {
-    axios.post.mockRejectedValueOnce(
-      mockAxiosError(400, { errorCode: "EMAIL_ALREADY_EXISTS" })
-    );
-
-    const response = await request(app)
-      .post("/generate-apikey")
-      .send({ email: "existing@example.com" });
-
-    expect(response.status).toBe(400);
-    expect(response.body).toEqual({ errorCode: "EMAIL_ALREADY_EXISTS" });
-  });
+  // Tests específicos para errores de apikey
+  testApiKeyErrors("EMAIL_REQUIRED", 400);
+  testApiKeyErrors("INVALID_EMAIL_FORMAT", 400);
+  testApiKeyErrors("EMAIL_ALREADY_EXISTS", 400);
 
   it("should return GENERIC error code for unexpected errors", async () => {
     axios.post.mockRejectedValueOnce(
@@ -649,27 +571,21 @@ describe("Gateway Service", () => {
     expect(response.body).toEqual({ errorCode: "GENERIC" });
   });
 
-  // Test /validate-apikey endpoint
-  it("should forward validate-apikey request to the user service", async () => {
-    const apiKey = "valid-api-key-12345";
-    const response = await request(app).get(`/validate-apikey/${apiKey}`);
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body.valid).toBe(true);
-    expect(response.body.username).toBe("testuser");
-    expect(axios.get).toHaveBeenCalledWith(
-      expect.stringContaining(`/validate-apikey/${apiKey}`)
-    );
-  });
-
-  it("should handle errors from validate-apikey endpoint", async () => {
-    axios.get.mockRejectedValueOnce(
-      mockAxiosError(401, { error: "API key inválida" })
-    );
-
-    const response = await request(app).get("/validate-apikey/invalid-key");
-
-    expect(response.statusCode).toBe(401);
-    expect(response.body.error).toBe("API key inválida");
-  });
+  // Tests para el endpoint /validate-apikey
+  testGetEndpoint(
+    "validate-apikey",
+    "apiKey",
+    "valid-api-key-12345",
+    200,
+    "validateApikey"
+  );
+  testGetEndpoint(
+    "validate-apikey",
+    "apiKey",
+    "invalid-key",
+    401,
+    null,
+    "API key inválida",
+    "response"
+  );
 });
