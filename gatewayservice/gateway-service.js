@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
+const path = require("path");
 const promBundle = require("express-prom-bundle");
 
 const app = express();
@@ -15,6 +16,7 @@ const statsServiceUrl =
   process.env.STATS_SERVICE_URL || "http://localhost:8005";
 
 app.use(cors());
+
 app.use(express.json());
 
 //Prometheus configuration
@@ -33,8 +35,8 @@ app.post("/login", async (req, res) => {
     res.json(authResponse.data);
   } catch (error) {
     res
-        .status(error.response.status)
-        .json({ error: error.response.data.error });
+        .status(error?.response?.status)
+        .json({ error: error?.response?.data.error });
   }
 });
 

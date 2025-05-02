@@ -850,7 +850,7 @@ function closeServer() {
 
 // Start server if run directly (not imported as a module)
 // Iniciar servidor si se ejecuta directamente (no si se importa como módulo)
-if (require.main === module) {
+if (require.main === module || process.env.NODE_ENV === 'test') {
     startServer(); // Iniciar con el puerto por defecto
     // Graceful shutdown handling (manejo de cierre controlado)
     // Capturar señales SIGINT (Ctrl+C) y SIGTERM

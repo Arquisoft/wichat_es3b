@@ -11,9 +11,11 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
+
 const Game = ({ onGameEnd }) => {
   const { i18n, t } = useTranslation();
   const currentLanguage = i18n.language || "es";
+
 
   const [questionNumber, setQuestionNumber] = useState(0);
   const [questions, setQuestions] = useState([]);
@@ -151,6 +153,7 @@ const Game = ({ onGameEnd }) => {
 
     // Cleanup interval
     return () => clearInterval(timerRef.current);
+    
   }, [timeLeft, isAnswered, isLoading, currentQuestion, config, showSummary]);
 
   // Update progress bar visually based on timeLeft
@@ -330,6 +333,7 @@ const Game = ({ onGameEnd }) => {
     if (config.categories.length > 1) {
       return t("various") + " 🧩";
     }
+  
 
     const category = config.categories[0];
     switch (category) {
@@ -450,6 +454,7 @@ const Game = ({ onGameEnd }) => {
             <div className="answerPanel">
               {shuffledAnswers.map((respuesta, index) => (
                 <BaseButton
+                  buttonid={`answer-${index}`}
                   key={index}
                   text={respuesta}
                   onClick={() => handleAnswerClick(respuesta)}
@@ -572,3 +577,4 @@ const Game = ({ onGameEnd }) => {
 };
 
 export default Game;
+
