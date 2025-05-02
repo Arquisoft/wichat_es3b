@@ -48,7 +48,7 @@ defineFeature(feature, test => {
                 throw new Error('Login failed or redirection did not occur');
             }
             // Esperamos a que carguen todas las preguntas.
-            await page.waitForTimeout(20000);
+            await page.waitForTimeout(25000);
         } catch (error) {
             console.error('Error during login process: ', error);
             await browser.close();
@@ -173,6 +173,74 @@ defineFeature(feature, test => {
 
         then('The results page should be shown', async () => {
             await page.waitForSelector('h1', { text: "Resumen de la partida", timeout: 5000 });
+        });
+    });
+
+    test('The user is able to start a game with 5 hints', ({ given, when, then }) => {
+        given('A logged user', async () => {
+            // Inicio de sesión ya realizado en beforeAll
+        });
+
+        when('The user configures a game with 5 hints and starts it', async () => {
+            await expect(page).toClick('a', { text: 'Jugar' });
+            await page.waitForSelector('#limitePistas', { visible: true, timeout: 5000 });
+            await page.select('#limitePistas', '5');
+            await expect(page).toClick('button', { text: 'Jugar' });
+        });
+
+        then('The game page should be shown', async () => {
+            await page.waitForSelector('#answer-1', { visible: true, timeout: 5000 });
+        });
+    });
+
+    test('The user is able to start a game with 7 hints', ({ given, when, then }) => {
+        given('A logged user', async () => {
+            // Inicio de sesión ya realizado en beforeAll
+        });
+
+        when('The user configures a game with 7 hints and starts it', async () => {
+            await expect(page).toClick('a', { text: 'Jugar' });
+            await page.waitForSelector('#limitePistas', { visible: true, timeout: 5000 });
+            await page.select('#limitePistas', '7');
+            await expect(page).toClick('button', { text: 'Jugar' });
+        });
+
+        then('The game page should be shown', async () => {
+            await page.waitForSelector('#answer-1', { visible: true, timeout: 5000 });
+        });
+    });
+
+    test('The user is able to start a game with 45 seconds', ({ given, when, then }) => {
+        given('A logged user', async () => {
+            // Inicio de sesión ya realizado en beforeAll
+        });
+
+        when('The user configures a game with 45 seconds and starts it', async () => {
+            await expect(page).toClick('a', { text: 'Jugar' });
+            await page.waitForSelector('#tiempoPregunta', { visible: true, timeout: 5000 });
+            await page.select('#tiempoPregunta', '45');
+            await expect(page).toClick('button', { text: 'Jugar' });
+        });
+
+        then('The game page should be shown', async () => {
+            await page.waitForSelector('#answer-1', { visible: true, timeout: 5000 });
+        });
+    });
+
+    test('The user is able to start a game with 60 seconds', ({ given, when, then }) => {
+        given('A logged user', async () => {
+            // Inicio de sesión ya realizado en beforeAll
+        });
+
+        when('The user configures a game with 60 seconds and starts it', async () => {
+            await expect(page).toClick('a', { text: 'Jugar' });
+            await page.waitForSelector('#tiempoPregunta', { visible: true, timeout: 5000 });
+            await page.select('#tiempoPregunta', '60');
+            await expect(page).toClick('button', { text: 'Jugar' });
+        });
+
+        then('The game page should be shown', async () => {
+            await page.waitForSelector('#answer-1', { visible: true, timeout: 5000 });
         });
     });
 

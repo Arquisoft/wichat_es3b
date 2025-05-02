@@ -28,3 +28,23 @@ Feature: Game Feature
       Given A logged user
       When The user configures a AIvsPlayer game
       Then The results page should be shown
+
+    Scenario: The user is able to start a game with 5 hints
+      Given A logged user
+      When The user configures a game with 5 hints and starts it
+      Then The game page should be shown
+
+    Scenario: The user is able to start a game with 7 hints
+      Given A logged user
+      When The user configures a game with 7 hints and starts it
+      Then The game page should be shown
+
+    Scenario: The user is able to start a game with 45 seconds
+      Given A logged user
+      When The user configures a game with 45 seconds and starts it
+      Then The game page should be shown
+
+    Scenario: The user is able to start a game with 60 seconds
+      Given A logged user
+      When The user configures a game with 60 seconds and starts it
+      Then The game page should be shown
