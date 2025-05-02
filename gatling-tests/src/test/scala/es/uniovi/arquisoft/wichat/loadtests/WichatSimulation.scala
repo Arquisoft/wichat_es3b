@@ -67,12 +67,5 @@ class WichatSimulation extends Simulation {
         .check(jsonPath("$.username").is("${loggedInUser}")) // Verifica que el username en la respuesta coincida
     )
 
-  // 4. Configuración de la inyección de carga
-  setUp(
-    // Define cómo se inyectarán los usuarios virtuales en el escenario 'scn'
-    scn.inject(atOnceUsers(10)) // Inyecta 10 usuarios virtuales de golpe al inicio de la simulación
-    // --- Otras estrategias de inyección comentadas como ejemplo ---
-    // rampUsers(10).during(5.seconds) // Incrementa linealmente 10 usuarios durante 5 segundos
-    // constantUsersPerSec(2).during(15.seconds) // Mantiene una tasa constante de 2 usuarios nuevos por segundo durante 15 segundos
-  ).protocols(httpProtocol) // Asocia el protocolo HTTP definido al principio con esta configuración
+  setUp(scn.inject(constantUsersPerSec(5).during(15))).protocols(httpProtocol)
 }
