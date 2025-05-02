@@ -48,8 +48,9 @@ async function createTestUser() {
 async function generateQuestions() {
     try{
         await axios.get('http://localhost:8004/generateQuestionsIfNotExists')
+        console.log(await axios.get('http://localhost:8004/questionsDB?n=1&topic=all'));
     }catch (error) {
-        console.error('Error al generar preguntas:', error.response?.data || error.message);
+        console.error('Error al generar preguntas de prueba:', error.response?.data || error.message);
     }
 }
 

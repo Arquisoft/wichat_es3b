@@ -97,26 +97,17 @@ app.get("/questionsDB", async (req, res) => {
 
     for (let i = 0; i < topics.length; i++) {
       const topic = topics[i];
-      let numToFetch = questionsPerCategory;
-      if (i < extra) numToFetch++;
+      const numToFetch = questionsPerCategory + (i < extra ? 1 : 0);
 
-      let categoryQuestions = [];
-      while (categoryQuestions.length < numToFetch) {
-        const remainingQuestions = await Question.aggregate([
-          { $match: { category: topic, _id: { $nin: Array.from(selectedQuestionIds) } } },
-          { $sample: { size: numToFetch - categoryQuestions.length } }
-        ]);
+      // Obtener preguntas de la categoría actual
+      const categoryQuestions = await Question.aggregate([
+        { $match: { category: topic, _id: { $nin: Array.from(selectedQuestionIds) } } },
+        { $sample: { size: numToFetch } }
+      ]);
 
-        categoryQuestions = categoryQuestions.concat(remainingQuestions);
-        remainingQuestions.forEach(q => selectedQuestionIds.add(q._id));
-      }
-
-      if (categoryQuestions.length === 0) {
-        console.log(`⚠️ No hay preguntas disponibles para la categoría '${topic}'`);
-      }
-
-
+      // Agregar preguntas seleccionadas y registrar sus IDs
       selectedQuestions.push(...categoryQuestions);
+      categoryQuestions.forEach(q => selectedQuestionIds.add(q._id));
     }
 
     const formattedQuestions = selectedQuestions.map(q => ({
@@ -183,12 +174,37 @@ async function obtainQuestions() {
   }
 }
 
-if (require.main === module || process.env.NODE_ENV === "test") {
+if (process.env.NODE_ENV === "test") {
+  app.get("/generateQuestionsIfNotExists", async (req, res) => {
+    console.log("Creando preguntas en ejecución de test.");
+    try {
+      await connectDB();
+      const selectedQuestions = await questionManager.loadAllQuestions(["all"], 10);
+      await saveQuestionsToDB(selectedQuestions);
+      console.log("Resultado final en la BD:")
+      const allQuestions = await Question.find({});
+      console.log(allQuestions);
+      res.json(selectedQuestions);
+    }
+    catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+}
+
+if (require.main === module && process.env.NODE_ENV ==! "test") {
   app.listen(port, () => {
     console.log(`🚀 Question Service listening at http://localhost:${port}`);
     obtainQuestions().catch((err) =>
         console.error("❌ Error al obtener preguntas:", err)
     );
+  });
+}
+
+if (process.env.NODE_ENV === "test") {
+  console.log("No se han cargado preguntas, ejecución en tests.");
+  app.listen(port, () => {
+    console.log(`🚀 Question Service listening at http://localhost:${port}`);
   });
 }
 
