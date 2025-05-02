@@ -83,7 +83,7 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
       setShowAiMessage(true);
       setTimeout(() => {
         if (isMounted.current) setShowAiMessage(false);
-      }, 5000);
+      }, 7000);
     }
   }, [difficulty, t]);
 
@@ -139,7 +139,7 @@ const PlayerVsAIGame = ({ onGameEnd }) => {
         setShowAiMessage(true);
         setTimeout(() => {
           if (isMounted.current) setShowAiMessage(false);
-        }, 5000);
+        }, 7000);
       }
     } catch (error) {
       console.error("Error getting AI answer:", error);
