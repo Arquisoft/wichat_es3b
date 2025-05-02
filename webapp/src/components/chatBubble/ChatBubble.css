@@ -1,0 +1,35 @@
+@import url("../../assets/global.css");
+
+.chat-container {
+    display: flex;
+    margin-bottom: 2em;
+  }
+  
+  .chat-container.sent {
+    justify-content: flex-end;
+  }
+  
+  .chat-container.received {
+    justify-content: flex-start;
+  }
+
+  .chat-bubble {
+    max-width: 70%;
+    padding: 12px;
+    border-radius: 16px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 0.5em;
+  }
+  
+  .chat-bubble.sent {
+    background-color: var(--color-primario);
+    color: white;
+    border-top-right-radius: 0;
+  }
+  
+  .chat-bubble.received {
+    background-color: #e0e0e0;
+    color: black;
+    border-top-left-radius: 0;
+  }
+  

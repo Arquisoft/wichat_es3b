@@ -1,0 +1,24 @@
+{
+  "name": "wikiquestionservice",
+  "version": "1.0.0",
+  "description": "Wikidata service, encharged to get questions from wikidata API",
+  "main": "wikiQuestion-service.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.8.2",
+    "express": "^4.18.2",
+    "mongoose": "^8.9.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.1.0"
+  }
+}
