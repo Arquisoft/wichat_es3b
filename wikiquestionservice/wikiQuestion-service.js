@@ -179,11 +179,8 @@ if (process.env.NODE_ENV === "test") {
     console.log("Creando preguntas en ejecución de test.");
     try {
       await connectDB();
-      const selectedQuestions = await questionManager.loadAllQuestions(["all"], 10);
+      const selectedQuestions = await questionManager.loadAllQuestions(["all"], 30);
       await saveQuestionsToDB(selectedQuestions);
-      console.log("Resultado final en la BD:")
-      const allQuestions = await Question.find({});
-      //console.log(allQuestions);
       res.json(selectedQuestions);
     }
     catch (error) {

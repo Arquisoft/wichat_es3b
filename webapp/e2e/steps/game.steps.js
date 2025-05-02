@@ -11,8 +11,8 @@ let browser;
 defineFeature(feature, test => {
     beforeAll(async () => {
         browser = process.env.GITHUB_ACTIONS
-            ? await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox'], slowMo: 100})
-            : await puppeteer.launch({ headless: false, slowMo: 100});
+            ? await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox'], slowMo: 50})
+            : await puppeteer.launch({ headless: false, slowMo: 50});
 
         page = await browser.newPage();
         setDefaultOptions({ timeout: 10000 });
@@ -48,7 +48,7 @@ defineFeature(feature, test => {
                 throw new Error('Login failed or redirection did not occur');
             }
             // Esperamos a que carguen todas las preguntas.
-            await page.waitForTimeout(10000);
+            await page.waitForTimeout(20000);
         } catch (error) {
             console.error('Error during login process: ', error);
             await browser.close();
@@ -64,8 +64,7 @@ defineFeature(feature, test => {
 
     test('The user is able to start playing a game', ({ given, when, then }) => {
         given('A logged user', async () => {
-            // Ensure the game page is loaded
-            await page.waitForSelector('button', { visible: true, timeout: 5000 });
+            // Inicio de sesión ya realizado en beforeAll
         });
 
         when('I configure and start a new game', async () => {
@@ -74,14 +73,14 @@ defineFeature(feature, test => {
         );
 
         then('The game page should be shown', async () => {
-            await page.waitForSelector('#answer-1', { visible: true, timeout: 500000 });
+            await page.waitForSelector('#answer-1', { visible: true, timeout: 5000 });
         });
-    },600000000);
+    },60000000);
 
     test('The user is able to play a game', ({ given, when, then }) => {
 
         given('A logged user', async () => {
-            await page.waitForSelector('button', { visible: true, timeout: 5000 });
+            // Inicio de sesión ya realizado en beforeAll
         });
 
         when('I play a game', async () => {
@@ -113,8 +112,7 @@ defineFeature(feature, test => {
 
     test('The user is able to restart a game', ({ given, when, then }) => {
         given('A logged user', async () => {
-            // Ensure the game page is loaded
-            await page.waitForSelector('button', { visible: true, timeout: 5000 });
+            // Inicio de sesión ya realizado en beforeAll
         });
 
         when('I play a game and start another', async () => {
@@ -129,14 +127,80 @@ defineFeature(feature, test => {
         );
 
         then('A new question should be shown', async () => {
-            await page.waitForSelector('#answer-1', { visible: true, timeout: 500000 });
+            await page.waitForSelector('#answer-1', { visible: true, timeout: 5000 });
         });
     },600000000);
+
+    test('The user is able to play a 20 questions game', ({ given, when, then }) => {
+        given('A logged user', async () => {
+            // Inicio de sesión ya realizado en beforeAll
+        });
+
+        when('The user configures a 20 questions game and plays it', async () => {
+            await start20QGame();
+            for(let i = 0; i < 2; i++) {
+                await playA10QGame();
+            }
+        });
+
+        then('The results page should be shown', async () => {
+            await page.waitForSelector('h1', { text: "Resumen de la partida", timeout: 5000 });
+        });
+    });
+
+    test('The user is able to start a 30 questions game', ({ given, when, then }) => {
+        given('A logged user', async () => {
+            // Inicio de sesión ya realizado en beforeAll
+        });
+
+        when('The user configures a 30 questions game and starts it', async () => {
+            await start30QGame();
+        });
+
+        then('A new question should be shown', async () => {
+            await page.waitForSelector('h1', { text: "Resumen de la partida", timeout: 5000 });
+        });
+    });
+
+    test('The user is able to start a AIvsPlayer game', ({ given, when, then }) => {
+        given('A logged user', async () => {
+            // Inicio de sesión ya realizado en beforeAll
+        });
+
+        when('The user configures a AIvsPlayer game', async () => {
+            await startAIGame();
+        });
+
+        then('The results page should be shown', async () => {
+            await page.waitForSelector('h1', { text: "Resumen de la partida", timeout: 5000 });
+        });
+    });
 
     async function startDefaultGame() {
         await expect(page).toClick('a', { text: 'Jugar' });
         await page.waitForSelector('#numPreguntas', { visible: true, timeout: 5000 });
         await page.select('#numPreguntas', '10');
+        await expect(page).toClick('button', { text: 'Jugar' });
+    }
+
+    async function start20QGame() {
+        await expect(page).toClick('a', { text: 'Jugar' });
+        await page.waitForSelector('#numPreguntas', { visible: true, timeout: 5000 });
+        await page.select('#numPreguntas', '20');
+        await expect(page).toClick('button', { text: 'Jugar' });
+    }
+
+    async function start30QGame() {
+        await expect(page).toClick('a', { text: 'Jugar' });
+        await page.waitForSelector('#numPreguntas', { visible: true, timeout: 5000 });
+        await page.select('#numPreguntas', '30');
+        await expect(page).toClick('button', { text: 'Jugar' });
+    }
+
+    async function startAIGame() {
+        await expect(page).toClick('a', { text: 'Jugar' });
+        await page.waitForSelector('#modoJuego', { visible: true, timeout: 5000 });
+        await page.select('#numPreguntas', 'playerVsIA');
         await expect(page).toClick('button', { text: 'Jugar' });
     }
 
