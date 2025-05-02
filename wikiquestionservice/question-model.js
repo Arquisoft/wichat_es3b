@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 
 const QuestionSchema = new mongoose.Schema({
-  category: { type: String }, 
+  category: { type: String },
 
   question: {
     es: { type: String }, 

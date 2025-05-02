@@ -97,26 +97,17 @@ app.get("/questionsDB", async (req, res) => {
 
     for (let i = 0; i < topics.length; i++) {
       const topic = topics[i];
-      let numToFetch = questionsPerCategory;
-      if (i < extra) numToFetch++;
+      const numToFetch = questionsPerCategory + (i < extra ? 1 : 0);
 
-      let categoryQuestions = [];
-      while (categoryQuestions.length < numToFetch) {
-        const remainingQuestions = await Question.aggregate([
-          { $match: { category: topic, _id: { $nin: Array.from(selectedQuestionIds) } } },
-          { $sample: { size: numToFetch - categoryQuestions.length } }
-        ]);
+      // Obtener preguntas de la categoría actual
+      const categoryQuestions = await Question.aggregate([
+        { $match: { category: topic, _id: { $nin: Array.from(selectedQuestionIds) } } },
+        { $sample: { size: numToFetch } }
+      ]);
 
-        categoryQuestions = categoryQuestions.concat(remainingQuestions);
-        remainingQuestions.forEach(q => selectedQuestionIds.add(q._id));
-      }
-
-      if (categoryQuestions.length === 0) {
-        console.log(`⚠️ No hay preguntas disponibles para la categoría '${topic}'`);
-      }
-
-
+      // Agregar preguntas seleccionadas y registrar sus IDs
       selectedQuestions.push(...categoryQuestions);
+      categoryQuestions.forEach(q => selectedQuestionIds.add(q._id));
     }
 
     const formattedQuestions = selectedQuestions.map(q => ({
@@ -162,12 +153,14 @@ async function obtainQuestions() {
     for (const categoria of categorias) {
       const count = await Question.countDocuments({ category: categoria });
       if (count < 60) {
+        console.log("No hay suficientes preguntas en la categoría: ", categoria);
         const missingQuestionsCount = 60 - count;
         const additionalQuestions = await questionManager.loadAllQuestions([categoria], missingQuestionsCount);
         if (additionalQuestions && additionalQuestions.length > 0) {
           await saveQuestionsToDB(additionalQuestions);
         }
       }else {
+        console.log("Suficientes preguntas en la categoría: ", categoria);
         const questionsToDelete = await Question.find({ category: categoria }).limit(4);
         const questionIdsToDelete = questionsToDelete.map(q => q._id);
         await Question.deleteMany({ _id: { $in: questionIdsToDelete } });
@@ -183,12 +176,34 @@ async function obtainQuestions() {
   }
 }
 
+if (process.env.NODE_ENV === "e2e_test") {
+  app.get("/generateQuestionsIfNotExists", async (req, res) => {
+    console.log("Creando preguntas en ejecución de test.");
+    try {
+      await connectDB();
+      const selectedQuestions = await questionManager.loadAllQuestions(["all"], 30);
+      await saveQuestionsToDB(selectedQuestions);
+      res.json(selectedQuestions);
+    }
+    catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+}
+
 if (require.main === module) {
   app.listen(port, () => {
     console.log(`🚀 Question Service listening at http://localhost:${port}`);
     obtainQuestions().catch((err) =>
         console.error("❌ Error al obtener preguntas:", err)
     );
+  });
+}
+
+if (process.env.NODE_ENV === "e2e_test") {
+  app.listen(port, () => {
+    console.log("No se han cargado preguntas, ejecución en tests.");
+    console.log(`🚀 Question Service listening at http://localhost:${port}`);
   });
 }
 
