@@ -37,10 +37,6 @@ class AskLLMDuringGame extends Simulation {
 
   private val scn = scenario("AskLLMDuringGame")
     .exec(
-      http("request_0")
-        .get("/questionsDB?n=10&topic=all")
-        .headers(headers_0),
-      pause(5),
       http("request_1")
         .options("/askllm")
         .headers(headers_1)
@@ -52,5 +48,5 @@ class AskLLMDuringGame extends Simulation {
         )
     )
 
-	setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+	setUp(scn.inject(constantUsersPerSec(5).during(15))).protocols(httpProtocol)
 }

@@ -5,8 +5,15 @@ import scala.concurrent.duration._
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
+import java.util.UUID
 
 class Register extends Simulation {
+
+   val dynamicFeeder = Iterator.continually(Map(
+    "email" -> (UUID.randomUUID().toString + "@example.com"),
+    "username" -> ("user_" + UUID.randomUUID().toString.take(8)),
+    "password" -> ("Pass" + UUID.randomUUID().toString.take(6) + "!")
+  ))
 
   private val httpProtocol = http
     .baseUrl("http://localhost:3000")
@@ -61,7 +68,7 @@ class Register extends Simulation {
   
   private val uri1 = "localhost"
 
-  private val scn = scenario("Register")
+  private val scn = scenario("Register").feed(dynamicFeeder)
     .exec(
       http("request_0")
         .get("/")
@@ -91,7 +98,9 @@ class Register extends Simulation {
           http("request_6")
             .post("http://" + uri1 + ":8000/adduser")
             .headers(headers_6)
-            .body(RawFileBody("es/uniovi/arquisoft/wichat/loadtests/register/0006_request.json"))
+            .body(StringBody(
+              """{"email":"${email}","username":"${username}","password":"${password}"}"""
+        )).asJson
         )
     )
 
