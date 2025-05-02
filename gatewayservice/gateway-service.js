@@ -244,7 +244,12 @@ app.get('/questionsDB', async (req, res) => {
     const fullURL = `${wikiQuestionServiceUrl}/questionsDB?n=${n}&topic=${encodeURIComponent(topic)}`;
     console.log("Redirigiendo a:", fullURL);
 
-    const response = await axios.get(fullURL);
+    const response = await axios.get(fullURL, {
+      headers: {
+        // Agregar encabezados personalizados si es necesario
+        'X-Forwarded-For': req.ip,
+      },
+    });
     res.json(response.data);
   } catch (error) {
     console.error("Error al obtener preguntas:", error.message);

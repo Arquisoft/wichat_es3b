@@ -153,12 +153,14 @@ async function obtainQuestions() {
     for (const categoria of categorias) {
       const count = await Question.countDocuments({ category: categoria });
       if (count < 60) {
+        console.log("No hay suficientes preguntas en la categoría: ", categoria);
         const missingQuestionsCount = 60 - count;
         const additionalQuestions = await questionManager.loadAllQuestions([categoria], missingQuestionsCount);
         if (additionalQuestions && additionalQuestions.length > 0) {
           await saveQuestionsToDB(additionalQuestions);
         }
       }else {
+        console.log("Suficientes preguntas en la categoría: ", categoria);
         const questionsToDelete = await Question.find({ category: categoria }).limit(4);
         const questionIdsToDelete = questionsToDelete.map(q => q._id);
         await Question.deleteMany({ _id: { $in: questionIdsToDelete } });
@@ -189,7 +191,7 @@ if (process.env.NODE_ENV === "test") {
   });
 }
 
-if (require.main === module && process.env.NODE_ENV ==! "test") {
+if (require.main === module && process.env.NODE_ENV === undefined) {
   app.listen(port, () => {
     console.log(`🚀 Question Service listening at http://localhost:${port}`);
     obtainQuestions().catch((err) =>
