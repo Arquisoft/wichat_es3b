@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Flag from "react-world-flags"; // Importa react-world-flags
 import "./LanguageChangeMenu.css";
 import Dropdown from "../dropdown/Dropdown";
 import DropdownItem from "../dropdown/dropdownItem/DropdownItem";
@@ -14,8 +13,8 @@ const LanguageChangeMenu = ({ variant = "primary" }) => {
   };
 
   const items = [
-    { countryCode: "ES", text: "Español", code: "es" }, // España
-    { countryCode: "GB", text: "English", code: "en" }, // Reino Unido
+    { countryCode: "ES", text: "Español (ES)", code: "es" },
+    { countryCode: "GB", text: "English (EN)", code: "en" },
   ];
 
   return (
@@ -32,7 +31,6 @@ const LanguageChangeMenu = ({ variant = "primary" }) => {
                   onClick={() => handleLanguageChange(item.code)}
                 >
                   <div className="itemContent">
-                    <Flag code={item.countryCode} />
                     {item.text}
                   </div>
                 </DropdownItem>
