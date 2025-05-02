@@ -269,6 +269,8 @@ jobs:
             [ -f ~/.env ] && rm ~/.env
             echo "MONGODB_URI= \"${{ secrets.MONGODB_URI }}\"" > ~/.env
             echo "LLM_API_KEY= \"${{ secrets.LLM_API_KEY }}\"" >> ~/.env
+            echo "Cleaning up old containers..."
+            docker rm -f $(docker ps -aq) || true
             docker compose --profile prod down
             docker rmi $(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "<none>" | awk '{print $2}')
             docker rmi $(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "deployment_branch" | awk '{print $2}')
