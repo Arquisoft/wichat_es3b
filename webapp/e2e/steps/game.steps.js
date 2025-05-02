@@ -48,7 +48,7 @@ defineFeature(feature, test => {
                 throw new Error('Login failed or redirection did not occur');
             }
         } catch (error) {
-            console.error('Error during login process:', error);
+            console.error('Error during login process: ', error);
             await browser.close();
             throw error;
         }
