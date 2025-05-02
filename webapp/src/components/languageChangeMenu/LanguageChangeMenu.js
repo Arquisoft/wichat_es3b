@@ -13,8 +13,8 @@ const LanguageChangeMenu = ({ variant = "primary" }) => {
   };
 
   const items = [
-    { countryCode: "ES", text: "Español (ES)", code: "es" },
-    { countryCode: "GB", text: "English (EN)", code: "en" },
+    { countryCode: "ES", text: "Español", code: "es" },
+    { countryCode: "GB", text: "English", code: "en" },
   ];
 
   return (
