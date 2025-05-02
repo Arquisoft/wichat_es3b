@@ -38,7 +38,7 @@ export default function GameHistory({ games, currentIndex, onNavigate }) {
     return visibleGames;
   };
 
-  const visibleGames = getVisibleGames();
+  const visibleGames = games.length > 0 ? getVisibleGames() : [];
 
   return (
     <section className="history-section">
@@ -101,11 +101,12 @@ export default function GameHistory({ games, currentIndex, onNavigate }) {
           Array.from({ length: games.length }).map((_, index) => (
             <span
               key={index}
+              data-testid="pagination-dot"
               className={`pagination-dot ${
                 currentIndex === index ? "active" : ""
               }`}
               onClick={() => {
-                if (isAnimating) return;
+                if (isAnimating || index === currentIndex) return;
 
                 setIsAnimating(true);
                 // Navegar a la página correspondiente

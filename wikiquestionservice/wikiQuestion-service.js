@@ -1,7 +1,5 @@
 const express = require("express");
-const cors = require("cors");
 const bodyParser = require("body-parser");
-const cron = require("node-cron");
 const QuestionManager = require("./questiongenerator/questionManager");
 const mongoose = require("mongoose");
 const Question = require("./question-model");
@@ -31,7 +29,6 @@ const defaultNumQuestions = 25;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
 
 function filterValidTopics(rawTopic) {
   const validCategories = ["paises", "cine", "clubes", "literatura", "arte", "all"];
@@ -57,7 +54,7 @@ app.get("/questions", async (req, res) => {
       topics = ["all"];
     }
 
-    const selectedQuestions = await questionManager.loadAllQuestions(topics, numQuestions);
+      const selectedQuestions = await questionManager.loadAllQuestions(topics, numQuestions);
 
     const formattedQuestions = selectedQuestions.map((q) => ({
       pregunta: q.obtenerPreguntaPorIdioma(),
@@ -142,7 +139,7 @@ async function saveQuestionsToDB(questions) {
   try {
     for (const q of questions) {
       const newQuestion = new Question({
-        category: q.categoria,
+        category: q.categoryName,
         question: q.preguntas,
         correctAnswer: q.respuestaCorrecta,
         incorrectAnswers: q.respuestasIncorrectas,
@@ -158,34 +155,40 @@ async function saveQuestionsToDB(questions) {
   }
 }
 
-async function generateQuestions() {
+async function obtainQuestions() {
   try {
-    const allCategories = ["paises", "cine", "clubes", "literatura", "arte"];
-
-    for (const category of allCategories) {
-      const currentQuestions = await Question.find({
-        category: category
-      });
-
-      if (currentQuestions.length < 100) {
-        const missingQuestionsCount = 100 - currentQuestions.length;
-        const additionalQuestions = await questionManager.loadAllQuestions([category], missingQuestionsCount);
+    await connectDB();
+    const categorias = ["paises", "cine", "clubes", "literatura", "arte"];
+    for (const categoria of categorias) {
+      const count = await Question.countDocuments({ category: categoria });
+      if (count < 60) {
+        const missingQuestionsCount = 60 - count;
+        const additionalQuestions = await questionManager.loadAllQuestions([categoria], missingQuestionsCount);
         if (additionalQuestions && additionalQuestions.length > 0) {
           await saveQuestionsToDB(additionalQuestions);
-        } else {
-          console.log(`No se generaron preguntas adicionales para '${category}'`);
+        }
+      }else {
+        const questionsToDelete = await Question.find({ category: categoria }).limit(4);
+        const questionIdsToDelete = questionsToDelete.map(q => q._id);
+        await Question.deleteMany({ _id: { $in: questionIdsToDelete } });
+        const newQuestions = await questionManager.loadAllQuestions([categoria], 4);
+        if (newQuestions && newQuestions.length > 0) {
+          await saveQuestionsToDB(newQuestions);
         }
       }
     }
-    console.log("Proceso de todas las categorías completado.");
+    await disconnectDB();
   } catch (error) {
-    console.error("Error al procesar las categorías:", error);
+    console.error("❌ Error al obtener el conteo de preguntas:", error);
   }
 }
 
 if (require.main === module) {
   app.listen(port, () => {
     console.log(`🚀 Question Service listening at http://localhost:${port}`);
+    obtainQuestions().catch((err) =>
+        console.error("❌ Error al obtener preguntas:", err)
+    );
   });
 }
 
