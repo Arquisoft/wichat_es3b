@@ -630,9 +630,22 @@ function closeServer() {
     return Promise.resolve();
 }
 
-// Si este archivo se ejecuta directamente, inicia el servidor
+// Start server if run directly (not imported as a module)
+// Iniciar servidor si se ejecuta directamente (no si se importa como módulo)
 if (require.main === module || process.env.NODE_ENV === 'test') {
-    startServer();
+    startServer(); // Iniciar con el puerto por defecto
+    // Graceful shutdown handling (manejo de cierre controlado)
+    // Capturar señales SIGINT (Ctrl+C) y SIGTERM
+    process.on('SIGINT', async () => {
+        console.log('SIGINT signal received: closing HTTP server');
+        await closeServer(); // Esperar a que cierre el servidor
+        process.exit(0); // Salir del proceso
+    });
+    process.on('SIGTERM', async () => {
+        console.log('SIGTERM signal received: closing HTTP server');
+        await closeServer(); // Esperar a que cierre el servidor
+        process.exit(0); // Salir del proceso
+    });
 }
 
 module.exports = {

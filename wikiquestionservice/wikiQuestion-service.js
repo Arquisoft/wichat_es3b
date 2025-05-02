@@ -1,6 +1,5 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cron = require("node-cron");
 const QuestionManager = require("./questiongenerator/questionManager");
 const mongoose = require("mongoose");
 const Question = require("./question-model");
@@ -8,7 +7,7 @@ const Question = require("./question-model");
 const app = express();
 const port = 8004;
 
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:57611/questiondb';
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/questiondb';
 async function connectDB() {
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(mongoUri);
@@ -55,7 +54,7 @@ app.get("/questions", async (req, res) => {
       topics = ["all"];
     }
 
-    const selectedQuestions = await questionManager.loadAllQuestions(topics, numQuestions);
+      const selectedQuestions = await questionManager.loadAllQuestions(topics, numQuestions);
 
     const formattedQuestions = selectedQuestions.map((q) => ({
       pregunta: q.obtenerPreguntaPorIdioma(),
@@ -71,37 +70,23 @@ app.get("/questions", async (req, res) => {
   }
 });
 
-if (process.env.NODE_ENV === "test") {
-  app.get("/generateQuestionsIfNotExists", async (req, res) => {
-    try {
-      await connectDB();
-      const selectedQuestions = await questionManager.loadAllQuestions(["all"], 10);
-      await saveQuestionsToDB(selectedQuestions);
-      res.json(selectedQuestions);
-    }
-    catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-}
-
 app.get("/questionsDB", async (req, res) => {
+  await connectDB();
+  const numQuestions = parseInt(req.query.n ?? defaultNumQuestions, 10);
+  const topic = (req.query.topic && req.query.topic !== "undefined") ? req.query.topic : defaultTopics;
+
+  if (numQuestions > 30) {
+    return res.status(400).json({ error: "El límite de preguntas es 30" });
+  }
+
+  let topics = filterValidTopics(topic);
+
+  if (topics.length === 0) {
+    return res.status(400).json({ error: "No se proporcionaron categorías válidas." });
+  }
+
   try {
-    await connectDB();
-    const numQuestions = parseInt(req.query.n ?? defaultNumQuestions, 10);
-    const topic = (req.query.topic && req.query.topic !== "undefined") ? req.query.topic : defaultTopics;
-
-    if (numQuestions > 30) {
-      return res.status(400).json({ error: "El límite de preguntas es 30" });
-    }
-
-    let topics = filterValidTopics(topic);
-
-    if (topics.length === 0) {
-      return res.status(400).json({ error: "No se proporcionaron categorías válidas." });
-    }
-
-    if (topics.includes("all") || topics.length === 0) {
+    if (topics.includes("all")|| topics.length === 0) {
       topics = ["paises", "cine", "clubes", "literatura", "arte"];
     }
 
@@ -110,50 +95,28 @@ app.get("/questionsDB", async (req, res) => {
     const selectedQuestions = [];
     const selectedQuestionIds = new Set();
 
-    //for (let i = 0; i < topics.length; i++) {
-    //  const topic = topics[i];
-    //  let numToFetch = questionsPerCategory;
-    //  if (i < extra) numToFetch++;
-//
-    //  let categoryQuestions = [];
-    //  while (categoryQuestions.length < numToFetch) {
-    //    const remainingQuestions = await Question.aggregate([
-    //      { $match: { category: topic, _id: { $nin: Array.from(selectedQuestionIds) } } },
-    //      { $sample: { size: numToFetch - categoryQuestions.length } }
-    //    ]);
-//
-    //    if (remainingQuestions.length === 0) {
-    //      console.log(`⚠️ No hay más preguntas disponibles para la categoría '${topic}'`);
-    //      break; // Salir del bucle si no hay más preguntas disponibles
-    //    }
-//
-    //    categoryQuestions = categoryQuestions.concat(remainingQuestions);
-    //    remainingQuestions.forEach(q => selectedQuestionIds.add(q._id));
-    //  }
-//
-    //  if (categoryQuestions.length === 0) {
-    //    console.log(`⚠️ No hay preguntas disponibles para la categoría '${topic}'`);
-    //  }
-//
-    //  const questionIds = categoryQuestions.map(q => q._id);
-    //  await Question.deleteMany({ _id: { $in: questionIds } });
-//
-    //  selectedQuestions.push(...categoryQuestions);
-    //}
-
     for (let i = 0; i < topics.length; i++) {
       const topic = topics[i];
-      const numToFetch = questionsPerCategory + (i < extra ? 1 : 0);
+      let numToFetch = questionsPerCategory;
+      if (i < extra) numToFetch++;
 
-      // Obtener preguntas de la categoría actual
-      const categoryQuestions = await Question.aggregate([
-        { $match: { categoryName: topic, _id: { $nin: Array.from(selectedQuestionIds) } } },
-        { $sample: { size: numToFetch } }
-      ]);
+      let categoryQuestions = [];
+      while (categoryQuestions.length < numToFetch) {
+        const remainingQuestions = await Question.aggregate([
+          { $match: { category: topic, _id: { $nin: Array.from(selectedQuestionIds) } } },
+          { $sample: { size: numToFetch - categoryQuestions.length } }
+        ]);
 
-      // Agregar preguntas seleccionadas y registrar sus IDs
+        categoryQuestions = categoryQuestions.concat(remainingQuestions);
+        remainingQuestions.forEach(q => selectedQuestionIds.add(q._id));
+      }
+
+      if (categoryQuestions.length === 0) {
+        console.log(`⚠️ No hay preguntas disponibles para la categoría '${topic}'`);
+      }
+
+
       selectedQuestions.push(...categoryQuestions);
-      categoryQuestions.forEach(q => selectedQuestionIds.add(q._id));
     }
 
     const formattedQuestions = selectedQuestions.map(q => ({
@@ -176,7 +139,7 @@ async function saveQuestionsToDB(questions) {
   try {
     for (const q of questions) {
       const newQuestion = new Question({
-        categoryName: q.categoryName,
+        category: q.categoryName,
         question: q.preguntas,
         correctAnswer: q.respuestaCorrecta,
         incorrectAnswers: q.respuestasIncorrectas,
@@ -192,34 +155,40 @@ async function saveQuestionsToDB(questions) {
   }
 }
 
-async function generateQuestions() {
+async function obtainQuestions() {
   try {
-    const allCategories = ["paises", "cine", "clubes", "literatura", "arte"];
-
-    for (const category of allCategories) {
-      const currentQuestions = await Question.find({
-        category: category
-      });
-
-      if (currentQuestions.length < 100) {
-        const missingQuestionsCount = 100 - currentQuestions.length;
-        const additionalQuestions = await questionManager.loadAllQuestions([category], missingQuestionsCount);
+    await connectDB();
+    const categorias = ["paises", "cine", "clubes", "literatura", "arte"];
+    for (const categoria of categorias) {
+      const count = await Question.countDocuments({ category: categoria });
+      if (count < 60) {
+        const missingQuestionsCount = 60 - count;
+        const additionalQuestions = await questionManager.loadAllQuestions([categoria], missingQuestionsCount);
         if (additionalQuestions && additionalQuestions.length > 0) {
           await saveQuestionsToDB(additionalQuestions);
-        } else {
-          console.log(`No se generaron preguntas adicionales para '${category}'`);
+        }
+      }else {
+        const questionsToDelete = await Question.find({ category: categoria }).limit(4);
+        const questionIdsToDelete = questionsToDelete.map(q => q._id);
+        await Question.deleteMany({ _id: { $in: questionIdsToDelete } });
+        const newQuestions = await questionManager.loadAllQuestions([categoria], 4);
+        if (newQuestions && newQuestions.length > 0) {
+          await saveQuestionsToDB(newQuestions);
         }
       }
     }
-    console.log("Proceso de todas las categorías completado.");
+    await disconnectDB();
   } catch (error) {
-    console.error("Error al procesar las categorías:", error);
+    console.error("❌ Error al obtener el conteo de preguntas:", error);
   }
 }
 
-if (require.main === module || process.env.NODE_ENV === "test") {
+if (require.main === module) {
   app.listen(port, () => {
     console.log(`🚀 Question Service listening at http://localhost:${port}`);
+    obtainQuestions().catch((err) =>
+        console.error("❌ Error al obtener preguntas:", err)
+    );
   });
 }
 

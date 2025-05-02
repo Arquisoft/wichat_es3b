@@ -34,7 +34,8 @@ const Game = ({ onGameEnd }) => {
   const [totalTimeUsed, setTotalTimeUsed] = useState(0);
   const [showRules, setShowRules] = useState(false);
   const [hintsLeft, setHintsLeft] = useState(3); // Default hints, updated by config
-  const [questionAnimationComplete, setQuestionAnimationComplete] = useState(false);
+  const [questionAnimationComplete, setQuestionAnimationComplete] =
+    useState(false);
   const [shuffledAnswers, setShuffledAnswers] = useState([]);
   const [config, setConfig] = useState(null); // Game configuration
 
@@ -44,7 +45,8 @@ const Game = ({ onGameEnd }) => {
   const hasSavedStats = useRef(false); // Prevent saving stats multiple times
 
   // --- Constants ---
-  const GATEWAY_URL = process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
+  const GATEWAY_URL =
+    process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
   const loggedUsername = localStorage.getItem("username");
 
   // --- Effects ---
@@ -66,7 +68,7 @@ const Game = ({ onGameEnd }) => {
       tiempoPregunta: 30,
       limitePistas: 3,
       modoJuego: "singleplayer", // Ensure correct mode default
-      categories: ["all"]
+      categories: ["all"],
     };
     const finalConfig = { ...defaultConfig, ...storedConfig };
 
@@ -87,14 +89,23 @@ const Game = ({ onGameEnd }) => {
           return;
         }
         try {
-          const categories = config.categories.includes("all") ? ["all"] : config.categories;
+          const categories = config.categories.includes("all")
+            ? ["all"]
+            : config.categories;
           const numPreguntas = config.numPreguntas ?? 10;
-          const queryString = `questionsDB?n=${config.numPreguntas}&topic=${categories.join(",")}`;
-          console.log("URL de la solicitud al gateway:", `${GATEWAY_URL}/${queryString}`);
+          const queryString = `questionsDB?n=${
+            config.numPreguntas
+          }&topic=${categories.join(",")}`;
+          console.log(
+            "URL de la solicitud al gateway:",
+            `${GATEWAY_URL}/${queryString}`
+          );
           const response = await fetch(`${GATEWAY_URL}/${queryString}`);
-          console.log(response);
+
           if (!response.ok) {
-            throw new Error(`Failed to fetch questions: ${response.statusText}`);
+            throw new Error(
+              `Failed to fetch questions: ${response.statusText}`
+            );
           }
           const data = await response.json();
 
@@ -108,7 +119,6 @@ const Game = ({ onGameEnd }) => {
             setIsLoading(false);
           }
         } catch (error) {
-          console.log(error);
           console.error("Error fetching questions:", error);
           if (isMounted.current) setIsLoading(false);
         }
@@ -166,8 +176,10 @@ const Game = ({ onGameEnd }) => {
   // Shuffle answers when current question changes
   useEffect(() => {
     if (currentQuestion) {
-      const correctAnswer = currentQuestion.respuestaCorrecta?.[currentLanguage];
-      const incorrectAnswers = currentQuestion.respuestas?.[currentLanguage] || [];
+      const correctAnswer =
+        currentQuestion.respuestaCorrecta?.[currentLanguage];
+      const incorrectAnswers =
+        currentQuestion.respuestas?.[currentLanguage] || [];
 
       if (correctAnswer) {
         const allAnswers = [...incorrectAnswers, correctAnswer];
@@ -186,7 +198,11 @@ const Game = ({ onGameEnd }) => {
   // Check if game ended to save stats and show summary
   useEffect(() => {
     // Ensure config and questions are loaded, and it's the last question
-    if (config && questions.length > 0 && questionNumber >= config.numPreguntas - 1) {
+    if (
+      config &&
+      questions.length > 0 &&
+      questionNumber >= config.numPreguntas - 1
+    ) {
       // Trigger only once when the last question is answered or timed out
       if (isAnswered && !hasSavedStats.current) {
         saveStats(); // Save stats
@@ -228,7 +244,15 @@ const Game = ({ onGameEnd }) => {
     } catch (error) {
       console.error("Error saving single player statistics:", error);
     }
-  }, [loggedUsername, correctAnswers, incorrectAnswers, totalTimeUsed, score, config, GATEWAY_URL]); // Dependencies
+  }, [
+    loggedUsername,
+    correctAnswers,
+    incorrectAnswers,
+    totalTimeUsed,
+    score,
+    config,
+    GATEWAY_URL,
+  ]); // Dependencies
 
   // Handle moving to the next question
   const handleNextQuestion = useCallback(() => {
@@ -260,34 +284,45 @@ const Game = ({ onGameEnd }) => {
   }, [questionNumber, config, questions]); // Dependencies
 
   // Handle player's answer selection
-  const handleAnswerClick = useCallback(async (respuesta) => {
-    if (isAnswered || !currentQuestion || !config) return; // Guard conditions
+  const handleAnswerClick = useCallback(
+    async (respuesta) => {
+      if (isAnswered || !currentQuestion || !config) return; // Guard conditions
 
-    clearInterval(timerRef.current); // Stop timer
-    const timeUsed = config.tiempoPregunta - timeLeft; // Calculate time taken
+      clearInterval(timerRef.current); // Stop timer
+      const timeUsed = config.tiempoPregunta - timeLeft; // Calculate time taken
 
-    if (isMounted.current) {
-      setSelectedAnswer(respuesta);
-      setIsAnswered(true);
-      setTotalTimeUsed((prev) => prev + timeUsed); // Add time used for this question
+      if (isMounted.current) {
+        setSelectedAnswer(respuesta);
+        setIsAnswered(true);
+        setTotalTimeUsed((prev) => prev + timeUsed); // Add time used for this question
 
-      if (respuesta === currentQuestion.respuestaCorrecta?.[currentLanguage]) {
-        setIsCorrect(true);
-        setScore((prevScore) => prevScore + 10); // Add points
-        setCorrectAnswers((prev) => prev + 1);
-      } else {
-        setIsCorrect(false);
-        setIncorrectAnswers((prev) => prev + 1);
+        if (
+          respuesta === currentQuestion.respuestaCorrecta?.[currentLanguage]
+        ) {
+          setIsCorrect(true);
+          const timeBonus = Math.round(
+            (config.tiempoPregunta - timeUsed) * (20 / config.tiempoPregunta)
+          );
+          const pointsEarned = 10 + Math.max(0, timeBonus);
+          setScore((prevScore) => prevScore + pointsEarned);
+          setCorrectAnswers((prev) => prev + 1);
+        } else {
+          setIsCorrect(false);
+          setIncorrectAnswers((prev) => prev + 1);
+        }
       }
-    }
-    // The useEffect checking for game end will handle summary/saving
-  }, [isAnswered, currentQuestion, config, timeLeft, currentLanguage]); // Dependencies
+      // The useEffect checking for game end will handle summary/saving
+    },
+    [isAnswered, currentQuestion, config, timeLeft, currentLanguage]
+  ); // Dependencies
 
   // Format time remaining
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   // Toggle hint chatbox visibility
@@ -298,11 +333,19 @@ const Game = ({ onGameEnd }) => {
   // --- Render Logic ---
 
   if (isLoading) {
-    return <div className="loading-div"><h1>{t('loading')}</h1></div>;
+    return (
+      <div className="loading-div">
+        <h1>{t("loading")}</h1>
+      </div>
+    );
   }
 
   if (!currentQuestion) {
-    return <div className="loading-div"><h1>Error: No question data available.</h1></div>;
+    return (
+      <div className="loading-div">
+        <h1>Error: No question data available.</h1>
+      </div>
+    );
   }
 
   const getCategoryDisplay = () => {
@@ -319,13 +362,13 @@ const Game = ({ onGameEnd }) => {
       case "clubes":
         return t("football") + " ⚽";
       case "cine":
-        return t("cinema") + " 🎬" ;
+        return t("cinema") + " 🎬";
       case "literatura":
         return t("literature") + " 📚";
       case "paises":
         return t("countries") + " 🌎";
       case "arte":
-        return t("art") + " 🎨" ;
+        return t("art") + " 🎨";
       case "all":
       default:
         return t("all") + " 🧠";
@@ -333,188 +376,233 @@ const Game = ({ onGameEnd }) => {
   };
 
   return (
-      <div className="gameContainer">
-        {/* Main Game Area */}
-        <main className={showRules || showSummary ? "blurred" : ""}>
-          <div className="game-layout">
-            {/* Left Column (Hints) */}
-            <div className="left-column">
-              <div className="hint-section">
-                <HintButton
-                    // Translate button text based on visibility
-                    text={isChatBoxVisible ? t('hideHints', 'Ocultar pistas') : t('needHint', '¿Necesitas una pista?')}
-                    onClick={toggleChatBox}
-                    disabled={hintsLeft <= 0 && !isChatBoxVisible} // Disable if no hints left and not visible
-                />
-                {/* ChatBox for hints */}
-                <div className={`chatBoxContainer ${isChatBoxVisible ? "visible" : "hidden"}`}>
-                  {currentQuestion && ( // Ensure currentQuestion exists before rendering ChatBox
-                      <ChatBox
-                          // Pass necessary question details
-                          question={{
-                            pregunta: currentQuestion.pregunta, // Pass the whole object
-                            respuestaCorrecta: currentQuestion.respuestaCorrecta, // Pass the whole object
-                            respuestas: currentQuestion.respuestas, // Pass the whole object
-                            descripcion: currentQuestion.descripcion || [],
-                            img: currentQuestion.img || [],
-                          }}
-                          language={currentLanguage} // Pass current language
-                          isVisible={isChatBoxVisible} // Control visibility
-                          hintsLeft={hintsLeft}
-                          setHintsLeft={setHintsLeft} // Allow ChatBox to update hints count
-                      />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Center Column (Question & Answers) */}
-            <motion.div
-                className="center-column"
-                key={questionNumber} // Animate when question changes
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-                onAnimationComplete={() => setQuestionAnimationComplete(true)}
-            >
-              <div className="question-section">
-                <div className="categoryDisplay"><h1>{getCategoryDisplay()}</h1></div>
-                <div className="questionNumber">
-                  <h2>{`${t('question')} ${questionNumber + 1}/${config?.numPreguntas || 10}`}</h2>
-                  {/* Enable next button only after answered and if not the last question */}
-                  {questionNumber < (config?.numPreguntas || 10) - 1 && (
-                      <ArrowForwardIcon
-                          titleAccess={t("nextQuestion")}
-                          fontSize="medium"
-                          id="nextArrow"
-                          onClick={isAnswered ? handleNextQuestion : undefined}
-                          style={{
-                            backgroundColor: isAnswered ? 'var(--color-primario)' : '#ccc',
-                            color: 'white',
-                            borderRadius: '50%',
-                            padding: '0.3em',
-                            cursor: isAnswered ? "pointer" : "not-allowed",
-                            opacity: isAnswered ? 1 : 0.5,
-                            transition: 'background-color 0.3s ease, opacity 0.3s ease',
-                          }}
-                      />
-                  )}
-                </div>
-                <h1>{currentQuestion?.pregunta?.[currentLanguage] || t('loading')}</h1>
-              </div>
-
-              {/* Optional Image */}
-              {currentQuestion?.img?.[0] && (
-                  <div className="question-image">
-                    <img
-                        src={currentQuestion.img[0]}
-                        alt={t('questionImageAlt', { question: currentQuestion?.pregunta?.[currentLanguage] })}
-                        onError={(e) => e.target.style.display='none'}
-                    />
-                  </div>
-              )}
-
-              {/* Answer Buttons */}
-              <div className="answerPanel">
-                { shuffledAnswers.map((respuesta, index) => (
-                    <BaseButton
-                        buttonid={`answer-${index}`}
-                        key={index}
-                        text={respuesta}
-                        onClick={() => handleAnswerClick(respuesta)}
-                        buttonType={
-                          isAnswered
-                              ? respuesta === currentQuestion?.respuestaCorrecta?.[currentLanguage]
-                                  ? "buttonCorrect"
-                                  : selectedAnswer === respuesta
-                                      ? "buttonIncorrect"
-                                      : "buttonDisabled" // Style for other incorrect options
-                              : "buttonPrimary" // Default state
-                        }
-                        disabled={isAnswered}
-                    />
-                ))}
-              </div>
-
-              {/* Timer */}
-              <div className="timer-section">
-                <Box display="flex" alignItems="center" width="100%" gap={1}>
-                  <span>{t('time')}</span>
-                  <Box width="100%" sx={{ mx: 1 }}>
-                    <LinearProgress id="progressBar" variant="determinate" value={progress} />
-                  </Box>
-                  <span>{formatTime(timeLeft)}</span>
-                </Box>
-              </div>
-            </motion.div>
-
-            {/* Right Column (Score & Rules) */}
-            <div className="right-column">
-              <div className="rules-points-section">
-                <div className="points-display">
-                  <span>{`${t('score')}: `} </span>
-                  <span className="score">{score}</span>
-                </div>
-                <BaseButton text={t('rules')} buttonType="buttonSecondary" onClick={() => setShowRules(true)} />
+    <div className="gameContainer">
+      {/* Main Game Area */}
+      <main className={showRules || showSummary ? "blurred" : ""}>
+        <div className="game-layout">
+          {/* Left Column (Hints) */}
+          <div className="left-column">
+            <div className="hint-section">
+              <HintButton
+                // Translate button text based on visibility
+                text={
+                  isChatBoxVisible
+                    ? t("hideHints", "Ocultar pistas")
+                    : t("needHint", "¿Necesitas una pista?")
+                }
+                onClick={toggleChatBox}
+                disabled={hintsLeft <= 0 && !isChatBoxVisible} // Disable if no hints left and not visible
+              />
+              {/* ChatBox for hints */}
+              <div
+                className={`chatBoxContainer ${
+                  isChatBoxVisible ? "visible" : "hidden"
+                }`}
+              >
+                {currentQuestion && ( // Ensure currentQuestion exists before rendering ChatBox
+                  <ChatBox
+                    // Pass necessary question details
+                    question={{
+                      pregunta: currentQuestion.pregunta, // Pass the whole object
+                      respuestaCorrecta: currentQuestion.respuestaCorrecta, // Pass the whole object
+                      respuestas: currentQuestion.respuestas, // Pass the whole object
+                      descripcion: currentQuestion.descripcion || [],
+                      img: currentQuestion.img || [],
+                    }}
+                    language={currentLanguage} // Pass current language
+                    isVisible={isChatBoxVisible} // Control visibility
+                    hintsLeft={hintsLeft}
+                    setHintsLeft={setHintsLeft} // Allow ChatBox to update hints count
+                  />
+                )}
               </div>
             </div>
           </div>
-        </main>
 
-        {/* Rules Dialog */}
-        {showRules && (
-            <div className="overlay">
-              <div className="dialogGameRulesContainer">
-                <InfoDialog
-                    title={t("gameRules")}
-                    content={
-                      <ol>
-                        {/* Translate rules specific to single player */}
-                        <li>{t('singlePlayerRule1', t('observe'))}</li>
-                        <li>{t('singlePlayerRule2', t('answer'))}</li>
-                        <li>{t('singlePlayerRule3', t('hintInfo'))}</li>
-                      </ol>
-                    }
-                    onClose={() => setShowRules(false)}
-                />
+          {/* Center Column (Question & Answers) */}
+          <motion.div
+            className="center-column"
+            key={questionNumber} // Animate when question changes
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+            onAnimationComplete={() => setQuestionAnimationComplete(true)}
+          >
+            <div className="question-section">
+              <div className="categoryDisplay">
+                <h1>{getCategoryDisplay()}</h1>
               </div>
-            </div>
-        )}
-
-        {/* Summary Dialog */}
-        {showSummary && (
-            <div className="overlay">
-              <div className="dialogGameRulesContainer">
-                <InfoDialog
-                    title={t("summaryTitle")} // Use translated title
-                    content={
-                      <div className="summaryContent">
-                        {/* Use translated labels */}
-                        <p>{t('summaryCorrect')} {correctAnswers}</p>
-                        <p>{t('summaryIncorrect')} {incorrectAnswers}</p>
-                        <p>{t('summaryRatio')} {(correctAnswers / (correctAnswers + incorrectAnswers || 1) * 100).toFixed(0)}%</p>
-                        <p>
-                          {t('summaryAvgTime')}{" "}
-                          {(totalTimeUsed / (correctAnswers + incorrectAnswers || 1)).toFixed(2)}s
-                        </p>
-                        <p>{t('summaryMaxScore')} {score}</p>
-                      </div>
-                    }
-                    onClose={() => {
-                      // Don't save stats again here, already saved by useEffect
-                      setShowSummary(false);
-                      if (onGameEnd) {
-                        onGameEnd(); // Call the callback passed from PlayView
-                      } else {
-                        // Fallback if prop is not passed (should not happen with PlayView update)
-                        window.location.reload();
-                      }
+              <div className="questionNumber">
+                <h2>{`${t("question")} ${questionNumber + 1}/${
+                  config?.numPreguntas || 10
+                }`}</h2>
+                {/* Enable next button only after answered and if not the last question */}
+                {questionNumber < (config?.numPreguntas || 10) - 1 && (
+                  <ArrowForwardIcon
+                    titleAccess={t("nextQuestion")}
+                    fontSize="medium"
+                    id="nextArrow"
+                    onClick={isAnswered ? handleNextQuestion : undefined}
+                    style={{
+                      backgroundColor: isAnswered
+                        ? "var(--color-primario)"
+                        : "#ccc",
+                      color: "white",
+                      borderRadius: "50%",
+                      padding: "0.3em",
+                      cursor: isAnswered ? "pointer" : "not-allowed",
+                      opacity: isAnswered ? 1 : 0.5,
+                      transition:
+                        "background-color 0.3s ease, opacity 0.3s ease",
                     }}
+                  />
+                )}
+              </div>
+              <h1>
+                {currentQuestion?.pregunta?.[currentLanguage] || t("loading")}
+              </h1>
+            </div>
+
+            {/* Optional Image */}
+            {currentQuestion?.img?.[0] && (
+              <div className="question-image">
+                <img
+                  src={currentQuestion.img[0]}
+                  alt={t("questionImageAlt", {
+                    question: currentQuestion?.pregunta?.[currentLanguage],
+                  })}
+                  onError={(e) => (e.target.style.display = "none")}
                 />
               </div>
+            )}
+
+            {/* Answer Buttons */}
+            <div className="answerPanel">
+              {shuffledAnswers.map((respuesta, index) => (
+                <BaseButton
+                  buttonid={`answer-${index}`}
+                  key={index}
+                  text={respuesta}
+                  onClick={() => handleAnswerClick(respuesta)}
+                  buttonType={
+                    isAnswered
+                      ? respuesta ===
+                        currentQuestion?.respuestaCorrecta?.[currentLanguage]
+                        ? "buttonCorrect"
+                        : selectedAnswer === respuesta
+                        ? "buttonIncorrect"
+                        : "buttonDisabled" // Style for other incorrect options
+                      : "buttonPrimary" // Default state
+                  }
+                  disabled={isAnswered}
+                />
+              ))}
             </div>
-        )}
-      </div>
+
+            {/* Timer */}
+            <div className="timer-section">
+              <Box display="flex" alignItems="center" width="100%" gap={1}>
+                <span>{t("time")}</span>
+                <Box width="100%" sx={{ mx: 1 }}>
+                  <LinearProgress
+                    id="progressBar"
+                    variant="determinate"
+                    value={progress}
+                  />
+                </Box>
+                <span>{formatTime(timeLeft)}</span>
+              </Box>
+            </div>
+          </motion.div>
+
+          {/* Right Column (Score & Rules) */}
+          <div className="right-column">
+            <div className="rules-points-section">
+              <div className="points-display">
+                <span>{`${t("score")}: `} </span>
+                <span className="score">{score}</span>
+              </div>
+              <BaseButton
+                text={t("rules")}
+                buttonType="buttonSecondary"
+                onClick={() => setShowRules(true)}
+              />
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Rules Dialog */}
+      {showRules && (
+        <div className="overlay">
+          <div className="dialogGameRulesContainer">
+            <InfoDialog
+              title={t("gameRules")}
+              content={
+                <ol>
+                  {/* Translate rules specific to single player */}
+                  <li>{t("singlePlayerRule1", t("observe"))}</li>
+                  <li>{t("singlePlayerRule2", t("answer"))}</li>
+                  <li>{t("singlePlayerRule3", t("hintInfo"))}</li>
+                </ol>
+              }
+              onClose={() => setShowRules(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Summary Dialog */}
+      {showSummary && (
+        <div className="overlay">
+          <div className="dialogGameRulesContainer">
+            <InfoDialog
+              title={t("summaryTitle")} // Use translated title
+              content={
+                <div className="summaryContent">
+                  {/* Use translated labels */}
+                  <p>
+                    {t("summaryCorrect")} {correctAnswers}
+                  </p>
+                  <p>
+                    {t("summaryIncorrect")} {incorrectAnswers}
+                  </p>
+                  <p>
+                    {t("summaryRatio")}{" "}
+                    {(
+                      (correctAnswers /
+                        (correctAnswers + incorrectAnswers || 1)) *
+                      100
+                    ).toFixed(0)}
+                    %
+                  </p>
+                  <p>
+                    {t("summaryAvgTime")}{" "}
+                    {(
+                      totalTimeUsed / (correctAnswers + incorrectAnswers || 1)
+                    ).toFixed(2)}
+                    s
+                  </p>
+                  <p>
+                    {t("summaryMaxScore")} {score}
+                  </p>
+                </div>
+              }
+              onClose={() => {
+                // Don't save stats again here, already saved by useEffect
+                setShowSummary(false);
+                if (onGameEnd) {
+                  onGameEnd(); // Call the callback passed from PlayView
+                } else {
+                  // Fallback if prop is not passed (should not happen with PlayView update)
+                  window.location.reload();
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

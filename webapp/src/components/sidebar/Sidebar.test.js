@@ -20,10 +20,16 @@ jest.mock("react-i18next", () => ({
   }),
 }));
 
+// Mock del componente UserAvatar
+jest.mock("../userAvatar/UserAvatar", () => {
+  return function MockUserAvatar({ username }) {
+    return <img data-testid="mock-avatar" alt="Avatar de usuario" />;
+  };
+});
+
 // Datos de prueba para el usuario
 const mockUserData = {
   username: "TestUser",
-  avatar: "/test-avatar.png",
   stats: {
     gamesPlayed: 10,
     correctAnswers: 75,
@@ -70,9 +76,8 @@ describe("Sidebar Component", () => {
     expect(screen.getByText("TestUser")).toBeInTheDocument();
 
     // Avatar
-    const avatar = screen.getByAltText("Avatar de usuario");
+    const avatar = screen.getByTestId("mock-avatar");
     expect(avatar).toBeInTheDocument();
-    expect(avatar).toHaveAttribute("src", "/test-avatar.png");
 
     // Estadísticas
     expect(screen.getByText("Partidas jugadas:")).toBeInTheDocument();
@@ -92,24 +97,6 @@ describe("Sidebar Component", () => {
 
     expect(screen.getByText("Mejor puntuación:")).toBeInTheDocument();
     expect(screen.getByText("500")).toBeInTheDocument();
-  });
-
-  test("usa imagen de placeholder cuando no hay avatar", () => {
-    const userWithoutAvatar = {
-      ...mockUserData,
-      avatar: null,
-    };
-
-    render(
-      <Sidebar
-        userData={userWithoutAvatar}
-        isVisible={true}
-        onClose={() => {}}
-      />
-    );
-
-    const avatar = screen.getByAltText("Avatar de usuario");
-    expect(avatar).toHaveAttribute("src", "/placeholder.svg");
   });
 
   test("llama a onClose cuando se hace clic en el overlay", () => {
