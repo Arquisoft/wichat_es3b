@@ -8,6 +8,7 @@ import io.gatling.jdbc.Predef._
 
 class Play10qCountries extends Simulation {
 
+  val csvFeeder = csv("../resources/data/users.csv").random()
   private val httpProtocol = http
     .baseUrl("http://localhost:8000")
     .inferHtmlResources()
@@ -21,7 +22,7 @@ class Play10qCountries extends Simulation {
   private val headers_1 = Map("Priority" -> "u=0, i")
   
   private val headers_6 = Map(
-  		"Accept" -> "*/*",
+  		"Accept" -> "application/json",
   		"Origin" -> "http://localhost:3000",
   		"Priority" -> "u=4"
   )
@@ -43,7 +44,7 @@ class Play10qCountries extends Simulation {
   
   private val uri1 = "localhost"
 
-  private val scn = scenario("Play10qCountries")
+  private val scn = scenario("Play10qCountries").feed(csvFeeder)
     .exec(
       http("request_0")
         .get("http://" + uri1 + ":3000/static/media/cinemaCategory.3700251e39422a873b7f.jpg")
@@ -77,7 +78,7 @@ class Play10qCountries extends Simulation {
           http("request_8")
             .post("/savestats")
             .headers(headers_8)
-            .body(RawFileBody("es/uniovi/arquisoft/wichat/loadtests/play10qcountries/0008_request.json"))
+            .body(StringBody("""{"username": "${username}", "rightAnswers":4,"wrongAnswers":6,"time":7,"score":40,"date":"2025-05-01T14:10:08.683Z","win":false,"gameMode":"singleplayer"}""")).asJson
         )
     )
 

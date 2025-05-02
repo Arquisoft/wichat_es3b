@@ -8,6 +8,7 @@ import io.gatling.jdbc.Predef._
 
 class PlaySolo extends Simulation {
 
+  val csvFeeder = csv("../resources/data/users.csv").random()
   private val httpProtocol = http
     .baseUrl("http://localhost:8000")
     .inferHtmlResources()
@@ -120,7 +121,7 @@ class PlaySolo extends Simulation {
   
   private val uri1 = "localhost"
 
-  private val scn = scenario("PlaySolo")
+  private val scn = scenario("PlaySolo").feed(csvFeeder)
     .exec(
       http("request_0")
         .get("http://" + uri1 + ":3000/")
@@ -150,7 +151,7 @@ class PlaySolo extends Simulation {
           http("request_6")
             .post("/login")
             .headers(headers_6)
-            .body(RawFileBody("es/uniovi/arquisoft/wichat/loadtests/playsolo/0006_request.json"))
+            .body(StringBody("""{"username": "${username}", "password": "${password}"}""")).asJson
         ),
       pause(1),
       http("request_7")
@@ -185,7 +186,7 @@ class PlaySolo extends Simulation {
           http("request_15")
             .post("/savestats")
             .headers(headers_15)
-            .body(RawFileBody("es/uniovi/arquisoft/wichat/loadtests/playsolo/0015_request.json"))
+            .body(StringBody("""{"username": "${username}", "rightAnswers":7,"wrongAnswers":23,"time":17,"score":209,"date":"2025-05-02T11:19:36.471Z","win":false,"gameMode":"singleplayer"}""")).asJson
         ),
       pause(2),
       http("request_16")
