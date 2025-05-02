@@ -510,22 +510,23 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_choosing_react_for_the_frontend">9.3. Choosing React for the Frontend</a></li>
 <li><a href="#_using_node_js_for_backend_development">9.4. Using Node.js for Backend Development</a></li>
 <li><a href="#_selecting_mongodb_for_the_database">9.5. Selecting MongoDB for the Database</a></li>
+<li><a href="#_selecting_docker_for_the_deployment">9.6. Selecting Docker for the Deployment</a></li>
+<li><a href="#_selecting_javascript_node_js_for_the_backend">9.7. Selecting JavaScript (Node.js) for the Backend</a></li>
+<li><a href="#_preloading_and_normalizing_question_sets_at_application_startup">9.8. Preloading and Normalizing Question Sets at Application Startup</a></li>
 </ul>
 </li>
-<li><a href="#_9_6_selecting_docker_for_the_deployment">10. 9.6 Selecting Docker for the Deployment</a></li>
-<li><a href="#_9_7_selecting_javascript_node_js_for_the_backend">11. 9.7 Selecting JavaScript (Node.js) for the Backend</a></li>
-<li><a href="#section-quality-scenarios">12. Quality Requirements</a>
+<li><a href="#section-quality-scenarios">10. Quality Requirements</a>
 <ul class="sectlevel2">
-<li><a href="#_quality_tree">12.1. Quality Tree</a></li>
-<li><a href="#_quality_scenarios">12.2. Quality Scenarios</a></li>
+<li><a href="#_quality_tree">10.1. Quality Tree</a></li>
+<li><a href="#_quality_scenarios">10.2. Quality Scenarios</a></li>
 </ul>
 </li>
-<li><a href="#section-technical-risks">13. Risks and Technical Debts</a>
+<li><a href="#section-technical-risks">11. Risks and Technical Debts</a>
 <ul class="sectlevel2">
-<li><a href="#_technical_debts">13.1. Technical Debts</a></li>
+<li><a href="#_technical_debts">11.1. Technical Debts</a></li>
 </ul>
 </li>
-<li><a href="#section-glossary">14. Glossary</a></li>
+<li><a href="#section-glossary">12. Glossary</a></li>
 </ul>
 </div>
 </div>
@@ -1491,8 +1492,12 @@ Leave out normal, simple, boring or standardized parts of your system</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Renders interface elements.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Game Logic</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Game</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Controls application logic rules.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GameView</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Controls the Game.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">API Client</p></td>
@@ -1671,7 +1676,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/SignIn%20diagram.svg" alt="SignIn diagram" width="772" height="501">
+<img src="./images/SignIn%20diagram.svg" alt="SignIn diagram" width="734" height="514">
 </div>
 </div>
 </div>
@@ -1682,7 +1687,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/LogIn%20diagram.svg" alt="LogIn diagram" width="626" height="501">
+<img src="./images/LogIn%20diagram.svg" alt="LogIn diagram" width="600" height="514">
 </div>
 </div>
 </div>
@@ -1693,7 +1698,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/New%20question.svg" alt="New question" width="921" height="736">
+<img src="./images/New%20question.svg" alt="New question" width="878" height="757">
 </div>
 </div>
 </div>
@@ -1704,7 +1709,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/New%20clue.svg" alt="New clue" width="972" height="488">
+<img src="./images/New%20clue.svg" alt="New clue" width="916" height="501">
 </div>
 </div>
 </div>
@@ -1715,7 +1720,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Question%20record.svg" alt="Question record" width="795" height="592">
+<img src="./images/Question%20record.svg" alt="Question record" width="758" height="609">
 </div>
 </div>
 </div>
@@ -1726,7 +1731,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/API%20Access%20-%20Questions.svg" alt="API Access   Questions" width="646" height="416">
+<img src="./images/API%20Access%20-%20Questions.svg" alt="API Access   Questions" width="605" height="427">
 </div>
 </div>
 </div>
@@ -1737,7 +1742,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/API%20Access%20-%20Records.svg" alt="API Access   Records" width="591" height="416">
+<img src="./images/API%20Access%20-%20Records.svg" alt="API Access   Records" width="563" height="427">
 </div>
 </div>
 <div style="page-break-after: always;"></div>
@@ -2072,35 +2077,40 @@ on this list.</p>
 <h4 id="_domain_description">8.1.2. <em>Domain description</em></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
 </colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Term</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Term</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-------------</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-----------------</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">User</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a user of the application.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a registered user of the application. Each user has a username, a password, and a creation date.</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">UserRecord</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Stores all the game sessions in which a user has participated and keeps their total score.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Game</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a game session played by a user. It stores performance data such as the number of correct answers, time taken, score, and date. Each game is associated with one user and includes multiple questions.</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">GameSession</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a game session played by a user, storing all the questions, the choices made, and the total score.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stats</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stores overall performance statistics for a user, such as total games played, accuracy ratio, and streak-related metrics.</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Question</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Represents questions shown to the user by the application and stores the wrong choices, correct choices, and the text that is displayed.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choice</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Represents the choices that the user can make when answering a question. It stores the text of the choice and indicates if it was selected by the user.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a multilingual question shown in a game, including correct and incorrect answers, optional image and description metadata. A question can appear in multiple games.</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
 </table>
@@ -2260,16 +2270,12 @@ have had some exposure to NoSQL databases, further training and development in t
 <p>To learn basic concepts about MongoDb and practice examples <a href="https://github.com/Arquisoft/wichat_es3b/issues/9">Issue #9</a>.</p>
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_9_6_selecting_docker_for_the_deployment">10. 9.6 Selecting Docker for the Deployment</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_selecting_docker_for_the_deployment">9.6. Selecting Docker for the Deployment</h3>
 <div class="paragraph">
 <p>Considering the need for a dependable, scalable, and efficient deployment process, we chose Docker to containerize
 our services. Docker allows us to define and package all the components of our application in a consistent and
-repeatable manner, making it easy to deploy across various environments without issues.<br>
-Task made in link: <a href="https://github.com/Arquisoft/wichat_es3b/issues/24">Issue #24</a></p>
+repeatable manner, making it easy to deploy across various environments without issues.<br></p>
 </div>
 <div class="paragraph">
 <p><strong>Justification</strong></p>
@@ -2297,10 +2303,8 @@ the application as needed.</p>
 </ul>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_9_7_selecting_javascript_node_js_for_the_backend">11. 9.7 Selecting JavaScript (Node.js) for the Backend</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_selecting_javascript_node_js_for_the_backend">9.7. Selecting JavaScript (Node.js) for the Backend</h3>
 <div class="paragraph">
 <p>We chose JavaScript (Node.js) for the backend because using the same language on both
 the frontend and backend simplifies development and improves team collaboration.<br>
@@ -2331,6 +2335,29 @@ Decision made in <a href="https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%
 <p>Maintenance: While efficient, Node.js requires ongoing monitoring to maintain performance, especially as the app scales.</p>
 </li>
 </ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_preloading_and_normalizing_question_sets_at_application_startup">9.8. Preloading and Normalizing Question Sets at Application Startup</h3>
+<div class="paragraph">
+<p>To ensure a consistent and balanced number of questions per category in the application, we decided to preload and normalize the question sets during application startup.</p>
+</div>
+<div class="paragraph">
+<p>At the moment the application starts, each question category will be processed to ensure exactly 60 questions are available:
+- If a category contains fewer than 60 questions, new ones will be generated to reach 60.
+- If a category contains more than 60 questions, 4 will be removed at random and replaced with 4 newly generated ones.</p>
+</div>
+<div class="paragraph">
+<p><strong>Justification</strong>
+This approach ensures that all categories offer a uniform and fair gameplay experience by maintaining a consistent number of questions, avoiding categories with too few or too many.
+It also guarantees regular content refreshment in overpopulated categories to prevent repeated questions and improve user engagement.
+Additionally, centralizing this logic at startup simplifies runtime operations and reduces delays during the user&#8217;s turn.</p>
+</div>
+<div class="paragraph">
+<p><strong>Consequences</strong>
+- We must implement logic to identify under and overpopulated categories and interface this with the question generation module.
+- Startup time may slightly increase, especially if many questions need to be generated.
+- No changes are required to the current data model or storage structure.</p>
 </div>
 <div class="sidebarblock arc42help">
 <div class="content">
@@ -2379,8 +2406,9 @@ There you will find links and examples about ADR.</p>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
+</div>
 <div class="sect1">
-<h2 id="section-quality-scenarios">12. Quality Requirements</h2>
+<h2 id="section-quality-scenarios">10. Quality Requirements</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>In order to make Wichat a satisfactory final product, we find it crucial to set some quality requirements to live up with. These aspects are to influence architectural decisions and hence include some measurable features:</p>
@@ -2421,7 +2449,7 @@ There you will find links and examples about ADR.</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_quality_tree">12.1. Quality Tree</h3>
+<h3 id="_quality_tree">10.1. Quality Tree</h3>
 <div class="imageblock">
 <div class="content">
 <img src="./images/diagrama_escenarios_calidad.jpg" alt="Diagrama de escenarios de calidad" width="primera versión">
@@ -2429,7 +2457,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_quality_scenarios">12.2. Quality Scenarios</h3>
+<h3 id="_quality_scenarios">10.2. Quality Scenarios</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 23.0769%;">
@@ -2535,7 +2563,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-technical-risks">13. Risks and Technical Debts</h2>
+<h2 id="section-technical-risks">11. Risks and Technical Debts</h2>
 <div class="sectionbody">
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -2579,7 +2607,7 @@ There you will find links and examples about ADR.</p>
 </tbody>
 </table>
 <div class="sect2">
-<h3 id="_technical_debts">13.1. Technical Debts</h3>
+<h3 id="_technical_debts">11.1. Technical Debts</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2597,7 +2625,7 @@ There you will find links and examples about ADR.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-glossary">14. Glossary</h2>
+<h2 id="section-glossary">12. Glossary</h2>
 <div class="sectionbody">
 <div class="sidebarblock arc42help">
 <div class="content">
@@ -2679,7 +2707,7 @@ There you will find links and examples about ADR.</p>
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2025-03-03 09:35:08 +0100
+Last updated 2025-05-02 18:54:24 +0200
 </div>
 </div>
 </body>
