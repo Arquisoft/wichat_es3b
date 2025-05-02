@@ -183,7 +183,7 @@ if (process.env.NODE_ENV === "test") {
       await saveQuestionsToDB(selectedQuestions);
       console.log("Resultado final en la BD:")
       const allQuestions = await Question.find({});
-      console.log(allQuestions);
+      //console.log(allQuestions);
       res.json(selectedQuestions);
     }
     catch (error) {

@@ -12,7 +12,7 @@ defineFeature(feature, test => {
     beforeAll(async () => {
         browser = process.env.GITHUB_ACTIONS
             ? await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox'], slowMo: 100})
-            : await puppeteer.launch({ headless: false, slowMo: 50});
+            : await puppeteer.launch({ headless: false, slowMo: 100});
 
         page = await browser.newPage();
         setDefaultOptions({ timeout: 10000 });
@@ -62,8 +62,9 @@ defineFeature(feature, test => {
         });
 
         when('I play a game', async () => {
-                try{
-                    
+            try{
+                // Esperando por preguntas
+                //await page.waitForTimeout(10000);
                 await expect(page).toClick('a', { text: 'Jugar' });
                 await page.waitForSelector('#numPreguntas', { visible: true, timeout: 5000 });
                 await page.select('#numPreguntas', '10');
