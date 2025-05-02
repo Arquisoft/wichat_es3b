@@ -8,8 +8,11 @@
       <excludeFolder url="file://$MODULE_DIR$/gatewayservice/coverage" />
       <excludeFolder url="file://$MODULE_DIR$/llmservice/coverage" />
       <excludeFolder url="file://$MODULE_DIR$/users/userservice/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/codeStyles" />
+      <excludeFolder url="file://$MODULE_DIR$/gatling-tests/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="scala-sdk-2.13.16" level="application" />
   </component>
 </module>
