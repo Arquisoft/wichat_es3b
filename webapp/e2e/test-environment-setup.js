@@ -14,7 +14,7 @@ async function startServer() {
     mongoserver = await MongoMemoryServer.create();
     const mongoUri = mongoserver.getUri();
     process.env.MONGODB_URI = mongoUri;
-    process.env.NODE_ENV = 'test'
+    process.env.NODE_ENV = 'e2e_test';
     console.log('MONGODB_URI: '+ mongoUri);
     userservice = await require("../../users/userservice/user-service");
     authservice = await require("../../users/authservice/auth-service");
@@ -26,6 +26,7 @@ async function startServer() {
 
     // Crear usuario de prueba
     await createTestUser();
+    
 }
 
 async function createTestUser() {

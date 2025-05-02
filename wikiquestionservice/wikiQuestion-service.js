@@ -176,7 +176,7 @@ async function obtainQuestions() {
   }
 }
 
-if (process.env.NODE_ENV === "test") {
+if (process.env.NODE_ENV === "e2e_test") {
   app.get("/generateQuestionsIfNotExists", async (req, res) => {
     console.log("Creando preguntas en ejecución de test.");
     try {
@@ -191,7 +191,7 @@ if (process.env.NODE_ENV === "test") {
   });
 }
 
-if (require.main === module && process.env.NODE_ENV === undefined) {
+if (require.main === module) {
   app.listen(port, () => {
     console.log(`🚀 Question Service listening at http://localhost:${port}`);
     obtainQuestions().catch((err) =>
@@ -200,9 +200,9 @@ if (require.main === module && process.env.NODE_ENV === undefined) {
   });
 }
 
-if (process.env.NODE_ENV === "test") {
-  console.log("No se han cargado preguntas, ejecución en tests.");
+if (process.env.NODE_ENV === "e2e_test") {
   app.listen(port, () => {
+    console.log("No se han cargado preguntas, ejecución en tests.");
     console.log(`🚀 Question Service listening at http://localhost:${port}`);
   });
 }

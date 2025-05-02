@@ -158,7 +158,8 @@ defineFeature(feature, test => {
         });
 
         then('A new question should be shown', async () => {
-            await page.waitForSelector('h1', { text: "Resumen de la partida", timeout: 5000 });
+            await page.waitForSelector('h2', { text: "Pregunta 1/30", timeout: 5000 });
+            //await page.waitForSelector('h1', { text: "Resumen de la partida", timeout: 5000 }); menos exacto
         });
     });
 
