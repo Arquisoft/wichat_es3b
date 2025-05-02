@@ -10,7 +10,7 @@ const port = 8003;
 const modelState = {
     primary: 'empathy', // Modelo principal
     backup: 'mistral',  // Modelo de respaldo
-    current: 'empathy'  // Modelo actualmente en uso
+    current: 'mistral'  // Modelo actualmente en uso
 };
 
 // Function to reset state (useful for tests)
