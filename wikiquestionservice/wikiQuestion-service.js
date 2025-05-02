@@ -183,7 +183,7 @@ async function obtainQuestions() {
   }
 }
 
-if (require.main === module) {
+if (require.main === module || process.env.NODE_ENV === "test") {
   app.listen(port, () => {
     console.log(`🚀 Question Service listening at http://localhost:${port}`);
     obtainQuestions().catch((err) =>
