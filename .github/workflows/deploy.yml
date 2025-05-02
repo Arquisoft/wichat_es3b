@@ -258,21 +258,6 @@ jobs:
           touch ~/.ssh/known_hosts
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Clean up old containers and images
-        run: |
-          docker rm -f prometheus-wichat_es3b || true
-          docker rm -f mongodb-wichat_es3b || true
-          docker rm -f llmservice-wichat_es3b || true
-          docker rm -f userservice-wichat_es3b || true
-          docker rm -f wikiquestionservice-wichat_es3b || true
-          docker rm -f authservice-wichat_es3b || true
-          docker rm -f statsservice-wichat_es3b || true
-          docker rm -f gatewayservice-wichat_es3b || true
-          docker rm -f webapp-wichat_es3b || true
-          docker rm -f apiservice-wichat_es3b || true
-          docker rmi $(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "<none>" | awk '{print $2}')
-          docker rmi $(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "deployment_branch" | awk '{print $2}')
-
       - name: Deploy over SSH
         uses: fifsky/ssh-action@master
         with:
