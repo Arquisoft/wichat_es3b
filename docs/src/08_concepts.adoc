@@ -64,22 +64,12 @@ image:diagram-8_1.png[]
 
 ==== _Domain description_
 |===
-|Term |Description
-
-|User
-|Represents a user of the application.
-
-|UserRecord
-|Stores all the game sessions in which a user has participated and keeps their total score.
-
-|GameSession
-|Represents a game session played by a user, storing all the questions, the choices made, and the total score.
-
-|Question
-|Represents questions shown to the user by the application and stores the wrong choices, correct choices, and the text that is displayed.
-
-|Choice
-|Represents the choices that the user can make when answering a question. It stores the text of the choice and indicates if it was selected by the user.
+| Term    | Description |
+|-------------|-----------------|
+| User    | Represents a registered user of the application. Each user has a username, a password, and a creation date. |
+| Game    | Represents a game session played by a user. It stores performance data such as the number of correct answers, time taken, score, and date. Each game is associated with one user and includes multiple questions. |
+| Stats   | Stores overall performance statistics for a user, such as total games played, accuracy ratio, and streak-related metrics. |
+| Question| Represents a multilingual question shown in a game, including correct and incorrect answers, optional image and description metadata. A question can appear in multiple games. |
 
 |===
 
