@@ -7,8 +7,21 @@ const Question = require("./question-model");
 const app = express();
 const port = 8004;
 
-const mongoUri = process.env.MONGODB_URI;
-mongoose.connect(mongoUri);
+
+if (process.env.NODE_ENV === 'test') {
+  // Mock MongoDB connection for tests
+  mongoose.connect = jest.fn().mockImplementation(() => {
+    return {
+      connection: {
+        close: jest.fn()
+      }
+    };
+  });
+} else {
+  // Original MongoDB connection for real environments
+  const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/wikiQuestions';
+  mongoose.connect(mongoUri);
+}
 
 const questionManager = new QuestionManager();
 
@@ -238,8 +251,10 @@ if (process.env.NODE_ENV === "e2e_test") {
   });
 }
 
-server.on("close", () => {
-  mongoose.connection.close();
-});
+if (server) {
+  server.on("close", () => {
+    mongoose.connection.close();
+  });
+}
 
 module.exports = app;
