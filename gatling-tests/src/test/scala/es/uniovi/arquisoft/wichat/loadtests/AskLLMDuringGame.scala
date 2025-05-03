@@ -48,5 +48,5 @@ class AskLLMDuringGame extends Simulation {
         )
     )
 
-	setUp(scn.inject(constantUsersPerSec(5).during(15))).protocols(httpProtocol)
+	setUp(scn.inject(rampUsers(750).during(30))).protocols(httpProtocol)
 }

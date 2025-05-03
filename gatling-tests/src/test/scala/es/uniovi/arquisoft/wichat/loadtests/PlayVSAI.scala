@@ -214,5 +214,5 @@ class PlayVSAI extends Simulation {
         )
     )
 
-	setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+	setUp(scn.inject(rampUsers(50).during(30))).protocols(httpProtocol)
 }

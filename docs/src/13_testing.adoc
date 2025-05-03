@@ -31,3 +31,59 @@ These tests are run automatically as part of the CI/CD pipeline to ensure that t
 
 Load tests are used to test the performance of your application under heavy load. They simulate multiple users interacting with the application simultaneously and measure response times and resource usage.
 
+In the case of our application, we have done several tests to identify exactly the capacity that the app can support.
+
+==== 10 Ramp Users
+We can observe that the application can handle 10 ramp users without any issues. The response times are low, and the system performs well.
+image:gameflow_rampusers_10.PNG[]
+
+==== 50 Ramp Users
+When we increase the number of ramp users to 50, we can see the questions service starts to fail.
+image:gameflow_rampusers_50.PNG[]
+
+More than 50% of requests end in failure
+image:gameflow_rampusers_50_details_getQuestions.PNG[]
+
+==== 2000 Ramp Users
+When we increase the number of ramp users to 2000, we can see that now the questions service fails every time. But the other services are still able to handle the load.
+image:gameflow_rampusers_2000.PNG[]
+
+===== 22000 Ramp Users
+When we increase the number of ramp users to 22000, we can see that other services start to fail as well. The system is unable to handle the load, and response times increase significantly.
+image:info1.png[]
+image:info2.png[]
+
+So this is where we're going to stop and look at the graphs we get from the test results:
+
+Active users throughout the simulation::
+image:grafica1.png[]
+* The rapid increase to ~2,000 users is observed, load maintenance and gradual decline at the end of the test.
+
+Distribution of response times::
+image:grafica2.png[]
+Two main peaks stand out:
+* Fast responses (~300 ms)
+* Timeout responses (far right, ~60,000 ms)
+
+Response time percentiles (OK)::
+image:grafica3.png[]
+* A pattern is observed where times initially increase and then stabilize.
+* There is a noticeable spike around 11:39:00 where even the fastest responses degraded, which could be due to many factors.
+
+Number of requests per second::
+image:grafica4.png[]
+* Initial peak of ~180 requests/second.
+* Later stabilization around 50-100 requests/second.
+* Direct correlation between the number of active users and the volume of requests.
+
+Number of responses per second::
+image:grafica5.png[]
+* An initial spike in traffic is observed around 11:37:00, with over 100 responses/second, followed by a plateau. The green-to-red ratio indicates a significant number of errors throughout the test.
+
+These graphs reveal that the system experiences significant degradation under load, with specific points of failure at certain endpoints and response times deteriorating markedly as concurrency increases.
+
+Furthermore, we can also conclude that the question service acts as a bottleneck in the application.
+
+On the other hand, we see that in addition to the question service, the LLM begins to cause problems starting at about 750 users, as shown in the following table:
+image:llm_rampusers_750.PNG[]
+* The request_1 represents the OPTIONS request, while the request_2 represents the POST request.
