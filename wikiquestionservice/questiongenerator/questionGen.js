@@ -74,7 +74,6 @@ class WikidataQueryService {
         }
 
         let entidadesProcesadas = 0;
-        console.log("Iterando en bucle de: "+this.categoryName);
         while (this.questionsArray.length < this.questionsPerCategory) {
             if (entidadesProcesadas >= this.entitiesArray.length) {
                 console.log("No se alcanzaron suficientes entidades, buscando más...");
