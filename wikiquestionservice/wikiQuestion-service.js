@@ -153,7 +153,6 @@ async function obtainQuestions() {
     for (const categoria of categorias) {
       const count = await Question.countDocuments({ category: categoria });
       if (count < 60) {
-        console.log("No hay suficientes preguntas en la categoría: ", categoria);
         const missingQuestionsCount = 60 - count;
         const additionalQuestions = await questionManager.loadAllQuestions([categoria], missingQuestionsCount);
         if (additionalQuestions && additionalQuestions.length > 0) {
@@ -161,10 +160,11 @@ async function obtainQuestions() {
         }
       }else {
         console.log("Suficientes preguntas en la categoría: ", categoria);
-        const questionsToDelete = await Question.find({ category: categoria }).limit(4);
+        const allGeneratedQuestions  = await questionManager.loadAllQuestions([categoria], 10);
+        const newQuestions = await filtrarPreguntasNoExistentes(allGeneratedQuestions);
+        const questionsToDelete = await Question.find({ category: categoria }).limit(newQuestions.length);
         const questionIdsToDelete = questionsToDelete.map(q => q._id);
         await Question.deleteMany({ _id: { $in: questionIdsToDelete } });
-        const newQuestions = await questionManager.loadAllQuestions([categoria], 4);
         if (newQuestions && newQuestions.length > 0) {
           await saveQuestionsToDB(newQuestions);
         }
@@ -175,6 +175,17 @@ async function obtainQuestions() {
     console.error("❌ Error al obtener el conteo de preguntas:", error);
   }
 }
+
+async function filtrarPreguntasNoExistentes(newQuestions) {
+  const nuevosEnunciados = newQuestions.map(q => q.preguntas.es);
+
+  const existentes = await Question.find({ 'question.es': { $in: nuevosEnunciados } }, 'question.es').lean();
+
+  const enunciadosExistentes = new Set(existentes.map(q => q.question.es));
+
+  return newQuestions.filter(q => !enunciadosExistentes.has(q.preguntas.es));
+}
+
 
 if (process.env.NODE_ENV === "e2e_test") {
   app.get("/generateQuestionsIfNotExists", async (req, res) => {

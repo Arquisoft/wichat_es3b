@@ -14,15 +14,35 @@ import countriesCategory from "../../assets/img/categories/countriesCategory.jpg
 import artCategory from "../../assets/img/categories/artCategory.jpg";
 import allCategory from "../../assets/img/categories/allCategory.jpg";
 
-const GameSettings = ({onStartGame}) => {
+const GameSettings = ({ onStartGame }) => {
   const { t } = useTranslation();
   const categories = useMemo(
     () => [
-      { id: "football", name: t("football"), imageSrc: footballCategory, value: "clubes" },
-      { id: "cinema", name: t("cinema"), imageSrc: cinemaCategory, value: "cine" },
-      { id: "literature", name: t("literature"), imageSrc: literatureCategory , value: "literatura"},
-      { id: "countries", name: t("countries"), imageSrc: countriesCategory , value: "paises"},
-      { id: "art", name: t("art"), imageSrc: artCategory , value: "arte" },
+      {
+        id: "football",
+        name: t("football"),
+        imageSrc: footballCategory,
+        value: "clubes",
+      },
+      {
+        id: "cinema",
+        name: t("cinema"),
+        imageSrc: cinemaCategory,
+        value: "cine",
+      },
+      {
+        id: "literature",
+        name: t("literature"),
+        imageSrc: literatureCategory,
+        value: "literatura",
+      },
+      {
+        id: "countries",
+        name: t("countries"),
+        imageSrc: countriesCategory,
+        value: "paises",
+      },
+      { id: "art", name: t("art"), imageSrc: artCategory, value: "arte" },
       { id: "all", name: t("all"), imageSrc: allCategory, value: "all" },
     ],
     [t]
@@ -30,22 +50,14 @@ const GameSettings = ({onStartGame}) => {
 
   const [selectedCategories, setSelectedCategories] = useState(() => {
     const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
-    return storedConfig?.categories || [];
-  })
+    return storedConfig?.categories ?? ["all"];
+  });
 
   useEffect(() => {
     const config = JSON.parse(localStorage.getItem("quizConfig")) || {};
     config.categories = selectedCategories;
     localStorage.setItem("quizConfig", JSON.stringify(config));
   }, [selectedCategories]);
-  const [, forceUpdate] = useState(0);
-  useEffect(() => {
-    const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
-    if (storedConfig?.categories) {
-      setSelectedCategories(storedConfig.categories);
-      forceUpdate(prev => prev + 1);
-    }
-  }, []);
 
   useEffect(() => {
     const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
@@ -118,7 +130,9 @@ const GameSettings = ({onStartGame}) => {
           toggleButton={<SidebarToggleButton onClick={toggleSidebar} />}
         />
         <div
-          className={`mainGameSettingsContainer ${sidebarOpen ? "gameSidebar-open" : ""}`}
+          className={`mainGameSettingsContainer ${
+            sidebarOpen ? "gameSidebar-open" : ""
+          }`}
         >
           {!sidebarOpen && (
             <div className="content-toggle-container">
@@ -146,8 +160,7 @@ const GameSettings = ({onStartGame}) => {
             </motion.div>
 
             <div className="gameButtonPanel">
-              <BaseButton text={t("play")}
-                          onClick={onStartGame}/>
+              <BaseButton text={t("play")} onClick={onStartGame} />
             </div>
           </div>
         </div>
