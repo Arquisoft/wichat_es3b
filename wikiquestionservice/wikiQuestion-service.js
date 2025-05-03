@@ -1,77 +1,211 @@
 const express = require("express");
-const cors = require("cors");
 const bodyParser = require("body-parser");
-const cron = require("node-cron");
 const QuestionManager = require("./questiongenerator/questionManager");
+const mongoose = require("mongoose");
+const Question = require("./question-model");
 
 const app = express();
 const port = 8004;
-let questionsLoaded = false;
+
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/questiondb';
+async function connectDB() {
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(mongoUri);
+  }
+}
+
+async function disconnectDB() {
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect();
+  }
+}
+
 
 const questionManager = new QuestionManager();
+
+const defaultTopics = ["all"];
+const defaultNumQuestions = 25;
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(cors());
-
-app.use((req, res, next) => {
-  if (!questionsLoaded) {
-    return res.status(500).json({
-      error:
-        "Las preguntas aún no han sido cargadas. Por favor, inténtalo de nuevo más tarde.",
-    });
-  }
-  next();
-});
+function filterValidTopics(rawTopic) {
+  const validCategories = ["paises", "cine", "clubes", "literatura", "arte", "all"];
+  return rawTopic.split(",").filter(t => validCategories.includes(t));
+}
 
 app.get("/questions", async (req, res) => {
-  const { n = 10} = req.query;
+  const { n = 25, topic = "all" } = req.query;
   const numQuestions = parseInt(n, 10);
-  if (numQuestions > 25) {
-    return res.status(400).json({ error: "El límite de preguntas es 25" });
+
+  if (numQuestions > 30) {
+    return res.status(400).json({ error: "El límite de preguntas es 30" });
   }
+
+  let topics = filterValidTopics(topic);
+
+  if (topics.length === 0) {
+    return res.status(400).json({ error: "No se proporcionaron categorías válidas." });
+  }
+
   try {
-    await questionManager.loadAllQuestions();
+    if (topics.includes("all") || topics.length === 0) {
+      topics = ["all"];
+    }
 
-    const allQuestions = questionManager.questions;
+      const selectedQuestions = await questionManager.loadAllQuestions(topics, numQuestions);
 
-    const limitedQuestions = allQuestions.slice(0, numQuestions).map((q) => {
-      const questionText = q.obtenerPreguntaPorIdioma();
-      const respuestas = q.obtenerRespuestas();
-      return {
-        pregunta: questionText,
-        respuestaCorrecta: q.respuestaCorrecta,
-        respuestas: respuestas,
-        descripcion: q.descripcion,
-        img: q.obtenerImg(),
-      };
-    });
+    const formattedQuestions = selectedQuestions.map((q) => ({
+      pregunta: q.obtenerPreguntaPorIdioma(),
+      respuestaCorrecta: q.respuestaCorrecta,
+      respuestas: q.obtenerRespuestas(),
+      descripcion: q.descripcion,
+      img: q.obtenerImg(),
+    }));
 
-    res.json(limitedQuestions);
+    res.json(formattedQuestions);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
-const server = app.listen(port, async () => {
-  console.log(`Question Service listening at http://localhost:${port}`);
+app.get("/questionsDB", async (req, res) => {
+  await connectDB();
+  const numQuestions = parseInt(req.query.n ?? defaultNumQuestions, 10);
+  const topic = (req.query.topic && req.query.topic !== "undefined") ? req.query.topic : defaultTopics;
+
+  if (numQuestions > 30) {
+    return res.status(400).json({ error: "El límite de preguntas es 30" });
+  }
+
+  let topics = filterValidTopics(topic);
+
+  if (topics.length === 0) {
+    return res.status(400).json({ error: "No se proporcionaron categorías válidas." });
+  }
+
   try {
-    await questionManager.loadAllQuestions();
-    questionsLoaded = true;
-    console.log("Generadores de preguntas cargados con éxito!");
+    if (topics.includes("all")|| topics.length === 0) {
+      topics = ["paises", "cine", "clubes", "literatura", "arte"];
+    }
+
+    const questionsPerCategory = Math.floor(numQuestions / topics.length);
+    const extra = numQuestions % topics.length;
+    const selectedQuestions = [];
+    const selectedQuestionIds = new Set();
+
+    for (let i = 0; i < topics.length; i++) {
+      const topic = topics[i];
+      const numToFetch = questionsPerCategory + (i < extra ? 1 : 0);
+
+      // Obtener preguntas de la categoría actual
+      const categoryQuestions = await Question.aggregate([
+        { $match: { category: topic, _id: { $nin: Array.from(selectedQuestionIds) } } },
+        { $sample: { size: numToFetch } }
+      ]);
+
+      // Agregar preguntas seleccionadas y registrar sus IDs
+      selectedQuestions.push(...categoryQuestions);
+      categoryQuestions.forEach(q => selectedQuestionIds.add(q._id));
+    }
+
+    const formattedQuestions = selectedQuestions.map(q => ({
+      pregunta: q.question,
+      respuestaCorrecta: q.correctAnswer,
+      respuestas: q.incorrectAnswers,
+      descripcion: q.description,
+      img: q.img
+    }));
+
+    res.json(formattedQuestions);
   } catch (error) {
-    console.error("Error al cargar los generadores de preguntas:", error);
+    res.status(500).json({ error: error.message });
+  } finally {
+    await disconnectDB();
   }
 });
 
-cron.schedule("0 3 * * *", async () => {
+async function saveQuestionsToDB(questions) {
   try {
-    await questionManager.loadAllQuestions();
-    console.log("Generadores de preguntas recargados.");
-  } catch (error) {
-    console.error("Error al recargar los generadores de preguntas:", error);
-  }
-});
+    for (const q of questions) {
+      const newQuestion = new Question({
+        category: q.categoryName,
+        question: q.preguntas,
+        correctAnswer: q.respuestaCorrecta,
+        incorrectAnswers: q.respuestasIncorrectas,
+        description: q.descripcion,
+        img: q.img
+      });
 
-module.exports = server;
+      await newQuestion.save();
+    }
+    console.log("Preguntas guardadas en MongoDB.");
+  } catch (error) {
+    console.error("Error al guardar preguntas:", error);
+  }
+}
+
+async function obtainQuestions() {
+  try {
+    await connectDB();
+    const categorias = ["paises", "cine", "clubes", "literatura", "arte"];
+    for (const categoria of categorias) {
+      const count = await Question.countDocuments({ category: categoria });
+      if (count < 60) {
+        console.log("No hay suficientes preguntas en la categoría: ", categoria);
+        const missingQuestionsCount = 60 - count;
+        const additionalQuestions = await questionManager.loadAllQuestions([categoria], missingQuestionsCount);
+        if (additionalQuestions && additionalQuestions.length > 0) {
+          await saveQuestionsToDB(additionalQuestions);
+        }
+      }else {
+        console.log("Suficientes preguntas en la categoría: ", categoria);
+        const questionsToDelete = await Question.find({ category: categoria }).limit(4);
+        const questionIdsToDelete = questionsToDelete.map(q => q._id);
+        await Question.deleteMany({ _id: { $in: questionIdsToDelete } });
+        const newQuestions = await questionManager.loadAllQuestions([categoria], 4);
+        if (newQuestions && newQuestions.length > 0) {
+          await saveQuestionsToDB(newQuestions);
+        }
+      }
+    }
+    await disconnectDB();
+  } catch (error) {
+    console.error("❌ Error al obtener el conteo de preguntas:", error);
+  }
+}
+
+if (process.env.NODE_ENV === "e2e_test") {
+  app.get("/generateQuestionsIfNotExists", async (req, res) => {
+    console.log("Creando preguntas en ejecución de test.");
+    try {
+      await connectDB();
+      const selectedQuestions = await questionManager.loadAllQuestions(["all"], 30);
+      await saveQuestionsToDB(selectedQuestions);
+      res.json(selectedQuestions);
+    }
+    catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+}
+
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`🚀 Question Service listening at http://localhost:${port}`);
+    obtainQuestions().catch((err) =>
+        console.error("❌ Error al obtener preguntas:", err)
+    );
+  });
+}
+
+if (process.env.NODE_ENV === "e2e_test") {
+  app.listen(port, () => {
+    console.log("No se han cargado preguntas, ejecución en tests.");
+    console.log(`🚀 Question Service listening at http://localhost:${port}`);
+  });
+}
+
+
+module.exports = app;

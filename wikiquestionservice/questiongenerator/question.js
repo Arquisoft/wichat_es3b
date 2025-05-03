@@ -4,13 +4,15 @@ class Question {
         preguntas,
         respuestasIncorrectas,
         descripcion,
-        img
+        img,
+        categoryName
     ) {
         this.respuestaCorrecta = respuestaCorrecta;
         this.preguntas = preguntas;
         this.respuestasIncorrectas = respuestasIncorrectas;
         this.descripcion = descripcion;
         this.img = img;
+        this.categoryName=categoryName;
     }
 
     obtenerPreguntaPorIdioma() {
@@ -29,7 +31,12 @@ class Question {
 
             respuestas[idioma] = [correcta, ...incorrectas];
         }
+        const numRespuestas = Object.values(respuestas)[0].length;
+        const ordenAleatorio = Array.from({ length: numRespuestas }, (_, i) => i).sort(() => Math.random() - 0.5);
 
+        for (const idioma in respuestas) {
+            respuestas[idioma] = ordenAleatorio.map(index => respuestas[idioma][index]);
+        }
         return respuestas;
     }
     obtenerImg() {

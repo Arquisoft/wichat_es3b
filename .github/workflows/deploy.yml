@@ -7,7 +7,7 @@ on:
   release:
     types: [published]
 
-jobs:
+jobs: 
   unit-tests:
     runs-on: ubuntu-latest
     steps:
@@ -15,6 +15,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Checkout branch
+        run: git checkout deployment_branch
+      - name: Pull branch
+        run: git pull origin deployment_branch
       - name: Set CI to false
         run: echo "CI=false" >> $GITHUB_ENV
       - name: Install Dependencies
@@ -26,6 +30,7 @@ jobs:
           npm --prefix gatewayservice ci
           npm --prefix webapp ci
           npm --prefix wikiquestionservice ci
+          npm --prefix apiservice ci
       - name: Run Unit Tests
         run: |
           npm --prefix users/authservice test -- --coverage
@@ -35,13 +40,14 @@ jobs:
           npm --prefix gatewayservice test -- --coverage
           npm --prefix webapp test -- --coverage
           npm --prefix wikiquestionservice test -- --coverage
+          npm --prefix apiservice test -- --coverage
       - name: Analyze with SonarCloud
         uses: SonarSource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   e2e-tests:
-    needs: [unit-tests]
+    needs: [ unit-tests ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,7 +59,16 @@ jobs:
           npm --prefix webapp install
       - name: Set CI to false
         run: echo "CI=false" >> $GITHUB_ENV
+      - run: npm --prefix users/authservice install
+      - run: npm --prefix users/userservice install
+      - run: npm --prefix users/statsservice install
+      - run: npm --prefix wikiquestionservice install
+      - run: npm --prefix apiservice install
+      - run: npm --prefix llmservice install
+      - run: npm --prefix gatewayservice install
+      - run: npm --prefix webapp install
       - run: npm --prefix webapp run build
+      - run: npm --prefix webapp run test:e2e
 
   docker-push-webapp:
     name: Push webapp Docker Image to GitHub Packages
@@ -85,18 +100,21 @@ jobs:
       packages: write
     needs: [e2e-tests]
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-    - name: Publish to Registry
-      uses: elgohr/Publish-Docker-Github-Action@v5
-      with:
-          name: arquisoft/wichat_es3b/authservice
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: ghcr.io
-          workdir: users/authservice
-          platforms: linux/amd64,linux/arm64
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        with:
+            name: arquisoft/wichat_es3b/authservice
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+            registry: ghcr.io
+            workdir: users/authservice
+            platforms: linux/amd64,linux/arm64
+            buildargs: MONGODB_URI
 
   docker-push-userservice:
     name: Push user service Docker Image to GitHub Packages
@@ -109,12 +127,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
         with:
           name: arquisoft/wichat_es3b/userservice
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
           workdir: users/userservice
+          buildargs: MONGODB_URI
 
   docker-push-statsservice:
     name: Push stats service Docker Image to GitHub Packages
@@ -127,12 +148,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
         with:
           name: arquisoft/wichat_es3b/statsservice
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
           workdir: users/statsservice
+          buildargs: MONGODB_URI
 
   docker-push-llmservice:
     name: Push llm service Docker Image to GitHub Packages
@@ -161,10 +185,6 @@ jobs:
     needs: [e2e-tests]
     steps:
       - uses: actions/checkout@v4
-      - name: Update OpenAPI configuration
-        run: |
-          DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}
-          sed -i "s/SOMEIP/${DEPLOY_HOST}/g" gatewayservice/openapi.yaml
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
@@ -192,10 +212,34 @@ jobs:
           registry: ghcr.io
           workdir: wikiquestionservice
 
+  docker-push-apiservice:
+    name: Push api service Docker Image to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [ e2e-tests ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update OpenAPI configuration
+        run: |
+          DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}
+          sed -i "s/SOMEIP/${DEPLOY_HOST}/g" apiservice/openapi.yaml
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          name: arquisoft/wichat_es3b/apiservice
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          workdir: apiservice
+
   deploy:
     name: Deploy over SSH
     runs-on: ubuntu-latest
-    needs: [docker-push-userservice, docker-push-authservice, docker-push-llmservice, docker-push-gatewayservice, docker-push-webapp, docker-push-wikiquestionservice, docker-push-statsservice]
+    needs: [docker-push-userservice, docker-push-authservice, docker-push-llmservice, docker-push-gatewayservice,
+            docker-push-webapp, docker-push-wikiquestionservice, docker-push-statsservice,
+              docker-push-apiservice]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -221,6 +265,13 @@ jobs:
           user: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           command: |
-            wget https://raw.githubusercontent.com/arquisoft/wichat_es3b/master/docker-compose.yml -O docker-compose.yml
+            wget https://raw.githubusercontent.com/arquisoft/wichat_es3b/deployment_branch/docker-compose.yml -O docker-compose.yml
+            [ -f ~/.env ] && rm ~/.env
+            echo "MONGODB_URI= \"${{ secrets.MONGODB_URI }}\"" > ~/.env
+            echo "LLM_API_KEY= \"${{ secrets.LLM_API_KEY }}\"" >> ~/.env
+            echo "Cleaning up old containers..."
+            docker rm -f $(docker ps -aq) || true
             docker compose --profile prod down
+            docker rmi $(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "<none>" | awk '{print $2}')
+            docker rmi $(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "deployment_branch" | awk '{print $2}')
             docker compose --profile prod up -d --pull always

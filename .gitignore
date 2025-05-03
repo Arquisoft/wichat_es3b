@@ -5,3 +5,4 @@ docs/build
 .idea/
 webapp/.env
 llmservice/mainDePrueba.js
+gatling-tests/target/

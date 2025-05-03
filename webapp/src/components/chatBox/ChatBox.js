@@ -1,36 +1,46 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import "./ChatBox.css";
 import ChatBubble from "../chatBubble/ChatBubble";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import axios from "axios";
+import { useTranslation } from "react-i18next";
+import useSubmitOnEnter from "../../hooks/useSubmitOnEnter";
 
-const ChatBox = ({ question, language = "es", isVisible }) => {
+const ChatBox = ({
+  question,
+  language = "es",
+  isVisible,
+  hintsLeft,
+  setHintsLeft,
+}) => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [hint, setHint] = useState("");
   const [isLoadingHint, setIsLoadingHint] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
-
   const [input, setInput] = useState("");
 
   // Función simple para obtener una pista
   const getHint = async () => {
+    if (hintsLeft <= 0) {
+      alert("No hay más pistas disponibles.");
+      return;
+    }
     setIsLoadingHint(true);
     setHint(""); // Limpiar pista anterior
     setLoadingMessage("...");
 
     try {
-      // URL del gateway
-      const URL = "http://localhost:8000/";
-
+      const URL =
+        process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
       const requestData = {
         userQuestion: input,
         question: question,
         idioma: "es",
-        model: "empathy"
       };
 
       // Llamar al servicio LLM
-      const response = await axios.post(`${URL}askllm`, requestData);
+      const response = await axios.post(`${URL}/askllm`, requestData);
 
       // Obtener la respuesta
       const answer = response.data.answer;
@@ -44,12 +54,16 @@ const ChatBox = ({ question, language = "es", isVisible }) => {
         ...prevMessages,
         { text: answer, isSender: false },
       ]);
+      setHintsLeft((prev) => prev - 1);
     } catch (error) {
       console.error("Error al obtener pista:", error);
-      setHint("No se pudo obtener una pista en este momento.");
+      setHint(t("hintError"));
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: hint, isSender: false },
+        {
+          text: t("hintError"),
+          isSender: false,
+        },
       ]);
     } finally {
       setIsLoadingHint(false);
@@ -63,11 +77,7 @@ const ChatBox = ({ question, language = "es", isVisible }) => {
     getHint();
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSend();
-    }
-  };
+  const handleKeyDown = useSubmitOnEnter(handleSend);
 
   useEffect(() => {
     let interval;
@@ -86,32 +96,43 @@ const ChatBox = ({ question, language = "es", isVisible }) => {
   if (!isVisible) return null;
 
   return (
-      <div className="chat-box">
-        <div className="messages">
-          {messages.map((msg, index) => (
-              <ChatBubble key={index} message={msg.text} isSender={msg.isSender} />
-          ))}
-          {isLoadingHint && (
-              <ChatBubble message={loadingMessage} isSender={false} />
-          )}
-        </div>
-        <div className="input-container">
-          <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Pídele una pista a la IA..."
-              onKeyPress={handleKeyPress}
-          />
-          <button className="send-button" onClick={handleSend}>
-            <ArrowUpwardIcon
-                titleAccess="Envía un mensaje"
-                fontSize="inherit"
-                id="sendMessageToAIButton"
-            />
-          </button>
-        </div>
+    <div className="chat-box">
+      <div className="chat-box-header">
+        <span>{`${t("hintsLeft")}: `} </span>
+        <span className={`hints-counter ${hintsLeft <= 0 ? "no-hints" : ""}`}>
+          {hintsLeft}
+        </span>
       </div>
+      <div className="messages">
+        {messages.map((msg, index) => (
+          <ChatBubble key={index} message={msg.text} isSender={msg.isSender} />
+        ))}
+        {isLoadingHint && (
+          <ChatBubble message={loadingMessage} isSender={false} />
+        )}
+      </div>
+      <div className="input-container">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={hintsLeft > 0 ? t("askAIForHints") : t("noHintsLeft")}
+          onKeyDown={handleKeyDown}
+          disabled={hintsLeft <= 0}
+        />
+        <button
+          className="send-button"
+          onClick={handleSend}
+          disabled={hintsLeft <= 0 || input.trim() === ""}
+        >
+          <ArrowUpwardIcon
+            titleAccess={hintsLeft > 0 ? t("askAIForHints") : t("noHintsLeft")}
+            fontSize="inherit"
+            id="sendMessageToAIButton"
+          />
+        </button>
+      </div>
+    </div>
   );
 };
 

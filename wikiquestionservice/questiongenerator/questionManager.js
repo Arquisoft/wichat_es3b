@@ -3,11 +3,11 @@ const CategoryLoader = require('./categoryLoader');
 class QuestionManager {
     constructor() {
         this.questions = [];
-        this.categoryLoader = new CategoryLoader();
     }
 
-    async loadAllQuestions() {
-        const allServices = this.categoryLoader.getAllServices();
+    async loadAllQuestions(topics,numQuestions) {
+        const categoryLoader = new CategoryLoader(topics,numQuestions);
+        const allServices = categoryLoader.getAllServices();
         const questionPromises = [];
 
         for (const categoryName in allServices) {
@@ -33,28 +33,11 @@ class QuestionManager {
 
         const results = await Promise.all(questionPromises);
 
-        // Agregar todas las preguntas generadas
         this.questions = results.flat();
 
         console.log(`📌 Total de preguntas generadas: ${this.questions.length}`);
         this.shuffleQuestions();
-    }
-
-
-    addQuestions(preguntas) {
-        this.questions.push(...preguntas);
-    }
-    getQuestionsByTopic(topics, count) {
-        let filteredQuestions = [];
-
-        if (topics.includes("all")) {
-            filteredQuestions = this.questions;
-        } else {
-            filteredQuestions = this.questions.filter(question => topics.includes(question.category));
-        }
-
-        // Limitar el número de preguntas
-        return filteredQuestions.slice(0, count);
+        return this.questions;
     }
 
     shuffleQuestions() {
@@ -64,13 +47,6 @@ class QuestionManager {
         }
     }
 
-
-    getRandomQuestion() {
-        if (this.questions.length === 0) {
-            throw new Error("No hay preguntas disponibles.");
-        }
-        return this.questions.shift();
-    }
 }
 
 module.exports = QuestionManager;

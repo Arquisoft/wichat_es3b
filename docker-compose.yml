@@ -12,7 +12,7 @@ services:
 
   authservice:
     container_name: authservice-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/authservice:latest
+    image: ghcr.io/arquisoft/wichat_es3b/authservice:deployment_branch
     profiles: ["dev", "prod"]
     build: ./users/authservice
     depends_on:
@@ -26,7 +26,7 @@ services:
 
   userservice:
     container_name: userservice-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/userservice:latest
+    image: ghcr.io/arquisoft/wichat_es3b/userservice:deployment_branch
     profiles: ["dev", "prod"]
     build: ./users/userservice
     depends_on:
@@ -38,16 +38,15 @@ services:
     environment:
       MONGODB_URI: ${MONGODB_URI}
 
-
   statsservice:
     container_name: statsservice-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/statsservice:latest
+    image: ghcr.io/arquisoft/wichat_es3b/statsservice:deployment_branch
     profiles: ["dev", "prod"]
-    build: ./users/statsservice  
+    build: ./users/statsservice
     depends_on:
-      - mongodb 
+      - mongodb
     ports:
-      - "8005:8005" 
+      - "8005:8005"
     networks:
       - mynetwork
     environment:
@@ -55,17 +54,19 @@ services:
 
   llmservice:
     container_name: llmservice-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/llmservice:latest
+    image: ghcr.io/arquisoft/wichat_es3b/llmservice:deployment_branch
     profiles: ["dev", "prod"]
     build: ./llmservice
     ports:
       - "8003:8003"
     networks:
       - mynetwork
+    environment:
+      LLM_API_KEY: ${LLM_API_KEY}
 
   gatewayservice:
     container_name: gatewayservice-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/gatewayservice:latest
+    image: ghcr.io/arquisoft/wichat_es3b/gatewayservice:deployment_branch
     profiles: ["dev", "prod"]
     build: ./gatewayservice
     depends_on:
@@ -73,6 +74,8 @@ services:
       - userservice
       - authservice
       - llmservice
+      - statsservice
+      - wikiquestionservice
     ports:
       - "8000:8000"
     networks:
@@ -81,34 +84,60 @@ services:
       AUTH_SERVICE_URL: http://authservice:8002
       USER_SERVICE_URL: http://userservice:8001
       LLM_SERVICE_URL: http://llmservice:8003
+      STATS_SERVICE_URL: http://statsservice:8005
+      QUESTION_SERVICE_URL: http://wikiquestionservice:8004
+
+  apiservice:
+    container_name: apiservice-wichat_es3b
+    image: ghcr.io/arquisoft/wichat_es3b/apiservice:deployment_branch
+    profiles: [ "dev", "prod" ]
+    build:
+      context: ./apiservice
+      args:
+        API_URI: ${API_URI}
+    depends_on:
+      - gatewayservice
+    ports:
+      - "8006:8006"
+    networks:
+      - mynetwork
+    environment:
+      GATEWAY_SERVICE_URL: http://gatewayservice:8000
 
   webapp:
     container_name: webapp-wichat_es3b
-    image: ghcr.io/arquisoft/wichat_es3b/webapp:latest
+    image: ghcr.io/arquisoft/wichat_es3b/webapp:deployment_branch
     profiles: ["dev", "prod"]
-    build: 
+    build:
       context: ./webapp
       args:
+        API_URI: ${API_URI}
         LLM_API_KEY: ${LLM_API_KEY}
     depends_on:
       - gatewayservice
     ports:
       - "3000:3000"
+
+
   wikiquestionservice:
     container_name: wikiquestionservice-wichat_es3b
     build: ./wikiquestionservice
-    image: ghcr.io/arquisoft/wichat_es3b/wikiquestionservice:latest
-    profiles: [ "dev", "prod" ]
+    image: ghcr.io/arquisoft/wichat_es3b/wikiquestionservice:deployment_branch
+    profiles: ["dev", "prod"]
+    depends_on:
+      - mongodb
     ports:
       - "8004:8004"
     networks:
       - mynetwork
     restart: always
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
 
   prometheus:
     image: prom/prometheus
     container_name: prometheus-wichat_es3b
-    profiles: ["dev"]
+    profiles: ["dev", "prod"]
     networks:
       - mynetwork
     volumes:
@@ -116,13 +145,13 @@ services:
       - prometheus_data:/prometheus
     ports:
       - "9090:9090"
-    depends_on: 
+    depends_on:
       - gatewayservice
-      
+
   grafana:
     image: grafana/grafana
     container_name: grafana-wichat_es3b
-    profiles: ["dev"]
+    profiles: ["dev", "prod"]
     networks:
       - mynetwork
     volumes:
@@ -135,14 +164,13 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     ports:
       - "9091:9091"
-    depends_on: 
+    depends_on:
       - prometheus
-
 
 volumes:
   mongodb_data:
-  prometheus_data: 
-  grafana_data: 
+  prometheus_data:
+  grafana_data:
 
 networks:
   mynetwork:

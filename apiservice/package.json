@@ -1,0 +1,32 @@
+{
+  "name": "apiservice",
+  "version": "1.0.0",
+  "description": "API service for WIChat application, provides API documentation and endpoints",
+  "main": "apiservice.js",
+  "scripts": {
+    "start": "node apiservice.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arquisoft/wichat_es3b.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arquisoft/wichat_es3b/issues"
+  },
+  "homepage": "https://github.com/arquisoft/wichat_es3b#readme",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-prom-bundle": "^8.0.0",
+    "swagger-ui-express": "^5.0.1",
+    "yaml": "^2.7.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}

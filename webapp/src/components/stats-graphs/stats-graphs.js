@@ -3,11 +3,13 @@
 import { useEffect, useRef } from "react";
 import { Chart, registerables } from "chart.js";
 import "./stats-graphs.css";
+import { useTranslation } from "react-i18next";
 
 // Registramos los componentes necesarios de Chart.js
 Chart.register(...registerables);
 
 export default function StatsGraphs({ monthlyData, pieData }) {
+  const {t} = useTranslation();
   // Referencias para los canvas de los gráficos
   const lineChartRef = useRef(null);
   const pieChartRef = useRef(null);
@@ -41,10 +43,10 @@ export default function StatsGraphs({ monthlyData, pieData }) {
             labels: monthlyData.map((item) => item.month),
             datasets: [
               {
-                label: "Ratio de aciertos",
+                label: t("rightAnswersRatio"),
                 data: monthlyData.map((item) => item.value),
                 borderColor: colors.tertiary,
-                backgroundColor: colors.tertiary + "20", // Con transparencia
+                backgroundColor: colors.tertiary + "20",
                 tension: 0.3,
                 fill: true,
               },
@@ -148,7 +150,7 @@ export default function StatsGraphs({ monthlyData, pieData }) {
 
   return (
     <section className="stats-section">
-      <h2 className="section-title">Gráficas</h2>
+      <h2 className="section-title">{t("graphs")}</h2>
 
       <div className="graphs-container">
         <div className="line-chart-container">

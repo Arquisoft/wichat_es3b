@@ -22,6 +22,8 @@
 /* Contenedor de la imagen de perfil */
 .profile-image {
   margin-right: 1.25rem;
+  height: 70px;
+  width: 70px;
 }
 
 .profile-image img {
@@ -56,20 +58,6 @@
   font-size: 1.5rem;
   font-weight: 600;
   font-style: normal;
-}
-
-.profile-level {
-  font-size: 1rem;
-  color: white;
-  background-color: var(--color-primario);
-  padding: 0.2rem 0.5rem;
-  border-radius: 0.75rem;
-  transition: background-color 0.3s ease;
-}
-
-.profile-level:hover {
-  background-color: var(--color-hover-boton);
-  color: white;
 }
 
 /* Barra de progreso para el nivel */

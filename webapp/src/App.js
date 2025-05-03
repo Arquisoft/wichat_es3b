@@ -4,8 +4,10 @@ import AuthForm from "./pages/authForm/AuthForm";
 import Home from "./pages/home/Home.js";
 import PerfilPage from "./pages/profilePage/PerfilPage.js";
 import { Route, Routes } from "react-router-dom";
-import Game from "./pages/game/Game.js";
-import PrivateRoute from "./components/routes/PrivateRoute.js"; // Importar el componente
+import PlayView from "./pages/playView/PlayView.js";
+import PrivateRoute from "./components/routes/PrivateRoute.js";
+import Ranking from './pages/ranking/Ranking.js'
+import ApiKeyGenerator from "./pages/apiKeyGenerator/ApiKeyGenerator.js";
 
 function App() {
   return (
@@ -17,17 +19,27 @@ function App() {
         path="/play"
         element={
           <PrivateRoute>
-            <Game />
+            <PlayView />
           </PrivateRoute>
         }
       />
-      <Route path="/profile" element={
+      <Route
+        path="/profile/"
+        element={
           <PrivateRoute>
-              <PerfilPage />
+            <PerfilPage />
           </PrivateRoute>
-          } />
-
+        }
+      />
+      <Route
+        path="/stats/:username"
+        element={
+            <PerfilPage />
+        }
+      />
       <Route path="/home" element={<Home />} />
+      <Route path="/ranking" element={<Ranking/>} />
+      <Route path="/apiKeyGenerator" element={<ApiKeyGenerator/>} />
     </Routes>
   );
 }

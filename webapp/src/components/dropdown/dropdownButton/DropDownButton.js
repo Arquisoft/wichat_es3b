@@ -2,10 +2,10 @@ import React from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import "./DropdownButton.css";
 
-const DropDownButton = ({ children, open, toggle }) => {
+const DropDownButton = ({ children, open, toggle, variant}) => {
   return (
     <div
-      className={`dropdown-btn ${open ? "button-open" : null}`}
+      className={`dropdown-btn ${variant} ${open ? "button-open" : null}`}
       onClick={toggle}
     >
       {children}
