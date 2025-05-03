@@ -5,6 +5,8 @@ const path = require("path");
 const promBundle = require("express-prom-bundle");
 
 const app = express();
+app.disable("x-powered-by");
+
 const port = 8000;
 
 const wikiQuestionServiceUrl =
