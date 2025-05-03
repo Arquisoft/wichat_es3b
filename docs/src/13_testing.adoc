@@ -1,0 +1,33 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-testing]]
+== Testing
+
+Testing is an important part of the development process. It helps ensure that your code works as expected and that changes do not introduce new bugs. In this section, we will cover the tests used in this project and some concepts related to testing.
+
+=== Unit Tests & Code Coverage
+
+Unit tests are used to test individual components of your code in isolation. They are typically small and fast, allowing you to run them frequently during development.
+
+Code coverage is a measure of how much of your code is executed during tests. It helps identify untested parts of your code and can be used to improve test quality.
+
+In our project specifically:
+
+image:QualityGate.PNG[]
+
+We can observe that the code coverage is 83%, which is above the threshold of 80% set in the quality gate. This means that the code is well-tested and meets the quality standards.
+
+=== E2E Tests
+
+End-to-end (E2E) tests are used to test the entire application from start to finish. They simulate real user interactions and verify that the application behaves as expected.
+
+image:e2e.PNG[]
+
+We have a total of 15 E2E tests, which cover various scenarios and user interactions, like login, logout, signup, access the profile, access the ranking and play both Single Player and Player VS AI game modes with different configurations.
+
+These tests are run automatically as part of the CI/CD pipeline to ensure that the application works correctly after each change.
+
+=== Load Tests
+
+Load tests are used to test the performance of your application under heavy load. They simulate multiple users interacting with the application simultaneously and measure response times and resource usage.
+

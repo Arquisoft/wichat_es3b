@@ -147,7 +147,7 @@ public class GameFlowSimulation extends Simulation {
             scn.injectOpen(
                     // Define your load profile here
                     // atOnceUsers(10) // Example: 10 users starting at the same time
-                    rampUsers(10).during(Duration.ofSeconds(30)) // Example: Ramp up 50 users over 30 seconds
+                    rampUsers(2100).during(Duration.ofSeconds(30)) // Example: Ramp up 50 users over 30 seconds
                     // constantUsersPerSec(10).during(Duration.ofMinutes(1)) // Example: Constant 10 users/sec for 1 min
             ).protocols(httpProtocol)
     ).assertions(
