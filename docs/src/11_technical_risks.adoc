@@ -17,6 +17,7 @@ ifndef::imagesdir[:imagesdir: ../images]
 [cols="1,3", options="header"]
 |===
 | Technical Debt | Considerations
+|Game logic is handled on the frontend instead of the backend|Ideally, the game logic should reside on the backend to improve security and maintainability. However, due to time constraints, it remains on the frontend for now. This refactor is planned for future iterations.
 |===
 
 

@@ -56,13 +56,13 @@ image::08-concepts-EN.drawio.png["Possible topics for crosscutting concepts"]
 See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
 ****
 endif::arc42help[]
-=== _Domain concepts_
-==== _Domain model_
+=== Domain concepts
+==== Domain model
 
 
 image:diagram-8_1.png[]
 
-==== _Domain description_
+==== Domain description
 |===
 |Term |Description
 
@@ -85,18 +85,18 @@ image:diagram-8_1.png[]
 
 
 
-=== _Microservices architecture_
+=== Service-oriented architecture
 
-_We have decided that our architecture will be based on microservices, which means that every part of the aplication will be divided in a service that performs a specific function. The services can communicate witch eachother using their repective APIs or via the shared database_
-
-
-
-=== _Build, Test, Deploy_
-
-_The project follows a CI/CD pipeline that automates the build, test, and deployment processes. This ensures that the application is always up-to-date and working correctly._
+We have decided that our architecture will be based on microservices,but as the services are not fully decoupled at the data level it's more accurate a service-oriented architecture, which means that every part of the aplication will be divided in a service that performs a specific function. The services can communicate witch eachother using their repective APIs or via the shared database.
 
 
-=== _Usability_
 
-_Usability is crucial for any application, as it directly impacts user interaction efficiency. To ensure our app’s usability, we conducted extensive user research, leading to an intuitive interface design. Employing a user-centric approach throughout development, we prioritized user experience, facilitating easy navigation_
+=== Build, Test, Deploy
+
+The project follows a CI/CD pipeline that automates the build, test, and deployment processes using GitHub Actions. This ensures that the application is always up-to-date and working correctly.
+Deployment is done manually to Azure. Each service is deployed in a container, and the frontend is exposed via a public IP.
+
+=== Usability
+
+Usability is crucial for any application, as it directly impacts user interaction efficiency. To ensure our app’s usability, we conducted extensive user research, leading to an intuitive interface design. Employing a user-centric approach throughout development, we prioritized user experience, facilitating easy navigation.
 

@@ -45,17 +45,17 @@ A user wants to create a new account. The user introduces the required informati
 actor User
 collections WebApp
 collections GatewayService
-collections UsersService
-database DB
+collections UserService
+database DB as "MongoDB"
 
-User -> WebApp: Request login
+User -> WebApp: Request sign in
 WebApp -> GatewayService: SignInRequest(UserData)
-GatewayService  -> UsersService: SignInRequest(UserData)
-UsersService -> UsersService: validateFields()
-UsersService  -> DB: validateRequiredFieldsAndInsert()
-DB -> UsersService: Confirm data
-UsersService -> UsersService: loginUser()
-UsersService -> GatewayService: Confirm sign in
+GatewayService  -> UserService: SignInRequest(UserData)
+UserService -> UserService: validateFields()
+UserService  -> DB: validateRequiredFieldsAndInsert()
+DB -> UserService: Confirm data
+UserService -> UserService: loginUser()
+UserService -> GatewayService: Confirm sign in
 GatewayService -> WebApp: Confirm sign in
 WebApp -> User: Confirm sign in
 ----
@@ -68,7 +68,7 @@ actor User
 collections WebApp
 collections GatewayService
 collections AuthService
-database DB
+database DB as "MongoDB"
 
 User -> WebApp: Request login
 WebApp -> GatewayService: LogInRequest(UserData)
@@ -82,37 +82,33 @@ GatewayService -> WebApp: Confirm login
 WebApp -> User: Confirm login
 ----
 
-=== New Question
-A user wants to start a new round, it can be a new question or start a new game. The system generates a new question and shows it to the user. The user answers the question and the system validates the answer. The system updates the user's score and stats, then shows the results to the user.
+=== Generate Questions
+The admin wants to generate new questions to be stored in the database for later use during gameplay. This process is handled in the backend, using the Wikidata API to retrieve relevant data.
 [plantuml,"New question",svg]
 ----
-actor User
-collections WA as "Web App"
-collections GW as "GatewayService"
-collections GMS as "GameService"
-collections QUS as "QuestionService"
-collections USERS as "UsersService"
+actor Admin
+collections QUS as "WikiQuestionService"
+collections QM as "QuestionManager"
+collections CL as "CategoryLoader"
+collections QG as "QuestionGen"
 entity WD as "WikidataAPI"
 database DB as "MongoDB"
 
-User -> WA: Starts new round
-WA -> GW: getNewQuestion()
-GW -> GMS: getNewQuestion()
-GMS -> QUS: getNewQuestion()
-QUS -> WD: getNewQuestion()
-WD -> QUS: Question Info
-QUS -> GMS: Question Info
-GMS -> GMS: Saves question info
-GMS -> GW: Question Data
-GW -> WA: Question Data
-User -> WA: Answers question
-WA -> GW: Send answer
-GW -> GMS: Send answer
-GMS -> GMS: checkAnswer()
-GMS -> USERS: Update user score
-USERS -> DB: Update user data
-GMS -> GW: Show results
-GW -> WA: Show results
+Admin -> QUS: generateQuestions()
+QUS -> QM: loadAllQuestions(topics,numQuestions)
+QM -> CL: new CategoryLoader(topics,numQuestions)
+CL -> QG: new WikidataQueryService(categoryName,entity,properties,questions,types,img,categoryQuestions)
+QG -> QG: generateQuestions()
+QG -> WD: obtenerIdsDeWikidata(quantity)
+WD -> QG: Ids
+QG -> QG: generarDescripcion(entity_id, randomIndex)
+QG -> WD: obtenerValoresDePropiedad(id,property,type,language)
+WD -> QG: Property Values
+QG -> QG: obtenerRespuestasIncorrectas(entityId,property,propertyValues,type,language)
+QG -> CL: WikidataQueryService
+CL -> QM: CategoryLoader
+QM -> QUS: Questions
+QUS -> DB: saveQuestionsToDB(questions)
 ----
 
 === New Clue
@@ -138,28 +134,28 @@ QU -> GW: Clue Data
 GW -> WA: Clue Data
 ----
 
-=== Check Record
-A user wants to check the record of a game session. The system loads all records and the user selects one to see the details. The system loads the details of the record and shows them to the user.
+=== Get Ranking and stats from the top player
+The user accesses the player ranking via the web application. The request is routed through the gateway to the statsservice, which fetches and returns the ranking data. The user then selects the top player to view detailed statistics, which are also retrieved from the statsservice and displayed in the UI.
 [plantuml,"Question record",svg]
 ----
 actor User
 collections WA as "Web App"
 collections GW as "GatewayService"
-collections US as "UsersService"
+collections SS as "StatsService"
 database DB as "MongoDB"
 
-User -> WA: Access record page
-WA -> GW: loadRecords()
-GW -> US: loadRecords()
-US -> DB: getActiveUserRecords()
-DB -> US: User Records
-US -> GW: User Records
-GW -> WA: User Records
-User -> WA: Record details
-WA -> GW: getRecordDetails(RecordID)
-GW -> US: getRecordDetails(RecordID)
-US -> DB: getRecordDetails(RecordID)
-DB -> US: Record Details
-US -> GW: Record Details
-GW -> WA: Record Details
+User -> WA: Access ranking page
+WA -> GW: /getranking
+GW -> SS: /getranking
+SS -> DB: Stats.find().sort({ maxScore: -1, ratio: -1 }) .limit(10);
+DB -> SS: Top Players Stats
+SS -> GW: Top Players Stats
+GW -> WA: Top Payers Stats
+User -> WA: Access top player page
+WA -> GW: /getstats/:topPlayerUsername
+GW -> SS: /getstats/:topPlayerUsername
+SS -> DB: Stats.findOne({ topPlayerUsername })
+DB -> SS: Top Player Stats
+SS -> GW: Top Player Stats
+GW -> WA: Top Player Stats
 ----
