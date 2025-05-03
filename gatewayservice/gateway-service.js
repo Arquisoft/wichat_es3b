@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
+const path = require("path");
 const promBundle = require("express-prom-bundle");
 
 const app = express();
@@ -15,6 +16,7 @@ const statsServiceUrl =
   process.env.STATS_SERVICE_URL || "http://localhost:8005";
 
 app.use(cors());
+
 app.use(express.json());
 
 const promClient = require('prom-client');
@@ -59,8 +61,8 @@ app.post("/login", async (req, res) => {
     res.json(authResponse.data);
   } catch (error) {
     res
-        .status(error.response.status)
-        .json({ error: error.response.data.error });
+        .status(error?.response?.status)
+        .json({ error: error?.response?.data.error });
   }
 });
 
@@ -200,6 +202,7 @@ app.get("/games/:username", async (req, res) => {
   }
 });
 
+// Endpoint para obtener las estadísticas de ratios por mes
 app.get("/ratios-per-month/:username", async (req, res) => {
   try {
     const username = req.params.username;
@@ -219,10 +222,7 @@ app.get("/ratios-per-month/:username", async (req, res) => {
 // Question endpoints
 app.get('/questions', async (req, res) => {
   try {
-    let { n, topic = "all" } = req.query;
-
-    n = parseInt(n);
-    if (isNaN(n)) n = 10;
+    const { n = 10, topic = "all" } = req.query;
 
     const fullURL = `${wikiQuestionServiceUrl}/questions?n=${n}&topic=${encodeURIComponent(topic)}`;
     console.log("Redirigiendo a:", fullURL);
@@ -260,7 +260,7 @@ app.get('/validate-apikey/:apikey', async (req, res) => {
 });
 
 
-
+// Endpoint para redirigir la generación de preguntas
 app.get('/questionsDB', async (req, res) => {
   try {
     const { n = 10, topic = "all" } = req.query;
@@ -276,6 +276,7 @@ app.get('/questionsDB', async (req, res) => {
   }
 });
 
+//Para mostrar metricas de Prometheus
 app.get("/metrics", async (req, res) => {
   res.set('Content-Type', promClient.register.contentType);
   res.end(await promClient.register.metrics());
