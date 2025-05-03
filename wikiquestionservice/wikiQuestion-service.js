@@ -205,6 +205,7 @@ async function obtainQuestions() {
 }
 
 async function filtrarPreguntasNoExistentes(newQuestions) {
+  
   const nuevosEnunciados = newQuestions.map((q) => q.preguntas.es);
 
   const existentes = await Question.find(

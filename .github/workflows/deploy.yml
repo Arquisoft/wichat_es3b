@@ -47,7 +47,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   e2e-tests:
-    needs: [unit-tests]
+    needs: [ unit-tests ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,7 +59,16 @@ jobs:
           npm --prefix webapp install
       - name: Set CI to false
         run: echo "CI=false" >> $GITHUB_ENV
+      - run: npm --prefix users/authservice install
+      - run: npm --prefix users/userservice install
+      - run: npm --prefix users/statsservice install
+      - run: npm --prefix wikiquestionservice install
+      - run: npm --prefix apiservice install
+      - run: npm --prefix llmservice install
+      - run: npm --prefix gatewayservice install
+      - run: npm --prefix webapp install
       - run: npm --prefix webapp run build
+      - run: npm --prefix webapp run test:e2e
 
   docker-push-webapp:
     name: Push webapp Docker Image to GitHub Packages
@@ -260,6 +269,23 @@ jobs:
             [ -f ~/.env ] && rm ~/.env
             echo "MONGODB_URI= \"${{ secrets.MONGODB_URI }}\"" > ~/.env
             echo "LLM_API_KEY= \"${{ secrets.LLM_API_KEY }}\"" >> ~/.env
+
+            mkdir -p ./gatewayservice/monitoring/grafana/provisioning/dashboards
+            mkdir -p ./gatewayservice/monitoring/grafana/provisioning/datasources
+            mkdir -p ./gatewayservice/monitoring/prometheus
+            
+            rm -f ./gatewayservice/monitoring/grafana/provisioning/datasources/datasource.yml
+            rm -f ./gatewayservice/monitoring/prometheus/prometheus.yml
+            rm -f ./gatewayservice/monitoring/grafana/provisioning/dashboards/dashboard.yml
+            rm -f ./gatewayservice/monitoring/grafana/provisioning/dashboards/example-service-dashboard.json
+
+            wget -P ./gatewayservice/monitoring/grafana/provisioning/datasources https://raw.githubusercontent.com/Arquisoft/wichat_es3b/refs/heads/deployment_branch/gatewayservice/monitoring/grafana/provisioning/datasources/datasource.yml
+            wget -P ./gatewayservice/monitoring/prometheus https://raw.githubusercontent.com/Arquisoft/wichat_es3b/refs/heads/deployment_branch/gatewayservice/monitoring/prometheus/prometheus.yml
+            wget -P ./gatewayservice/monitoring/grafana/provisioning/dashboards https://raw.githubusercontent.com/Arquisoft/wichat_es3b/refs/heads/deployment_branch/gatewayservice/monitoring/grafana/provisioning/dashboards/dashboard.yml
+            wget -P ./gatewayservice/monitoring/grafana/provisioning/dashboards https://raw.githubusercontent.com/Arquisoft/wichat_es3b/refs/heads/deployment_branch/gatewayservice/monitoring/grafana/provisioning/dashboards/example-service-dashboard.json
+
+            echo "Cleaning up old containers..."
+            docker rm -f $(docker ps -aq) || true
             docker compose --profile prod down
             docker rmi $(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "<none>" | awk '{print $2}')
             docker rmi $(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "deployment_branch" | awk '{print $2}')

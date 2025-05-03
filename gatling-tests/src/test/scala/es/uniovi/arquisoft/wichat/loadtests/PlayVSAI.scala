@@ -213,6 +213,6 @@ class PlayVSAI extends Simulation {
             .check(status.is(400))
         )
     )
-
+  
 	setUp(scn.inject(constantUsersPerSec(5).during(15))).protocols(httpProtocol)
 }
