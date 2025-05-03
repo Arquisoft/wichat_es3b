@@ -24,50 +24,44 @@ const Game = ({ onGameEnd }) => {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [isCorrect, setIsCorrect] = useState(null); // null, true, or false
+  const [isCorrect, setIsCorrect] = useState(null);
   const [score, setScore] = useState(0);
   const [isAnswered, setIsAnswered] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(30); // Initial time, updated by config
+  const [timeLeft, setTimeLeft] = useState(30);
   const [progress, setProgress] = useState(100);
   const [isChatBoxVisible, setIsChatBoxVisible] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [totalTimeUsed, setTotalTimeUsed] = useState(0);
   const [showRules, setShowRules] = useState(false);
-  const [hintsLeft, setHintsLeft] = useState(3); // Default hints, updated by config
+  const [hintsLeft, setHintsLeft] = useState(3);
   const [questionAnimationComplete, setQuestionAnimationComplete] =
     useState(false);
   const [shuffledAnswers, setShuffledAnswers] = useState([]);
-  const [config, setConfig] = useState(null); // Game configuration
+  const [config, setConfig] = useState(null);
 
-  // --- Refs ---
   const timerRef = useRef(null);
-  const isMounted = useRef(true); // Track component mount state
-  const hasSavedStats = useRef(false); // Prevent saving stats multiple times
+  const isMounted = useRef(true);
+  const hasSavedStats = useRef(false);
 
-  // --- Constants ---
   const GATEWAY_URL =
     process.env.REACT_APP_GATEWAY_SERVICE_URL || "http://localhost:8000";
   const loggedUsername = localStorage.getItem("username");
 
-  // --- Effects ---
-
-  // Set mounted ref to false on unmount
   useEffect(() => {
     isMounted.current = true;
     return () => {
       isMounted.current = false;
-      clearInterval(timerRef.current); // Clear timer on unmount
+      clearInterval(timerRef.current);
     };
   }, []);
 
-  // Load configuration from localStorage
   useEffect(() => {
     const storedConfig = JSON.parse(localStorage.getItem("quizConfig"));
     const defaultConfig = {
       numPreguntas: 10,
       tiempoPregunta: 30,
       limitePistas: 3,
-      modoJuego: "singleplayer", // Ensure correct mode default
+      modoJuego: "singleplayer",
       categories: ["all"],
     };
     const finalConfig = { ...defaultConfig, ...storedConfig };
@@ -75,11 +69,10 @@ const Game = ({ onGameEnd }) => {
     if (isMounted.current) {
       setConfig(finalConfig);
       setTimeLeft(finalConfig.tiempoPregunta);
-      setHintsLeft(finalConfig.limitePistas); // Set hints from config
+      setHintsLeft(finalConfig.limitePistas);
     }
-  }, []); // Run only on mount
+  }, []);
 
-  // Fetch questions when config is loaded
   useEffect(() => {
     if (config) {
       const fetchQuestions = async () => {
@@ -112,7 +105,7 @@ const Game = ({ onGameEnd }) => {
           if (isMounted.current) {
             if (data && data.length > 0) {
               setQuestions(data);
-              setCurrentQuestion(data[0]); // Set initial question
+              setCurrentQuestion(data[0]);
             } else {
               console.error("No questions received from API.");
             }
@@ -125,29 +118,27 @@ const Game = ({ onGameEnd }) => {
       };
       fetchQuestions();
     }
-  }, [config, GATEWAY_URL]); // Depend on config and GATEWAY_URL
+  }, [config, GATEWAY_URL]);
 
-  // Timer effect
   useEffect(() => {
-    if (isLoading || !currentQuestion || showSummary || !config) return; // Guard conditions
+    if (isLoading || !currentQuestion || showSummary || !config) return;
 
     const TOTAL_TIME = config.tiempoPregunta;
 
     if (timeLeft <= 0 && !isAnswered) {
       clearInterval(timerRef.current);
-      // Handle timeout: mark as answered incorrectly
       if (isMounted.current) {
         setIsAnswered(true);
-        setIsCorrect(false); // Mark as incorrect on timeout
+        setIsCorrect(false);
         setIncorrectAnswers((prev) => prev + 1);
-        const timeUsed = TOTAL_TIME; // Full time used on timeout
+        const timeUsed = TOTAL_TIME;
         setTotalTimeUsed((prev) => prev + timeUsed);
       }
       return;
     }
 
     if (isAnswered) {
-      clearInterval(timerRef.current); // Stop timer if answered
+      clearInterval(timerRef.current);
       return;
     }
 
@@ -162,8 +153,8 @@ const Game = ({ onGameEnd }) => {
 
     // Cleanup interval
     return () => clearInterval(timerRef.current);
-
-  }, [timeLeft, isAnswered, isLoading, currentQuestion, config, showSummary]); // Dependencies
+    
+  }, [timeLeft, isAnswered, isLoading, currentQuestion, config, showSummary]);
 
   // Update progress bar visually based on timeLeft
   useEffect(() => {
@@ -183,7 +174,6 @@ const Game = ({ onGameEnd }) => {
 
       if (correctAnswer) {
         const allAnswers = [...incorrectAnswers, correctAnswer];
-        // Simple shuffle
         for (let i = allAnswers.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [allAnswers[i], allAnswers[j]] = [allAnswers[j], allAnswers[i]];
@@ -197,23 +187,18 @@ const Game = ({ onGameEnd }) => {
 
   // Check if game ended to save stats and show summary
   useEffect(() => {
-    // Ensure config and questions are loaded, and it's the last question
     if (
       config &&
       questions.length > 0 &&
       questionNumber >= config.numPreguntas - 1
     ) {
-      // Trigger only once when the last question is answered or timed out
       if (isAnswered && !hasSavedStats.current) {
-        saveStats(); // Save stats
-        if (isMounted.current) setShowSummary(true); // Show summary dialog
-        hasSavedStats.current = true; // Mark as saved
+        saveStats();
+        if (isMounted.current) setShowSummary(true);
+        hasSavedStats.current = true;
       }
     }
-  }, [isAnswered, questionNumber, questions.length, config]); // Dependencies
-
-
-  // --- Functions ---
+  }, [isAnswered, questionNumber, questions.length, config]);
 
   // Save game statistics
   const saveStats = useCallback(async () => {
@@ -227,9 +212,8 @@ const Game = ({ onGameEnd }) => {
         time: totalTimeUsed,
         score: score,
         date: new Date().toISOString(),
-        // 'win' might not be relevant for single player, adjust as needed
-        win: correctAnswers > incorrectAnswers, // Example logic
-        gameMode: "singleplayer", // Add game mode
+        win: correctAnswers > incorrectAnswers,
+        gameMode: "singleplayer",
       };
       const response = await fetch(`${GATEWAY_URL}/savestats`, {
         method: "POST",
@@ -252,12 +236,11 @@ const Game = ({ onGameEnd }) => {
     score,
     config,
     GATEWAY_URL,
-  ]); // Dependencies
+  ]);
 
   // Handle moving to the next question
   const handleNextQuestion = useCallback(() => {
     if (!config || questionNumber >= config.numPreguntas - 1) {
-      // Should already be handled by the useEffect checking for game end
       return;
     }
 
@@ -268,33 +251,31 @@ const Game = ({ onGameEnd }) => {
       setSelectedAnswer(null);
       setIsCorrect(null);
       setIsAnswered(false);
-      setTimeLeft(config.tiempoPregunta); // Reset timer
+      setTimeLeft(config.tiempoPregunta);
       setProgress(100);
-      setQuestionAnimationComplete(false); // Reset animation flag
-      // Don't reset hasSavedStats here
+      setQuestionAnimationComplete(false);
     } else {
       console.error("Next question data is missing.");
-      // Potentially show summary as a fallback if next question is missing
       if (isMounted.current && !hasSavedStats.current) {
         saveStats();
         setShowSummary(true);
         hasSavedStats.current = true;
       }
     }
-  }, [questionNumber, config, questions]); // Dependencies
+  }, [questionNumber, config, questions]);
 
   // Handle player's answer selection
   const handleAnswerClick = useCallback(
     async (respuesta) => {
-      if (isAnswered || !currentQuestion || !config) return; // Guard conditions
+      if (isAnswered || !currentQuestion || !config) return;
 
-      clearInterval(timerRef.current); // Stop timer
-      const timeUsed = config.tiempoPregunta - timeLeft; // Calculate time taken
+      clearInterval(timerRef.current);
+      const timeUsed = config.tiempoPregunta - timeLeft;
 
       if (isMounted.current) {
         setSelectedAnswer(respuesta);
         setIsAnswered(true);
-        setTotalTimeUsed((prev) => prev + timeUsed); // Add time used for this question
+        setTotalTimeUsed((prev) => prev + timeUsed);
 
         if (
           respuesta === currentQuestion.respuestaCorrecta?.[currentLanguage]
@@ -311,10 +292,9 @@ const Game = ({ onGameEnd }) => {
           setIncorrectAnswers((prev) => prev + 1);
         }
       }
-      // The useEffect checking for game end will handle summary/saving
     },
     [isAnswered, currentQuestion, config, timeLeft, currentLanguage]
-  ); // Dependencies
+  );
 
   // Format time remaining
   const formatTime = (time) => {
@@ -329,8 +309,6 @@ const Game = ({ onGameEnd }) => {
   const toggleChatBox = () => {
     setIsChatBoxVisible(!isChatBoxVisible);
   };
-
-  // --- Render Logic ---
 
   if (isLoading) {
     return (
@@ -384,35 +362,32 @@ const Game = ({ onGameEnd }) => {
           <div className="left-column">
             <div className="hint-section">
               <HintButton
-                // Translate button text based on visibility
                 text={
                   isChatBoxVisible
                     ? t("hideHints", "Ocultar pistas")
                     : t("needHint", "¿Necesitas una pista?")
                 }
                 onClick={toggleChatBox}
-                disabled={hintsLeft <= 0 && !isChatBoxVisible} // Disable if no hints left and not visible
+                disabled={hintsLeft <= 0 && !isChatBoxVisible}
               />
-              {/* ChatBox for hints */}
               <div
                 className={`chatBoxContainer ${
                   isChatBoxVisible ? "visible" : "hidden"
                 }`}
               >
-                {currentQuestion && ( // Ensure currentQuestion exists before rendering ChatBox
+                {currentQuestion && (
                   <ChatBox
-                    // Pass necessary question details
                     question={{
-                      pregunta: currentQuestion.pregunta, // Pass the whole object
-                      respuestaCorrecta: currentQuestion.respuestaCorrecta, // Pass the whole object
-                      respuestas: currentQuestion.respuestas, // Pass the whole object
+                      pregunta: currentQuestion.pregunta,
+                      respuestaCorrecta: currentQuestion.respuestaCorrecta,
+                      respuestas: currentQuestion.respuestas,
                       descripcion: currentQuestion.descripcion || [],
                       img: currentQuestion.img || [],
                     }}
-                    language={currentLanguage} // Pass current language
-                    isVisible={isChatBoxVisible} // Control visibility
+                    language={currentLanguage}
+                    isVisible={isChatBoxVisible}
                     hintsLeft={hintsLeft}
-                    setHintsLeft={setHintsLeft} // Allow ChatBox to update hints count
+                    setHintsLeft={setHintsLeft}
                   />
                 )}
               </div>
@@ -422,7 +397,7 @@ const Game = ({ onGameEnd }) => {
           {/* Center Column (Question & Answers) */}
           <motion.div
             className="center-column"
-            key={questionNumber} // Animate when question changes
+            key={questionNumber}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
@@ -436,7 +411,6 @@ const Game = ({ onGameEnd }) => {
                 <h2>{`${t("question")} ${questionNumber + 1}/${
                   config?.numPreguntas || 10
                 }`}</h2>
-                {/* Enable next button only after answered and if not the last question */}
                 {questionNumber < (config?.numPreguntas || 10) - 1 && (
                   <ArrowForwardIcon
                     titleAccess={t("nextQuestion")}
@@ -491,8 +465,8 @@ const Game = ({ onGameEnd }) => {
                         ? "buttonCorrect"
                         : selectedAnswer === respuesta
                         ? "buttonIncorrect"
-                        : "buttonDisabled" // Style for other incorrect options
-                      : "buttonPrimary" // Default state
+                        : "buttonDisabled"
+                      : "buttonPrimary"
                   }
                   disabled={isAnswered}
                 />
@@ -540,7 +514,6 @@ const Game = ({ onGameEnd }) => {
               title={t("gameRules")}
               content={
                 <ol>
-                  {/* Translate rules specific to single player */}
                   <li>{t("singlePlayerRule1", t("observe"))}</li>
                   <li>{t("singlePlayerRule2", t("answer"))}</li>
                   <li>{t("singlePlayerRule3", t("hintInfo"))}</li>
@@ -557,10 +530,9 @@ const Game = ({ onGameEnd }) => {
         <div className="overlay">
           <div className="dialogGameRulesContainer">
             <InfoDialog
-              title={t("summaryTitle")} // Use translated title
+              title={t("summaryTitle")}
               content={
                 <div className="summaryContent">
-                  {/* Use translated labels */}
                   <p>
                     {t("summaryCorrect")} {correctAnswers}
                   </p>
@@ -589,12 +561,10 @@ const Game = ({ onGameEnd }) => {
                 </div>
               }
               onClose={() => {
-                // Don't save stats again here, already saved by useEffect
                 setShowSummary(false);
                 if (onGameEnd) {
-                  onGameEnd(); // Call the callback passed from PlayView
+                  onGameEnd();
                 } else {
-                  // Fallback if prop is not passed (should not happen with PlayView update)
                   window.location.reload();
                 }
               }}
