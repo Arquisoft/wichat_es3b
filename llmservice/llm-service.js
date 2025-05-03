@@ -4,6 +4,8 @@ const express = require('express');
 require("dotenv").config();
 
 const app = express();
+app.disable("x-powered-by");
+
 const port = 8003;
 
 // --- State Variables ---

@@ -8,6 +8,7 @@ const ApiKey = require("./apikey-model");
 const crypto = require("crypto"); // Para generar la API key
 
 const app = express();
+app.disable("x-powered-by");
 const port = 8001;
 
 // Middleware to parse JSON in request bodydocker ps --filter "name=mongodb-wichat_es3b"
@@ -31,9 +32,13 @@ app.post("/adduser", async (req, res) => {
     // Check if required fields are present in the request body
     validateRequiredFields(req, ["email", "username", "password"]);
 
+    const username = req.body.username?.toString().trim();
+    const email = req.body.email?.toString().trim();
+
     const existingUser = await User.findOne({
-      $or: [{ username: req.body.username }, { email: req.body.email }],
+      $or: [{ username }, { email }],
     });
+    
     if (existingUser) {
       return res.status(400).json({
         error: "Ya existe un usuario con ese nombre o correo electrónico",
