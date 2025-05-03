@@ -123,7 +123,7 @@ app.post("/savestats", async (req, res) => {
     );
     res.json(statsResponse.data);
   } catch (error) {
-    console.error("Error en el gateway:", error.message);
+    console.error("Error en el gateway: ", error.message);
 
     if (error.response) {
       res
