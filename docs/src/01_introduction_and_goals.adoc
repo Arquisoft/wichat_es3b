@@ -80,15 +80,19 @@ endif::arc42help[]
 [options="header",cols="1,2,2"]
 |===
 |Priority|Quality Goal|Expectations
-| _1_ | _Usability_ | _All people should be able to enjoy and finish with success the application within a reasonable
+| _1_ | *_Usability_* | _All people should be able to enjoy and finish with success the application within a reasonable
 limit of time_
-| _2_ | _Maintainability_ | _The application should be easy to maintain, with clear, well-documented code and modular
+| _2_ | *_Maintainability_* | _The application should be easy to maintain, with clear, well-documented code and modular
 design that allows for future updates._
-| _3_ | _Accessibility_ | _The application should be usable by people with various disabilities, meeting common
+| _3_ | *_Accessibility_* | _The application should be usable by people with various disabilities, meeting common
 accessibility standards_
-| _4_ | _Availability_ | _The application should be available with minimal downtime, aiming for 99.9% uptime or better,
-and should be scalable to handle user demand_
-| _5_ | _Reliability_ | _The application should operate consistently and recover quickly from failures_
+| _4_ | *_Availability_* | _While the application initially aimed for a 99.9% availability target, this level of uptime 
+typically requires production-grade infrastructure, including redundancy, autoscaling, and service-level agreements (SLAs) 
+provided by cloud providers.
+Since this project is hosted on Microsoft Azure using student credits, it does not benefit from guaranteed SLAs or high-availability 
+configurations. Therefore, a more realistic expectation for availability is in the range of 99.0% to 99.5%, which allows for occasional 
+downtime due to maintenance, restarts, or limited resource allocations in the free tier._
+| _5_ | *_Reliability_* | _The application should operate consistently and recover quickly from failures_
 |===
 
 ifdef::arc42help[]

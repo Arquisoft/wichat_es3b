@@ -67,7 +67,7 @@ image::doc3-business-context-diagram.png["Businesss Context diagram", align="cen
 |Question Presentation, Answer Feedback, Hint Presentation
 
 | *_WIKIDATA_*
-| Data queries (probably in SPARQL)
+| Data queries
 | Question and Answer Data (JSON format)
 
 | *_LLM'S_*
@@ -93,23 +93,27 @@ together with a mapping table showing the relationships between channels and inp
 ****
 endif::arc42help[]
 
-image:technical-context-diagram.png[]
+image:technical-context-diagram.png["Technical Context diagram", align="center"]
 
 
 |===
 | Communication partners | Inputs | Outputs
 
-| *_Question service_*
+| *_wikiquestion service_*
 | Question data-index
 | Questions and answers
 
-| *_User service_*
+| *_authservice_*
 | Login info
 | User info (account page)
 
-| *_History service_*
-| Session user info
-| User's history
+| *_userservice_*
+| New user info
+| User info (account page)
+
+| *_statsservice_*
+| User name
+| User's history and stats
 
 | *_LLM service_*
 | User text inputs
