@@ -259,7 +259,7 @@ app.get('/validate-apikey/:apikey', async (req, res) => {
 });
 
 
-
+// Endpoint para redirigir la generación de preguntas
 app.get('/questionsDB', async (req, res) => {
   try {
     const { n = 10, topic = "all" } = req.query;
