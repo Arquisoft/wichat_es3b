@@ -202,6 +202,7 @@ app.get("/games/:username", async (req, res) => {
   }
 });
 
+// Endpoint para obtener las estadísticas de ratios por mes
 app.get("/ratios-per-month/:username", async (req, res) => {
   try {
     const username = req.params.username;
