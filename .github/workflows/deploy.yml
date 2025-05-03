@@ -269,6 +269,21 @@ jobs:
             [ -f ~/.env ] && rm ~/.env
             echo "MONGODB_URI= \"${{ secrets.MONGODB_URI }}\"" > ~/.env
             echo "LLM_API_KEY= \"${{ secrets.LLM_API_KEY }}\"" >> ~/.env
+
+            mkdir -p ./gatewayservice/monitoring/grafana/provisioning/dashboards
+            mkdir -p ./gatewayservice/monitoring/grafana/provisioning/datasources
+            mkdir -p ./gatewayservice/monitoring/prometheus
+            
+            rm -f ./gatewayservice/monitoring/grafana/provisioning/datasources/datasource.yml
+            rm -f ./gatewayservice/monitoring/prometheus/prometheus.yml
+            rm -f ./gatewayservice/monitoring/grafana/provisioning/dashboards/dashboard.yml
+            rm -f ./gatewayservice/monitoring/grafana/provisioning/dashboards/example-service-dashboard.json
+
+            wget -P ./gatewayservice/monitoring/grafana/provisioning/datasources https://raw.githubusercontent.com/Arquisoft/wichat_es3b/refs/heads/deployment_branch/gatewayservice/monitoring/grafana/provisioning/datasources/datasource.yml
+            wget -P ./gatewayservice/monitoring/prometheus https://raw.githubusercontent.com/Arquisoft/wichat_es3b/refs/heads/deployment_branch/gatewayservice/monitoring/prometheus/prometheus.yml
+            wget -P ./gatewayservice/monitoring/grafana/provisioning/dashboards https://raw.githubusercontent.com/Arquisoft/wichat_es3b/refs/heads/deployment_branch/gatewayservice/monitoring/grafana/provisioning/dashboards/dashboard.yml
+            wget -P ./gatewayservice/monitoring/grafana/provisioning/dashboards https://raw.githubusercontent.com/Arquisoft/wichat_es3b/refs/heads/deployment_branch/gatewayservice/monitoring/grafana/provisioning/dashboards/example-service-dashboard.json
+
             echo "Cleaning up old containers..."
             docker rm -f $(docker ps -aq) || true
             docker compose --profile prod down
