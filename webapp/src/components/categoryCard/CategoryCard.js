@@ -6,6 +6,7 @@ const CategoryCard = ({ name, imageSrc, isSelected, onClick }) => {
   const handleKeyDown = useSubmitOnEnter(onClick);
   return (
     <div
+      id={name}
       className={`category-card ${isSelected ? "selected" : ""}`}
       onClick={onClick}
       role="button"
