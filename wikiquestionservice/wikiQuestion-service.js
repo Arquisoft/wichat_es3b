@@ -79,6 +79,7 @@ app.get("/questionsDB", async (req, res) => {
     return res.status(400).json({ error: "El límite de preguntas es 30" });
   }
 
+
   let topics = filterValidTopics(topic);
 
   if (topics.length === 0) {
