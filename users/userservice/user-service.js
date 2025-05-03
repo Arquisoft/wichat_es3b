@@ -8,6 +8,7 @@ const ApiKey = require("./apikey-model");
 const crypto = require("crypto"); // Para generar la API key
 
 const app = express();
+app.disable("x-powered-by");
 const port = 8001;
 
 // Middleware to parse JSON in request bodydocker ps --filter "name=mongodb-wichat_es3b"
