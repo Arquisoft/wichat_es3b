@@ -8,6 +8,8 @@ import io.gatling.jdbc.Predef._
 
 class IniciarSesion extends Simulation {
 
+  val csvFeeder = csv("../resources/data/users.csv").random()
+
   private val httpProtocol = http
     .baseUrl("http://localhost:3000")
     .inferHtmlResources()
@@ -62,7 +64,7 @@ class IniciarSesion extends Simulation {
   
   private val uri1 = "localhost"
 
-  private val scn = scenario("IniciarSesion")
+  private val scn = scenario("IniciarSesion").feed(csvFeeder)
     .exec(
       http("request_0")
         .get("/")
@@ -95,9 +97,9 @@ class IniciarSesion extends Simulation {
           http("request_7")
             .post("http://" + uri1 + ":8000/login")
             .headers(headers_7)
-            .body(RawFileBody("es/uniovi/arquisoft/wichat/loadtests/iniciarsesion/0007_request.json"))
+            .body(StringBody("""{"username": "${username}", "password": "${password}"}""")).asJson
         )
     )
 
-	setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+	setUp(scn.inject(constantUsersPerSec(5).during(15))).protocols(httpProtocol)
 }

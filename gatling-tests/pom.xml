@@ -41,7 +41,7 @@
         <artifactId>gatling-maven-plugin</artifactId>
         <version>${gatling-maven-plugin.version}</version>
         <configuration>
-          <simulationClass>es.uniovi.arquisoft.wichat.loadtests.GameFlowSimulation</simulationClass>
+          <simulationClass>es.uniovi.arquisoft.wichat.loadtests.Register</simulationClass>
         </configuration>
       </plugin>
       <plugin>
