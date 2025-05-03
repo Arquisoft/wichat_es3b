@@ -123,5 +123,5 @@ class Ranking extends Simulation {
         .headers(headers_8)
     )
 
-	setUp(scn.inject(atOnceUsers(50))).protocols(httpProtocol)
+	setUp(scn.inject(constantUsersPerSec(5).during(15))).protocols(httpProtocol)
 }
