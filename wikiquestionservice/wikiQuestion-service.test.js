@@ -1,16 +1,69 @@
 const request = require("supertest");
-const server = require("./wikiQuestion-service");
+const { app } = require("./wikiQuestion-service");
+
 const Question = require("./questiongenerator/question");
 const WikidataQueryService = require('./questiongenerator/questionGen');
 
 const CategoryLoader = require("./questiongenerator/categoryLoader");
+const mongoose = require("mongoose");
 
+jest.mock("mongoose", () => {
+    const actualMongoose = jest.requireActual("mongoose");
+
+    return {
+        ...actualMongoose,
+        connect: jest.fn(),
+        disconnect: jest.fn(),
+        connection: {
+            readyState: 0
+        }
+    };
+});
+
+const { connectDB, disconnectDB } = require("./wikiQuestion-service");
+
+describe("Conexión a MongoDB", () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it("debería conectar si mongoose no está conectado", async () => {
+        mongoose.connection.readyState = 0;
+        await connectDB();
+        expect(mongoose.connect).toHaveBeenCalled();
+    });
+
+    it("no debería reconectar si ya está conectado", async () => {
+        mongoose.connection.readyState = 1;
+        await connectDB();
+        expect(mongoose.connect).not.toHaveBeenCalled();
+    });
+
+    it("debería desconectar si mongoose está conectado", async () => {
+        mongoose.connection.readyState = 1;
+        await disconnectDB();
+        expect(mongoose.disconnect).toHaveBeenCalled();
+    });
+
+    it("no debería desconectar si ya está desconectado", async () => {
+        mongoose.connection.readyState = 0;
+        await disconnectDB();
+        expect(mongoose.disconnect).not.toHaveBeenCalled();
+    });
+});
 /* TEST FUNCIONANDO cambio */
 describe('Wikidata Service', () => {
+    let server;
 
+    beforeAll(() => {
+        server = app.listen(8004);
+    });
+
+    afterAll(() => {
+        server.close();
+    });
 
     describe('Category Loader Tests', () => {
-        /* Test para comprobar que poniendo "all" nos cargan todas las categorías */
         it('should distribute questions across all valid categories when "all" is selected', () => {
             const loader = new CategoryLoader(["all"], 30);
             const services = loader.getAllServices();
@@ -20,7 +73,7 @@ describe('Wikidata Service', () => {
             expect(services).toHaveProperty('paises');
             expect(services).toHaveProperty('clubes');
             expect(services).toHaveProperty('arte');
-            expect(Object.keys(services).length).toBe(5);  // Solo categorías válidas deben estar
+            expect(Object.keys(services).length).toBe(5);
         });
 
         /* Test para comprobar que poniendo "all" y otra nos cargan todas las categorías igualmente */
@@ -148,6 +201,7 @@ describe('Wikidata Service', () => {
     });
 
     describe('API Tests', () => {
+
         it("should return 400 if the number of questions is more than 30", async () => {
             const response = await request(server).get("/questions?n=31");
             expect(response.status).toBe(400);

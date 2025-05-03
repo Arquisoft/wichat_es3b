@@ -219,4 +219,8 @@ if (process.env.NODE_ENV === "e2e_test") {
 }
 
 
-module.exports = app;
+module.exports = {
+  app,
+  connectDB,
+  disconnectDB
+};
