@@ -32,9 +32,13 @@ app.post("/adduser", async (req, res) => {
     // Check if required fields are present in the request body
     validateRequiredFields(req, ["email", "username", "password"]);
 
+    const username = req.body.username?.toString().trim();
+    const email = req.body.email?.toString().trim();
+
     const existingUser = await User.findOne({
-      $or: [{ username: req.body.username }, { email: req.body.email }],
+      $or: [{ username }, { email }],
     });
+    
     if (existingUser) {
       return res.status(400).json({
         error: "Ya existe un usuario con ese nombre o correo electrónico",
