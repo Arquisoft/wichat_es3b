@@ -37,7 +37,7 @@ class WikidataQueryService {
         return valor;
     }
 
-    async obtenerIdsDeWikidata(cantidad = 50) {
+    async obtenerIdsDeWikidata(cantidad = 150) {
         const sparqlQuery = `
         SELECT ?entity ?entityLabel WHERE {
             ?entity wdt:P31 ${this.entity}.
@@ -67,18 +67,18 @@ class WikidataQueryService {
     }
 
     async generateQuestions() {
-        await this.obtenerIdsDeWikidata();
+            await this.obtenerIdsDeWikidata();
         if (this.entitiesArray.length === 0) {
             console.warn("⚠️ No hay entidades disponibles para generar preguntas.");
             return [];
         }
 
         let entidadesProcesadas = 0;
-
+        console.log("Iterando en bucle de: "+this.categoryName);
         while (this.questionsArray.length < this.questionsPerCategory) {
             if (entidadesProcesadas >= this.entitiesArray.length) {
                 console.log("No se alcanzaron suficientes entidades, buscando más...");
-                await this.obtenerIdsDeWikidata(50);
+                await this.obtenerIdsDeWikidata(60);
             }
 
             for (const entity of this.entitiesArray) {

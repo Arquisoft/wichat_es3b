@@ -168,13 +168,13 @@ async function obtainQuestions() {
           await saveQuestionsToDB(additionalQuestions);
         }
       }else {
-        const questionsToDelete = await Question.find({ category: categoria }).limit(4);
-        const questionIdsToDelete = questionsToDelete.map(q => q._id);
-        await Question.deleteMany({ _id: { $in: questionIdsToDelete } });
-        const newQuestions = await questionManager.loadAllQuestions([categoria], 4);
-        if (newQuestions && newQuestions.length > 0) {
-          await saveQuestionsToDB(newQuestions);
-        }
+        //const questionsToDelete = await Question.find({ category: categoria }).limit(4);
+        //const questionIdsToDelete = questionsToDelete.map(q => q._id);
+        //await Question.deleteMany({ _id: { $in: questionIdsToDelete } });
+        //const newQuestions = await questionManager.loadAllQuestions([categoria], 4);
+        //if (newQuestions && newQuestions.length > 0) {
+        //  await saveQuestionsToDB(newQuestions);
+        //}
       }
     }
     await disconnectDB();
