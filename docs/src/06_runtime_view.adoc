@@ -120,7 +120,7 @@ collections WA as "Web App"
 collections GW as "GatewayService"
 collections QU as "GameService"
 collections LLMS as "LLMService"
-entity LLM as "MistralAPI"
+entity LLM as "EmpathyAPI"
 
 User -> WA: Asks for a question
 WA -> GW: userAsksForNewClue(userText)
@@ -158,4 +158,5 @@ SS -> DB: Stats.findOne({ topPlayerUsername })
 DB -> SS: Top Player Stats
 SS -> GW: Top Player Stats
 GW -> WA: Top Player Stats
+
 ----
