@@ -275,6 +275,7 @@ app.get('/questionsDB', async (req, res) => {
   }
 });
 
+//Para mostrar metricas de Prometheus
 app.get("/metrics", async (req, res) => {
   res.set('Content-Type', promClient.register.contentType);
   res.end(await promClient.register.metrics());
