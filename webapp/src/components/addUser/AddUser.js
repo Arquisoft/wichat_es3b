@@ -27,20 +27,20 @@ const AddUser = ({ handleToggleView }) => {
 
   const addUser = async () => {
     if (!email) {
-      setError(t("emptyEmail")); // Añadir esta clave en tus traducciones
+      setError(t("emptyEmail"));
       return;
     } else if (!username) {
-      setError(t("emptyUsername")); // Añadir esta clave en tus traducciones
+      setError(t("emptyUsername"));
       return;
     } else if (!password) {
-      setError(t("emptyPassword")); // Añadir esta clave en tus traducciones
+      setError(t("emptyPassword"));
       return;
     } else if (!passwordConfirm) {
-      setError(t("emptyPasswordConfirm")); // Añadir esta clave en tus traducciones
+      setError(t("emptyPasswordConfirm"));
       return;
     }
     if (password !== passwordConfirm) {
-      setError(t("passwordsDoNotMatch")); // Añade esta clave a tu archivo de traducciones
+      setError(t("passwordsDoNotMatch"));
       return;
     }
     try {
@@ -64,6 +64,11 @@ const AddUser = ({ handleToggleView }) => {
   };
 
   const handleKeyDown = useSubmitOnEnter(addUser);
+  const handleShowPasswordKeyDown = (e, toggleFunction) => {
+    if (e.key === "Enter") {
+      toggleFunction();
+    }
+  };
 
   return (
     <div className="mainDiv">
@@ -100,7 +105,15 @@ const AddUser = ({ handleToggleView }) => {
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={handleKeyDown}
             />
-            <span onClick={toggleShowPassword}>👁️‍🗨️</span>
+            <span
+              tabIndex={0}
+              onClick={toggleShowPassword}
+              onKeyDown={(e) =>
+                handleShowPasswordKeyDown(e, toggleShowPassword)
+              }
+            >
+              👁️‍🗨️
+            </span>
           </div>
         </div>
         <div className="formField">
@@ -113,7 +126,15 @@ const AddUser = ({ handleToggleView }) => {
               onChange={(e) => setPasswordConfirm(e.target.value)}
               onKeyDown={handleKeyDown}
             />
-            <span onClick={toggleShowPasswordConfirm}>👁️‍🗨️</span>
+            <span
+              tabIndex={0}
+              onClick={toggleShowPasswordConfirm}
+              onKeyDown={(e) =>
+                handleShowPasswordKeyDown(e, toggleShowPasswordConfirm)
+              }
+            >
+              👁️‍🗨️
+            </span>
           </div>
         </div>
         <div className="buttonPanel">
