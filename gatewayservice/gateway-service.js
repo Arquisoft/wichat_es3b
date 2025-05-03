@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
+const path = require("path");
 const promBundle = require("express-prom-bundle");
 
 const app = express();
@@ -15,10 +16,37 @@ const statsServiceUrl =
   process.env.STATS_SERVICE_URL || "http://localhost:8005";
 
 app.use(cors());
+
 app.use(express.json());
 
+const promClient = require('prom-client');
+
+// Crear un contador de solicitudes
+const httpRequestsTotal = new promClient.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+  labelNames: ['method', 'path', 'status_code'],
+});
+
+// Middleware para contar las solicitudes
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    httpRequestsTotal.inc({
+      method: req.method,
+      path: req.path,
+      status_code: res.statusCode,
+    });
+  });
+  next();
+});
+
+
 //Prometheus configuration
-const metricsMiddleware = promBundle({ includeMethod: true });
+const metricsMiddleware = promBundle({
+  includeMethod: true,
+  includePath: true, // ← agrega esto
+  normalizePath: true // ← útil para agrupar rutas como /getstats/:username
+});
 app.use(metricsMiddleware);
 
 // Health check endpoint
@@ -33,8 +61,8 @@ app.post("/login", async (req, res) => {
     res.json(authResponse.data);
   } catch (error) {
     res
-        .status(error.response.status)
-        .json({ error: error.response.data.error });
+        .status(error?.response?.status)
+        .json({ error: error?.response?.data.error });
   }
 });
 
@@ -174,6 +202,7 @@ app.get("/games/:username", async (req, res) => {
   }
 });
 
+// Endpoint para obtener las estadísticas de ratios por mes
 app.get("/ratios-per-month/:username", async (req, res) => {
   try {
     const username = req.params.username;
@@ -231,7 +260,7 @@ app.get('/validate-apikey/:apikey', async (req, res) => {
 });
 
 
-
+// Endpoint para redirigir la generación de preguntas
 app.get('/questionsDB', async (req, res) => {
   try {
     const { n = 10, topic = "all" } = req.query;
@@ -246,6 +275,13 @@ app.get('/questionsDB', async (req, res) => {
     res.status(error.response?.status || 500).json({ error: error.message });
   }
 });
+
+//Para mostrar metricas de Prometheus
+app.get("/metrics", async (req, res) => {
+  res.set('Content-Type', promClient.register.contentType);
+  res.end(await promClient.register.metrics());
+});
+
 
 // Start the gateway service
 const server = app.listen(port, () => {
