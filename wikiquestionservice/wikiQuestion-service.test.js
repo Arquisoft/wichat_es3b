@@ -202,6 +202,19 @@ describe('Wikidata Service', () => {
 
     describe('API Tests', () => {
 
+        it("should return 400 if more than 30 questions are requested", async () => {
+            const response = await request(app).get("/questionsDB?n=31");
+            expect(response.status).toBe(400);
+            expect(response.body.error).toBe("El límite de preguntas es 30");
+        });
+
+        it("should return 400 if no valid categories are provided", async () => {
+            const response = await request(app).get("/questionsDB?topic=invalidCategory");
+            expect(response.status).toBe(400);
+            expect(response.body.error).toBe("No se proporcionaron categorías válidas.");
+        });
+
+
         it("should return 400 if the number of questions is more than 30", async () => {
             const response = await request(server).get("/questions?n=31");
             expect(response.status).toBe(400);

@@ -99,13 +99,11 @@ app.get("/questionsDB", async (req, res) => {
       const topic = topics[i];
       const numToFetch = questionsPerCategory + (i < extra ? 1 : 0);
 
-      // Obtener preguntas de la categoría actual
       const categoryQuestions = await Question.aggregate([
         { $match: { category: topic, _id: { $nin: Array.from(selectedQuestionIds) } } },
         { $sample: { size: numToFetch } }
       ]);
 
-      // Agregar preguntas seleccionadas y registrar sus IDs
       selectedQuestions.push(...categoryQuestions);
       categoryQuestions.forEach(q => selectedQuestionIds.add(q._id));
     }
