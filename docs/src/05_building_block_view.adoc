@@ -9,31 +9,7 @@ ifndef::imagesdir[:imagesdir: ../images]
 
 === Whitebox Overall System
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Here you describe the decomposition of the overall system using the following white box template. It contains
-
- * an overview diagram
- * a motivation for the decomposition
- * black box descriptions of the contained building blocks. For these we offer you alternatives:
-
-   ** use _one_ table for a short and pragmatic overview of all contained building blocks and their interfaces
-   ** use a list of black box descriptions of the building blocks according to the black box template (see below).
-   Depending on your choice of tool this list could be sub-chapters (in text files), sub-pages (in a Wiki) or nested elements (in a modeling tool).
-
-
- * (optional:) important interfaces, that are not explained in the black box templates of a building block, but are very important for understanding the white box.
-Since there are so many ways to specify interfaces why do not provide a specific template for them.
- In the worst case you have to specify and describe syntax, semantics, protocols, error handling,
- restrictions, versions, qualities, necessary compatibilities and many things more.
-In the best case you will get away with examples or simple signatures.
-
-****
-endif::arc42help[]
-
 image:5_Overview_diagram.png[]
-
 
 Motivation::
 
@@ -58,24 +34,6 @@ Important Interfaces::
 
 Both Question and Hint API will make use of external services (SONAR and Wikidata), and therefore will use their APIs.
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Insert your explanations of black boxes from level 1:
-
-If you use tabular form you will only describe your black boxes with name and
-responsibility according to the following schema:
-
-[cols="1,2" options="header"]
-|===
-| **Name** | **Responsibility**
-|===
-
-If you use a list of black box descriptions then you fill in a separate black box template for every important building block .
-Its headline is the name of the black box.
-****
-endif::arc42help[]
-
 [cols="1,2" options="header"]
 |===
 | **Name** | **Responsibility** 
@@ -92,17 +50,6 @@ endif::arc42help[]
 
 === Level 2
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Here you can specify the inner structure of (some) building blocks from level 1 as white boxes.
-
-You have to decide which building blocks of your system are important enough to justify such a detailed description.
-Please prefer relevance over completeness. Specify important, surprising, risky, complex or volatile building blocks.
-Leave out normal, simple, boring or standardized parts of your system
-****
-endif::arc42help[]
-
 ==== WebApp
 Composed of modules to handle the interface, game logic and API communication.
 
@@ -115,13 +62,6 @@ image:5.2_WebappDiagram.png[]
 |PlayView |Controls the Game.
 |API Client|Manages calls to backend services.
 |===
-
-ifdef::arc42help[]
-[role="arc42help"]
-****
-...describes the internal structure of _building block 1_.
-****
-endif::arc42help[]
 
 ==== Question Service
 Decomposed into modules for both managing questions and storing data.
@@ -136,16 +76,6 @@ image:5.2_QuestionServiceDiagram.png[]
 
 === Level 3
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Here you can specify the inner structure of (some) building blocks from level 2 as white boxes.
-
-When you need more detailed levels of your architecture please copy this
-part of arc42 for additional levels.
-****
-endif::arc42help[]
-
 ==== Webapp - API Client
 Encapsulates comunication with backend services.
 image:5.2_APIClientDiagram.png[]
@@ -157,11 +87,4 @@ image:5.2_APIClientDiagram.png[]
 |Question Client|Retrieves questions from the backend.
 |Hint Client|Requests hints from the corresponding service.
 |===
-
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Specifies the internal structure of _building block x.1_.
-****
-endif::arc42help[]
 
