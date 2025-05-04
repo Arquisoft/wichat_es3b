@@ -3,6 +3,35 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-architecture-constraints]]
 == Architecture Constraints
 
+=== Technical Constraints
+
+[options="header",cols="1,2"]
+|===
+|Constraint|Description
+|Wikidata|The application must interact with Wikidata to generate the questions and answers.
+|Git and GitHub|The project will have version control through Git. The repository will be in GitHub, where issues, "project" and wiki will be useful for project tracking.
+|LLM|The application must have a bot chat to interact with it. The chat have to be made by an LLM.
+|Azure|Azure defines the deployment environment, available services, and cost limitations. This affects architectural decisions such as scalability options, storage solutions, and integration choices.
+|===
+
+=== Convention Constraints
+[options="header",cols="1,2"]
+|===
+|Constraint|Description
+|Arc42|The project documentation will be done following the Arc42 template. Arc42 is a framework for documenting software architecture that provides a clear and structured approach to communicate architectural decisions, components, and requirements.
+|Time|The project deadline is May 5th, but there will be sprints during the process. Important dates are February 24th for the first verion of de documentation, March 17th for a prototype of the application, and April 7th for an almost finished application.
+|Code Maintainability|We follow Clean Code principles to ensure maintainability, making the code easy to read, modify, and extend over time.
+|===
+
+=== Organizational Constraints
+
+[options="header",cols="1,2"]
+|===
+|Constraint|Description
+|Team|The team is made up of seven members who never worked together. The members will reunite at least one time per week to catch up on work and establish next objectives.  
+|Technical knowledge|The development team consists of students who are beginners with the technologies used.
+|Testing|Testing: The team has limited experience with automated testing, which may impact the speed and coverage of testing during development.
+|===
 
 ifdef::arc42help[]
 [role="arc42help"]

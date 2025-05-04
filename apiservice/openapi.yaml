@@ -1,0 +1,200 @@
+openapi: 3.0.0
+info:
+  title: WIChat API
+  description: API REST para la aplicación WIChat - Juego de adivinanzas de imágenes con pistas conversacionales.
+  version: 0.5.0
+servers:
+  - url: http://localhost:8006
+    description: Development server
+  - url: http://SOMEIP:8006
+    description: Production server
+security:
+  - apiKeyAuth: []
+paths:
+  /health:
+    get:
+      summary: Check the health status of the service.
+      operationId: checkHealth
+      tags:
+        - System
+      security: []  # No authentication required for health check
+      responses:
+        '200':
+          description: Service is healthy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+  /questions/{n}/{topic}:
+    get:
+      summary: Get n questions
+      operationId: getQuestions
+      tags:
+        - Questions
+      parameters:
+        - name: n
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Number of questions to retrieve
+        - name: topic
+          in: path
+          required: false
+          schema:
+            type: string
+          description: Topic of the questions (e.g., "all", "history", "history,geography")
+      responses:
+        '200':
+          description: Questions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuestionSummary'
+        '401':
+          description: Unauthorized - API key is missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /getstats/{username}:
+    get:
+      summary: Get statistics for a user
+      operationId: getUserStats
+      tags:
+        - Users
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Username to get statistics for
+      responses:
+        '200':
+          description: User statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStats'
+        '401':
+          description: Unauthorized - API key is missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key to authenticate requests
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Health status
+          example: OK
+        gateway:
+          type: object
+          description: Gateway service health status
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Invalid credentials"
+    QuestionSummary:
+      type: object
+      properties:
+        pregunta:
+          type: string
+          description: Pregunta generada por wikidata
+          example: "¿Cuál es la capital de Japón?"
+        respuestaCorrecta:
+          type: string
+          description: Respuesta correcta a la pregunta
+          example: "Tokio"
+        respuestas:
+          type: array
+          description: Respuestas a la pregunta
+          example: [
+            "Tokio",
+            "Ottawa",
+            "Oslo",
+            "Dublín"
+          ]
+        descripcion:
+          type: array
+          description: Datos de la entidad en Wikidata
+          example: [
+            {
+              "propiedad": "jefe de Estado",
+              "valor": "Naruhito"
+            },
+            {
+              "propiedad": "participó en",
+              "valor": "Grupo de los cuatro"
+            },
+            {
+              "propiedad": "idioma oficial",
+              "valor": "japonés"
+            },
+            {
+              "propiedad": "comparte fronteras con",
+              "valor": "Estados Unidos"
+            }
+          ]
+        img:
+          type: array
+          description: Imagen de la entidad en Wikidata
+          example: [
+            "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Japan.svg"
+          ]
+    UserStats:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username
+          example: "user123"
+        totalGames:
+          type: integer
+          description: Total number of games played
+          example: 42
+        totalCorrect:
+          type: integer
+          description: Total number of correct answers
+          example: 30
+        totalIncorrect:
+          type: integer
+          description: Total number of incorrect answers
+          example: 12
+        ratio:
+          type: number
+          description: Ratio of correct to total answers
+          example: 0.71

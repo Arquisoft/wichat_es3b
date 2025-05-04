@@ -1,7 +1,134 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
-[[section-design-decisions]]
-== Architecture Decisions
+== Architectural decisions
+=== Use of Large Language Models (LLMs) in the System
+We will use LLM in our question-and-answer application to generate hints during
+the user's turn.
+
+*_Decision:_* +
+It was decided to integrate Large Language Models (LLMs) through external APIs to generate real-time responses and hints. +
+The selected models are Mistral-7B-Instruct-v0.3 and Qwen2.5-Coder-7B-Instruct, both from Empathy AI
+because it is the API key that has been provided to us and allows us to access both easily with the same API key, improving our resilience in case of external failure by any of the models .
+
+*Consequences* +
+Consequently, we need a structured knowledge source, in our case Wikidata,
+from which we will extract and process the information to provide it to the user and also we must learn to create effective prompts.
+
+To know more about Prompt Engineering link:https://github.com/Arquisoft/wichat_es3b/issues/4[Issue #4].
+
+=== Using Wikidata as the main knowledge base
+We require a structured and up-to-date knowledge base, so we decided to utilize Wikidata
+as the primary information source. +
+Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
+
+*Justification*
+
+ - Wikidata is an open, structured database offering information in RDF and SPARQL formats.
+ - It enables flexible integrations with our backend systems.
+
+*Consequences*
+
+ - Optimal performance requires expertise in SPARQL query optimization.
+ - Data updates are dependent on the Wikidata community.
+
+To learn basic concepts about Wikidata and SPARQL link:https://github.com/Arquisoft/wichat_es3b/issues/6[Issue #6].
+
+
+=== Choosing React for the Frontend
+We require an efficient framework for frontend development so we decided to utilize
+React for the user interface. +
+Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
+
+*Justification*
+
+ - React's declarative nature facilitates the construction of interactive user interfaces.
+ - The integration of React with Wikidata is straightforward and user-friendly, simplifying data management and display.
+
+As a consequence, most part of the team will require React training because it is a new technology for many of us.
+
+To learn basic concepts about React link:https://github.com/Arquisoft/wichat_es3b/issues/7[Issue #7].
+
+=== Using Node.js for Backend Development
+We require an efficient and scalable technology for the backend so we will
+utilize Node.js to solve this problem. +
+Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
+
+
+*Justification* +
+Node.js is highly efficient for asynchronous and high-traffic applications.
+Furthermore, it is a great opportunity for many of us to learn how to use this important technology in the software development world.
+
+New knowledge about Node.js link:https://github.com/Arquisoft/wichat_es3b/issues/3[Issue #3]
+
+=== Selecting MongoDB for the Database
+Due to the requirement for flexible storage of structured and unstructured data,
+we have chosen a NoSQL database over SQL.  +
+Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
+
+
+*Justification*
+
+ - It facilitates the storage of semi-structured data in JSON format.
+ - It works very well with Node.js and is highly scalable.
+
+*Consequences* +
+Query optimization may be required for handling large data volumes. Although we
+have had some exposure to NoSQL databases, further training and development in this area will be necessary to optimize their usage.
+
+To learn basic concepts about MongoDb and practice examples link:https://github.com/Arquisoft/wichat_es3b/issues/9[Issue #9].
+
+
+=== Selecting Docker for the Deployment
+Considering the need for a dependable, scalable, and efficient deployment process, we chose Docker to containerize
+our services. Docker allows us to define and package all the components of our application in a consistent and
+repeatable manner, making it easy to deploy across various environments without issues. +
+
+*Justification*
+
+ - Docker ensures a consistent environment for all our services, making sure they run the same way in both
+development and production. This greatly reduces potential problems that might arise due to configuration differences.
+
+- By using Docker Compose, we can define all the services in a single file, making it simpler to orchestrate and scale
+the application as needed.
+
+*Consequences*
+
+- To make sure we’re deploying and troubleshooting containers effectively, we'll need a solid understanding of Docker-specific tools (like Docker Compose) and networking.
+
+=== Selecting JavaScript (Node.js) for the Backend
+We chose JavaScript (Node.js) for the backend because using the same language on both
+the frontend and backend simplifies development and improves team collaboration. +
+Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
+
+
+*Justification*
+
+- Unified Language: Using JavaScript across the stack makes development smoother and faster.
+- Rich Ecosystem: With npm, we have access to a vast library of packages that speed up development.
+
+*Consequences*
+
+- Learning Curve: Developers will need to get comfortable with asynchronous programming and patterns like Promises or async/await.
+- Maintenance: While efficient, Node.js requires ongoing monitoring to maintain performance, especially as the app scales.
+
+
+=== Preloading and Normalizing Question Sets at Application Startup
+
+To ensure a consistent and balanced number of questions per category in the application, we decided to preload and normalize the question sets during application startup.
+  
+At the moment the application starts, each question category will be processed to ensure exactly 60 questions are available:
+- If a category contains fewer than 60 questions, new ones will be generated to reach 60.
+- If a category contains more than 60 questions, 4 will be removed at random and replaced with 4 newly generated ones.
+
+*Justification*  
+This approach ensures that all categories offer a uniform and fair gameplay experience by maintaining a consistent number of questions, avoiding categories with too few or too many. 
+It also guarantees regular content refreshment in overpopulated categories to prevent repeated questions and improve user engagement.
+Additionally, centralizing this logic at startup simplifies runtime operations and reduces delays during the user's turn.
+
+*Consequences*  
+- We must implement logic to identify under and overpopulated categories and interface this with the question generation module.
+- Startup time may slightly increase, especially if many questions need to be generated.
+- No changes are required to the current data model or storage structure.
 
 
 ifdef::arc42help[]

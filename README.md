@@ -9,6 +9,19 @@
 <img src="https://miro.medium.com/max/365/1*Jr3NFSKTfQWRUyjblBSKeg.png" height="100">
 </p>
 
+## Development team
+
+
+| 🧑‍💻 Name           | 📧 Email                                      | 🐙 GitHub                                      |
+|---------------------|-----------------------------------------------|------------------------------------------------|
+| Enol Rodríguez Hevia     | [UO287935@uniovi.es](uo287935@uniovi.es) | [![GitHub](https://img.shields.io/badge/enolRodriguezHevia-blue?style=flat&logo=github)](https://github.com/enolRodriguezHevia) |
+| Alberto Fernández Azcoaga    | [UO179637@uniovi.es](mailto:uo179637@uniovi.es) | [![GitHub](https://img.shields.io/badge/AlbertoFAz-pink?style=flat&logo=github)](https://github.com/AlbertoFAz) |
+| David González González   | [UO291047@uniovi.es](mailto:uo291047@uniovi.es) | [![GitHub](https://img.shields.io/badge/UO291047-yellow?style=flat&logo=github)](https://github.com/UO291047)  |
+| Zinedine Álvarez Sais    | [UO294258@uniovi.es](mailto:uo294258@uniovi.es) | [![GitHub](https://img.shields.io/badge/uo294258-purple?style=flat&logo=github)](https://github.com/uo294258)   |
+| Alejandro Vega García   | [UO294615@uniovi.es](mailto:uo294615@uniovi.es) | [![GitHub](https://img.shields.io/badge/alejandroVG2305-orange?style=flat&logo=github)](https://github.com/alejandroVG2305)  |
+| Ignacio Llaneza Aller   | [UO294914@uniovi.es](mailto:uo294914@uniovi.es) | [![GitHub](https://img.shields.io/badge/nalleta-brown?style=flat&logo=github)](https://github.com/nalleta)   |
+| Daniel Uría Edroso  | [UO282813@uniovi.es](mailto:uo282813@uniovi.es) | [![GitHub](https://img.shields.io/badge/git--uni-green?style=flat&logo=github)](https://github.com/git-uni)   |
+
 This is a base project for the Software Architecture course in 2024/2025. It is a basic application composed of several components.
 
 - **User service**. Express service that handles the insertion of new users in the system.
@@ -17,7 +30,7 @@ This is a base project for the Software Architecture course in 2024/2025. It is 
 - **Gateway service**. Express service that is exposed to the public and serves as a proxy to the two previous ones.
 - **Webapp**. React web application that uses the gateway service to allow basic login and new user features.
 
-Both the user and auth service share a Mongo database that is accessed with mongoose.
+Both the user and auth service share a Mongo database that is accessed with mongoose. 
 
 ## Quick start guide
 
@@ -91,7 +104,7 @@ Once we have our machine ready, we could deploy by hand the application, taking 
 
 As you can see, unitary tests of each module and e2e tests are executed before pushing the docker images and deploying them. Using this approach we avoid deploying versions that do not pass the tests.
 
-The deploy action is the following:
+The deploy action is the following: 
 
 ```yml
 deploy:
@@ -117,12 +130,3 @@ This action uses three secrets that must be configured in the repository:
 - DEPLOY_KEY: key to authenticate the user in the remote machine.
 
 Note that this action logs in the remote machine and downloads the docker-compose file from the repository and launches it. Obviously, previous actions have been executed which have uploaded the docker images to the GitHub Packages repository.
-
-#Contactos de los integrantes del grupo
-Enol Rodríguez Hevia - uo287935@uniovi.es
-Alberto Fernández Azcoaga - uo179637@uniovi.es
-David González González - uo291047@uniovi.es
-Zinedine Álvarez Sais - uo294258@uniovi.es
-Alejandro Vega García - uo294615@uniovi.es
-Ignacio Llaneza Aller - uo294914@uniovi.es
-Daniel Uría Edroso - uo282813@uniovi.es

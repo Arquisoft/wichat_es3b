@@ -67,18 +67,29 @@ In the best case you will get away with examples or simple signatures.
 ****
 endif::arc42help[]
 
-_**<Overview Diagram>**_
+image:5_Overview_diagram.png[]
+
 
 Motivation::
 
-_<text explanation>_
-
+This view describes the decomposition of the WIChat system into several building blocks, focusing on the web application, external API interactions, and data handling, in order to provide an interactive and efficient user experience.
 
 Contained Building Blocks::
-_<Description of contained building block (black boxes)>_
+
+- **Webapp**: Manages the user interface and game logic.
+- **User Authentication Service**: Handles user registration and login.
+- **Question Service**: Generates and retrieves questions.
+- **Hint Generation Service**: Provides hints for users during the quiz.
+- **API Gateway**: Routes requests between the frontend and backend.
+- **Database**: Stores user data and question-related metadata.
 
 Important Interfaces::
-_<Description of important interfaces>_
+
+- **User API**: Allows interaction with user data.
+- **Question API**: Provides access to questions and answers.
+- **Hint API**: Offers hints for the questions.
+
+Both Question and Hint API will make use of external services (SONAR and Wikidata), and therefore will use their APIs.
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -91,65 +102,23 @@ responsibility according to the following schema:
 [cols="1,2" options="header"]
 |===
 | **Name** | **Responsibility**
-| _<black box 1>_ | _<Text>_
-| _<black box 2>_ | _<Text>_
 |===
-
-
 
 If you use a list of black box descriptions then you fill in a separate black box template for every important building block .
 Its headline is the name of the black box.
 ****
 endif::arc42help[]
 
-==== <Name black box 1>
-
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Here you describe <black box 1>
-according the the following black box template:
-
-* Purpose/Responsibility
-* Interface(s), when they are not extracted as separate paragraphs. This interfaces may include qualities and performance characteristics.
-* (Optional) Quality-/Performance characteristics of the black box, e.g.availability, run time behavior, ....
-* (Optional) directory/file location
-* (Optional) Fulfilled requirements (if you need traceability to requirements).
-* (Optional) Open issues/problems/risks
-
-****
-endif::arc42help[]
-
-_<Purpose/Responsibility>_
-
-_<Interface(s)>_
-
-_<(Optional) Quality/Performance Characteristics>_
-
-_<(Optional) Directory/File Location>_
-
-_<(Optional) Fulfilled Requirements>_
-
-_<(optional) Open Issues/Problems/Risks>_
-
-
-
-
-==== <Name black box 2>
-
-_<black box template>_
-
-==== <Name black box n>
-
-_<black box template>_
-
-
-==== <Name interface 1>
-
-...
-
-==== <Name interface m>
-
+[cols="1,2" options="header"]
+|===
+| **Name** | **Responsibility** 
+| Webapp |Main entry point for users. It renders the graphical interface and executes game logic in client.
+| API Gateway |Central request router between the Webapp and backend services.
+| Question Service | Generates and retrieves system questions, based on catrgory and difficulty level.
+| User Authentication Service | Manages user registration, authentication and administration.
+| Hint Generation Service | Generates hints for questions based on difficulty level, by means of a LLM.
+| Database | Stores user information and questions. Recieves requests to store questions and manages credentials.
+|===
 
 
 === Level 2
@@ -165,7 +134,18 @@ Leave out normal, simple, boring or standardized parts of your system
 ****
 endif::arc42help[]
 
-==== White Box _<building block 1>_
+==== WebApp
+Composed of modules to handle the interface, game logic and API communication.
+
+image:5.2_WebappDiagram.png[]
+[cols="1,2" options="header"]
+|===
+| **Name** | **Responsibility** 
+|UI Renderer|Renders interface elements.
+|Game |Controls application logic rules.
+|GameView |Controls the Game.
+|API Client|Manages calls to backend services.
+|===
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -174,21 +154,16 @@ ifdef::arc42help[]
 ****
 endif::arc42help[]
 
-_<white box template>_
-
-==== White Box _<building block 2>_
-
-
-_<white box template>_
-
-...
-
-==== White Box _<building block m>_
-
-
-_<white box template>_
-
-
+==== Question Service
+Decomposed into modules for both managing questions and storing data.
+image:5.2_QuestionServiceDiagram.png[]
+[cols="1,2" options="header"]
+|===
+| **Name** | **Responsibility** 
+|Question Repository|Accesses and manipulates data in the database.
+|Difficulty Manager|Adjusts questions based on difficulty.
+|WikiData Fetcher|Queries WikiData for relevant information.
+|===
 
 === Level 3
 
@@ -202,7 +177,17 @@ part of arc42 for additional levels.
 ****
 endif::arc42help[]
 
-==== White Box <_building block x.1_>
+==== Webapp - API Client
+Encapsulates comunication with backend services.
+image:5.2_APIClientDiagram.png[]
+
+[cols="1,2" options="header"]
+|===
+| **Name** | **Responsibility** 
+|UserAuth Client|Manages user authentication
+|Question Client|Retrieves questions from the backend.
+|Hint Client|Requests hints from the corresponding service.
+|===
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -211,15 +196,3 @@ Specifies the internal structure of _building block x.1_.
 ****
 endif::arc42help[]
 
-_<white box template>_
-
-
-==== White Box <_building block x.2_>
-
-_<white box template>_
-
-
-
-==== White Box <_building block y.1_>
-
-_<white box template>_

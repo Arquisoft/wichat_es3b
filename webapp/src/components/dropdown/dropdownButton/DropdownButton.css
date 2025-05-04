@@ -1,0 +1,29 @@
+@import url(../../../assets/global.css);
+
+.dropdown-btn {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  cursor: pointer;
+}
+
+/* Variante secondary */
+.dropdown-btn.secondary {
+  background-color: var(--color-primario); 
+  color: white;
+}
+
+.toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1rem;
+}
+
+.button-open {
+  border: var(--color-primario) 2px solid;
+}

@@ -1,0 +1,266 @@
+name: CI for wichat_es3b
+
+on:
+  push:
+    branches:
+      - deployment_branch
+  release:
+    types: [published]
+
+jobs: 
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Checkout branch
+        run: git checkout deployment_branch
+      - name: Pull branch
+        run: git pull origin deployment_branch
+      - name: Set CI to false
+        run: echo "CI=false" >> $GITHUB_ENV
+      - name: Install Dependencies
+        run: |
+          npm --prefix users/authservice ci
+          npm --prefix users/userservice ci
+          npm --prefix users/statsservice ci
+          npm --prefix llmservice ci
+          npm --prefix gatewayservice ci
+          npm --prefix webapp ci
+          npm --prefix wikiquestionservice ci
+          npm --prefix apiservice ci
+      - name: Run Unit Tests
+        run: |
+          npm --prefix users/authservice test -- --coverage
+          npm --prefix users/userservice test -- --coverage
+          npm --prefix users/statsservice test -- --coverage
+          npm --prefix llmservice test -- --coverage
+          npm --prefix gatewayservice test -- --coverage
+          npm --prefix webapp test -- --coverage
+          npm --prefix wikiquestionservice test -- --coverage
+          npm --prefix apiservice test -- --coverage
+      - name: Analyze with SonarCloud
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  e2e-tests:
+    needs: [unit-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Dependencies for E2E
+        run: |
+          npm --prefix webapp install
+      - name: Set CI to false
+        run: echo "CI=false" >> $GITHUB_ENV
+      - run: npm --prefix webapp run build
+
+  docker-push-webapp:
+    name: Push webapp Docker Image to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [e2e-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        env:
+          API_URI: http://${{ secrets.DEPLOY_HOST }}:8000
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+        with:
+          name: arquisoft/wichat_es3b/webapp
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          workdir: webapp
+          buildargs: API_URI,LLM_API_KEY
+
+  docker-push-authservice:
+    name: Push auth service Docker Image to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [e2e-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        with:
+            name: arquisoft/wichat_es3b/authservice
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+            registry: ghcr.io
+            workdir: users/authservice
+            platforms: linux/amd64,linux/arm64
+            buildargs: MONGODB_URI
+
+  docker-push-userservice:
+    name: Push user service Docker Image to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [e2e-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        with:
+          name: arquisoft/wichat_es3b/userservice
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          workdir: users/userservice
+          buildargs: MONGODB_URI
+
+  docker-push-statsservice:
+    name: Push stats service Docker Image to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [e2e-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        with:
+          name: arquisoft/wichat_es3b/statsservice
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          workdir: users/statsservice
+          buildargs: MONGODB_URI
+
+  docker-push-llmservice:
+    name: Push llm service Docker Image to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [e2e-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          name: arquisoft/wichat_es3b/llmservice
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          workdir: llmservice
+
+  docker-push-gatewayservice:
+    name: Push gateway service Docker Image to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [e2e-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          name: arquisoft/wichat_es3b/gatewayservice
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          workdir: gatewayservice
+
+  docker-push-wikiquestionservice:
+    name: Push wikiquestionservice Docker Image to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [e2e-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          name: arquisoft/wichat_es3b/wikiquestionservice
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          workdir: wikiquestionservice
+
+  docker-push-apiservice:
+    name: Push api service Docker Image to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [ e2e-tests ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update OpenAPI configuration
+        run: |
+          DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}
+          sed -i "s/SOMEIP/${DEPLOY_HOST}/g" apiservice/openapi.yaml
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          name: arquisoft/wichat_es3b/apiservice
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          workdir: apiservice
+
+  deploy:
+    name: Deploy over SSH
+    runs-on: ubuntu-latest
+    needs: [docker-push-userservice, docker-push-authservice, docker-push-llmservice, docker-push-gatewayservice,
+            docker-push-webapp, docker-push-wikiquestionservice, docker-push-statsservice,
+              docker-push-apiservice]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up SSH key
+        run: |
+          # Crear el directorio para las claves SSH
+          mkdir -p ~/.ssh
+          
+          # Escribir la clave SSH en un archivo en ~/.ssh/deploy_key
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
+          
+          # Asignar permisos adecuados (lectura/escritura solo para el propietario)
+          chmod 600 ~/.ssh/deploy_key
+          
+          # Configurar los hosts conocidos para evitar advertencias al conectar
+          touch ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy over SSH
+        uses: fifsky/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          user: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          command: |
+            wget https://raw.githubusercontent.com/arquisoft/wichat_es3b/deployment_branch/docker-compose.yml -O docker-compose.yml
+            [ -f ~/.env ] && rm ~/.env
+            echo "MONGODB_URI= \"${{ secrets.MONGODB_URI }}\"" > ~/.env
+            echo "LLM_API_KEY= \"${{ secrets.LLM_API_KEY }}\"" >> ~/.env
+            docker compose --profile prod down
+            docker rmi $(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "<none>" | awk '{print $2}')
+            docker rmi $(docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | grep "deployment_branch" | awk '{print $2}')
+            docker compose --profile prod up -d --pull always

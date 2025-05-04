@@ -56,19 +56,47 @@ image::08-concepts-EN.drawio.png["Possible topics for crosscutting concepts"]
 See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
 ****
 endif::arc42help[]
-
-=== _<Concept 1>_
-
-_<explanation>_
+=== Domain concepts
+==== Domain model
 
 
+image:diagram-8_1.png[]
 
-=== _<Concept 2>_
+==== Domain description
+|===
+|Term |Description
 
-_<explanation>_
+|User
+|Represents a user of the application.
 
-...
+|UserRecord
+|Stores all the game sessions in which a user has participated and keeps their total score.
 
-=== _<Concept n>_
+|GameSession
+|Represents a game session played by a user, storing all the questions, the choices made, and the total score.
 
-_<explanation>_
+|Question
+|Represents questions shown to the user by the application and stores the wrong choices, correct choices, and the text that is displayed.
+
+|Choice
+|Represents the choices that the user can make when answering a question. It stores the text of the choice and indicates if it was selected by the user.
+
+|===
+
+
+
+=== Service-oriented architecture
+
+We have decided that our architecture will be based on microservices,but as the services are not fully decoupled at the data level it's more accurate a service-oriented architecture, which means that every part of the aplication will be divided in a service that performs a specific function. The services can communicate witch eachother using their repective APIs or via the shared database.
+
+
+
+=== Build, Test, Deploy
+
+The project follows a CI/CD pipeline that automates the build, test, and deployment processes using GitHub Actions. This ensures that the application is always up-to-date and working correctly.
+Deployment is done manually to Azure. Each service is deployed in a container, and the frontend is exposed via a public IP.
+
+=== Usability
+
+Usability is crucial for any application, as it directly impacts user interaction efficiency. To ensure our app’s usability, we conducted extensive user research, leading to an intuitive interface design. Employing a user-centric approach throughout development, we prioritized user experience, facilitating easy navigation.
+

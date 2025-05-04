@@ -1,0 +1,9 @@
+@import url(../../../assets/global.css);
+
+.dropdown-item {
+  margin: 0.1em;
+  padding: 0.5rem;
+  width: fit-content;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
