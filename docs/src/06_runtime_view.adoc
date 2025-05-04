@@ -38,8 +38,52 @@ See https://docs.arc42.org/section-6/[Runtime View] in the arc42 documentation.
 
 ****
 endif::arc42help[]
-=== Sign In
-A user wants to create a new account. The user introduces the required information and clicks the "Sign In" button. The system validates the information and creates a new account. If all the process runs correctly, the system logs in the user and redirects to the main page.
+
+
+=== Initial Question Load
+When the application runs, Wiki Question Service checks the number of questions of each of the five available thematics in database. There are two posible stages:
+**A thematic has not enough questions:**
+If a thematic does not reach a minimum of 60 questions in database, the service will use Wikidata API and SPARQL to generate as many questions as needed, and stores them in database. 
+
+[plantuml,"Initial Question Load",svg]
+----
+entity WD as "Wikidata API"
+collections WKS as "WikiQuestion Service"
+database DB as "MongoDB"
+note right of WKS
+Service startup:
+Initial question load
+end note
+
+WKS -> DB: Checks number of questions of each thematic
+DB -> WKS: Returns the number of questions of each thematic
+WKS -> WD: Queries as many questions as needed
+WD -> WKS: Returns different questions
+WKS -> DB: Stores questions
+----
+
+**A thematic has enough questions:**
+If there are already enough questions, the service substitutes 10 questions of that tematic with another 10 different questions, in order to ensure their variety.
+
+[plantuml,"Initial Question Load",svg]
+----
+entity WD as "Wikidata API"
+collections WKS as "WikiQuestion Service"
+database DB as "MongoDB"
+note right of WKS
+Service startup:
+Initial question load
+end note
+
+WKS -> DB: Checks number of questions of each thematic
+DB -> WKS: Returns the number of questions of each thematic
+WKS -> WD: Queries 10 questions from each thematic
+WD -> WKS: Returns different questions
+WKS -> DB: Stores questions
+----
+
+=== Sign Up
+A user wants to create a new account. The user introduces the required information and clicks the "Sign Up" button. The system validates the information and creates a new account. If all the process runs correctly, the system displays a success message
 [plantuml,"SignIn diagram",svg]
 ----
 actor User
@@ -49,157 +93,202 @@ collections UsersService
 database DB
 
 User -> WebApp: Request login
-WebApp -> GatewayService: SignInRequest(UserData)
-GatewayService  -> UsersService: SignInRequest(UserData)
-UsersService -> UsersService: validateFields()
-UsersService  -> DB: validateRequiredFieldsAndInsert()
-DB -> UsersService: Confirm data
-UsersService -> UsersService: loginUser()
-UsersService -> GatewayService: Confirm sign in
-GatewayService -> WebApp: Confirm sign in
-WebApp -> User: Confirm sign in
+WebApp -> GatewayService: Sends request with user data
+GatewayService  -> UsersService: Redirects request with user data
+UsersService -> UsersService: Validates fields
+UsersService  -> DB: Validates and inserts user in DB
+DB -> UsersService: Confirms success
+UsersService -> GatewayService: Confirms successful sign up
+GatewayService -> WebApp: Confirms successful sign up
+WebApp -> User: Displays success message
 ----
 
 === Log In
 A user wants to log in into the application. The user introduces the required information and clicks the "Log In" button. The system validates the information and if the user had already an account, redirects them to the main page.
 [plantuml,"LogIn diagram",svg]
 ----
-actor User
-collections WebApp
-collections GatewayService
-collections AuthService
-database DB
+actor User 
+collections WebApp as "Web App"
+collections GatewayService as "Gateway Service"
+collections AuthService "Auth Service"
+database DB as  "MongoDB"
 
-User -> WebApp: Request login
-WebApp -> GatewayService: LogInRequest(UserData)
-GatewayService  -> AuthService: LogInRequest(UserData)
-AuthService -> AuthService: validateFields()
-AuthService  -> DB: logInUser()
-DB -> AuthService: Confirm data
-AuthService -> AuthService: loginUser()
-AuthService -> GatewayService: Confirm login
-GatewayService -> WebApp: Confirm login
-WebApp -> User: Confirm login
+User -> WebApp: Requests login
+WebApp -> GatewayService: Sends request with user data
+GatewayService  -> AuthService: Redirects request with user data
+AuthService -> AuthService: Validates fields
+AuthService  -> DB: Queries user
+DB -> AuthService: Confirms data
+AuthService -> AuthService: Logs user in
+AuthService -> GatewayService: Confirms login
+GatewayService -> WebApp: Confirms login
+WebApp -> User: Displays login confirmation
 ----
 
-=== New Question
-A user wants to start a new round, it can be a new question or start a new game. The system generates a new question and shows it to the user. The user answers the question and the system validates the answer. The system updates the user's score and stats, then shows the results to the user.
+=== Pre-game Question Retrieval
+When a user asks to start a new game, the system is expected to retrieve 10/20/30 questions of the chosen thematics from its database, depending on the game mode. This will be done before starting the game.
 [plantuml,"New question",svg]
 ----
 actor User
 collections WA as "Web App"
-collections GW as "GatewayService"
-collections GMS as "GameService"
-collections QUS as "QuestionService"
-collections USERS as "UsersService"
-entity WD as "WikidataAPI"
+collections GW as "Gateway Service"
+collections WKS as "WikiQuestion Service"
 database DB as "MongoDB"
 
-User -> WA: Starts new round
-WA -> GW: getNewQuestion()
-GW -> GMS: getNewQuestion()
-GMS -> QUS: getNewQuestion()
-QUS -> WD: getNewQuestion()
-WD -> QUS: Question Info
-QUS -> GMS: Question Info
-GMS -> GMS: Saves question info
-GMS -> GW: Question Data
-GW -> WA: Question Data
-User -> WA: Answers question
-WA -> GW: Send answer
-GW -> GMS: Send answer
-GMS -> GMS: checkAnswer()
-GMS -> USERS: Update user score
-USERS -> DB: Update user data
-GMS -> GW: Show results
-GW -> WA: Show results
+User -> WA: Starts new game
+WA -> GW: Asks for required questions
+GW -> WKS: Redirects request
+WKS-> DB: Queries questions
+DB -> WKS: Retrieves required questions
+WKS -> GW: Returns question data
+GW -> WA: Returns question data
+WA -> User: Display questions
 ----
 
-=== New Clue
-A user wants to get a new clue for the current question. The GameService cheks if all the conditions are met and asks the LLMService for a new clue. The LLMService validates the clue and returns it to the GameService, which sends it to the GatewayService and finally to the WebApp.
+
+=== Play a Game
+Once the questions are retrieved from the database (previous diagram), the game starts. A user will send an answer to each of the questions of the game. The system validates them and computes the score depending on the time spent in answering the question. At the end of the game, the front-end sends a request to save user statistics in database.
+[plantuml,"Play a game",svg]
+----
+actor User
+collections WA as "Web App"
+collections GW as "Gateway Service"
+collections SS as "Stats Service"
+database DB as "MongoDB"
+
+User -> WA: Sends answers
+WA -> WA: Validates answers and computes score
+WA -> GW: Sends a request to save game stats
+GW -> SS: Redirects request
+SS-> DB: Saves stats
+DB -> SS: Confirms insertion
+SS -> GW: Confirms insertion
+GW -> WA: Confirms insertion
+WA -> User: Displays game summary
+----
+
+=== ASK LLM for hints
+A user wants to get a new clue for the current question. The request is redirected to the LLMService that handles the connection with the real LLM.
+Once it is processed, it is displayed in the game front-end.
 [plantuml,"New clue",svg]
 ----
 actor User
 collections WA as "Web App"
-collections GW as "GatewayService"
-collections QU as "GameService"
-collections LLMS as "LLMService"
-entity LLM as "EmpathyAPI"
+collections GW as "Gateway Service"
+collections LLMS as "LLM Service"
+entity LLM as "Empathy API"
 
-User -> WA: Asks for a question
-WA -> GW: userAsksForNewClue(userText)
-GW -> QU: userAsksForNewClue(userText)
-QU -> LLMS: getNewClue(userText)
-LLMS -> LLMS: validateClue(userText)
-LLMS -> LLM: getClue(userText)
-LLM -> LLMS: LLM Answer
-LLMS -> QU: Clue Data
-QU -> GW: Clue Data
-GW -> WA: Clue Data
+User -> WA: Asks LLM for a question
+WA -> GW: Sends request with user message
+GW -> LLMS: Redirects request with user message
+LLMS -> LLM: Requests LLM answer
+LLM -> LLMS: Returns LLM answer
+LLMS -> GW: Returns LLM answer
+GW -> WA: Returns LLM answer
+WA -> User: Displays answer
+WA -> WA: Decrements one hint
 ----
 
-=== Check Record
-A user wants to check the record of a game session. The system loads all records and the user selects one to see the details. The system loads the details of the record and shows them to the user.
-[plantuml,"Question record",svg]
+
+=== Check Ranking
+A user asks to see the ranking of the players with the 10 most high scores in a single game. The request is processed by the Stats Service and is returned and displayed to the user.
+[plantuml,"User Stats",svg]
 ----
 actor User
 collections WA as "Web App"
-collections GW as "GatewayService"
-collections US as "UsersService"
+collections GW as "Gateway Service"
+collections SS as "Stats Service"
 database DB as "MongoDB"
 
-User -> WA: Access record page
-WA -> GW: loadRecords()
-GW -> US: loadRecords()
-US -> DB: getActiveUserRecords()
-DB -> US: User Records
-US -> GW: User Records
-GW -> WA: User Records
-User -> WA: Record details
-WA -> GW: getRecordDetails(RecordID)
-GW -> US: getRecordDetails(RecordID)
-US -> DB: getRecordDetails(RecordID)
-DB -> US: Record Details
-US -> GW: Record Details
-GW -> WA: Record Details
+User -> WA: Asks for user ranking
+WA -> GW: Sends request
+GW -> SS: Redirects request
+SS -> DB: Queries top 10 users
+DB -> SS: Retrieves ranking
+SS -> GW: Provides ranking
+GW -> WA: Returns ranking
+WA -> User: Displays user ranking
+----
+
+=== Check User Stats
+A user asks to see another user's game statistics (or their own). The request is then redirected to the stats service, which processes the request and sends a response for the specific user. This data is displayed in the profile view.
+[plantuml,"User Stats",svg]
+----
+actor User
+collections WA as "Web App"
+collections GW as "Gateway Service"
+collections SS as "Stats Service"
+database DB as "MongoDB"
+
+User -> WA: Asks for a user's profile
+WA -> GW: Sends request with the specific username
+GW -> SS: Redirects request with specific username
+SS -> DB: Queries user statistics
+DB -> SS: Retrieves user stats
+SS -> GW: Provides user stats
+GW -> WA: Returns user stats
+WA -> User: Displays user stats
+----
+
+=== Ask for API Key
+A developer user requests for a private API Key in order to integrate our services in their applications. The user provides an email and the system checks if it is registered in its database. If it is not, it displays an API key for the user to store in a safe place.
+
+[plantuml,"Ask for API Key",svg]
+----
+actor User
+collections WA as "Web App"
+collections GW as "Gateway Service"
+collections US as "User Service"
+database DB as "MongoDB"
+
+User -> WA: Requests an API key
+WA -> GW: Sends request with the specified e-mail
+GW -> US: Redirects request with specified e-mail
+US -> US: Validates e-mail
+US -> DB: Queries and registers e-mail and generated API Key
+DB -> US: Confirms registration
+US -> GW: Provides API Key
+GW -> WA: Returns API Key
+WA -> User: Displays private API Key
 ----
 
 === API Access - Ask for questions
-The user wants to document an API access scenario where a user asks for questions. The system processes the request  and returns the questions to the user.
+The user wants to use the API in order to get game questions in return. The system processes the request and returns the questions to the user.
+
 [plantuml,"API Access - Questions",svg]
 ----
 actor User
-collections IG as "API Information Gateway"
-collections GW as "GatewayService"
-collections WS as "WikiquestionService"
+collections IG as "API Service"
+collections GW as "Gateway Service"
+collections WS as "Wikiquestion Service"
 database DB as "MongoDB"
 
-User -> IG: /questions/:n/:topic
-IG -> GW: questions()
-GW -> WS: loadQuestions()
-WS -> DB: loadQuestions()
-DB -> WS: Questions
-WS -> GW: Questions
-GW -> IG: Questions
-IG -> User: Questions
+User -> IG: Requests questions
+IG -> GW: Sends request with the number of questions and thematic
+GW -> WS: Redirects request
+WS -> DB: Queries specified questions
+DB -> WS: Retrieves questions
+WS -> GW: Provides questions
+GW -> IG: Returns questions
+IG -> User: Sends response
 ----
 
 === API Access - Ask for user records
-A user wants to check the stats of a user. The system loads the stats of the user asked for.
+A user wants to check the stats of a user through the API. The system loads the stats of the user asked for.
 [plantuml,"API Access - Records",svg]
 ----
 actor User
-collections IG as "API Information Gateway"
-collections GW as "GatewayService"
-collections SS as "StatsService"
+collections IG as "API Service"
+collections GW as "Gateway Service"
+collections SS as "Stats Service"
 database DB as "MongoDB"
 
-User -> IG: /getstats/:username
-IG -> GW: getStats()
-GW -> SS: getStats()
-SS -> DB: getStats()
-DB -> SS: UserStats
-SS -> GW: UserStats
-GW -> IG: UserStats
-IG -> User: UserStats
+User -> IG: Requests stats of specific user
+IG -> GW: Sends request with specific username
+GW -> SS: Redirects request
+SS -> DB: Queries stats for specific user
+DB -> SS: Retrieves user stats
+SS -> GW: Provides user stats
+GW -> IG: Returns user stats
+IG -> User: Sends response
 ----

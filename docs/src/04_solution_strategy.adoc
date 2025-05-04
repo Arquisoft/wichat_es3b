@@ -3,44 +3,20 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-solution-strategy]]
 == Solution Strategy
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Contents
-A short summary and explanation of the fundamental decisions and solution strategies, that shape system architecture. It includes
 
-* technology decisions
-* decisions about the top-level decomposition of the system, e.g. usage of an architectural pattern or design pattern
-* decisions on how to achieve key quality goals
-* relevant organizational decisions, e.g. selecting a development process or delegating certain tasks to third parties.
-
-.Motivation
-These decisions form the cornerstones for your architecture. They are the foundation for many other detailed decisions or implementation rules.
-
-.Form
-Keep the explanations of such key decisions short.
-
-Motivate what was decided and why it was decided that way,
-based upon problem statement, quality goals and key constraints.
-Refer to details in the following sections.
-
-
-.Further Information
-
-See https://docs.arc42.org/section-4/[Solution Strategy] in the arc42 documentation.
-
-****
-endif::arc42help[]
 
 We develop an application of questions, like 'Saber y Ganar', in which the main objetive is to comunicate with a chatbot to obtain some hints for answer correctly each question.
+Users can register to play and save their game statistics, they will also to be able to consult a ranking with the most remarkable games of all users
+.
 
-We start from a ready-make application, which condition us when making some of the technical decisions.
-
-.Technologies used:
-* JavaScript: JavaScript is a very flexible programming language widely used in software development. Besides, we decided to continue with this language due to the base application.
-* Node.js: Node.js is used to create server-side applications with JavaScript, so we decided to use it to make the back-end of our web app.
-* MongoDB: MongoDB is an open-source NoSQL database that uses a document-based data model for information storage and retrieval. Again its use is mainly due to the legacy project.
-* React JS: It's a framework widely used to create user interface components. Chosen for the large volume of documentation and the fact that it is the framework used during the previous app.
+=== Technologies used:
+* *JavaScript*: JavaScript is a very flexible programming language widely used in software development.
+* *Node.js*: Node.js is used to create server-side applications with JavaScript, so we decided to use it to make the back-end of our web app.
+* *MongoDB*: MongoDB is an open-source NoSQL database that uses a document-based data model for information storage and retrieval. We use MongoDB Atlas for running a Mongo database in the cloud.
+* *React*: It's a framework widely used to create user interface components. Chosen for the large volume of documentation.
+* *Wikidata*: An open, collaborative database that stores structured information, allowing both humans and machines to access, share, and reuse knowledge efficiently.
+* *Microsoft Azure*: It's a cloud computing platform and set of services provided by Microsoft that allows us to deploy, manage , and scale online applications and services.
+* *Asciidoc*: It's a lightweight markup language for writing documentation in plain text, which can be converted to formats like HTML, PDF. We’ll use it for creating and managing our project’s documentation efficiently.
 
 === Decissions made to achieve quality goals
 * *Usability*: Although usability is already guaranteed by the developers of the base application, we will try to make interaction with the chatbot simple so that it remains that way.
@@ -51,3 +27,8 @@ We start from a ready-make application, which condition us when making some of t
 * Communication between team members is mostly made through Github, using issues to create and assign tasks, Whatsapp, to ask the rest of the team for help if needed for quick advice, and meetings.
 * For the tasks to be performed, we have decided to implement an author-reviewer mechanic to avoid a single person being in charge of a part of the application and minimize large avoidable errors.
 
+=== Testability
+To ensure the correct functionality of the application, we performed extensive testing.
+This included load testing to evaluate performance under high demand,
+and coverage testing to verify that all critical parts of the code are properly tested.
+These efforts help guarantee a stable and reliable system.
