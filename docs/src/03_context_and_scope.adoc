@@ -54,11 +54,11 @@ endif::arc42help[]
 
 image::doc3-business-context-diagram.png["Businesss Context diagram", align="center"]
 
-.Q&A System
+.WICHAT System
 |===
 | Communication partners | Inputs | Outputs
 
-| *_Q&A_*
+| *_WICHAT_*
 | Data from Wikidata, Hints from LLM's, User Answers, User Requests
 | Questions to User, Feedback to User, Queries to Wikidata, Requests to LLM's
 
@@ -73,6 +73,10 @@ image::doc3-business-context-diagram.png["Businesss Context diagram", align="cen
 | *_LLM'S_*
 |Hint Generation Request using a text prompt
 |Generated hints
+
+| *_API_*
+| User requests
+| Backend data response
 |===
 
 === Technical Context
@@ -93,15 +97,19 @@ together with a mapping table showing the relationships between channels and inp
 ****
 endif::arc42help[]
 
-image:technical-context-diagram.png["Technical Context diagram", align="center"]
+image:final-technical-context-diagram-3.1.png["Technical Context diagram", align="center"]
 
 
 |===
 | Communication partners | Inputs | Outputs
 
-| *_wikiquestion service_*
+| *_wikiquestionservice_*
 | Question data-index
 | Questions and answers
+
+| *_apiservice_*
+| User requests
+| Backend data
 
 | *_authservice_*
 | Login info
@@ -115,7 +123,7 @@ image:technical-context-diagram.png["Technical Context diagram", align="center"]
 | User name
 | User's history and stats
 
-| *_LLM service_*
+| *_llmservice_*
 | User text inputs
 | Hints about the question
 
@@ -127,9 +135,9 @@ image:technical-context-diagram.png["Technical Context diagram", align="center"]
 | Request for question data with category
 | Question sources
 
-| *_Persistence_*
-| RAW data for questions and answers
-| Structured data of questions and answers
+| *_MongoDB_*
+| RAW data for questions, answers, and user information
+| Structured data of questions answers, and user information
 
 | *_Webapp_*
 | User inputs
