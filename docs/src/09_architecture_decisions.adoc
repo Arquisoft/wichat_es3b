@@ -189,7 +189,6 @@ Due to errors encountered during the deployment process, we decided to customize
 - Increased complexity: Customizing the build process adds complexity to the deployment pipeline, as we need to ensure that all tests are properly configured and executed.
 - Longer github actions duration: Including end-to-end tests in the build process may increase the time it takes to complete the build and deployment process, which could impact the speed of development and deployment cycles.
 
-
 === Preloading and Normalizing Question Sets at Application Startup
 
 To ensure a consistent and balanced number of questions per category in the application, we decided to preload and normalize the question sets during application startup.
