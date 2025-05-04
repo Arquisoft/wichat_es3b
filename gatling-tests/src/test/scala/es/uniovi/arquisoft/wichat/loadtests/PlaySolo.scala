@@ -205,5 +205,5 @@ class PlaySolo extends Simulation {
         )
     )
 
-	setUp(scn.inject(constantUsersPerSec(5).during(15))).protocols(httpProtocol)
+	setUp(scn.inject(constantUsersPerSec(10).during(75))).protocols(httpProtocol)
 }

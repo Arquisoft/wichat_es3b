@@ -60,7 +60,7 @@ app.post('/login',  [
 
 // Start the server
 const server = app.listen(port, () => {
-  console.log(`Auth Service listening at http://localhost:${port}`);
+  console.log(`Auth Service listening at http://localhost: ${port}`);
 });
 
 server.on('close', () => {
