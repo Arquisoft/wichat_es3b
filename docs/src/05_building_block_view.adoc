@@ -108,7 +108,7 @@ image:5.2_WebappDiagram.png[]
 | **Name** | **Responsibility** 
 |UI Renderer|Renders interface elements.
 |Game |Controls application logic rules.
-|GameView |Controls the Game.
+|PlayView |Controls the Game.
 |API Client|Manages calls to backend services.
 |===
 
