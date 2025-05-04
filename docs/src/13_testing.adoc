@@ -9,14 +9,16 @@ Testing is an important part of the development process. It helps ensure that yo
 
 image:QualityGate.PNG[]
 
-We can observe that the code coverage is 82%, which is above the threshold of 80% set in the quality gate. This means that the code is well-tested and meets the quality standards.
-Also, 0 hotspots are presented, which means that the code does not contain any known big vulnerabilities.
+We can observe that the code coverage is ~82%, which is above the threshold of 80% set in the quality gate. This means that the code is well-tested and meets the quality standards.
+Also, 0.9% hotspots are presented, which means that the code does not contain any known big vulnerabilities.
 
 === E2E Tests
 
 image:e2e.PNG[]
 
 We have a total of 15 E2E tests, which cover various scenarios and user interactions, like login, logout, signup, access the profile, access the ranking and play both Single Player and Player VS AI game modes with different configurations.
+
+We try to cover all the possible scenarios that a user can encounter while using the application. Ensure all the code is covered is almost imposible, though.
 
 These tests are run automatically as part of the CI/CD pipeline to ensure that the application works correctly after each change.
 
