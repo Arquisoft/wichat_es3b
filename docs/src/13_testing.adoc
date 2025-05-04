@@ -5,17 +5,20 @@ ifndef::imagesdir[:imagesdir: ../images]
 
 Testing is an important part of the development process. It helps ensure that your code works as expected and that changes do not introduce new bugs. In this section, we will cover the tests used in this project and some concepts related to testing.
 
-=== Unit Tests & Code Coverage
+=== Unit Tests, Code Coverage & Security Hotspots
 
 Unit tests are used to test individual components of your code in isolation. They are typically small and fast, allowing you to run them frequently during development.
 
 Code coverage is a measure of how much of your code is executed during tests. It helps identify untested parts of your code and can be used to improve test quality.
 
+Security hotspots are areas of your code that may be vulnerable to security issues. They are typically identified by static analysis tools and should be reviewed carefully.
+
 In our project specifically:
 
 image:QualityGate.PNG[]
 
-We can observe that the code coverage is 83%, which is above the threshold of 80% set in the quality gate. This means that the code is well-tested and meets the quality standards.
+We can observe that the code coverage is 82%, which is above the threshold of 80% set in the quality gate. This means that the code is well-tested and meets the quality standards.
+Also, 0 hotspots are presented, which means that the code does not contain any known big vulnerabilities.
 
 === E2E Tests
 
@@ -87,3 +90,12 @@ Furthermore, we can also conclude that the question service acts as a bottleneck
 On the other hand, we see that in addition to the question service, the LLM begins to cause problems starting at about 750 users, as shown in the following table:
 image:llm_rampusers_750.PNG[]
 * The request_1 represents the OPTIONS request, while the request_2 represents the POST request.
+
+====
+
+After obtaining this data and reviewing what the problem could be, we found that with each request to the '/questionsDB' endpoint, a new connection to the database was created, which obviously slowed down the response time significantly.
+
+After solving this problem, we can see that, although slow, 1000 users are handled without problems.
+image:updatedEndpointQuestions_rampUsers_1000.PNG[]
+
+====
