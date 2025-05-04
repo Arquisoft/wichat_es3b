@@ -12,7 +12,7 @@ const app = express();
 const port = 8006;
 const gatewayServiceUrl = process.env.GATEWAY_SERVICE_URL || "http://localhost:8000";
 
-app.use(cors());
+app.use(cors({origin: '*'}));
 app.use(express.json());
 
 // Mocked in tests, real setup here

@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const { check, validationResult } = require("express-validator");
 const Stats = require("./stat-model");
 const Game = require("./game-model");
+//const User = require('../userservice/user-model');
 
 const app = express();
 const port = 8005;
@@ -98,6 +99,10 @@ app.get("/getstats/:username", async (req, res) => {
   try {
     const { username } = req.params;
 
+    /*const user = await User.findOne({ username });
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }*/
         const stats = await Stats.findOne({ username });
 
         if (!stats) {

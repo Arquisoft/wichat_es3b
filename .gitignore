@@ -1,7 +1,8 @@
 node_modules
-coverage
+coverage 
 docs/build
 .env
 .idea/
 webapp/.env
 llmservice/mainDePrueba.js
+gatling-tests/target/

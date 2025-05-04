@@ -10,7 +10,7 @@ const InfoDialog = ({ title, content, onClose, variant="info" }) => {
       <h1>{title}</h1>
       <div className="dialogMessageContainer">{content}</div>
       <div className="dialogButtonContainer">
-        <BaseButton text={t("understood")} onClick={onClose}></BaseButton>
+        <BaseButton buttonid={`${title}-button`} text={t("understood")} onClick={onClose}></BaseButton>
       </div>
     </div>
   );

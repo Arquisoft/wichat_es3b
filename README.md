@@ -4,129 +4,62 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_wichat_es3b&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Arquisoft_wichat_es3b)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_wichat_es3b&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Arquisoft_wichat_es3b)
 
-<p float="left">
-<img src="https://blog.wildix.com/wp-content/uploads/2020/06/react-logo.jpg" height="100">
-<img src="https://miro.medium.com/max/365/1*Jr3NFSKTfQWRUyjblBSKeg.png" height="100">
-</p>
-
-## Development team
-
-
-| 🧑‍💻 Name           | 📧 Email                                      | 🐙 GitHub                                      |
-|---------------------|-----------------------------------------------|------------------------------------------------|
-| Enol Rodríguez Hevia     | [UO287935@uniovi.es](uo287935@uniovi.es) | [![GitHub](https://img.shields.io/badge/enolRodriguezHevia-blue?style=flat&logo=github)](https://github.com/enolRodriguezHevia) |
-| Alberto Fernández Azcoaga    | [UO179637@uniovi.es](mailto:uo179637@uniovi.es) | [![GitHub](https://img.shields.io/badge/AlbertoFAz-pink?style=flat&logo=github)](https://github.com/AlbertoFAz) |
-| David González González   | [UO291047@uniovi.es](mailto:uo291047@uniovi.es) | [![GitHub](https://img.shields.io/badge/UO291047-yellow?style=flat&logo=github)](https://github.com/UO291047)  |
-| Zinedine Álvarez Sais    | [UO294258@uniovi.es](mailto:uo294258@uniovi.es) | [![GitHub](https://img.shields.io/badge/uo294258-purple?style=flat&logo=github)](https://github.com/uo294258)   |
-| Alejandro Vega García   | [UO294615@uniovi.es](mailto:uo294615@uniovi.es) | [![GitHub](https://img.shields.io/badge/alejandroVG2305-orange?style=flat&logo=github)](https://github.com/alejandroVG2305)  |
-| Ignacio Llaneza Aller   | [UO294914@uniovi.es](mailto:uo294914@uniovi.es) | [![GitHub](https://img.shields.io/badge/nalleta-brown?style=flat&logo=github)](https://github.com/nalleta)   |
-| Daniel Uría Edroso  | [UO282813@uniovi.es](mailto:uo282813@uniovi.es) | [![GitHub](https://img.shields.io/badge/git--uni-green?style=flat&logo=github)](https://github.com/git-uni)   |
+<div align="center">
+<img src="webapp/src/assets/img/logo_base.png" height="100">
+</div>
 
 This is a base project for the Software Architecture course in 2024/2025. It is a basic application composed of several components.
 
 - **User service**. Express service that handles the insertion of new users in the system.
 - **Auth service**. Express service that handles the authentication of users.
 - **LLM service**. Express service that handles the communication with the LLM.
+- **Stats service**. Express service that provides user stats.
+- **API service**. Express service that provides WIChat data through an API.
 - **Gateway service**. Express service that is exposed to the public and serves as a proxy to the two previous ones.
 - **Webapp**. React web application that uses the gateway service to allow basic login and new user features.
 
-Both the user and auth service share a Mongo database that is accessed with mongoose. 
+## Group member contacts
 
-## Quick start guide
+|Nombre|Email|
+|------|-----|
+|Enol Rodríguez Hevia | uo287935@uniovi.es|
+|Alberto Fernández Azcoaga | uo179637@uniovi.es|
+|David González González | uo291047@uniovi.es|
+|Zinedine Álvarez Sais | uo294258@uniovi.es|
+|Alejandro Vega García | uo294615@uniovi.es|
+|Ignacio Llaneza Aller | uo294914@uniovi.es|
+|Daniel Uría Edroso | uo282813@uniovi.es|
 
-First, clone the project:
+## Useful information
+### Game Modes
+WIChat offers two game modes: Solo Mode and VS AI Mode.
 
-```git clone git@github.com:arquisoft/wichat_es3b.git```
+- **Solo Mode**: You play on your own and have the possibility to request hints from an integrated LLM. You can configure the number of questions, the time limit per question, and the number of available hints.
+- **VS AI Mode**: You compete against the AI. In this mode, hints are disabled, and both you and the AI answer the same set of questions. The winner is the one who gets the most correct answers.
 
-### LLM API key configuration
+### Customization Options
+Before starting a game, you can choose:
 
-In order to communicate with the LLM integrated in this project, we need to setup an API key. Two integrations are available in this propotipe: gemini and empaphy. The API key provided must match the LLM provider used.
+- The number of questions.
+- The time allowed per question.
+- The number of LLM hints available.
+- One or more topics to focus the questions on.
 
-We need to create two .env files. 
-- The first one in the webapp directory (for executing the webapp using ```npm start```). The content of this .env file should be as follows:
-```
-REACT_APP_LLM_API_KEY="YOUR-API-KEY"
-```
-- The second one located in the root of the project (along the docker-compose.yml). This .env file is used for the docker-compose when launching the app with docker. The content of this .env file should be as follows:
-```
-LLM_API_KEY="YOUR-API-KEY"
-```
+### Hints
+In Solo Mode, you may use hints provided by the LLM. The hints can vary depending on the type of question and can help guide you toward the correct answer.
 
-Note that these files must NOT be uploaded to the github repository (they are excluded in the .gitignore).
+### Statistics
+WIChat allows you to view your game history and performance, including:
+- Total number of games played
+- Number of correct and incorrect answers
+- Accuracy ratio (correct/wrong)
+- Monthly evolution of your accuracy ratio in chart format
+- Comparative graphs of correct vs. incorrect answers
+### Rankings
+The platform includes a leaderboard showing the Top 10 players with the highest scores. You can also access detailed statistics for each ranked player.
 
-An extra configuration for the LLM to work in the deployed version of the app is to include it as a repository secret (LLM_API_KEY). This secret will be used by GitHub Action when building and deploying the application.
-
-
-### Launching Using docker
-For launching the propotipe using docker compose, just type:
-```docker compose --profile dev up --build```
-
-### Component by component start
-First, start the database. Either install and run Mongo or run it using docker:
-
-```docker run -d -p 27017:27017 --name=my-mongo mongo:latest```
-
-You can use also services like Mongo Altas for running a Mongo database in the cloud.
-
-Now launch the auth, user and gateway services. Just go to each directory and run `npm install` followed by `npm start`.
-
-Lastly, go to the webapp directory and launch this component with `npm install` followed by `npm start`.
-
-After all the components are launched, the app should be available in localhost in port 3000.
-
-## Deployment
-For the deployment, we have several options. The first and more flexible is to deploy to a virtual machine using SSH. This will work with any cloud service (or with our own server). Other options include using the container services that all the cloud services provide. This means, deploying our Docker containers directly. Here I am going to use the first approach. I am going to create a virtual machine in a cloud service and after installing docker and docker-compose, deploy our containers there using GitHub Actions and SSH.
-
-### Machine requirements for deployment
-The machine for deployment can be created in services like Microsoft Azure or Amazon AWS. These are in general the settings that it must have:
-
-- Linux machine with Ubuntu > 20.04 (the recommended is 24.04).
-- Docker installed.
-- Open ports for the applications installed (in this case, ports 3000 for the webapp and 8000 for the gateway service).
-
-Once you have the virtual machine created, you can install **docker** using the following instructions:
-
-```ssh
-sudo apt update
-sudo apt install apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
-sudo apt update
-sudo apt install docker-ce
-sudo usermod -aG docker ${USER}
-```
-
-### Continuous delivery (GitHub Actions)
-Once we have our machine ready, we could deploy by hand the application, taking our docker-compose file and executing it in the remote machine. In this repository, this process is done automatically using **GitHub Actions**. The idea is to trigger a series of actions when some condition is met in the repository. The precondition to trigger a deployment is going to be: "create a new release". The actions to execute are the following:
-
-![imagen](https://github.com/user-attachments/assets/7ead6571-0f11-4070-8fe8-1bbc2e327ad2)
+### API Access
+If you wish to use WIChat’s services externally, you can request an API key by entering your email address in the designated section.
 
 
-As you can see, unitary tests of each module and e2e tests are executed before pushing the docker images and deploying them. Using this approach we avoid deploying versions that do not pass the tests.
 
-The deploy action is the following: 
-
-```yml
-deploy:
-    name: Deploy over SSH
-    runs-on: ubuntu-latest
-    needs: [docker-push-userservice,docker-push-authservice,docker-push-llmservice,docker-push-gatewayservice,docker-push-webapp]
-    steps:
-    - name: Deploy over SSH
-      uses: fifsky/ssh-action@master
-      with:
-        host: ${{ secrets.DEPLOY_HOST }}
-        user: ${{ secrets.DEPLOY_USER }}
-        key: ${{ secrets.DEPLOY_KEY }}
-        command: |
-          wget https://raw.githubusercontent.com/arquisoft/wichat_es3b/master/docker-compose.yml -O docker-compose.yml
-          docker compose --profile prod down
-          docker compose --profile prod up -d --pull always
-```
-
-This action uses three secrets that must be configured in the repository:
-- DEPLOY_HOST: IP of the remote machine.
-- DEPLOY_USER: user with permission to execute the commands in the remote machine.
-- DEPLOY_KEY: key to authenticate the user in the remote machine.
-
-Note that this action logs in the remote machine and downloads the docker-compose file from the repository and launches it. Obviously, previous actions have been executed which have uploaded the docker images to the GitHub Packages repository.

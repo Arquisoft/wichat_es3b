@@ -98,35 +98,46 @@ export default function GameHistory({ games, currentIndex, onNavigate }) {
       {/* Indicadores de paginación */}
       <div className="pagination-dots">
         {games.length > 0 &&
-          Array.from({ length: games.length }).map((_, index) => (
-            <span
-              key={index}
-              data-testid="pagination-dot"
-              className={`pagination-dot ${
-                currentIndex === index ? "active" : ""
-              }`}
-              onClick={() => {
-                if (isAnimating || index === currentIndex) return;
+          Array.from({ length: games.length }).map((_, index) => {
+            const isActive = currentIndex === index;
 
-                setIsAnimating(true);
-                // Navegar a la página correspondiente
-                const diff = index - currentIndex;
-                if (diff > 0) {
-                  for (let i = 0; i < diff; i++) {
-                    setTimeout(() => onNavigate("next"), i * 100);
-                  }
-                } else if (diff < 0) {
-                  for (let i = 0; i < Math.abs(diff); i++) {
-                    setTimeout(() => onNavigate("prev"), i * 100);
-                  }
-                }
+            const handleDotNavigation = () => {
+              if (isAnimating || isActive) return;
 
-                setTimeout(() => {
-                  setIsAnimating(false);
-                }, Math.abs(diff) * 100 + 500);
-              }}
-            ></span>
-          ))}
+              setIsAnimating(true);
+              const diff = index - currentIndex;
+              const direction = diff > 0 ? "next" : "prev";
+              const steps = Math.abs(diff);
+
+              for (let i = 0; i < steps; i++) {
+                setTimeout(() => onNavigate(direction), i * 100);
+              }
+
+              setTimeout(() => {
+                setIsAnimating(false);
+              }, steps * 100 + 500);
+            };
+
+            const handleKeyDown = (e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleDotNavigation();
+              }
+            };
+
+            return (
+              <span
+                key={index}
+                data-testid="pagination-dot"
+                className={`pagination-dot ${isActive ? "active" : ""}`}
+                onClick={handleDotNavigation}
+                onKeyDown={handleKeyDown}
+                tabIndex={0}
+                role="button"
+                aria-label={`Ir a la partida ${index + 1}`}
+              />
+            );
+          })}
       </div>
     </section>
   );
