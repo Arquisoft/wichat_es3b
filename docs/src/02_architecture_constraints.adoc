@@ -8,10 +8,13 @@ ifndef::imagesdir[:imagesdir: ../images]
 [options="header",cols="1,2"]
 |===
 |Constraint|Description
-|Wikidata|The application must interact with Wikidata to generate the questions and answers.
+|Wikidata|All visual and textual content related to questions must be automatically created using structured data from Wikidata.
 |Git and GitHub|The project will have version control through Git. The repository will be in GitHub, where issues, "project" and wiki will be useful for project tracking.
 |LLM|The application must have a bot chat to interact with it. The chat have to be made by an LLM.
-|Azure|Azure defines the deployment environment, available services, and cost limitations. This affects architectural decisions such as scalability options, storage solutions, and integration choices.
+|Deployment|The complete system must be deployed on a public server or cloud platform, ensuring that users can access and use the application from anywhere via a URL, not just in local or development environments.
+|Monitoring|The deployed system must include monitoring and observability mechanisms, such as performance logging, error tracking, and health checks, to detect issues early and ensure system reliability over time.
+|Automated Testing and Integration|The project must adopt DevOps practices, including unit and integration testing, code linting, and automated CI/CD pipelines to ensure safe, consistent deployments and maintainable code.
+|Documented REST API|A unified, well-documented RESTful API must expose both user data (e.g., registration, scores, game history) and quiz data (e.g., questions, answers, metadata).
 |===
 
 === Convention Constraints
