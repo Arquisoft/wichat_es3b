@@ -55,3 +55,9 @@ Usability is crucial for any application, as it directly impacts user interactio
 === Internationalization
 We have implemented internationalization (i18n) to support both English and Spanish.
 This includes not only the user interface but also the question content, ensuring that the entire experience is localized based on the user's language preference.
+
+=== Monitoring
+
+The application includes a monitoring setup using Prometheus and Grafana. Prometheus collects real-time metrics from different services, such as request rates, response times, and error counts. These metrics are visualized in Grafana through custom dashboards, which help the development team track performance and availability.
+
+This setup allows early detection of anomalies or bottlenecks, ensuring a stable and responsive user experience.
