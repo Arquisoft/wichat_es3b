@@ -2133,12 +2133,6 @@ Additionally, centralizing this logic at startup simplifies runtime operations a
 <li>
 <p><strong>Accesibility:</strong> Make the application usable to people with diverse disabilities.</p>
 </li>
-<li>
-<p><strong>Reliability:</strong> Contistency and easy recovering.</p>
-</li>
-<li>
-<p><strong>Availability:</strong> Handling increased traffic without compromising performance.</p>
-</li>
 </ul>
 </div>
 <div class="paragraph">
@@ -2152,16 +2146,13 @@ Additionally, centralizing this logic at startup simplifies runtime operations a
 <li>
 <p><strong>Security:</strong> Basic measures, even if sensitive data is not handled.</p>
 </li>
-<li>
-<p><strong>Compatibility:</strong> Accesibility across diferent devices and screen sizes.</p>
-</li>
 </ul>
 </div>
 <div class="sect2">
 <h3 id="_quality_tree">10.1. Quality Tree</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/diagrama_escenarios_calidad.jpg" alt="Diagrama de escenarios de calidad" width="primera versión">
+<img src="./images/6_QualityTree.png" alt="Diagrama de escenarios de calidad" width="primera versión">
 </div>
 </div>
 </div>
@@ -2190,13 +2181,13 @@ Additionally, centralizing this logic at startup simplifies runtime operations a
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Q1.2</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Usability</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Users must be able to navigate between different game sections (settings, chat, etc.) in no more than 2 taps. It should take under 10 seconds for an average user.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Users must be able to navigate between different app sections (ranking, profile, game, API, etc.) in no more than 2 taps. It should take under 10 seconds for an average user.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Q2.1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Maintainability</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The addition of new questions must be quick and simple without interrupting the application flow. It should take approximately 5 minutes, this entailing no downtime for the application.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The addition of new questions must be quick and simple. It should take approximately 15 minutes</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
 </tr>
 <tr>
@@ -2208,25 +2199,19 @@ Additionally, centralizing this logic at startup simplifies runtime operations a
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Q3.1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Accessibility</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The application must support screen readers for users with visual impairments, guaranteeing as well buttons and answers that are simple to read. All interactive elements must have alternative text, and the screen reader should process the entire game in under 30 seconds for each screen.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The product must provide key listeners in every interactive element in the application. It must not take more than 30 seconds for an average user to find and use an interactive element in the website</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Q4.1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Reliability</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">If the system fails during a game, it should allow the user to resume the game from the last saved state. No more than 1 minute of progess should be lost.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Q5.1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Availability</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system must mantain 99.5% uptime over a month, including the peak usage period. Downtime must not overcome 3 hours and 39 minutes/month.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q3.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Accessibility</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The application must support screen readers for users with visual impairments, guaranteeing as well buttons and answers that are simple to read. All interactive elements must have alternative text, and the screen reader should process the entire game in under 1 minute for each screen.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">P1.1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Performance</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The product must respond to a player&#8217;s request in less than 0.5s.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The product must respond to a player&#8217;s request in less than 1s.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
 </tr>
 <tr>
@@ -2244,20 +2229,14 @@ Additionally, centralizing this logic at startup simplifies runtime operations a
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S1.2</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Security</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system must log all user actions related to account creation and gameplay. Unauthorized attempts to read private account information should trigger an alarm within 5 minutes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must support private routes, which will lead to the authentication view in case of unauthorized access 100% of unauthorized access attempts must be blocked and logged.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S1.3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Security</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must log all user actions related to account creation and gameplay. Logs must be stored securely and retrievable within 5 seconds.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C1.1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Compatibility</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The game should work correctly on both mobile and desktop devices, adjusting the dessign for different screen sizes, at least between 4"-27".</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C1.2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Compatibility</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system must support the latest versions of popular browsers (Chrome, Safari, Firefox, etc.). It should be completely functional, with 0 visual/functional issues.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
 </tr>
 </tbody>
 </table>
@@ -2607,7 +2586,7 @@ Two main peaks stand out:</p>
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2025-05-04 20:11:57 +0200
+Last updated 2025-05-04 20:26:11 +0200
 </div>
 </div>
 </body>
