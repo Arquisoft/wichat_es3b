@@ -50,4 +50,5 @@ Deployment is done manually to Azure. Each service is deployed in a container, a
 Usability is crucial for any application, as it directly impacts user interaction efficiency. To ensure our app’s usability, we conducted extensive user research, leading to an intuitive interface design. Employing a user-centric approach throughout development, we prioritized user experience, facilitating easy navigation.
 
 === Internationalization
-We have implemented internationalization (i18n) for both English and Spanish, covering the user interface as well as the question content.
+We have implemented internationalization (i18n) to support both English and Spanish.
+This includes not only the user interface but also the question content, ensuring that the entire experience is localized based on the user's language preference.
