@@ -110,7 +110,7 @@ A user wants to log in into the application. The user introduces the required in
 actor User 
 collections WebApp as "Web App"
 collections GatewayService as "Gateway Service"
-collections AuthService "Auth Service"
+collections AuthService as "Auth Service"
 database DB as  "MongoDB"
 
 User -> WebApp: Requests login
