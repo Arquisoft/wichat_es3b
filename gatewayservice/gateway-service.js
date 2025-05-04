@@ -5,6 +5,8 @@ const path = require("path");
 const promBundle = require("express-prom-bundle");
 
 const app = express();
+app.disable("x-powered-by");
+
 const port = 8000;
 
 const wikiQuestionServiceUrl =
@@ -123,7 +125,7 @@ app.post("/savestats", async (req, res) => {
     );
     res.json(statsResponse.data);
   } catch (error) {
-    console.error("Error en el gateway:", error.message);
+    console.error("Error en el gateway: ", error.message);
 
     if (error.response) {
       res
@@ -289,3 +291,5 @@ const server = app.listen(port, () => {
 });
 
 module.exports = server;
+
+//Cambio
