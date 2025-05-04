@@ -189,6 +189,22 @@ Due to errors encountered during the deployment process, we decided to customize
 - Increased complexity: Customizing the build process adds complexity to the deployment pipeline, as we need to ensure that all tests are properly configured and executed.
 - Longer github actions duration: Including end-to-end tests in the build process may increase the time it takes to complete the build and deployment process, which could impact the speed of development and deployment cycles.
 
+=== Azure as the deployment environment
+We decided to use Azure as the deployment environment for our application.
+
+*Justification*
+
+- Familiarity: All the team members have some experience with Azure due to SEW, which will make it easier to set up and manage the deployment process.
+- MVs customization: Azure allows us to customize the deployment process and configure the environment to meet our specific needs, which is important for our application.
+- Scalability: Azure provides a scalable infrastructure that can handle the expected load of our application, ensuring that it can grow as needed.
+- Free students plan: Azure offers a free plan for students, which allows us to deploy our application without incurring additional costs.
+- Disponibility: Azure provides a reliable and highly available infrastructure, ensuring that our application remains accessible to users at all times.
+
+*Consequences*
+
+- Limited cost: The free plan has limitations on resources and usage, which may impact the performance and scalability of our application.
+- Limited exprience: we are no experts in Azure, so we may encounter challenges during the deployment process. However, we can rely on the knowledge gained from SEW and the documentation provided by Azure to overcome these challenges.
+
 === Preloading and Normalizing Question Sets at Application Startup
 
 To ensure a consistent and balanced number of questions per category in the application, we decided to preload and normalize the question sets during application startup.
