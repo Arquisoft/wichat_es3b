@@ -5,42 +5,7 @@ ifndef::imagesdir[:imagesdir: ../images]
 
 == Building Block View
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Content
-The building block view shows the static decomposition of the system into building blocks (modules, components, subsystems, classes, interfaces, packages, libraries, frameworks, layers, partitions, tiers, functions, macros, operations, data structures, ...) as well as their dependencies (relationships, associations, ...)
 
-This view is mandatory for every architecture documentation.
-In analogy to a house this is the _floor plan_.
-
-.Motivation
-Maintain an overview of your source code by making its structure understandable through
-abstraction.
-
-This allows you to communicate with your stakeholder on an abstract level without disclosing implementation details.
-
-.Form
-The building block view is a hierarchical collection of black boxes and white boxes
-(see figure below) and their descriptions.
-
-image::05_building_blocks-EN.png["Hierarchy of building blocks"]
-
-*Level 1* is the white box description of the overall system together with black
-box descriptions of all contained building blocks.
-
-*Level 2* zooms into some building blocks of level 1.
-Thus it contains the white box description of selected building blocks of level 1, together with black box descriptions of their internal building blocks.
-
-*Level 3* zooms into selected building blocks of level 2, and so on.
-
-
-.Further Information
-
-See https://docs.arc42.org/section-5/[Building Block View] in the arc42 documentation.
-
-****
-endif::arc42help[]
 
 === Whitebox Overall System
 
@@ -77,9 +42,11 @@ This view describes the decomposition of the WIChat system into several building
 Contained Building Blocks::
 
 - **Webapp**: Manages the user interface and game logic.
-- **User Authentication Service**: Handles user registration and login.
+- **User Authentication Service**: Handles user authentication by validating login credentials and issuing a JWT token upon successful verification.
+- **User Stats Service**: Handles user stats about the games played.
+- **User Service**: Handles user registration and manages API key generation and validation for secure access.
 - **Question Service**: Generates and retrieves questions.
-- **Hint Generation Service**: Provides hints for users during the quiz.
+- **LLM Service**: Provides hints for users during the quiz.
 - **API Gateway**: Routes requests between the frontend and backend.
 - **Database**: Stores user data and question-related metadata.
 
@@ -115,7 +82,9 @@ endif::arc42help[]
 | Webapp |Main entry point for users. It renders the graphical interface and executes game logic in client.
 | API Gateway |Central request router between the Webapp and backend services.
 | Question Service | Generates and retrieves system questions, based on catrgory and difficulty level.
-| User Authentication Service | Manages user registration, authentication and administration.
+| User Authentication Service | Verifies login credentials and issues secure tokens for authenticated access.
+| User Service | Registers new users and manages the lifecycle of API keys for client authorization.
+| User Stats Service | Collects and updates user performance data from played games.
 | Hint Generation Service | Generates hints for questions based on difficulty level, by means of a LLM.
 | Database | Stores user information and questions. Recieves requests to store questions and manages credentials.
 |===
@@ -143,7 +112,7 @@ image:5.2_WebappDiagram.png[]
 | **Name** | **Responsibility** 
 |UI Renderer|Renders interface elements.
 |Game |Controls application logic rules.
-|GameView |Controls the Game.
+|PlayView |Controls the Game.
 |API Client|Manages calls to backend services.
 |===
 
@@ -161,7 +130,7 @@ image:5.2_QuestionServiceDiagram.png[]
 |===
 | **Name** | **Responsibility** 
 |Question Repository|Accesses and manipulates data in the database.
-|Difficulty Manager|Adjusts questions based on difficulty.
+|Category Handler |Generates questions for the specified categories.
 |WikiData Fetcher|Queries WikiData for relevant information.
 |===
 

@@ -3,35 +3,6 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-glossary]]
 == Glossary
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Contents
-The most important domain and technical terms that your stakeholders use when discussing the system.
-
-You can also see the glossary as source for translations if you work in multi-language teams.
-
-.Motivation
-You should clearly define your terms, so that all stakeholders
-
-* have an identical understanding of these terms
-* do not use synonyms and homonyms
-
-
-.Form
-
-A table with columns <Term> and <Definition>.
-
-Potentially more columns in case you need translations.
-
-
-.Further Information
-
-See https://docs.arc42.org/section-12/[Glossary] in the arc42 documentation.
-
-****
-endif::arc42help[]
-
 [cols="e,2e" options="header"]
 |===
 |Term |Definition
@@ -51,6 +22,12 @@ endif::arc42help[]
 |Back-end
 |Back-end is responsible for the server, database and application logic.
 
+|Container
+|A container is a lightweight, standalone, executable package that includes everything needed to run a piece of software, including the code, runtime, libraries and system tools.
+
+|Database
+|A database is an organized collection of structured information or data, typically stored electronically in a computer system.
+
 |API
 |APIs are mechanisms that allow two software components to communicate with each other through a set of definitions and protocols.
 
@@ -65,4 +42,19 @@ endif::arc42help[]
 
 |Hint
 |A suggestion or help provided by the LLM to assist the user in answering a question. It is generated in response to a prompt created by us, using the information from the saved question.
+
+|Unit Tests
+|Unit tests are used to test individual components of your code in isolation. They are typically small and fast, allowing you to run them frequently during development.
+
+|Code Coverage
+|Code coverage is a measure of how much of your code is executed during tests. It helps identify untested parts of your code and can be used to improve test quality.
+
+|Security Hotspots
+|Security hotspots are areas of your code that may be vulnerable to security issues. They are typically identified by static analysis tools and should be reviewed carefully.
+
+|E2E Tests
+|End-to-end tests are used to test the entire application from start to finish. They simulate real user interactions and verify that the application behaves as expected.
+
+|Load tests
+|Load tests are used to test the performance of your application under heavy load. They simulate multiple users interacting with the application simultaneously and measure response times and resource usage.
 |===

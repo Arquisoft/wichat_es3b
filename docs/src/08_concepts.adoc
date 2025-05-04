@@ -4,58 +4,7 @@ ifndef::imagesdir[:imagesdir: ../images]
 == Cross-cutting Concepts
 
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Content
-This section describes overall, principal regulations and solution ideas that are relevant in multiple parts (= cross-cutting) of your system.
-Such concepts are often related to multiple building blocks.
-They can include many different topics, such as
 
-* models, especially domain models
-* architecture or design patterns
-* rules for using specific technology
-* principal, often technical decisions of an overarching (= cross-cutting) nature
-* implementation rules
-
-
-.Motivation
-Concepts form the basis for _conceptual integrity_ (consistency, homogeneity) of the architecture. 
-Thus, they are an important contribution to achieve inner qualities of your system.
-
-Some of these concepts cannot be assigned to individual building blocks, e.g. security or safety. 
-
-
-.Form
-The form can be varied:
-
-* concept papers with any kind of structure
-* cross-cutting model excerpts or scenarios using notations of the architecture views
-* sample implementations, especially for technical concepts
-* reference to typical usage of standard frameworks (e.g. using Hibernate for object/relational mapping)
-
-.Structure
-A potential (but not mandatory) structure for this section could be:
-
-* Domain concepts
-* User Experience concepts (UX)
-* Safety and security concepts
-* Architecture and design patterns
-* "Under-the-hood"
-* development concepts
-* operational concepts
-
-Note: it might be difficult to assign individual concepts to one specific topic
-on this list.
-
-image::08-concepts-EN.drawio.png["Possible topics for crosscutting concepts"]
-
-
-.Further Information
-
-See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
-****
-endif::arc42help[]
 === Domain concepts
 ==== Domain model
 
@@ -93,10 +42,22 @@ We have decided that our architecture will be based on microservices,but as the 
 
 === Build, Test, Deploy
 
-The project follows a CI/CD pipeline that automates the build, test, and deployment processes using GitHub Actions. This ensures that the application is always up-to-date and working correctly.
-Deployment is done manually to Azure. Each service is deployed in a container, and the frontend is exposed via a public IP.
+The project follows a CI/CD pipeline that automates build, test, and deployment processes using GitHub Actions. This ensures that the application is always up-to-date and functioning correctly.
+
+We have performed both coverage testing to ensure that key parts of the application logic are tested, and load testing to verify performance under heavy use. These tests help ensure a stable and reliable system.
+
+Deployment is handled in two environments: locally using Docker containers for development and testing purposes, and in the cloud via Microsoft Azure for production deployment. Each service runs in a container, and the frontend is exposed through a public IP address.
 
 === Usability
 
 Usability is crucial for any application, as it directly impacts user interaction efficiency. To ensure our app’s usability, we conducted extensive user research, leading to an intuitive interface design. Employing a user-centric approach throughout development, we prioritized user experience, facilitating easy navigation.
 
+=== Internationalization
+We have implemented internationalization (i18n) to support both English and Spanish.
+This includes not only the user interface but also the question content, ensuring that the entire experience is localized based on the user's language preference.
+
+=== Monitoring
+
+The application includes a monitoring setup using Prometheus and Grafana. Prometheus collects real-time metrics from different services, such as request rates, response times, and error counts. These metrics are visualized in Grafana through custom dashboards, which help the development team track performance and availability.
+
+This setup allows early detection of anomalies or bottlenecks, ensuring a stable and responsive user experience.

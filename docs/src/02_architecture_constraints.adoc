@@ -8,10 +8,13 @@ ifndef::imagesdir[:imagesdir: ../images]
 [options="header",cols="1,2"]
 |===
 |Constraint|Description
-|Wikidata|The application must interact with Wikidata to generate the questions and answers.
+|Wikidata|All visual and textual content related to questions must be automatically created using structured data from Wikidata.
 |Git and GitHub|The project will have version control through Git. The repository will be in GitHub, where issues, "project" and wiki will be useful for project tracking.
 |LLM|The application must have a bot chat to interact with it. The chat have to be made by an LLM.
-|Azure|Azure defines the deployment environment, available services, and cost limitations. This affects architectural decisions such as scalability options, storage solutions, and integration choices.
+|Deployment|The complete system must be deployed on a public server or cloud platform, ensuring that users can access and use the application from anywhere via a URL, not just in local or development environments.
+|Monitoring|The deployed system must include monitoring and observability mechanisms, such as performance logging, error tracking, and health checks, to detect issues early and ensure system reliability over time.
+|Automated Testing and Integration|The project must adopt DevOps practices, including unit and integration testing, code linting, and automated CI/CD pipelines to ensure safe, consistent deployments and maintainable code.
+|Documented REST API|A unified, well-documented RESTful API must expose both user data (e.g., registration, scores, game history) and quiz data (e.g., questions, answers, metadata).
 |===
 
 === Convention Constraints
@@ -32,27 +35,3 @@ ifndef::imagesdir[:imagesdir: ../images]
 |Technical knowledge|The development team consists of students who are beginners with the technologies used.
 |Testing|Testing: The team has limited experience with automated testing, which may impact the speed and coverage of testing during development.
 |===
-
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Contents
-Any requirement that constraints software architects in their freedom of design and implementation decisions or decision about the development process. These constraints sometimes go beyond individual systems and are valid for whole organizations and companies.
-
-.Motivation
-Architects should know exactly where they are free in their design decisions and where they must adhere to constraints.
-Constraints must always be dealt with; they may be negotiable, though.
-
-.Form
-Simple tables of constraints with explanations.
-If needed you can subdivide them into
-technical constraints, organizational and political constraints and
-conventions (e.g. programming or versioning guidelines, documentation or naming conventions)
-
-
-.Further Information
-
-See https://docs.arc42.org/section-2/[Architecture Constraints] in the arc42 documentation.
-
-****
-endif::arc42help[]

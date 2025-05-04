@@ -1,29 +1,29 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
 == Architectural decisions
-=== Use of Large Language Models (LLMs) in the System
-We will use LLM in our question-and-answer application to generate hints during
-the user's turn.
+=== Use Empathy Models as Large Language Models (LLMs) in the System
+We need to integrate a Large Language Model (LLM) into our question-and-answer application to generate hints during the user's turn. Therefore, we decided to use the LLM models associated with the API key provided by the teachers.
 
 *_Decision:_* +
+
 It was decided to integrate Large Language Models (LLMs) through external APIs to generate real-time responses and hints. +
 The selected models are Mistral-7B-Instruct-v0.3 and Qwen2.5-Coder-7B-Instruct, both from Empathy AI
 because it is the API key that has been provided to us and allows us to access both easily with the same API key, improving our resilience in case of external failure by any of the models .
 
 *Consequences* +
+
 Consequently, we need a structured knowledge source, in our case Wikidata,
 from which we will extract and process the information to provide it to the user and also we must learn to create effective prompts.
 
 To know more about Prompt Engineering link:https://github.com/Arquisoft/wichat_es3b/issues/4[Issue #4].
 
-=== Using Wikidata as the main knowledge base
-We require a structured and up-to-date knowledge base, so we decided to utilize Wikidata
-as the primary information source. +
+=== Using SPARQL to comunicate with Wikidata
+We needed to use Wikidata, so we chose SPARQL to construct queries and retrieve the associated information. +
 Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
 
 *Justification*
 
- - Wikidata is an open, structured database offering information in RDF and SPARQL formats.
+ - Wikidata is an open knowledge base, and SPARQL is the most widely used method for retrieving information from it.
  - It enables flexible integrations with our backend systems.
 
 *Consequences*
@@ -60,7 +60,7 @@ Furthermore, it is a great opportunity for many of us to learn how to use this i
 
 New knowledge about Node.js link:https://github.com/Arquisoft/wichat_es3b/issues/3[Issue #3]
 
-=== Selecting MongoDB for the Database
+=== Selecting MongoDB Atlas for the Database
 Due to the requirement for flexible storage of structured and unstructured data,
 we have chosen a NoSQL database over SQL.  +
 Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%80%90-10-02-2025[Acta 2 ‐ 10 02 2025].
@@ -68,12 +68,15 @@ Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%8
 
 *Justification*
 
- - It facilitates the storage of semi-structured data in JSON format.
+ - Makes easier the storage of semi-structured data in JSON format.
  - It works very well with Node.js and is highly scalable.
+ - With the online version of MongoDB we can easily manage the database and scale it as needed.
+ - The online version increases disponibility and reduces the need for maintenance.
 
 *Consequences* +
 Query optimization may be required for handling large data volumes. Although we
 have had some exposure to NoSQL databases, further training and development in this area will be necessary to optimize their usage.
+If we need a bigger version of the database, we will have to pay for it.
 
 To learn basic concepts about MongoDb and practice examples link:https://github.com/Arquisoft/wichat_es3b/issues/9[Issue #9].
 
@@ -111,54 +114,116 @@ Decision made in link:https://github.com/Arquisoft/wichat_es3b/wiki/Acta-2-%E2%8
 - Learning Curve: Developers will need to get comfortable with asynchronous programming and patterns like Promises or async/await.
 - Maintenance: While efficient, Node.js requires ongoing monitoring to maintain performance, especially as the app scales.
 
+=== Implement the API service in a extra container
+We need to implement an API service to provide access to user data and the questions generated. To achieve this, we will deploy it as a separate service in its own container.
+
+*Justification*
+
+- Microservice independence: By isolating the API service in its own container, we can independently scale and manage it without affecting other services.
+- Easier access control: This separation allows for more granular access control and security measures, ensuring that only authorized services can interact with the API.
+
+*Consequences*
+
+- More complicated deployment: We need to ensure that the API service is properly configured and can communicate with other services in the system.
+- Increased complexity: This separation may introduce additional complexity in terms of service discovery and inter-service communication.
+
+=== Using Gatling to make the performance tests
+We need to ensure that our application can handle a large number of concurrent users and requests. To achieve this, we will use Gatling to perform performance tests on our system.
+
+*Justification*
+
+- Scalability: Gatling is designed to simulate a large number of users and can easily scale to test the performance of our application under heavy load.
+- Guide: we already have a guide in the course documentation that explains how to use Gatling for performance testing.
+
+*Consequences*
+
+- Learning curve: Some team members may need to familiarize themselves with Gatling and its configuration.
+- Difficulty in interpreting results: Analyzing the results of performance tests can be complex, and we need to ensure that we have the necessary expertise to interpret the data correctly.
+
+=== Using Graphana and Prometheus for monitoring
+We need to monitor our application to ensure its performance and reliability. To achieve this, we will use Prometheus for data collection and Graphana for visualization.
+
+*Justification*
+
+- Open-source: Both Prometheus and Graphana are open-source tools, which means we can use them without incurring additional costs.
+- Flexibility: Prometheus allows us to collect metrics from various sources, and Graphana provides a powerful visualization layer to analyze the data.
+- Guide: we already have a guide in the course documentation that explains how to use Prometheus and Graphana for monitoring.
+
+*Consequences*
+- Learning curve: Some team members may need to familiarize themselves with Prometheus and Graphana and their configuration.
+- Integration: We need to ensure that works on local and remote environments, which may require additional configuration and testing.
+
+=== Not using another proyect as base
+Although we could have used an existing project as the foundation for our application, we chose to build it from scratch and instead use other repositories only as references.
+
+*Justification*
+- Customization: By starting from scratch, we can tailor the application to our specific needs and requirements without being constrained by the limitations of an existing project.
+- Familiarity: It's easier for the team to understand and maintain the codebase when we build it from the ground up, rather than trying to decipher someone else's code.
+
+*Consequences*
+- Higher initial effort: Starting from scratch requires more time and effort to set up the project and implement the necessary features.
+
+=== Implementing an APIkey sistem to the API Service
+We decided to implement an authentication system for the API service to ensure that only authorized users can access the data and functionalities it provides. Authentication is based on the user's email, which is stored separately from gameplay data to avoid exposing sensitive information and to allow non-player users to access the API securely.
+
+*Justification*
+- Security: By implementing an API key system, we can control access to the API and prevent unauthorized users from accessing sensitive data or services.
+- Improving the overall value of the API: By requiring an API key, we can track usage and monitor performance, which can help us identify potential issues and improve the overall quality of the API.
+
+*Consequences*
+
+- Increased complexity: Implementing an API key system adds complexity to the API service, as we need to manage the generation, distribution (frontend), and validation of API keys.
+- User experience: Requiring an API key may create additional friction for users, as they need to obtain and manage the key to access the API.
+
+=== Customicing our Build process to ensure the aplication keeps on a consistent state
+
+Due to errors encountered during the deployment process, we decided to customize our build pipeline to ensure the application remains in a consistent state and that all tests are successfully completed before deploying to production. The default configuration only runs unit tests, but we also require all end-to-end tests to pass before any production deployment.
+
+*Justification*
+
+- Quality assurance: By customizing the build process to include end-to-end tests, we can ensure that the application is functioning correctly and that all components are working together as expected.
+- Consistency: This approach helps maintain a consistent state across different environments, reducing the risk of deployment issues and ensuring that the application behaves as expected in production.
+
+*Consequences*
+
+- Increased complexity: Customizing the build process adds complexity to the deployment pipeline, as we need to ensure that all tests are properly configured and executed.
+- Longer github actions duration: Including end-to-end tests in the build process may increase the time it takes to complete the build and deployment process, which could impact the speed of development and deployment cycles.
+
+=== Azure as the deployment environment
+We decided to use Azure as the deployment environment for our application.
+
+*Justification*
+
+- Familiarity: All the team members have some experience with Azure due to SEW, which will make it easier to set up and manage the deployment process.
+- MVs customization: Azure allows us to customize the deployment process and configure the environment to meet our specific needs, which is important for our application.
+- Scalability: Azure provides a scalable infrastructure that can handle the expected load of our application, ensuring that it can grow as needed.
+- Free students plan: Azure offers a free plan for students, which allows us to deploy our application without incurring additional costs.
+- Disponibility: Azure provides a reliable and highly available infrastructure, ensuring that our application remains accessible to users at all times.
+
+*Consequences*
+
+- Limited cost: The free plan has limitations on resources and usage, which may impact the performance and scalability of our application.
+- Limited exprience: we are no experts in Azure, so we may encounter challenges during the deployment process. However, we can rely on the knowledge gained from SEW and the documentation provided by Azure to overcome these challenges.
 
 === Preloading and Normalizing Question Sets at Application Startup
 
 To ensure a consistent and balanced number of questions per category in the application, we decided to preload and normalize the question sets during application startup.
   
 At the moment the application starts, each question category will be processed to ensure exactly 60 questions are available:
-- If a category contains fewer than 60 questions, new ones will be generated to reach 60.
-- If a category contains more than 60 questions, 4 will be removed at random and replaced with 4 newly generated ones.
 
-*Justification*  
+- If a category contains fewer than 60 questions, new ones will be generated to reach 60.
+
+- If a category contains more than 60 questions, 4 from each theme will be removed at random and replaced with 4 newly generated ones.
+
+*Justification*
+
 This approach ensures that all categories offer a uniform and fair gameplay experience by maintaining a consistent number of questions, avoiding categories with too few or too many. 
 It also guarantees regular content refreshment in overpopulated categories to prevent repeated questions and improve user engagement.
 Additionally, centralizing this logic at startup simplifies runtime operations and reduces delays during the user's turn.
 
-*Consequences*  
+*Consequences*
+
 - We must implement logic to identify under and overpopulated categories and interface this with the question generation module.
 - Startup time may slightly increase, especially if many questions need to be generated.
 - No changes are required to the current data model or storage structure.
 
-
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Contents
-Important, expensive, large scale or risky architecture decisions including rationales.
-With "decisions" we mean selecting one alternative based on given criteria.
-
-Please use your judgement to decide whether an architectural decision should be documented
-here in this central section or whether you better document it locally
-(e.g. within the white box template of one building block).
-
-Avoid redundancy. 
-Refer to section 4, where you already captured the most important decisions of your architecture.
-
-.Motivation
-Stakeholders of your system should be able to comprehend and retrace your decisions.
-
-.Form
-Various options:
-
-* ADR (https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions[Documenting Architecture Decisions]) for every important decision
-* List or table, ordered by importance and consequences or:
-* more detailed in form of separate sections per decision
-
-.Further Information
-
-See https://docs.arc42.org/section-9/[Architecture Decisions] in the arc42 documentation.
-There you will find links and examples about ADR.
-
-****
-endif::arc42help[]
