@@ -467,8 +467,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-solution-strategy">4. Solution Strategy</a>
 <ul class="sectlevel2">
-<li><a href="#_decissions_made_to_achieve_quality_goals">4.1. Decissions made to achieve quality goals</a></li>
-<li><a href="#_relevant_organizational_decisions">4.2. Relevant organizational decisions</a></li>
+<li><a href="#_technologiy_decisions">4.1. Technologiy decisions:</a></li>
+<li><a href="#_decissions_made_to_achieve_quality_goals">4.2. Decissions made to achieve quality goals</a></li>
+<li><a href="#_relevant_organizational_decisions">4.3. Relevant organizational decisions</a></li>
 </ul>
 </li>
 <li><a href="#section-building-block-view">5. Building Block View</a>
@@ -482,11 +483,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_sign_in">6.1. Sign In</a></li>
 <li><a href="#_log_in">6.2. Log In</a></li>
-<li><a href="#_new_question">6.3. New Question</a></li>
+<li><a href="#_generate_questions">6.3. Generate Questions</a></li>
 <li><a href="#_new_clue">6.4. New Clue</a></li>
-<li><a href="#_check_record">6.5. Check Record</a></li>
-<li><a href="#_api_access_ask_for_questions">6.6. API Access - Ask for questions</a></li>
-<li><a href="#_api_access_ask_for_user_records">6.7. API Access - Ask for user records</a></li>
+<li><a href="#_get_ranking_and_stats_from_the_top_player">6.5. Get Ranking and stats from the top player</a></li>
 </ul>
 </li>
 <li><a href="#section-deployment-view">7. Deployment View</a>
@@ -497,10 +496,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-concepts">8. Cross-cutting Concepts</a>
 <ul class="sectlevel2">
-<li><a href="#_domain_concepts">8.1. <em>Domain concepts</em></a></li>
-<li><a href="#_microservices_architecture">8.2. <em>Microservices architecture</em></a></li>
-<li><a href="#_build_test_deploy">8.3. <em>Build, Test, Deploy</em></a></li>
-<li><a href="#_usability">8.4. <em>Usability</em></a></li>
+<li><a href="#_domain_concepts">8.1. Domain concepts</a></li>
+<li><a href="#_service_oriented_architecture">8.2. Service-oriented architecture</a></li>
+<li><a href="#_build_test_deploy">8.3. Build, Test, Deploy</a></li>
+<li><a href="#_usability">8.4. Usability</a></li>
 </ul>
 </li>
 <li><a href="#_architectural_decisions">9. Architectural decisions</a>
@@ -709,31 +708,35 @@ If requirements documents exist this overview should refer to these documents.</
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>1</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Usability</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>Usability</em></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>All people should be able to enjoy and finish with success the application within a reasonable
 limit of time</em></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>2</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Maintainability</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>Maintainability</em></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>The application should be easy to maintain, with clear, well-documented code and modular
 design that allows for future updates.</em></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>3</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Accessibility</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>Accessibility</em></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>The application should be usable by people with various disabilities, meeting common
 accessibility standards</em></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>4</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Availability</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The application should be available with minimal downtime, aiming for 99.9% uptime or better,
-and should be scalable to handle user demand</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>Availability</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>While the application initially aimed for a 99.9% availability target, this level of uptime
+typically requires production-grade infrastructure, including redundancy, autoscaling, and service-level agreements (SLAs)
+provided by cloud providers.
+Since this project is hosted on Microsoft Azure using student credits, it does not benefit from guaranteed SLAs or high-availability
+configurations. Therefore, a more realistic expectation for availability is in the range of 99.0% to 99.5%, which allows for occasional
+downtime due to maintenance, restarts, or limited resource allocations in the free tier.</em></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>5</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Reliability</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>Reliability</em></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>The application should operate consistently and recover quickly from failures</em></p></td>
 </tr>
 </tbody>
@@ -880,6 +883,10 @@ viewers to use it.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">LLM</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The application must have a bot chat to interact with it. The chat have to be made by an LLM.</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Azure</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Azure defines the deployment environment, available services, and cost limitations. This affects architectural decisions such as scalability options, storage solutions, and integration choices.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -905,6 +912,10 @@ viewers to use it.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The project deadline is May 5th, but there will be sprints during the process. Important dates are February 24th for the first verion of de documentation, March 17th for a prototype of the application, and April 7th for an almost finished application.</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Code Maintainability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">We follow Clean Code principles to ensure maintainability, making the code easy to read, modify, and extend over time.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -927,8 +938,12 @@ viewers to use it.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The team is made up of seven members who never worked together. The members will reunite at least one time per week to catch up on work and establish next objectives.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The project deadline is May 5th, but there will be sprints during the process. Important dates are February 24th for the first verion of de documentation, March 17th for a prototype of the application, and April 7th for an almost finished application.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Technical knowledge</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The development team consists of students who are beginners with the technologies used.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Testing</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Testing: The team has limited experience with automated testing, which may impact the speed and coverage of testing during development.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1052,7 +1067,7 @@ The title of the table is the name of your system, the three columns contain the
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>WIKIDATA</em></strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Data queries (probably in SPARQL)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Data queries</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Question and Answer Data (JSON format)</p></td>
 </tr>
 <tr>
@@ -1083,7 +1098,7 @@ together with a mapping table showing the relationships between channels and inp
 </div>
 </div>
 <div class="paragraph">
-<p><span class="image"><img src="./images/technical-context-diagram.png" alt="technical context diagram"></span></p>
+<p><span class="image"><img src="./images/technical-context-diagram.png" alt="Technical Context diagram"></span></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -1100,19 +1115,24 @@ together with a mapping table showing the relationships between channels and inp
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>Question service</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>wikiquestion service</em></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Question data-index</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Questions and answers</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>User service</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>authservice</em></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Login info</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">User info (account page)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>History service</em></strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Session user info</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">User&#8217;s history</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>userservice</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">New user info</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User info (account page)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>statsservice</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User&#8217;s history and stats</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>LLM service</em></strong></p></td>
@@ -1192,28 +1212,27 @@ Refer to details in the following sections.</p>
 <div class="paragraph">
 <p>We develop an application of questions, like 'Saber y Ganar', in which the main objetive is to comunicate with a chatbot to obtain some hints for answer correctly each question.</p>
 </div>
-<div class="paragraph">
-<p>We start from a ready-make application, which condition us when making some of the technical decisions.</p>
-</div>
+<div class="sect2">
+<h3 id="_technologiy_decisions">4.1. Technologiy decisions:</h3>
 <div class="ulist">
-<div class="title">Technologies used:</div>
 <ul>
 <li>
-<p>JavaScript: JavaScript is a very flexible programming language widely used in software development. Besides, we decided to continue with this language due to the base application.</p>
+<p>JavaScript: JavaScript is a very flexible programming language widely used in software development.</p>
 </li>
 <li>
 <p>Node.js: Node.js is used to create server-side applications with JavaScript, so we decided to use it to make the back-end of our web app.</p>
 </li>
 <li>
-<p>MongoDB: MongoDB is an open-source NoSQL database that uses a document-based data model for information storage and retrieval. Again its use is mainly due to the legacy project.</p>
+<p>MongoDB: MongoDB is an open-source NoSQL database that uses a document-based data model for information storage and retrieval. We use MongoDB Atlas for running a Mongo database in the cloud.</p>
 </li>
 <li>
-<p>React JS: It&#8217;s a framework widely used to create user interface components. Chosen for the large volume of documentation and the fact that it is the framework used during the previous app.</p>
+<p>React JS: It&#8217;s a framework widely used to create user interface components. Chosen for the large volume of documentation.</p>
 </li>
 </ul>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_decissions_made_to_achieve_quality_goals">4.1. Decissions made to achieve quality goals</h3>
+<h3 id="_decissions_made_to_achieve_quality_goals">4.2. Decissions made to achieve quality goals</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1229,7 +1248,7 @@ Refer to details in the following sections.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_relevant_organizational_decisions">4.2. Relevant organizational decisions</h3>
+<h3 id="_relevant_organizational_decisions">4.3. Relevant organizational decisions</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1676,7 +1695,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/SignIn%20diagram.svg" alt="SignIn diagram" width="734" height="514">
+<img src="./images/SignIn%20diagram.svg" alt="SignIn diagram" width="737" height="514">
 </div>
 </div>
 </div>
@@ -1692,13 +1711,13 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 </div>
 <div class="sect2">
-<h3 id="_new_question">6.3. New Question</h3>
+<h3 id="_generate_questions">6.3. Generate Questions</h3>
 <div class="paragraph">
-<p>A user wants to start a new round, it can be a new question or start a new game. The system generates a new question and shows it to the user. The user answers the question and the system validates the answer. The system updates the user&#8217;s score and stats, then shows the results to the user.</p>
+<p>The admin wants to generate new questions to be stored in the database for later use during gameplay. This process is handled in the backend, using the Wikidata API to retrieve relevant data.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/New%20question.svg" alt="New question" width="878" height="757">
+<img src="./images/New%20question.svg" alt="New question" width="1886" height="678">
 </div>
 </div>
 </div>
@@ -1714,35 +1733,13 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 </div>
 <div class="sect2">
-<h3 id="_check_record">6.5. Check Record</h3>
+<h3 id="_get_ranking_and_stats_from_the_top_player">6.5. Get Ranking and stats from the top player</h3>
 <div class="paragraph">
-<p>A user wants to check the record of a game session. The system loads all records and the user selects one to see the details. The system loads the details of the record and shows them to the user.</p>
+<p>The user accesses the player ranking via the web application. The request is routed through the gateway to the statsservice, which fetches and returns the ranking data. The user then selects the top player to view detailed statistics, which are also retrieved from the statsservice and displayed in the UI.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Question%20record.svg" alt="Question record" width="758" height="609">
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_api_access_ask_for_questions">6.6. API Access - Ask for questions</h3>
-<div class="paragraph">
-<p>The user wants to document an API access scenario where a user asks for questions. The system processes the request  and returns the questions to the user.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="./images/API%20Access%20-%20Questions.svg" alt="API Access   Questions" width="605" height="427">
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_api_access_ask_for_user_records">6.7. API Access - Ask for user records</h3>
-<div class="paragraph">
-<p>A user wants to check the stats of a user. The system loads the stats of the user asked for.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="./images/API%20Access%20-%20Records.svg" alt="API Access   Records" width="563" height="427">
+<img src="./images/Question%20record.svg" alt="Question record" width="929" height="609">
 </div>
 </div>
 <div style="page-break-after: always;"></div>
@@ -1845,7 +1842,7 @@ when your infrastructure is more complex.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Scalability:</strong> The containerized microservices architecture allows for scaling individual components based on demand.</p>
+<p><strong>Scalability:</strong> The containerized service-oriented architecture allows for scaling individual components based on demand.</p>
 </li>
 <li>
 <p><strong>Portability:</strong> Docker containers ensure consistent execution across various environments.</p>
@@ -1868,7 +1865,7 @@ when your infrastructure is more complex.</p>
 <p><strong>User Interface:</strong> Delivered via a web application hosted on an Azure virtual machine.</p>
 </li>
 <li>
-<p><strong>Microservices:</strong> Packaged as Docker containers within the Azure VM, each responsible for distinct functionalities (e.g., user management or question generation).</p>
+<p><strong>Services:</strong> Packaged as Docker containers within the Azure VM, each responsible for distinct functionalities (e.g., user management or question generation).</p>
 </li>
 <li>
 <p><strong>Persistence Layer:</strong> A dedicated container hosting the database, accessible only to internal services.</p>
@@ -1919,14 +1916,14 @@ The Azure VM was selected for its reliability and integrated security features. 
 <div class="sect3">
 <h4 id="_docker_container_environment">7.2.2. Docker Container Environment</h4>
 <div class="paragraph">
-<p>Within the Azure VM, the Docker engine orchestrates several containers, each encapsulating a microservice. This environment supports modular development and independent scalability.</p>
+<p>Within the Azure VM, the Docker engine orchestrates several containers, each encapsulating a service. This environment supports modular development and independent scalability.</p>
 </div>
 <div class="paragraph">
 <p><span class="image"><img src="./images/diagram-7_3.png" alt="diagram 7 3"></span></p>
 </div>
 <div class="paragraph">
 <p><em>Explanation</em>:
-The Docker container environment isolates each microservice, enabling independent updates and robust fault tolerance. Internal communication is handled through the Docker network, ensuring efficient and secure interactions between services.</p>
+The Docker container environment isolates each service, enabling independent updates and robust fault tolerance. Internal communication is handled through the Docker network, ensuring efficient and secure interactions between services.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -1945,16 +1942,24 @@ The Docker container environment isolates each microservice, enabling independen
 <td class="tableblock halign-left valign-top"><p class="tableblock">Runs in the Web Application Container on the Azure VM, accessible to users via HTTP/HTTPS.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Microservices (User Service, Question Service, LLM Service)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Each microservice is packaged in its own Docker container within the Docker Engine on the Azure VM, communicating over an isolated internal network.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">API Service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runs in a secure Docker container. Access is restricted via credentials with no public exposure by default.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Persistence (Database)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Services (authservice, userservice, statsservice, llmservice, wikiquestionservice)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Each service is packaged in its own Docker container within the Docker Engine on the Azure VM, communicating over an isolated internal network.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Gateway Service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Acts as a single entry point for client requests. Deployed in its own Docker container, it routes traffic to internal services.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Persistence(mongodb)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Deployed as a dedicated container, ensuring secure data storage and access limited to internal services.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">External API (Wikidata)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Accessed securely over the public internet by relevant microservices.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Monitoring (Prometheus, Grafana)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Deployed as separate containers. Prometheus collects metrics from services; Grafana provides dashboards for visualization and analysis. Both are accessible internally for observability.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2066,15 +2071,15 @@ on this list.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_domain_concepts">8.1. <em>Domain concepts</em></h3>
+<h3 id="_domain_concepts">8.1. Domain concepts</h3>
 <div class="sect3">
-<h4 id="_domain_model">8.1.1. <em>Domain model</em></h4>
+<h4 id="_domain_model">8.1.1. Domain model</h4>
 <div class="paragraph">
 <p><span class="image"><img src="./images/diagram-8_1.png" alt="diagram 8 1"></span></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_domain_description">8.1.2. <em>Domain description</em></h4>
+<h4 id="_domain_description">8.1.2. Domain description</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -2089,40 +2094,45 @@ on this list.</p>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">User</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a registered user of the application. Each user has a username, a password, and a creation date.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a user of the application.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Game</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a game session played by a user. It stores performance data such as the number of correct answers, time taken, score, and date. Each game is associated with one user and includes multiple questions.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UserRecord</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stores all the game sessions in which a user has participated and keeps their total score.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Stats</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Stores overall performance statistics for a user, such as total games played, accuracy ratio, and streak-related metrics.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GameSession</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a game session played by a user, storing all the questions, the choices made, and the total score.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Question</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a multilingual question shown in a game, including correct and incorrect answers, optional image and description metadata. A question can appear in multiple games.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents questions shown to the user by the application and stores the wrong choices, correct choices, and the text that is displayed.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choice</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents the choices that the user can make when answering a question. It stores the text of the choice and indicates if it was selected by the user.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_microservices_architecture">8.2. <em>Microservices architecture</em></h3>
+<h3 id="_service_oriented_architecture">8.2. Service-oriented architecture</h3>
 <div class="paragraph">
-<p><em>We have decided that our architecture will be based on microservices, which means that every part of the aplication will be divided in a service that performs a specific function. The services can communicate witch eachother using their repective APIs or via the shared database</em></p>
+<p>We have decided that our architecture will be based on microservices,but as the services are not fully decoupled at the data level it&#8217;s more accurate a service-oriented architecture, which means that every part of the aplication will be divided in a service that performs a specific function. The services can communicate witch eachother using their repective APIs or via the shared database.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_build_test_deploy">8.3. <em>Build, Test, Deploy</em></h3>
+<h3 id="_build_test_deploy">8.3. Build, Test, Deploy</h3>
 <div class="paragraph">
-<p><em>The project follows a CI/CD pipeline that automates the build, test, and deployment processes. This ensures that the application is always up-to-date and working correctly.</em></p>
+<p>The project follows a CI/CD pipeline that automates the build, test, and deployment processes using GitHub Actions. This ensures that the application is always up-to-date and working correctly.
+Deployment is done manually to Azure. Each service is deployed in a container, and the frontend is exposed via a public IP.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_usability">8.4. <em>Usability</em></h3>
+<h3 id="_usability">8.4. Usability</h3>
 <div class="paragraph">
-<p><em>Usability is crucial for any application, as it directly impacts user interaction efficiency. To ensure our app’s usability, we conducted extensive user research, leading to an intuitive interface design. Employing a user-centric approach throughout development, we prioritized user experience, facilitating easy navigation</em></p>
+<p>Usability is crucial for any application, as it directly impacts user interaction efficiency. To ensure our app’s usability, we conducted extensive user research, leading to an intuitive interface design. Employing a user-centric approach throughout development, we prioritized user experience, facilitating easy navigation.</p>
 </div>
 <div style="page-break-after: always;"></div>
 </div>
@@ -2477,13 +2487,13 @@ There you will find links and examples about ADR.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Q2.1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Mantainability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maintainability</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The addition of new questions must be quick and simple without interrupting the application flow. It should take approximately 5 minutes, this entailing no downtime for the application.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Q2.2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Mantainability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maintainability</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The system must allow the implementation of new game models with minimal changes to the existing codebase, which should not take more than 1 hour. There should not be any regression in existing game functionality.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
 </tr>
@@ -2491,12 +2501,6 @@ There you will find links and examples about ADR.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Q3.1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Accessibility</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The application must support screen readers for users with visual impairments, guaranteeing as well buttons and answers that are simple to read. All interactive elements must have alternative text, and the screen reader should process the entire game in under 30 seconds for each screen.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Q3.2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Accessibility</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An option for high-contrast mode for users with daltonism or another visual disability must be provided. The color contrast between text and background must have a contrast radio of at least 4.5:1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
 </tr>
 <tr>
@@ -2508,7 +2512,7 @@ There you will find links and examples about ADR.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Q5.1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Availability</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system must mantain 99.9% uptime over a month, including the peak usage period. Downtime must not overcome 45 minutes/month.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must mantain 99.5% uptime over a month, including the peak usage period. Downtime must not overcome 3 hours and 39 minutes/month.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
 </tr>
 <tr>
@@ -2610,6 +2614,12 @@ There you will find links and examples about ADR.</p>
 <th class="tableblock halign-left valign-top">Considerations</th>
 </tr>
 </thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Game logic is handled on the frontend instead of the backend</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ideally, the game logic should reside on the backend to improve security and maintainability. However, due to time constraints, it remains on the frontend for now. This refactor is planned for future iterations.</p></td>
+</tr>
+</tbody>
 </table>
 <div style="page-break-after: always;"></div>
 </div>
@@ -2690,6 +2700,22 @@ There you will find links and examples about ADR.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>API</em></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>APIs are mechanisms that allow two software components to communicate with each other through a set of definitions and protocols.</em></p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Wikidata</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A structured, free knowledge database containing information on a wide range of topics. The application retrieves questions and answers from this source.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Question</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A statement generated by the application based on Wikidata. Once generated, it is stored in the database for future retrieval. Users must provide an answer, with the option to request hints.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Answer</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A response generated and stored along with the question. For each question, there is one correct answer and three incorrect ones. The answers are stored in the database and are presented to the user as part of the question for them to choose from.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Hint</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A suggestion or help provided by the LLM to assist the user in answering a question. It is generated in response to a prompt created by us, using the information from the saved question.</em></p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -2698,7 +2724,7 @@ There you will find links and examples about ADR.</p>
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2025-05-02 18:54:24 +0200
+Last updated 2025-02-23 22:25:11 +0100
 </div>
 </div>
 </body>
