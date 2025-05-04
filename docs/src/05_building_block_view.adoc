@@ -130,7 +130,7 @@ image:5.2_QuestionServiceDiagram.png[]
 |===
 | **Name** | **Responsibility** 
 |Question Repository|Accesses and manipulates data in the database.
-|Difficulty Manager|Adjusts questions based on difficulty.
+|Category Handler |Generates questions for the specified categories.
 |WikiData Fetcher|Queries WikiData for relevant information.
 |===
 
