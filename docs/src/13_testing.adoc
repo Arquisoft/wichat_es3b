@@ -7,22 +7,12 @@ Testing is an important part of the development process. It helps ensure that yo
 
 === Unit Tests, Code Coverage & Security Hotspots
 
-Unit tests are used to test individual components of your code in isolation. They are typically small and fast, allowing you to run them frequently during development.
-
-Code coverage is a measure of how much of your code is executed during tests. It helps identify untested parts of your code and can be used to improve test quality.
-
-Security hotspots are areas of your code that may be vulnerable to security issues. They are typically identified by static analysis tools and should be reviewed carefully.
-
-In our project specifically:
-
 image:QualityGate.PNG[]
 
 We can observe that the code coverage is 82%, which is above the threshold of 80% set in the quality gate. This means that the code is well-tested and meets the quality standards.
 Also, 0 hotspots are presented, which means that the code does not contain any known big vulnerabilities.
 
 === E2E Tests
-
-End-to-end (E2E) tests are used to test the entire application from start to finish. They simulate real user interactions and verify that the application behaves as expected.
 
 image:e2e.PNG[]
 
@@ -32,27 +22,24 @@ These tests are run automatically as part of the CI/CD pipeline to ensure that t
 
 === Load Tests
 
-Load tests are used to test the performance of your application under heavy load. They simulate multiple users interacting with the application simultaneously and measure response times and resource usage.
+We have done several tests to identify exactly the capacity that the app can support.
 
-In the case of our application, we have done several tests to identify exactly the capacity that the app can support.
-
-==== 10 Ramp Users
+10 Ramp Users::
 We can observe that the application can handle 10 ramp users without any issues. The response times are low, and the system performs well.
 image:gameflow_rampusers_10.PNG[]
 
-==== 50 Ramp Users
+50 Ramp Users::
 When we increase the number of ramp users to 50, we can see the questions service starts to fail.
 image:gameflow_rampusers_50.PNG[]
-
 More than 50% of requests end in failure
 image:gameflow_rampusers_50_details_getQuestions.PNG[]
 
-==== 2000 Ramp Users
+2000 Ramp Users::
 When we increase the number of ramp users to 2000, we can see that now the questions service fails every time. But the other services are still able to handle the load.
 image:gameflow_rampusers_2000.PNG[]
 
-===== 22000 Ramp Users
-When we increase the number of ramp users to 22000, we can see that other services start to fail as well. The system is unable to handle the load, and response times increase significantly.
+2200 Ramp Users::
+When we increase the number of ramp users to 2200, we can see that other services start to fail as well. The system is unable to handle the load, and response times increase significantly.
 image:info1.png[]
 image:info2.png[]
 
@@ -91,6 +78,7 @@ On the other hand, we see that in addition to the question service, the LLM begi
 image:llm_rampusers_750.PNG[]
 * The request_1 represents the OPTIONS request, while the request_2 represents the POST request.
 
+=== Improvements
 ====
 
 After obtaining this data and reviewing what the problem could be, we found that with each request to the '/questionsDB' endpoint, a new connection to the database was created, which obviously slowed down the response time significantly.
