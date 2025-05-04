@@ -42,9 +42,11 @@ This view describes the decomposition of the WIChat system into several building
 Contained Building Blocks::
 
 - **Webapp**: Manages the user interface and game logic.
-- **User Authentication Service**: Handles user registration and login.
+- **User Authentication Service**: Handles user authentication by validating login credentials and issuing a JWT token upon successful verification.
+- **User Stats Service**: Handles user stats about the games played.
+- **User Service**: Handles user registration and manages API key generation and validation for secure access.
 - **Question Service**: Generates and retrieves questions.
-- **Hint Generation Service**: Provides hints for users during the quiz.
+- **LLM Service**: Provides hints for users during the quiz.
 - **API Gateway**: Routes requests between the frontend and backend.
 - **Database**: Stores user data and question-related metadata.
 
@@ -80,7 +82,9 @@ endif::arc42help[]
 | Webapp |Main entry point for users. It renders the graphical interface and executes game logic in client.
 | API Gateway |Central request router between the Webapp and backend services.
 | Question Service | Generates and retrieves system questions, based on catrgory and difficulty level.
-| User Authentication Service | Manages user registration, authentication and administration.
+| User Authentication Service | Verifies login credentials and issues secure tokens for authenticated access.
+| User Service | Registers new users and manages the lifecycle of API keys for client authorization.
+| User Stats Service | Collects and updates user performance data from played games.
 | Hint Generation Service | Generates hints for questions based on difficulty level, by means of a LLM.
 | Database | Stores user information and questions. Recieves requests to store questions and manages credentials.
 |===
