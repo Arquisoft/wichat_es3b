@@ -8,6 +8,7 @@
 <img src="webapp/src/assets/img/logo_base.png" height="100">
 </div>
 
+
 [App documentation](https://Arquisoft.github.io/wichat_es3b/)
 
 This is a base project for the Software Architecture course in 2024/2025. It is a basic application composed of several components.
@@ -72,3 +73,4 @@ The platform includes a leaderboard showing the Top 10 players with the highest 
 
 If you wish to use WIChat’s services externally, you can request an API key by entering your email address in the designated section.
 [API Documentation](http://20.68.249.150:8006/api-doc/)
+
